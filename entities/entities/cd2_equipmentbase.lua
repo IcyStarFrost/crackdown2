@@ -4,12 +4,15 @@ ENT.Base = "base_anim"
 ENT.WorldModel = "models/weapons/w_grenade.mdl"
 ENT.PrintName = "Equipment"
 
-ENT.Cooldown = 3
-ENT.MaxGrenadeCount = 8
-ENT.TrailColor = color_white
+-- Equipment settings
+ENT.Cooldown = 3 -- The time before the grenade can be used again
+ENT.MaxGrenadeCount = 8 -- The amount of grenades a player can have
+ENT.TrailColor = color_white -- The trail color
 ENT.DelayTime = 3 -- The time before the grenade blows up. 0 for no timed explosive
-ENT.TickSound = nil
+ENT.TickSound = nil -- The sound that will play as the grenade ticks
+--
 
+-- Util vars
 ENT.NextTickSound = 0 -- Then next time the tick sound will play
 ENT.Exploded = false -- If the grenade exploded or not
 

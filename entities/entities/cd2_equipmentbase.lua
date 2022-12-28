@@ -49,10 +49,12 @@ end
 function ENT:OnDelayEnd()
 end
 
+-- Make the equipment bounce less
 function ENT:PhysicsCollide( data, phys )
     phys:SetVelocity( data.OurNewVelocity / 2)
 end
 
+-- Function for simply throwing the equipment near a certain position
 function ENT:ThrowTo( pos )
     local phys = self:GetPhysicsObject()
     local dist = clamp( self:GetPos():Distance( pos ) * 150, 0, 100000 )

@@ -170,6 +170,7 @@ end
 
 -- Returns the position our bullets come from
 function ENT:GetShootPos()
+    if !IsValid( self:GetActiveWeapon() ) then return self:WorldSpaceCenter() end
     local muzzle = self:GetActiveWeapon():LookupAttachment( "muzzle" )
     if muzzle == 0 then return self:GetActiveWeapon():GetPos() end
     local attach = self:GetActiveWeapon():GetAttachment( muzzle )

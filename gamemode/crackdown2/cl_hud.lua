@@ -17,6 +17,7 @@ local surface_SetMaterial = surface.SetMaterial
 local surface_DrawRect = surface.DrawRect
 local player_GetAll = player.GetAll
 local draw_NoTexture = draw.NoTexture
+local IsValid = IsValid
 local surface_SetFont = surface.SetFont
 local surface_GetTextSize = surface.GetTextSize
 local table_Copy = table.Copy

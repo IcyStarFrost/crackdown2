@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/crackdown2/civilian/guitar/w_guitar"
+	"$bumpmap" "models/crackdown2/civilian/guitar/w_guitar_normal"
+}

@@ -1,0 +1,8 @@
+"crackdown2"
+{
+	"base"		"base"
+	"title"		"CRACKDOWN 2"
+	"maps"		"^cd2_"
+	"category"	"pve"
+	"menusystem"	"1"
+}

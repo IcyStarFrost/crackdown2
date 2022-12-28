@@ -19,7 +19,7 @@ function ENT:OnDelayEnd()
 
     if SERVER then
         local blast = DamageInfo()
-        blast:SetAttacker( self:GetThrower() or self )
+        blast:SetAttacker( IsValid( self:GetThrower() ) and self:GetThrower() or self )
         blast:SetInflictor( self )
         blast:SetDamage( 200 )
         blast:SetDamageType( DMG_BLAST )

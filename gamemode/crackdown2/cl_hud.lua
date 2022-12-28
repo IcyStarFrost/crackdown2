@@ -207,7 +207,7 @@ end
 
 hook.Add( "HUDPaint", "crackdown2_hud", function()
     local scrw, scrh, ply = ScrW(), ScrH(), LocalPlayer()
-    if CD2_InDropMenu or !ply:IsCD2Agent() then RemoveHUDpanels() return end
+    if CD2_InDropMenu then RemoveHUDpanels() return end
 
     if !game.SinglePlayer() then
         for k, v in ipairs( player_GetAll() ) do
@@ -218,7 +218,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         end
     end
 
-    if CD2_InSpawnPointMenu then RemoveHUDpanels() return end
+    if CD2_InSpawnPointMenu or !ply:IsCD2Agent() then RemoveHUDpanels() return end
 
     if !ply:Alive() then 
         local usebind = input_LookupBinding( "+use" ) or "e"

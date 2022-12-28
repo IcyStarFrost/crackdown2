@@ -149,9 +149,13 @@ function ENT:MainThink()
             self.cd2_Goal = self.cd2_EnemyLastKnownPosition
         else
 
-            if self.cd2_Equipment != "none" and random( 1, 1000 ) == 1 and ( !self.cd2_grenadecooldown or CurTime() > self.cd2_grenadecooldown ) then
-                self:AddGesture( ACT_GMOD_GESTURE_ITEM_THROW, true )
-                CD2ThrowEquipment( self.cd2_Equipment, self, self:GetEnemy():GetPos() )
+            if self.cd2_Equipment != "none" and random( 1, 100 ) == 1 and ( !self.cd2_grenadecooldown or CurTime() > self.cd2_grenadecooldown ) then
+                CD2CreateThread( function()
+                    self:AddGesture( ACT_GMOD_GESTURE_ITEM_THROW, true )
+                    coroutine.wait( 1 )
+                    if !IsValid( self ) or !IsValid(  self:GetEnemy() ) then return end
+                    CD2ThrowEquipment( self.cd2_Equipment, self, self:GetEnemy():GetPos() )
+                end )
                 self.cd2_grenadecooldown = CurTime() + rand( 5, 15 )
             end
             

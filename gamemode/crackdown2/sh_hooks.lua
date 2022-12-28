@@ -153,10 +153,12 @@ hook.Add( "KeyPress", "crackdown2_equipmentuse", function( ply, key )
 
         CD2CreateThread( function()
 
+            ply:SetEquipmentCount( ply:GetEquipmentCount() - 1 )
+
             local tbl = scripted_ents.Get( CLIENT and CD2_DropEquipment or ply.cd2_Equipment )
             ply.cd2_grenadecooldown = CurTime() + tbl.Cooldown
 
-            ply:AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_GMOD_GESTURE_ITEM_THROW, true )
+            BroadcastLua( "Entity( " .. ply:EntIndex() .. " ):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_GMOD_GESTURE_ITEM_THROW, true )" )
             coroutine.wait( 0.5 )
 
             ply:EmitSound( "crackdown2/weapons/grenadethrow.mp3", 60, 100, 1, CHAN_WEAPON )

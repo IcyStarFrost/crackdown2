@@ -71,7 +71,8 @@ function PLAYER:SetupDataTables()
 
     self.Player:NetworkVar( "String", 0, "CD2Team" )
 
-    -- Skill Stats
+    -- Skill Stats --
+    -- These skills should be capped at 6
     self.Player:NetworkVar( "Int", 0, "AgilitySkill" )
     self.Player:NetworkVar( "Int", 1, "WeaponSkill" )
     self.Player:NetworkVar( "Int", 2, "StrengthSkill" )
@@ -85,18 +86,19 @@ function PLAYER:SetupDataTables()
     self.Player:NetworkVar( "Int", 9, "DrivingXP" )
     --
 
-    self.Player:NetworkVar( "Int", 10, "SafeFallHeight" )
-    self.Player:NetworkVar( "Int", 11, "EquipmentCount" )
-    self.Player:NetworkVar( "Int", 12, "MaxPickupWeight" )
+    self.Player:NetworkVar( "Int", 10, "SafeFallSpeed" ) -- The speed the player won't take damage from
+    self.Player:NetworkVar( "Int", 11, "EquipmentCount" ) -- The amount of equipment the player can have
+    self.Player:NetworkVar( "Int", 12, "MaxPickupWeight" ) -- The max weight the player can pick up
 
-    self.Player:NetworkVar( "Bool", 0, "IsRechargingShield" )
-    self.Player:NetworkVar( "Bool", 1, "IsRegeningHealth" )
-    self.Player:NetworkVar( "Bool", 2, "CanRevive" )
+    self.Player:NetworkVar( "Bool", 0, "IsRechargingShield" ) -- If the Player's shields are recharging
+    self.Player:NetworkVar( "Bool", 1, "IsRegeningHealth" ) -- If the Player's health is regenerating
+    self.Player:NetworkVar( "Bool", 2, "CanRevive" ) -- If the player can be revived
 
-    self.Player:NetworkVar( "Float", 0, "NWHealth" )
-    self.Player:NetworkVar( "Float", 1, "NWShields" )
+    self.Player:NetworkVar( "Float", 0, "NWHealth" ) -- Networked. Used for HUD
+    self.Player:NetworkVar( "Float", 1, "NWShields" ) -- Networked. Used for HUD
 
     self.Player:SetMaxPickupWeight( 200 )
+    self.Player:SetSafeFallSpeed( 600 )
 
 
 end

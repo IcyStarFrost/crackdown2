@@ -95,6 +95,11 @@ end
 function GM:OnDamagedByExplosion( ply, info )
 end
 
+function GM:GetFallDamage( ply, speed ) 
+    if ply:IsCD2Agent() and speed < ply:GetSafeFallSpeed() then return 0 end
+    return math.max( 0, math.ceil( 0.3318 * speed - 141.75 ) )
+end
+
 -- Shield and Health Regeneration
 hook.Add( "Tick", "crackdown2_regeneration", function()
     for k, ply in ipairs( player_GetAll() ) do

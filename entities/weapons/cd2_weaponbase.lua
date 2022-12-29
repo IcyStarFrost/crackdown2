@@ -86,7 +86,7 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
 	self.bullet.Num	= num_bullets
 	self.bullet.Src	= self:GetOwner():GetShootPos()
 	self.bullet.Dir	= IsValid( self:GetOwner().cd2_lockontarget ) and ( self:GetOwner().cd2_lockontarget:WorldSpaceCenter() - self:GetOwner():GetShootPos() ):GetNormalized() or self:GetOwner():GetAimVector()
-	self.bullet.Spread = Vector( spread, spread, 0 )
+	self.bullet.Spread = self:GetOwner():IsPlayer() and IsValid( self:GetOwner().cd2_lockontarget ) and Vector( 0.01, 0.01 ) or Vector( spread, spread, 0 )
 	self.bullet.Tracer = tracer or 1
     self.bullet.TracerName = tracername or "Tracer"
 	self.bullet.Force = force or damage

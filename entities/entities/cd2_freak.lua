@@ -1,7 +1,9 @@
 AddCSLuaFile()
 
 ENT.Base = "cd2_npcbase"
-ENT.PrintName = "freak"
+ENT.PrintName = "Freak"
+
+if CLIENT then language.Add( "cd2_freak", "Freak" ) end
 
 -- NPC Stats
 ENT.cd2_Health = 50 -- The health the NPC has

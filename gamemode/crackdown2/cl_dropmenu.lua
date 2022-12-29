@@ -382,8 +382,11 @@ function CD2OpenDropMenu( issupplypoint )
                 net.WriteAngle( CD2_SelectedSpawnAngle )
                 net.SendToServer()
             else
-                
-
+                net.Start( "cd2net_resupply" )
+                net.WriteString( CD2_DropPrimary )
+                net.WriteString( CD2_DropSecondary )
+                net.WriteString( CD2_DropEquipment )
+                net.SendToServer()
             end
         end
 

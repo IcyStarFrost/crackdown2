@@ -43,8 +43,21 @@ net.Receive( "cd2net_spawnatnearestspawn", function( len, ply )
     ply:Give( secondary )
 
     ply:SetEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
+    ply.cd2_Equipment = equipment
     ply.cd2_lastspawnprimary = primary
     ply.cd2_lastspawnsecondary = secondary
+end )
+
+net.Receive( "cd2net_resupply", function( len, ply )
+    local primary = net.ReadString()
+    local secondary = net.ReadString()
+    local equipment = net.ReadString()
+
+    ply:StripWeapons()
+    ply:SetEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
+    ply.cd2_Equipment = equipment
+    ply:Give( primary )
+    ply:Give( secondary )
 end )
 
 net.Receive( "cd2net_reviveplayer", function( len, ply ) 

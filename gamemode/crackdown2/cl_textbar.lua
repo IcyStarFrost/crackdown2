@@ -34,10 +34,10 @@ CD2_TextBox = CD2_TextBox or nil -- The text box itself
 
 --hook.Add( "OnGamemodeLoaded", "crackdown2_textbox", function()
     if IsValid( CD2_TextBox ) then CD2_TextBox:Remove() end
-
+    local x, y = ScreenScale( 178 ), ScreenScale( 67 )
     CD2_TextBox = vgui.Create( "DPanel", GetHUDPanel() )
-    CD2_TextBox:SetPos( ( ScrW() / 2 ) - 200 , ScrH() - 200 )
-    CD2_TextBox:SetSize( ScreenScale( 178 ), ScreenScale( 67 ) )
+    CD2_TextBox:SetPos( ( ScrW() / 2 ) - ( x / 2) , ScrH() - 205 )
+    CD2_TextBox:SetSize( x, y )
 
     CD2_TextBox.lbl = vgui.Create( "DLabel", CD2_TextBox )
     CD2_TextBox.lbl:SetFont( "crackdown2_textbox" )

@@ -61,6 +61,10 @@ function ENT:OnInjured2( info )
     if ( ( attacker:IsCD2NPC() or attacker:IsCD2Agent() ) and attacker:GetCD2Team() != self:GetCD2Team() ) then
         self:AttackTarget( attacker )
     end
+
+    if self:GetCD2Team() == "cell" then
+        self:PlayPainSound( "vo/npc/male01/pain0" .. random( 1, 9 ) .. ".wav" )
+    end
 end
 
 

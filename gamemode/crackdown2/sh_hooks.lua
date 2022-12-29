@@ -102,7 +102,10 @@ end
 
 -- Shield and Health Regeneration
 hook.Add( "Tick", "crackdown2_regeneration", function()
-    for k, ply in ipairs( player_GetAll() ) do
+    local players = player_GetAll() 
+    for i = 1, #players do
+        local ply = players[ i ]
+
         if !ply:Alive() then ply.cd2_delayregens = CurTime() + 0.5 continue end
         if !ply:IsCD2Agent() or ( ply.cd2_delayregens and CurTime() < ply.cd2_delayregens ) then continue end
 
@@ -140,7 +143,9 @@ end )
 
 if SERVER then
     hook.Add( "Tick", "crackdown2_updateplayernw", function()
-        for k, ply in ipairs( player_GetAll() ) do
+        local players = player_GetAll() 
+        for i = 1, #players do
+            local ply = players[ i ]
             if !ply:IsCD2Agent() then continue end
             ply:SetNWShields( ply:Armor() )
             ply:SetNWHealth( ply:Health() )
@@ -277,7 +282,10 @@ hook.Add( "Think", "crackdown2_lockon", function()
 
     if SERVER then
 
-        for k, ply in ipairs( player_GetAll() ) do
+        local players = player_GetAll() 
+        for i = 1, #players do
+            local ply = players[ i ]
+    
             if !ply:Alive() or !ply:IsCD2Agent() then continue end
 
             if ply:KeyDown( IN_ATTACK2 ) then
@@ -340,7 +348,10 @@ local actcommands = {
 }
 
 hook.Add( "Tick", "crackdown2_passiveactcommands", function()
-    for k, ply in ipairs( player_GetAll() ) do
+    local players = player_GetAll() 
+    for i = 1, #players do
+        local ply = players[ i ]
+
         if !ply:Alive() or !ply:IsCD2Agent() then continue end
         
         ply.cd2_nextgesture = ply.cd2_nextgesture or CurTime() + random( 5, 60 )
@@ -362,7 +373,10 @@ if !game.SinglePlayer() and CLIENT then
     local input_GetKeyName = input.GetKeyName
 
     hook.Add( "Tick", "crackdown2_playerreviving", function()
-        for k, ply in ipairs( player_GetAll() ) do
+        local players = player_GetAll() 
+        for i = 1, #players do
+            local ply = players[ i ]
+    
             if ply:Alive() or !ply:IsCD2Agent() or ply == LocalPlayer() or !ply:GetCanRevive() then continue end
 
             local ragdoll = ply:GetRagdollEntity()

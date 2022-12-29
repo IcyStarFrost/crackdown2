@@ -274,6 +274,9 @@ function ENT:Initialize()
         self.cd2_NavArea = navmesh.GetNavArea( self:WorldSpaceCenter(), 200 )
     end
 
+    self:AddCallback( "PhysicsCollide", function( us, data ) 
+        self:HandleCollision( data )
+    end )
     
 
     if self.Initialize2 then self:Initialize2() end
@@ -294,6 +297,33 @@ function ENT:SetupDataTables()
     self:NetworkVar( "Int", 0, "SightDistance" )
 
     if self.SetupDataTables2 then self:SetupDataTables2() end
+
+end
+
+function ENT:HandleCollision( data )
+    local collider = data.HitEntity
+
+    if !IsValid( collider ) then return end
+
+    local mass = data.HitObject:GetMass() or 500
+    local impactdmg = ( ( data.TheirOldVelocity:Length() * mass ) / 1000 )
+
+    if impactdmg > 10 then
+        local dmginfo = DamageInfo()
+        dmginfo:SetAttacker( collider )
+        if IsValid( collider:GetPhysicsAttacker() ) then
+            dmginfo:SetAttacker( collider:GetPhysicsAttacker() )
+        elseif collider:IsVehicle() and IsValid( collider:GetDriver() ) then
+            dmginfo:SetAttacker( collider:GetDriver() )
+            dmginfo:SetDamageType(DMG_VEHICLE)     
+        end
+        dmginfo:SetInflictor( collider )
+        dmginfo:SetDamage( impactdmg )
+        dmginfo:SetDamageType( DMG_CRUSH + DMG_CLUB )
+        dmginfo:SetDamageForce( data.TheirOldVelocity )
+        self.loco:SetVelocity( self.loco:GetVelocity() + data.TheirOldVelocity )
+        self:TakeDamageInfo( dmginfo )
+    end
 
 end
 

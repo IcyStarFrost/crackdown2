@@ -144,10 +144,6 @@ if SERVER then
 end
 
 
-hook.Add( "PlayerSwitchWeapon", "crackdown2_switchsounds", function( ply )
-    if !ply:IsCD2Agent() then return end
-    ply:EmitSound( "crackdown2/ply/switchweapon.wav", 70, 100, 0.5, CHAN_AUTO )
-end )
 
 hook.Add( "KeyPress", "crackdown2_equipmentuse", function( ply, key )
     if key == IN_GRENADE1 and ply:GetEquipmentCount() > 0 and ( !ply.cd2_grenadecooldown or CurTime() > ply.cd2_grenadecooldown ) then
@@ -208,7 +204,11 @@ if SERVER then
 
         if IsValid( wep ) and !wep:GetIsReloading() and key == IN_ATTACK and ply:KeyDown( IN_USE ) and ( !ply.cd2_meleecooldown or CurTime() > ply.cd2_meleecooldown ) then
             
-            BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_FIST, true )" )
+            if IsValid( ply.cd2_HeldTarget ) then
+                BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE, true )" )
+            else
+                BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_FIST, true )" )
+            end
             ply:EmitSound( "WeaponFrag.Throw", 80, 100, 1, CHAN_WEAPON )
 
             hulltbl.start = ply:GetPos() + ply:GetForward() * 50 + Vector( 0, 0, 5 )
@@ -222,11 +222,13 @@ if SERVER then
 
             if IsValid( hitent ) then
                 hitent:EmitSound( "physics/flesh/flesh_impact_hard" .. random( 1, 6 ) .. ".wav")
+                local phys = IsValid( ply.cd2_HeldTarget ) and ply.cd2_HeldTarget:GetPhysicsObject()
+                local add = IsValid( phys ) and phys:GetMass() / 10 or 0
 
                 local info = DamageInfo()
                 info:SetAttacker( ply )
                 info:SetInflictor( wep )
-                info:SetDamage( 25 )
+                info:SetDamage( 25 + add )
                 info:SetDamageType( DMG_CLUB )
                 info:SetDamageForce( ( hitent:GetPos() - ply:GetPos() ):GetNormalized() * 20000 )
                 hitent:TakeDamageInfo( info )
@@ -495,7 +497,7 @@ if CLIENT then
         if nexttrack and CurTime() > nexttrack then 
             nexttrack = nil
 
-            CD2StartMusic( tracks[ random( #tracks ) ], 0, true, false, nil, nil, nil, nil, nil, function( chan )
+            CD2StartMusic( tracks[ random( #tracks ) ], 0, false, true, nil, nil, nil, nil, nil, function( chan )
                 if !nexttrack then
                     nexttrack = CurTime() + chan:GetChannel():GetLength() + random( 90, 250 )
                 end

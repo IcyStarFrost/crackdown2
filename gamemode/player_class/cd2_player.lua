@@ -87,6 +87,7 @@ function PLAYER:SetupDataTables()
 
     self.Player:NetworkVar( "Int", 10, "SafeFallHeight" )
     self.Player:NetworkVar( "Int", 11, "EquipmentCount" )
+    self.Player:NetworkVar( "Int", 12, "MaxPickupWeight" )
 
     self.Player:NetworkVar( "Bool", 0, "IsRechargingShield" )
     self.Player:NetworkVar( "Bool", 1, "IsRegeningHealth" )

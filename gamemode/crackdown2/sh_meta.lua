@@ -31,3 +31,13 @@ function PLAYER:Trace( start, endpos, col, mask )
     local result = Trace( normaltrace )
     return result
 end
+
+function PLAYER:HandsPos()
+    local attach = self:GetAttachment( self:LookupAttachment( "anim_attachment_RH") )
+    return attach.Pos
+end
+
+function PLAYER:HandsAngles()
+    local attach = self:GetAttachment( self:LookupAttachment( "anim_attachment_RH") )
+    return attach.Ang
+end

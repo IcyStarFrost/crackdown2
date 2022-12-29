@@ -65,7 +65,7 @@ end
 function SWEP:CanPrimaryAttack()
     local owner = self:GetOwner()
 
-    if IsValid( owner ) and owner:IsPlayer() and owner:KeyDown( IN_USE ) then return false end
+    if IsValid( owner ) and owner:IsPlayer() and owner:KeyDown( IN_USE ) or self:GetPickupMode() then return false end
 
 	if self:Clip1() <= 0 and !self:GetIsReloading() then
 	
@@ -101,12 +101,32 @@ end
 
 function SWEP:SetupDataTables()
     self:NetworkVar( "Bool", 0, "IsReloading" )
+    self:NetworkVar( "Bool", 1, "PickupMode" )
 end
 
+function SWEP:EnterPickupMode()
+    if self:GetPickupMode() then return end
+
+    self:SetPickupMode( true )
+    self:SetHoldType( "melee" )
+    self:SetNoDraw( true )
+    self:DrawShadow( false )
+end
+
+function SWEP:ExitPickupMode()
+    if !self:GetPickupMode() then return end
+
+    self:SetPickupMode( false )
+    self:SetHoldType( self.HoldType )
+    self:SetNoDraw( false )
+    self:DrawShadow( true )
+end
 
 function SWEP:Holster( wep )
+    if self:GetPickupMode() then return end
     self:SetIsReloading( false )
     self:SetHoldType( "passive" )
+    self:GetOwner():EmitSound( "crackdown2/ply/switchweapon.wav", 70, 100, 0.5, CHAN_AUTO )
 
     timer.Simple( 0.6, function()
         if !IsValid( self ) or !IsValid( self:GetOwner() ) then return end
@@ -119,7 +139,7 @@ function SWEP:Holster( wep )
 end
 
 function SWEP:Reload()
-    if self:GetIsReloading() or self:GetOwner():IsPlayer() and !self:HasAmmo() or self:Clip1() == self:GetMaxClip1() then return end
+    if self:GetIsReloading() or self:GetOwner():IsPlayer() and !self:HasAmmo() or self:Clip1() == self:GetMaxClip1() or self:GetPickupMode() then return end
 
     self:SetIsReloading( true )
     

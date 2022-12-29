@@ -25,7 +25,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
         if ply:KeyDown( IN_USE ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) then ply.cd2_PickupDelay = ply.cd2_PickupDelay or CurTime() + 1 else ply.cd2_PickupDelay = nil end
 
         -- Pickup a new object
-        if !IsValid( ply.cd2_HeldObject ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) and ( ply.cd2_PickupDelay and CurTime() > ply.cd2_PickupDelay ) then
+        if !IsValid( ply.cd2_HeldObject ) and CurTime() > ply:GetNW2Float( "cd2_weapondrawcur", 0 ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) and ( ply.cd2_PickupDelay and CurTime() > ply.cd2_PickupDelay ) then
             ply:GetActiveWeapon():EnterPickupMode()
             local ent = ply:GetNW2Entity( "cd2_pickuptarget", nil )
 
@@ -120,7 +120,7 @@ if CLIENT then
         local targ = ply:GetNW2Entity( "cd2_pickuptarget", nil )
         local isholding = ply:GetNW2Bool( "cd2_isholdingent", false )
 
-        if !IsValid( targ ) or isholding then return end
+        if !IsValid( targ ) or isholding or CurTime() < ply:GetNW2Float( "cd2_weapondrawcur", 0 ) then return end
 
         local usebind = input_LookupBinding( "+use" ) or "e"
         local code = input_GetKeyCode( usebind )

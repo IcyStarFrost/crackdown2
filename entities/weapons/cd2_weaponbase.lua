@@ -22,6 +22,7 @@ SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 2
 SWEP.ReloadSounds = {}
 
+SWEP.IsExplosive = false -- If the weapon is explosive. used to render the dropped weapon color to yellow
 SWEP.DamageFalloffDiv = 200 -- The divisor amount to lower damage based on distance
 SWEP.LockOnRange = 2000 -- How far can the player lock onto targets
 SWEP.HoldType = "ar2"
@@ -31,9 +32,45 @@ local ipairs = ipairs
 local IsValid = IsValid
 local random = math.random
 local clamp = math.Clamp
+local table_insert = table.insert
+local math_rad = math.rad
+local surface_DrawPoly = CLIENT and surface.DrawPoly
+local surface_SetDrawColor = CLIENT and surface.SetDrawColor
+local surface_SetMaterial = CLIENT and surface.SetMaterial
+local draw_NoTexture = CLIENT and draw.NoTexture
+local surface_DrawRect = CLIENT and surface.DrawRect
+local Trace = util.TraceLine
+local IsValid = IsValid
+local math_cos = math.cos
+local LerpVector = LerpVector 
+local Lerp = Lerp
+local math_sin = math.sin
+local droppedguncolor = Color( 0, 153, 255 )
+local droppedexplosivecolor = Color( 255, 217, 0)
+local surface_DrawTexturedRectRotated = CLIENT and surface.DrawTexturedRectRotated
+local SysTime = SysTime
+local math_atan2 = math.atan2
+local util_SharedRandom = util.SharedRandom
+
+
+local droppedguncolor_alpha = Color( 0, 153, 255, 50 )
+local droppedexplosivecolor_alpha = Color( 255, 145, 0, 50 )
 
 function SWEP:Initialize()
     self:SetHoldType( self.HoldType )
+    self.DeleteTime = CurTime() + 30 -- The time until we will be deleted
+
+    self:SetCollisionGroup( COLLISION_GROUP_WEAPON )
+
+    if SERVER then
+        hook.Add( "Tick", self, function()
+            if !IsValid( self:GetOwner() ) and CurTime() > self.DeleteTime then
+                self:Remove()
+            elseif IsValid( self:GetOwner() ) then
+                self.DeleteTime = CurTime() + 30
+            end
+        end )
+    end
 end
 
 function SWEP:NPCShoot_Secondary( shootPos, shootDir )
@@ -149,8 +186,116 @@ function SWEP:Holster( wep )
 
 end
 
+local function draw_Circle( x, y, radius, seg )
+	local cir = {}
+
+	table_insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
+	for i = 0, seg do
+		local a = math_rad( ( i / seg ) * -360 )
+		table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
+	end
+
+	local a = math_rad( 0 ) -- This is needed for non absolute segment counts
+	table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
+
+	surface_DrawPoly( cir )
+end
+
+local effecttrace = {}
+local rectmat = Material( "crackdown2/effects/weaponrect.png" )
+local lightbeam = Material( "crackdown2/effects/weaponlightbeam.png" )
+local ammoicon = Material( "crackdown2/effects/ammo.png" )
+
+-- Returns if the player already has this weapon
+function SWEP:IsAmmoToLocalPlayer()
+    local ply = LocalPlayer() 
+    return ply:HasWeapon( self:GetClass() )
+end
+
+function SWEP:DrawWorldModel()
+    self:DrawModel()
+
+    self.cd2_effectdelay = self.cd2_effectdelay or SysTime() + 0.5
+    if !IsValid( self:GetOwner() ) and self:GetVelocity():IsZero() then
+        local wep = LocalPlayer():GetWeapon( self:GetClass() )
+        if SysTime() < self.cd2_effectdelay or ( IsValid( wep ) and wep:Ammo1() >= ( wep.Primary.DefaultClip - wep.Primary.ClipSize ) ) then 
+            self:SetupBones()
+            self:SetPos( self:GetNetworkOrigin() )
+            self:SetAngles( self:GetNetworkAngles() )
+            return 
+        end
+
+        if !self.cd2_effectpos then
+            effecttrace.start = self:WorldSpaceCenter()
+            effecttrace.endpos = self:WorldSpaceCenter() - Vector( 0, 0, 10000 )
+            effecttrace.filter = self
+            effecttrace.collisiongroup = COLLISION_GROUP_WORLD
+            local result = Trace( effecttrace )
+            self.cd2_effectpos = result.HitPos
+        end
+
+        self:SetupBones()
+        self:SetAngles( Angle( 0, SysTime() * 60, 0 ) )
+        self:SetPos( LerpVector( 3 * FrameTime(), self:GetPos(), self.cd2_effectpos + Vector( 0, 0, 40 ) ))
+        
+        self.cd2_lightbeamw = self.cd2_lightbeamw and Lerp( 1 * FrameTime(), self.cd2_lightbeamw, 30 ) or 0
+        self.cd2_lightbeamh = self.cd2_lightbeamh and Lerp( 1 * FrameTime(), self.cd2_lightbeamh, 40 ) or 0
+        cam.Start3D2D( self.cd2_effectpos, Angle( 0, 0 + SysTime() * 60, 90 ), 1 )
+            surface_SetDrawColor( self.IsExplosive and droppedexplosivecolor_alpha or droppedguncolor_alpha )
+            surface_SetMaterial( lightbeam )
+            surface_DrawTexturedRectRotated( 0, -20, self.cd2_lightbeamw, self.cd2_lightbeamh, 0 )
+
+            if self:IsAmmoToLocalPlayer() then
+                surface_SetMaterial( ammoicon )
+                surface_DrawTexturedRectRotated( 0, -60, 16, 16, 0 )
+            end
+        cam.End3D2D()
+        
+        cam.Start3D2D( self.cd2_effectpos, Angle( 0, 180 + SysTime() * 60, 90 ), 1 )
+            surface_SetDrawColor( self.IsExplosive and droppedexplosivecolor_alpha or droppedguncolor_alpha )
+            surface_SetMaterial( lightbeam )
+            surface_DrawTexturedRectRotated( 0, -20, self.cd2_lightbeamw, self.cd2_lightbeamh, 0 )
+
+            if self:IsAmmoToLocalPlayer() then
+                surface_SetMaterial( ammoicon )
+                surface_DrawTexturedRectRotated( 0, -60, 16, 16, 0 )
+            end
+        cam.End3D2D()
+
+        cam.Start3D2D( self.cd2_effectpos, Angle( 0, 0, 0 ), 0.1 )
+            
+            surface_SetDrawColor( self.IsExplosive and droppedexplosivecolor_alpha or droppedguncolor_alpha )
+            
+            for i = 1, 4 do
+                local x, y = math_sin( SysTime() * util_SharedRandom( "x" .. i, 1, 4, self:EntIndex() ) ) * 300, math_cos( SysTime() * util_SharedRandom( "x" .. i, 1, 4, self:EntIndex() ) ) * 300
+                surface_SetMaterial( rectmat)
+                surface_DrawTexturedRectRotated( x, y, 200, 100, ( math_atan2( x, y ) * 180 / math.pi ) )
+            end
+
+            for i = 1, 4 do
+                local x, y = math_sin( -SysTime() * util_SharedRandom( "2largex" .. i, 1, 4, self:EntIndex() ) ) * ( 100 * i ), math_cos( -SysTime() * util_SharedRandom( "2largex" .. i, 1, 4, self:EntIndex() ) ) * ( 100 * i )
+                surface_SetMaterial( rectmat)
+                surface_DrawTexturedRectRotated( x, y, 300, 200, ( math_atan2( x, y ) * 180 / math.pi ) )
+            end
+
+            for i = 1, 4 do
+                local x, y = math_sin( -SysTime() * util_SharedRandom( "2x" .. i, 1, 4, self:EntIndex() ) ) * ( 100 * i ), math_cos( -SysTime() * util_SharedRandom( "2x" .. i, 1, 4, self:EntIndex() ) ) * ( 100 * i )
+                surface_SetMaterial( rectmat)
+                surface_DrawTexturedRectRotated( x, y, 200, 100, ( math_atan2( x, y ) * 180 / math.pi ) )
+            end
+
+            draw_NoTexture()
+            draw_Circle( 0, 0, 300, 30 )
+            draw_Circle( 0, 0, 100, 6 )
+        cam.End3D2D()
+    else
+        self.cd2_effectdelay = SysTime() + 0.5
+        self.cd2_effectpos = nil
+    end
+end
+
 function SWEP:Reload()
-    if self:GetIsReloading() or self:GetOwner():IsPlayer() and !self:HasAmmo() or self:Clip1() == self:GetMaxClip1() or self:GetPickupMode() then return end
+    if self:GetIsReloading() or self:GetOwner():IsPlayer() and self:GetOwner():GetAmmoCount( self.Primary.Ammo ) <= 0 or self:Clip1() == self:GetMaxClip1() or self:GetPickupMode() then return end
 
     self:SetIsReloading( true )
 
@@ -176,10 +321,12 @@ function SWEP:Reload()
 
             local reserve = self:GetOwner():GetAmmoCount( self.Primary.Ammo )
             local count = clamp( self.Primary.ClipSize, 0, reserve )
+            local oldclip = self:Clip1()
             self:SetClip1( count )
 
             if SERVER then 
-                --self:GetOwner():RemoveAmmo( count, self.Primary.Ammo )
+                print( count - oldclip )
+                self:GetOwner():RemoveAmmo( count - oldclip, self.Primary.Ammo )
             end
         else
             self:SetClip1( self:GetMaxClip1() )

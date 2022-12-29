@@ -5,6 +5,8 @@ local Trace = util.TraceLine
 local table_insert = table.insert
 local math_max = math.max
 local ipairs = ipairs
+local clamp = math.Clamp
+local random = math.random
 local vistrace = {}
 local normaltrace = {}
 
@@ -147,7 +149,37 @@ function ENT:HandsAngles()
     return attach.Ang
 end
 
+-- Makes the npc drop their weapons and equipment
+function ENT:DropWeapons()
+    local wep = self:GetActiveWeapon()
+    if IsValid( wep ) then
 
+        wep.cd2_Ammocount = clamp( random( 1, wep.Primary.DefaultClip ), 0, wep.Primary.DefaultClip )
+        wep:SetOwner( nil )
+        wep:SetParent()
+        wep:SetPos( self:HandsPos() )
+        wep:SetAngles( self:HandsAngles() )
+        wep:PhysWake()
+
+        local phys = wep:GetPhysicsObject()
+
+        if IsValid( phys ) then
+            phys:ApplyForceCenter( Vector( random( -600, 600 ), random( -600, 600 ), random( 0, 600 ) ) )
+        end
+    end
+
+    if self.cd2_Equipment and self.cd2_Equipment != "none" then
+        local equipment = ents.Create( self.cd2_Equipment )
+        equipment:SetPos( self:WorldSpaceCenter() )
+        equipment:Spawn()
+
+        local phys = equipment:GetPhysicsObject()
+
+        if IsValid( phys ) then
+            phys:ApplyForceCenter( Vector( random( -8000, 8000 ), random( -8000, 8000 ), random( 0, 8000 ) ) )
+        end
+    end
+end
 
 -- Gives the specified weapon classname to the npc
 function ENT:Give( classname ) 

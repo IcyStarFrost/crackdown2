@@ -244,8 +244,10 @@ ENT.cd2_holdtypetranslations = {
 
 local IsValid = IsValid
 local CurTime = CurTime
+local clamp = math.Clamp
 local Lerp = Lerp
 local FrameTime = FrameTime
+local random = math.random
 local abs = math.abs
 
 
@@ -459,11 +461,51 @@ function ENT:OnInjured( info )
     self.cd2_loggeddamage[ attacker:SteamID() ][ info:GetDamageType() ] = self.cd2_loggeddamage[ attacker:SteamID() ][ info:GetDamageType() ] + info:GetDamage()
 end
 
+local function DropWeapons( pos, primary, equipment )
+
+    local wep = ents.Create( primary )
+    wep:SetPos( pos )
+    wep:SetAngles( AngleRand( -180, 180 ) )
+    wep:Spawn()
+    wep.cd2_Ammocount = clamp( random( 1, wep.Primary.DefaultClip ), 0, wep.Primary.DefaultClip )
+    wep:PhysWake()
+
+
+    local phys = wep:GetPhysicsObject()
+
+    if IsValid( phys ) then
+        phys:ApplyForceCenter( Vector( random( -600, 600 ), random( -600, 600 ), random( 0, 600 ) ) )
+    end
+
+    if equipment and equipment != "none" then
+        local equipment = ents.Create( equipment )
+        equipment:SetPos( pos )
+        equipment:Spawn()
+
+        local phys = equipment:GetPhysicsObject()
+
+        if IsValid( phys ) then
+            phys:ApplyForceCenter( Vector( random( -8000, 8000 ), random( -8000, 8000 ), random( 0, 8000 ) ) )
+        end
+    end
+end
+
 function ENT:OnKilled( info )
 
     local ragdoll = self:BecomeRagdoll( info )
 
-    if IsValid( self:GetActiveWeapon() ) then self:GetActiveWeapon():Remove() end
+    local shoulddrop = IsValid( self:GetActiveWeapon() )
+
+    if shoulddrop then
+        local primary = self.cd2_Weapon
+        local equipment = self.cd2_Equipment
+        hook.Add( "Tick", ragdoll, function()
+            if ragdoll:GetVelocity():IsZero() then
+                DropWeapons( ragdoll:GetPos() + Vector( 0, 0, 10 ), primary, equipment )
+                hook.Remove( "Tick", ragdoll )
+            end
+        end )
+    end
     
     self:RemoveAllHooks()
 
@@ -475,6 +517,8 @@ function ENT:OnKilled( info )
         if !IsValid( ragdoll ) then return end
         ragdoll:Remove()
     end )
+
+    if self.OnKilled2 then self:OnKilled2( info ) end
 end
 
 function ENT:BodyUpdate()

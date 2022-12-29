@@ -27,6 +27,37 @@ function PLAYER:Loadout()
 end
 
 function PLAYER:Death()
+
+    if game.SinglePlayer() then
+        local weps = self.Player:GetWeapons()
+        for i = 1, #weps do 
+            local wep = weps[ i ]
+            if IsValid( wep ) then
+                self.Player:DropWeapon( wep, self.Player:GetPos() + VectorRand( -70, 70 ) )
+            end
+        end
+
+        local equipment = ents.Create( self.Player.cd2_Equipment )
+        equipment:SetPos( self.Player:WorldSpaceCenter() )
+        equipment:Spawn()
+
+        local phys = equipment:GetPhysicsObject()
+
+        if IsValid( phys ) then
+            phys:ApplyForceCenter( Vector( random( -8000, 8000 ), random( -8000, 8000 ), random( 0, 8000 ) ) )
+        end
+    else
+        self.Player.cd2_deathweapons = {}
+        self.Player.cd2_deathequipment = self.Player.cd2_Equipment
+        local weps = self.Player:GetWeapons()
+        for i = 1, #weps do 
+            local wep = weps[ i ]
+            if IsValid( wep ) then
+                self.Player.cd2_deathweapons[ #self.Player.cd2_deathweapons + 1 ] = { wep:GetClass(), wep:Ammo1() }
+            end
+        end
+    end
+
     net.Start( "cd2net_playerkilled" )
     net.Send( self.Player )
 end
@@ -89,6 +120,7 @@ function PLAYER:SetupDataTables()
     self.Player:NetworkVar( "Int", 10, "SafeFallSpeed" ) -- The speed the player won't take damage from
     self.Player:NetworkVar( "Int", 11, "EquipmentCount" ) -- The amount of equipment the player can have
     self.Player:NetworkVar( "Int", 12, "MaxPickupWeight" ) -- The max weight the player can pick up
+    self.Player:NetworkVar( "Int", 13, "MaxEquipmentCount" )
 
     self.Player:NetworkVar( "Bool", 0, "IsRechargingShield" ) -- If the Player's shields are recharging
     self.Player:NetworkVar( "Bool", 1, "IsRegeningHealth" ) -- If the Player's health is regenerating

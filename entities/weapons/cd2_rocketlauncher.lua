@@ -20,6 +20,7 @@ SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 2
 SWEP.ReloadSounds = { { 0, "weapons/smg1/smg1_reload.wav" }, { 2, "weapons/slam/mine_mode.wav" } }
 
+SWEP.IsExplosive = true
 SWEP.HoldType = "rpg"
 SWEP.Primary.ShootSound = "weapons/rpg/rocketfire1.wav"
 
@@ -53,7 +54,7 @@ function SWEP:PrimaryAttack()
 end
 
 function SWEP:Reload()
-    if self:GetIsReloading() or !self:HasAmmo() or self:Clip1() == self:GetMaxClip1() then return end
+    if self:GetIsReloading() or self:GetOwner():GetAmmoCount( self.Primary.Ammo ) <= 0 or self:Clip1() == self:GetMaxClip1() then return end
     if self:GetOwner():IsPlayer() then BroadcastLua( "Entity(" .. self:GetOwner():EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_HL2MP_GESTURE_RELOAD_SMG1, true )" ) end
     BaseClass.Reload( self )
 end

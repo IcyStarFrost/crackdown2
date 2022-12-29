@@ -381,12 +381,20 @@ function CD2OpenDropMenu( issupplypoint )
                 net.WriteVector( CD2_SelectedSpawnPoint )
                 net.WriteAngle( CD2_SelectedSpawnAngle )
                 net.SendToServer()
+
+                LocalPlayer().cd2_Equipment = CD2_DropEquipment
+                LocalPlayer().cd2_lastspawnprimary = CD2_DropPrimary
+                LocalPlayer().cd2_lastspawnsecondary = CD2_DropSecondary
             else
                 net.Start( "cd2net_resupply" )
                 net.WriteString( CD2_DropPrimary )
                 net.WriteString( CD2_DropSecondary )
                 net.WriteString( CD2_DropEquipment )
                 net.SendToServer()
+
+                LocalPlayer().cd2_Equipment = CD2_DropEquipment
+                LocalPlayer().cd2_lastspawnprimary = CD2_DropPrimary
+                LocalPlayer().cd2_lastspawnsecondary = CD2_DropSecondary
             end
         end
 

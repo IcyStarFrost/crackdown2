@@ -179,7 +179,9 @@ end
 
 -- Returns our Eyes position
 function ENT:EyePos()
-    return self:GetAttachment( self:LookupAttachment( "eyes" ) ).Pos
+    local lookup = self:LookupAttachment( "eyes" )
+    if lookup <= 0 then return self:WorldSpaceCenter() + Vector( 0, 0, 5 ) end
+    return self:GetAttachment( lookup ).Pos
 end
 
 -- Returns where we are "aiming"
@@ -324,13 +326,13 @@ end
 function ENT:PlayVoiceSound( path, timeadd, bypasstime )
     if !self:CanSpeak() and !bypasstime then return end
     timeadd = timeadd or 0
-    self:EmitSound( path, 80, 100, 1, CHAN_VOICE )
+    self:EmitSound( path, 70, 100, 1, CHAN_VOICE )
     self.cd2_NextSpeak = CurTime() + SoundDuration( path ) + timeadd
 end
 
 -- Simple function for playing pain sounds
 function ENT:PlayPainSound( path )
     if CurTime() < self.cd2_NextPainSound then return end
-    self:EmitSound( path, 80, 100, 1, CHAN_VOICE )
+    self:EmitSound( path, 70, 100, 1, CHAN_VOICE )
     self.cd2_NextPainSound = CurTime() + SoundDuration( path )
 end

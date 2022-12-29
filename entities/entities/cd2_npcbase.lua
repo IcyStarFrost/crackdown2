@@ -421,13 +421,12 @@ end
 
 function ENT:OnInjured( info )
     local attacker = info:GetAttacker()
+    if self.OnInjured2 then self:OnInjured2( info ) end
     if !IsValid( attacker ) or !attacker:IsPlayer() then return end
     self.cd2_loggeddamage[ attacker:SteamID() ] = self.cd2_loggeddamage[ attacker:SteamID() ] or {}
 
     self.cd2_loggeddamage[ attacker:SteamID() ][ info:GetDamageType() ] = self.cd2_loggeddamage[ attacker:SteamID() ][ info:GetDamageType() ] or 0
     self.cd2_loggeddamage[ attacker:SteamID() ][ info:GetDamageType() ] = self.cd2_loggeddamage[ attacker:SteamID() ][ info:GetDamageType() ] + info:GetDamage()
-
-    if self.OnInjured2 then self:OnInjured2( info ) end
 end
 
 function ENT:OnKilled( info )

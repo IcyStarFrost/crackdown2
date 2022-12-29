@@ -114,7 +114,6 @@ function ENT:OnInjured2( info )
     local line = voicelines[ random( #voicelines ) ]
     self:PlayPainSound( line )
 
-
     if !self:GetIsPanicked() then
         self.cd2_Panickedlocation = self:GetPos()
         self.cd2_PanicEnd = CurTime() + rand( 15, 30 )
@@ -142,6 +141,16 @@ function ENT:Think2()
     if self:GetIsPanicked() and CurTime() > self.cd2_PanicEnd then
         self:SetState( "Idle" )
         self:StopMovement() 
+    end
+
+    if SERVER then
+        local nearzombies = CD2FindInSphere( self:GetPos(), self.cd2_SightDistance, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" and self:Visible( ent ) end )
+        if #nearzombies > 0 and !self:GetIsPanicked() then
+            self.cd2_Panickedlocation = self:GetPos()
+            self.cd2_PanicEnd = CurTime() + rand( 15, 30 )
+            self:SetState( "Panicked" )
+            self:StopMovement() 
+        end
     end
 end
 

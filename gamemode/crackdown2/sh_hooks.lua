@@ -474,6 +474,7 @@ if CLIENT then
     end )
 
 
+    -- Connect messages --
     hook.Add( "PlayerConnect", "crackdown2_connectmessage", function( name )
         if game.SinglePlayer() then return end
         CD2SetTextBoxText( name .. " joined the game" )
@@ -484,6 +485,23 @@ if CLIENT then
     hook.Add( "player_disconnect", "crackdown2_disconnectmessage", function( data )
         if game.SinglePlayer() then return end
         CD2SetTextBoxText( data.name .. " left the game (" .. data.reason .. ")"  )
+    end )
+
+
+    -- Ambient music --
+    local nexttrack = CurTime() + random( 90, 250 )
+    local tracks = { "sound/crackdown2/music/ambient/agency.mp3", "sound/crackdown2/music/ambient/hope.mp3", "sound/crackdown2/music/ambient/ambient1.mp3", "sound/crackdown2/music/ambient/ambient2.mp3", "sound/crackdown2/music/ambient/ambient3.mp3", "sound/crackdown2/music/ambient/ambient4.mp3" }
+    hook.Add( "Tick", "crackdown2_ambientmusic", function()
+        if nexttrack and CurTime() > nexttrack then 
+            nexttrack = nil
+
+            CD2StartMusic( tracks[ random( #tracks ) ], 0, false, false, nil, nil, nil, nil, nil, function( chan )
+                if !nexttrack then
+                    nexttrack = CurTime() + chan:GetChannel():GetLength() + random( 90, 250 )
+                end
+            end )
+
+        end
     end )
 
 end
@@ -533,7 +551,7 @@ end )
 
 -- Set the client's regen time
 hook.Add( "PlayerHurt", "crackdown2_delayregen", function( ply, attacker, remaining, damagetaken )
-    ply.cd_NextRegenTime = CurTime() + 8
+    ply.cd_NextRegenTime = CurTime() + 6
     net.Start( "cd2net_playerhurt" )
     net.Send( ply )
 end )

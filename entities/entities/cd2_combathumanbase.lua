@@ -36,7 +36,7 @@ function ENT:Initialize2()
             if IsValid( self:GetEnemy() ) then return end
             local chan = snddata.Channel 
             local pos = snddata.Pos or IsValid( snddata.Entity ) and snddata.Entity or nil
-            if self:GetRangeSquaredTo( pos ) > ( self.cd2_SightDistance * self.cd2_SightDistance ) then return end
+            if self:GetRangeSquaredTo( pos ) > ( self.cd2_SightDistance * self.cd2_SightDistance ) or pos == self or pos == self:GetActiveWeapon() then return end
 
             local trace = self:Trace( nil, pos, COLLISION_GROUP_WORLD )
             if trace.Hit and random( 1, 4) == 1 then self.cd2_Goal = isentity( pos ) and pos:GetPos() or pos end
@@ -127,6 +127,12 @@ function ENT:MainThink()
         self.cd2_CombatTimeout = CurTime() + 10
     end
 
+    local wep = self:GetActiveWeapon()
+
+    if IsValid( wep ) and !IsValid( self:GetEnemy() ) and wep:Clip1() < wep:GetMaxClip1() and random( 1, 100 ) == 1 and !wep:GetIsReloading() then
+        wep:Reload()
+    end
+
     if self.MainThink2 then self:MainThink2() end
 
     if IsValid( self:GetEnemy() ) and CurTime() > self.cd2_CombatTimeout then self:SetEnemy( NULL ) end
@@ -135,7 +141,7 @@ function ENT:MainThink()
 
     if !IsValid( self:GetEnemy() ) and CurTime() > self.cd2_NextIdleWalk then
         
-        self.cd2_Goal = self:GetPos() + Vector( random( -500, 500 ), random( -500, 500 ) )
+        self.cd2_Goal = self:GetRandomPos( 500 )
         self.cd2_NextIdleWalk = CurTime() + 5
     elseif IsValid( self:GetEnemy() ) then 
 
@@ -149,7 +155,7 @@ function ENT:MainThink()
             self.cd2_Goal = self.cd2_EnemyLastKnownPosition
         else
 
-            if self.cd2_Equipment != "none" and random( 1, 100 ) == 1 and ( !self.cd2_grenadecooldown or CurTime() > self.cd2_grenadecooldown ) then
+            if self.cd2_Equipment != "none" and random( 1, 1000 ) == 1 and ( !self.cd2_grenadecooldown or CurTime() > self.cd2_grenadecooldown ) then
                 CD2CreateThread( function()
                     self:AddGesture( ACT_GMOD_GESTURE_ITEM_THROW, true )
                     coroutine.wait( 1 )

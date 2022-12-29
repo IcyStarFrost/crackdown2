@@ -239,7 +239,7 @@ end
 -- Quick test functions
 
 function CD2QuickSpawnCellNPC()
-    local ent = ents.Create( "cd2_shotguncellsoldier" )
+    local ent = ents.Create( "cd2_smgcellsoldier" )
     ent:SetPos( Entity( 1 ):GetEyeTrace().HitPos )
     ent:Spawn()
 end

@@ -212,6 +212,8 @@ if SERVER then
     local TraceHull = util.TraceHull
     local FindInBox = ents.FindInBox
     local hulltbl = {}
+    local meleeanims = { ACT_HL2MP_GESTURE_RANGE_ATTACK_FIST, ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE2 }
+    
     -- Melee System
     hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
         if !ply:IsCD2Agent() then return end
@@ -223,8 +225,9 @@ if SERVER then
             if IsValid( ply.cd2_HeldObject ) then
                 BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE, true )" )
             else
-                BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_FIST, true )" )
+                BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, " .. meleeanims[ random( #meleeanims ) ] .. ", true )" )
             end
+            if ply:IsOnGround() then ply:SetVelocity( ply:GetForward() * 500) end
             ply:EmitSound( "WeaponFrag.Throw", 80, 100, 1, CHAN_WEAPON )
 
             local start = ply:GetPos() + ply:GetForward() * 50 + Vector( 0, 0, 5 )

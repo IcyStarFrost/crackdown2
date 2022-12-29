@@ -22,7 +22,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
         ply:SetNW2Entity( "cd2_pickuptarget", CD2GetClosestInTable( near, ply ) )
 
         -- Held key
-        if ply:KeyDown( IN_USE ) then ply.cd2_PickupDelay = ply.cd2_PickupDelay or CurTime() + 1 else ply.cd2_PickupDelay = nil end
+        if ply:KeyDown( IN_USE ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) then ply.cd2_PickupDelay = ply.cd2_PickupDelay or CurTime() + 1 else ply.cd2_PickupDelay = nil end
 
         -- Pickup a new object
         if !IsValid( ply.cd2_HeldObject ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) and ( ply.cd2_PickupDelay and CurTime() > ply.cd2_PickupDelay ) then

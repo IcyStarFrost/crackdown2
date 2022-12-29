@@ -200,6 +200,7 @@ if SERVER then
     end )
 
     local TraceHull = util.TraceHull
+    local FindInBox = ents.FindInBox
     local hulltbl = {}
     -- Melee System
     hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
@@ -209,34 +210,43 @@ if SERVER then
 
         if IsValid( wep ) and !wep:GetIsReloading() and key == IN_ATTACK and ply:KeyDown( IN_USE ) and ( !ply.cd2_meleecooldown or CurTime() > ply.cd2_meleecooldown ) then
             
-            if IsValid( ply.cd2_HeldTarget ) then
+            if IsValid( ply.cd2_HeldObject ) then
                 BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE, true )" )
             else
                 BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_FIST, true )" )
             end
             ply:EmitSound( "WeaponFrag.Throw", 80, 100, 1, CHAN_WEAPON )
 
-            hulltbl.start = ply:GetPos() + ply:GetForward() * 50 + Vector( 0, 0, 5 )
-            hulltbl.endpos = ply:GetPos() + ply:GetForward() * 50 + Vector( 0, 0, 5 )
-            hulltbl.mins = Vector( -70, -70, 0 )
-            hulltbl.maxs = Vector( 70, 70, 53 )
-            hulltbl.ignoreworld = true
-            hulltbl.filter = ply
-            local result = TraceHull( hulltbl )
-            local hitent = result.Entity
+            local start = ply:GetPos() + ply:GetForward() * 50 + Vector( 0, 0, 5 )
+            local mins = Vector( -70, -70, 0 )
+            local maxs = Vector( 70, 70, 53 )
+            local entities = FindInBox( start + mins, start + maxs )
 
-            if IsValid( hitent ) then
-                hitent:EmitSound( "physics/flesh/flesh_impact_hard" .. random( 1, 6 ) .. ".wav")
-                local phys = IsValid( ply.cd2_HeldTarget ) and ply.cd2_HeldTarget:GetPhysicsObject()
-                local add = IsValid( phys ) and phys:GetMass() / 10 or 0
+            if #entities > 0 then
+                for i = 1, #entities do
+                    local hitent = entities[ i ]
+                    if !IsValid( hitent ) then continue end
 
-                local info = DamageInfo()
-                info:SetAttacker( ply )
-                info:SetInflictor( wep )
-                info:SetDamage( 25 + add )
-                info:SetDamageType( DMG_CLUB )
-                info:SetDamageForce( ( hitent:GetPos() - ply:GetPos() ):GetNormalized() * 20000 )
-                hitent:TakeDamageInfo( info )
+                    local trace = ply:Trace( nil, hitent:WorldSpaceCenter() )
+
+                    if hitent != ply and hitent != ply.cd2_HeldObject and ( trace.Entity == hitent or !trace.Hit ) then
+                        hitent:EmitSound( "physics/flesh/flesh_impact_hard" .. random( 1, 6 ) .. ".wav")
+                        local heldobjectphys = IsValid( ply.cd2_HeldObject ) and ply.cd2_HeldObject:GetPhysicsObject()
+                        local add = IsValid( heldobjectphys ) and heldobjectphys:GetMass() / 10 or 0
+
+                        local hitphys = hitent:GetPhysicsObject()
+                        local force = hitent:IsCD2NPC() and 20000 or IsValid( hitphys ) and hitphys:GetMass() * 10 or 20000
+                        local normal = ( hitent:WorldSpaceCenter() - ply:WorldSpaceCenter() ):GetNormalized()
+                        
+                        local info = DamageInfo()
+                        info:SetAttacker( ply )
+                        info:SetInflictor( wep )
+                        info:SetDamage( 25 + add )
+                        info:SetDamageType( DMG_CLUB )
+                        info:SetDamageForce( normal * force )
+                        hitent:TakeDamageInfo( info )
+                    end
+                end
             end
             
             ply.cd2_meleecooldown = CurTime() + 0.5

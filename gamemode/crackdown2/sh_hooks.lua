@@ -98,7 +98,8 @@ end
 -- Shield and Health Regeneration
 hook.Add( "Tick", "crackdown2_regeneration", function()
     for k, ply in ipairs( player_GetAll() ) do
-        if !ply:Alive() or !ply:IsCD2Agent() then continue end
+        if !ply:Alive() then ply.cd2_delayregens = CurTime() + 0.5 continue end
+        if !ply:IsCD2Agent() or ( ply.cd2_delayregens and CurTime() < ply.cd2_delayregens ) then continue end
 
         if ( !ply.cd_NextRegenTime or CurTime() > ply.cd_NextRegenTime ) then
             if ply:GetNWShields() < ply:GetMaxArmor() and ( !ply.cd_NextRegen or CurTime() > ply.cd_NextRegen ) then

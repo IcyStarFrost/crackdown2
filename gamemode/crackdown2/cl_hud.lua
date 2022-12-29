@@ -244,6 +244,14 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         CD2DrawInputbar( scrw / 2.1, 200, upper( buttonname ), "Regenerate" )
         CD2DrawInputbar( scrw / 2, 250, upper( reloadname ), "Regenerate at nearest spawn" )
 
+        if #player_GetAll() > 1 then
+            local fbind = input_LookupBinding( "+forward" ) or "w"
+            local fcode = input_GetKeyCode( fbind )
+            local forwardname = input_GetKeyName( fcode )
+
+            CD2DrawInputbar( scrw / 1.9, 300, upper( forwardname ), "Hold to call for help" )
+        end
+
         RemoveHUDpanels()
         return 
     else

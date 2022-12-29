@@ -18,6 +18,8 @@ function ENT:OnDelayEnd()
         util.Effect( "Explosion", effect, true, true )
     end
 
+    util.Decal( "Scorch", self:GetPos(), self:GetPos() - Vector( 0, 0, 50 ), self )
+
     if SERVER then
         local blast = DamageInfo()
         blast:SetAttacker( IsValid( self:GetThrower() ) and self:GetThrower() or self )

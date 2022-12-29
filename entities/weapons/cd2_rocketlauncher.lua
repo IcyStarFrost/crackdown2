@@ -54,6 +54,6 @@ end
 
 function SWEP:Reload()
     if self:GetIsReloading() or !self:HasAmmo() or self:Clip1() == self:GetMaxClip1() then return end
-    if self:GetOwner():IsPlayer() then self:GetOwner():AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_HL2MP_GESTURE_RELOAD_SMG1, true ) end
+    if self:GetOwner():IsPlayer() then BroadcastLua( "Entity(" .. self:GetOwner():EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_HL2MP_GESTURE_RELOAD_SMG1, true )" ) end
     BaseClass.Reload( self )
 end

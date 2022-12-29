@@ -52,7 +52,7 @@ net.Receive( "cd2net_reviveplayer", function( len, ply )
     if agent:Alive() or !agent:GetCanRevive() then return end
 
     agent:Spawn()
-    agent:SetPos( ply:GetPos() + ply:GetForward() * 60 )
+    agent:SetPos( ply:GetPos() + ply:GetForward() * 60 + Vector( 0, 0, 5 ) )
     agent:Give( agent.cd2_lastspawnprimary )
     agent:Give( agent.cd2_lastspawnsecondary )
 end )
@@ -60,4 +60,15 @@ end )
 net.Receive( "cd2net_playerregenerate", function( len, ply )
     if !ply:IsCD2Agent() then return end
     ply:SetCanRevive( false )
+end )
+
+net.Receive( "cd2net_playercallforhelp", function( len, ply ) 
+
+    for k, v in ipairs( player.GetAll() ) do
+        if v == ply then continue end
+        net.Start( "cd2net_pingsounds" )
+        net.WriteUInt( 3, 4 )
+        net.Send( v )
+        CD2SendTextBoxMessage( v, ply:Name() .. " needs to be revived!" )
+    end
 end )

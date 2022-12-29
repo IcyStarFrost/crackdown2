@@ -152,6 +152,28 @@ function CD2CreateSkillGainOrb( pos, ply, skillname, xp, col )
     orb:Spawn()
 end
 
+-- Sends a message to a player's or all player's chat
+function CD2SendText( ply, ... )
+    net.Start( "cd2net_sendtext" )
+    net.WriteString( util.TableToJSON( { ... } ) )
+    if ply then
+        net.Send( ply )
+    else
+        net.Broadcast()
+    end
+end
+
+-- Sends a message to a player or players via the Text Box
+function CD2SendTextBoxMessage( ply, text )
+    net.Start( "cd2net_sendtextboxmessage" ) 
+    net.WriteString( text )
+    if !ply then 
+        net.Broadcast() 
+    else 
+        net.Send( ply ) 
+    end
+end
+
 -- Quick test functions
 
 function CD2QuickSpawnCellNPC()

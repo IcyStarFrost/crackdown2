@@ -166,3 +166,25 @@ net.Receive( "cd2net_stopguitar", function()
         CD2_GuitarPlayer:FadeOut()
     end
 end )
+
+net.Receive( "cd2net_pingsounds", function()
+    local times = net.ReadUInt( 4 )
+
+    CD2CreateThread( function()
+        for i = 1, times do
+            surface.PlaySound( "crackdown2/ui/ping.mp3" )
+            coroutine.wait( 0.6 )
+        end
+    end )
+
+end )
+
+net.Receive( "cd2net_sendtext", function()
+    local json = net.ReadString()
+    local args = util.JSONToTable( json )
+    chat.AddText( unpack( args ) )
+end )
+
+net.Receive( "cd2net_sendtextboxmessage", function()
+    CD2SetTextBoxText( net.ReadString() )
+end )

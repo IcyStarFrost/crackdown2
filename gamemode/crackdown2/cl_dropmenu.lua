@@ -407,4 +407,19 @@ hook.Add( "Think", "crackdown2_regeneratemenu", function()
         net.SendToServer()
     end
 
+    -- Call for help --
+    if ply:KeyDown( IN_FORWARD ) then
+        ply.cd2_callforhelpdelay = ply.cd2_callforhelpdelay or CurTime() + 1
+        ply.cd2_callforhelpcooldown = ply.cd2_callforhelpcooldown or 0
+
+        if CurTime() > ply.cd2_callforhelpdelay and CurTime() > ply.cd2_callforhelpcooldown then
+            net.Start( "cd2net_playercallforhelp" )
+            net.SendToServer()
+            CD2SetTextBoxText( "Call for help has been sent to other Agents" )
+            ply.cd2_callforhelpcooldown = CurTime() + 10
+        end
+    else
+        ply.cd2_callforhelpdelay = nil
+    end
+
 end )

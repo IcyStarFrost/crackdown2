@@ -276,71 +276,6 @@ end
 
 
 -- Crackdown 2 Lockon system --
--- Client and server teamwork woooooo
-
---[[ hook.Add( "Think", "crackdown2_lockon", function()
-
-    if SERVER then
-
-        local players = player_GetAll() 
-        for i = 1, #players do
-            local ply = players[ i ]
-    
-            if !ply:Alive() or !ply:IsCD2Agent() then continue end
-
-            if ply:KeyDown( IN_ATTACK2 ) then
-
-                local lockables = CD2FindInLockableTragets( ply )
-                ply.cd2_lockontarget = IsValid( ply.cd2_lockontarget ) and ply:GetPos():DistToSqr( ply.cd2_lockontarget:GetPos() ) <= ( 2000 * 2000 ) and ply.cd2_lockontarget or IsValid( lockables[ 1 ] ) and ply:GetPos():DistToSqr( lockables[ 1 ]:GetPos() ) <= ( 2000 * 2000 ) and lockables[ 1 ] or nil
-
-                if IsValid( ply.cd2_lockontarget ) then
-                    ply:SetEyeAngles( ( ply.cd2_lockontarget:WorldSpaceCenter() - ply:EyePos() ):Angle() )
-                end
-
-            else
-                ply.cd2_lockontarget = nil
-            end
-
-        end
-
-    else
-        local ply = LocalPlayer()
-
-        if !IsValid( ply ) or !ply:IsCD2Agent() then return end
-
-        local lockables = CD2FindInLockableTragets( ply )
-
-        if ply:KeyDown( IN_ATTACK2 ) then
-            ply.cd2_lockontarget = IsValid( ply.cd2_lockontarget ) and ply:GetPos():DistToSqr( ply.cd2_lockontarget:GetPos() ) <= ( 2000 * 2000 ) and ply.cd2_lockontarget or IsValid( lockables[ 1 ] ) and ply:GetPos():DistToSqr( lockables[ 1 ]:GetPos() ) <= ( 2000 * 2000 ) and lockables[ 1 ] or nil
-
-            if IsValid( ply.cd2_lockontarget ) then 
-                if !limitlockonsound then 
-                    surface.PlaySound( "crackdown2/ply/lockon.mp3" ) 
-                    limitlockonsound = true 
-                end 
-                local dir = ( ply.cd2_lockontarget:WorldSpaceCenter() - CD2_vieworigin ):Angle() 
-                dir:Normalize()
-                CD2_viewangles = dir
-                ply:SetEyeAngles( ( ply.cd2_lockontarget:WorldSpaceCenter() - ply:EyePos() ):Angle() )
-                CD2_viewlockedon = true
-            else
-                CD2_viewlockedon = false
-            end
-        else
-            CD2_viewlockedon = false
-            ply.cd2_lockontarget = nil
-            limitlockonsound = false
-        end
-
-        if #lockables > 0 then
-            CD2_lockon = true
-        else
-            CD2_lockon = false
-        end
-
-    end
-end ) ]]
-
 local limitlockonsound = false
 hook.Add( "Think", "crackdown2_lockon", function()
     local players = player_GetAll() 
@@ -394,6 +329,8 @@ hook.Add( "Think", "crackdown2_lockon", function()
 
 end )
 ------
+
+
 local actcommands = {
     "act group",
     "act forward",

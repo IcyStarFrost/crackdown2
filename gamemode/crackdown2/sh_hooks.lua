@@ -495,7 +495,7 @@ if CLIENT then
         if nexttrack and CurTime() > nexttrack then 
             nexttrack = nil
 
-            CD2StartMusic( tracks[ random( #tracks ) ], 0, false, false, nil, nil, nil, nil, nil, function( chan )
+            CD2StartMusic( tracks[ random( #tracks ) ], 0, true, false, nil, nil, nil, nil, nil, function( chan )
                 if !nexttrack then
                     nexttrack = CurTime() + chan:GetChannel():GetLength() + random( 90, 250 )
                 end

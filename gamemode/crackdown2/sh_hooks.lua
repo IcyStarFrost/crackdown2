@@ -277,8 +277,8 @@ end
 
 -- Crackdown 2 Lockon system --
 -- Client and server teamwork woooooo
-local limitlockonsound = false
-hook.Add( "Think", "crackdown2_lockon", function()
+
+--[[ hook.Add( "Think", "crackdown2_lockon", function()
 
     if SERVER then
 
@@ -339,6 +339,59 @@ hook.Add( "Think", "crackdown2_lockon", function()
         end
 
     end
+end ) ]]
+
+local limitlockonsound = false
+hook.Add( "Think", "crackdown2_lockon", function()
+    local players = player_GetAll() 
+    for i = 1, #players do
+        local ply = players[ i ]
+        if !ply:Alive() or !ply:IsCD2Agent() then continue end
+        
+
+        if ply:KeyDown( IN_ATTACK2 ) then
+            local lockables = CD2FindInLockableTragets( ply )
+            
+            local target =  IsValid( ply:GetNW2Entity( "cd2_lockontarget", nil ) ) and ply:GetPos():DistToSqr( ply:GetNW2Entity( "cd2_lockontarget", nil ):GetPos() ) <= ( 2000 * 2000 ) and ply:GetNW2Entity( "cd2_lockontarget", nil ) or IsValid( lockables[ 1 ] ) and ply:GetPos():DistToSqr( lockables[ 1 ]:GetPos() ) <= ( 2000 * 2000 ) and lockables[ 1 ] or nil
+            ply:SetNW2Entity( "cd2_lockontarget", target )
+            
+
+            if IsValid( ply:GetNW2Entity( "cd2_lockontarget", nil ) ) then
+                ply:SetEyeAngles( ( ply:GetNW2Entity( "cd2_lockontarget", nil ):WorldSpaceCenter() - ply:EyePos() ):Angle() )
+            end
+
+        else
+            ply:SetNW2Entity( "cd2_lockontarget", NULL )
+        end
+
+    end
+
+    if CLIENT then 
+        local ply = LocalPlayer()
+        local lockontarget = ply:GetNW2Entity( "cd2_lockontarget", nil )
+
+        if IsValid( lockontarget ) then
+            if !limitlockonsound then
+                surface.PlaySound( "crackdown2/ply/lockon.mp3" ) 
+                limitlockonsound = true
+            end
+
+            local dir = ( lockontarget:WorldSpaceCenter() - CD2_vieworigin ):Angle() 
+            dir:Normalize()
+            ply:SetEyeAngles( ( lockontarget:WorldSpaceCenter() - ply:EyePos() ):Angle() )
+            
+            CD2_viewangles = dir
+            CD2_viewlockedon = true
+            
+        else
+            CD2_viewlockedon = false
+            limitlockonsound = false
+        end
+
+        CD2_lockon = #CD2FindInLockableTragets( ply ) > 0
+        
+    end 
+
 end )
 ------
 local actcommands = {

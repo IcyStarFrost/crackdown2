@@ -125,7 +125,7 @@ local ents_FindInCone = ents.FindInCone
 -- Finds targets that the ply can lock onto using their view
 function CD2FindInLockableTragets( ply )
     local wep = ply:GetActiveWeapon()
-    if !IsValid( wep ) then return end
+    if !IsValid( wep ) then return {} end
     local entities = {}
     local cone = ents_FindInCone( CLIENT and CD2_vieworigin or ply:EyePos(), CLIENT and CD2_viewangles:Forward() or ply:GetAimVector(), wep.LockOnRange, 0.99 )
 

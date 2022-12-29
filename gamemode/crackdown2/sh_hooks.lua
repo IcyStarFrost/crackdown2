@@ -294,7 +294,7 @@ hook.Add( "Think", "crackdown2_lockon", function()
                 if !IsValid( wep ) then return end
                 
                 local lockables = CD2FindInLockableTragets( ply )
-                
+
                 local oldtarget = ply:GetNW2Entity( "cd2_lockontarget", nil )
                 local target = IsValid( oldtarget ) and oldtarget:GetPos():DistToSqr( ply:GetPos() ) <= ( wep.LockOnRange * wep.LockOnRange ) and oldtarget or IsValid( lockables[ 1 ] ) and lockables[ 1 ]:GetPos():DistToSqr( ply:GetPos() ) <= ( wep.LockOnRange * wep.LockOnRange ) and lockables[ 1 ]
                 ply:SetNW2Entity( "cd2_lockontarget", target )
@@ -313,6 +313,8 @@ hook.Add( "Think", "crackdown2_lockon", function()
 
     if CLIENT then 
         local ply = LocalPlayer()
+        if !IsValid( ply ) and !ply:IsCD2Agent() then return end
+
         local lockontarget = ply:GetNW2Entity( "cd2_lockontarget", nil )
 
         if IsValid( lockontarget ) then

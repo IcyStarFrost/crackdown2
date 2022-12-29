@@ -156,7 +156,7 @@ net.Receive( "cd2net_playguitar", function()
     local path = net.ReadString()
     local entity = net.ReadEntity()
     if !IsValid( entity ) then return end
-    local delay = SysTime() + 2
+    if IsValid( CD2_GuitarPlayer ) then CD2_GuitarPlayer:FadeOut() end
 
     CD2_GuitarPlayer = CD2StartMusic( path, 1, true, false, nil, true, nil, nil, entity )
 end )

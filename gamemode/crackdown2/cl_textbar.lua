@@ -32,7 +32,7 @@ CD2_CurrentTextBoxText = nil -- The current text being displayed in the text box
 CD2_textend = nil
 CD2_TextBox = CD2_TextBox or nil -- The text box itself
 
---hook.Add( "OnGamemodeLoaded", "crackdown2_textbox", function()
+hook.Add( "OnGamemodeLoaded", "crackdown2_textbox", function()
     if IsValid( CD2_TextBox ) then CD2_TextBox:Remove() end
     local x, y = ScreenScale( 178 ), ScreenScale( 67 )
     CD2_TextBox = vgui.Create( "DPanel", GetHUDPanel() )
@@ -64,4 +64,4 @@ CD2_TextBox = CD2_TextBox or nil -- The text box itself
         surface_SetDrawColor( linecol )
         surface_DrawOutlinedRect( 0, 0, w, h, 2 )
     end
---end )
+end )

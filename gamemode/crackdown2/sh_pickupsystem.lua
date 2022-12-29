@@ -85,7 +85,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
             ply.cd2_HeldTarget = nil
         end
 
-        if CLIENT and IsValid( ply.cd2_HeldTarget ) and ply.cd2_HeldTarget:GetPos():DistToSqr( ply:GetPos() ) > ( 100 * 100 ) then
+        if CLIENT and IsValid( ply.cd2_HeldTarget ) and ply.cd2_HeldTarget:GetPos():DistToSqr( ply:GetPos() ) > ( 200 * 200 ) then
             ply.cd2_HeldTarget = nil
         end
         

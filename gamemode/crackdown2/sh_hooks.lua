@@ -278,27 +278,34 @@ end
 -- Crackdown 2 Lockon system --
 local limitlockonsound = false
 hook.Add( "Think", "crackdown2_lockon", function()
-    local players = player_GetAll() 
-    for i = 1, #players do
-        local ply = players[ i ]
-        if !ply:Alive() or !ply:IsCD2Agent() then continue end
-        
 
-        if ply:KeyDown( IN_ATTACK2 ) then
-            local lockables = CD2FindInLockableTragets( ply )
-            
-            local target =  IsValid( ply:GetNW2Entity( "cd2_lockontarget", nil ) ) and ply:GetPos():DistToSqr( ply:GetNW2Entity( "cd2_lockontarget", nil ):GetPos() ) <= ( 2000 * 2000 ) and ply:GetNW2Entity( "cd2_lockontarget", nil ) or IsValid( lockables[ 1 ] ) and ply:GetPos():DistToSqr( lockables[ 1 ]:GetPos() ) <= ( 2000 * 2000 ) and lockables[ 1 ] or nil
-            ply:SetNW2Entity( "cd2_lockontarget", target )
+    if SERVER then
+        local players = player_GetAll() 
+        for i = 1, #players do
+            local ply = players[ i ]
+            if !ply:Alive() or !ply:IsCD2Agent() then continue end
             
 
-            if IsValid( ply:GetNW2Entity( "cd2_lockontarget", nil ) ) then
-                ply:SetEyeAngles( ( ply:GetNW2Entity( "cd2_lockontarget", nil ):WorldSpaceCenter() - ply:EyePos() ):Angle() )
+            if ply:KeyDown( IN_ATTACK2 ) then
+                local wep = ply:GetActiveWeapon()
+                if !IsValid( wep ) then return end
+                
+                local lockables = CD2FindInLockableTragets( ply )
+                
+                local oldtarget = ply:GetNW2Entity( "cd2_lockontarget", nil )
+                local target = IsValid( oldtarget ) and oldtarget:GetPos():DistToSqr( ply:GetPos() ) <= ( wep.LockOnRange * wep.LockOnRange ) and oldtarget or IsValid( lockables[ 1 ] ) and lockables[ 1 ]:GetPos():DistToSqr( ply:GetPos() ) <= ( wep.LockOnRange * wep.LockOnRange ) and lockables[ 1 ]
+                ply:SetNW2Entity( "cd2_lockontarget", target )
+                
+
+                if IsValid( ply:GetNW2Entity( "cd2_lockontarget", nil ) ) then
+                    ply:SetEyeAngles( ( ply:GetNW2Entity( "cd2_lockontarget", nil ):WorldSpaceCenter() - ply:EyePos() ):Angle() )
+                end
+
+            else
+                ply:SetNW2Entity( "cd2_lockontarget", NULL )
             end
 
-        else
-            ply:SetNW2Entity( "cd2_lockontarget", NULL )
         end
-
     end
 
     if CLIENT then 

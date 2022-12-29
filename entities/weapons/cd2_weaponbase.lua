@@ -91,7 +91,6 @@ function SWEP:DamageFalloff( attacker, tr, info )
 end
 
 function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer, tracername )
-    if self:GetOwner():IsPlayer() then print( self:GetOwner():GetNW2Entity( "cd2_lockontarget", nil ) ) end
     
 	self.bullet = self.bullet or {}
 	self.bullet.Num	= num_bullets
@@ -154,9 +153,8 @@ function SWEP:Reload()
     if self:GetIsReloading() or self:GetOwner():IsPlayer() and !self:HasAmmo() or self:Clip1() == self:GetMaxClip1() or self:GetPickupMode() then return end
 
     self:SetIsReloading( true )
-    
 
-    if self:GetOwner():IsCD2NPC() then
+    if self:GetOwner():IsCD2NPC() and SERVER then
         local anim = self:GetOwner().cd2_holdtypetranslations[ self:GetHoldType() ].reload
         self:GetOwner():AddGesture( anim, true )
     else

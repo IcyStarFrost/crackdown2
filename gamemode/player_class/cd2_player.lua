@@ -96,6 +96,8 @@ function PLAYER:SetupDataTables()
     self.Player:NetworkVar( "Float", 0, "NWHealth" )
     self.Player:NetworkVar( "Float", 1, "NWShields" )
 
+    self.Player:SetMaxPickupWeight( 200 )
+
 
 end
  

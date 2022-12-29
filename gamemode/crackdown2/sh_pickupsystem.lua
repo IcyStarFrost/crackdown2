@@ -47,7 +47,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
 
         if CLIENT and ply != LocalPlayer() then continue end
 
-        local find = CD2FindInSphere( ply:GetPos(), 100, function( ent ) return isphysics[ ent:GetClass() ] end )
+        local find = CD2FindInSphere( ply:GetPos(), 100, function( ent ) return isphysics[ ent:GetClass() ] and ent:GetNW2Int( "cd2_mass", 10000000 ) < ply:GetMaxPickupWeight() end )
         ply.cd2_Pickuptarget = CD2GetClosestInTable( find, ply )
         if ply:KeyDown( IN_USE ) then ply.cd2_PickupDelay = ply.cd2_PickupDelay or CurTime() + 1 else ply.cd2_PickupDelay = nil end
         

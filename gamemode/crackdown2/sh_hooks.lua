@@ -184,11 +184,16 @@ if SERVER then
     -- Network all health so the target health bars are accurate
     local ents_GetAll = ents.GetAll
     local nextupdate = 0
-    hook.Add( "Tick", "crackdown2_networkhealths", function()
+    hook.Add( "Tick", "crackdown2_networkvars", function()
         if CurTime() < nextupdate then return end
 
         for k, v in ipairs( ents_GetAll() ) do
             v:SetNWFloat( "cd2_health", v:Health() )
+
+            if IsValid( v:GetPhysicsObject() ) then
+                v:SetNW2Int( "cd2_mass", v:GetPhysicsObject():GetMass() )
+            end
+
         end
 
         nextupdate = CurTime() + 0.1

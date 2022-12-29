@@ -22,6 +22,8 @@ SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 2
 SWEP.ReloadSounds = {}
 
+SWEP.DamageFalloffDiv = 200 -- The divisor amount to lower damage based on distance
+SWEP.LockOnRange = 2000 -- How far can the player lock onto targets
 SWEP.HoldType = "ar2"
 SWEP.Primary.ShootSound = ""
 
@@ -80,18 +82,28 @@ function SWEP:CanPrimaryAttack()
 
 end
 
-function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer, tracername )
+function SWEP:DamageFalloff( attacker, tr, info )
+    local hitent = tr.Entity
+    if !IsValid( hitent ) then return end
+    local dist = attacker:GetPos():Distance( hitent:GetPos() )
+    local sub = dist / self.DamageFalloffDiv
+    info:SetDamage( info:GetDamage() - sub )
+end
 
+function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer, tracername )
+    if self:GetOwner():IsPlayer() then print( self:GetOwner():GetNW2Entity( "cd2_lockontarget", nil ) ) end
+    
 	self.bullet = self.bullet or {}
 	self.bullet.Num	= num_bullets
 	self.bullet.Src	= self:GetOwner():GetShootPos()
 	self.bullet.Dir	= IsValid( self:GetOwner().cd2_lockontarget ) and ( self:GetOwner().cd2_lockontarget:WorldSpaceCenter() - self:GetOwner():GetShootPos() ):GetNormalized() or self:GetOwner():GetAimVector()
-	self.bullet.Spread = self:GetOwner():IsPlayer() and IsValid( self:GetOwner().cd2_lockontarget ) and Vector( 0.01, 0.01 ) or Vector( spread, spread, 0 )
+	self.bullet.Spread = self:GetOwner():IsPlayer() and IsValid( self:GetOwner():GetNW2Entity( "cd2_lockontarget", nil ) ) and Vector( 0.001, 0.001 ) or Vector( spread, spread, 0 )
 	self.bullet.Tracer = tracer or 1
     self.bullet.TracerName = tracername or "Tracer"
 	self.bullet.Force = force or damage
 	self.bullet.Damage = damage
 	self.bullet.AmmoType = ammo_type or self.Primary.Ammo
+    self.bullet.Callback = function( attacker, tr, info ) self:DamageFalloff( attacker, tr, info ) end
 
 	self:GetOwner():FireBullets( self.bullet )
 

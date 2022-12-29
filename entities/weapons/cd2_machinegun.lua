@@ -15,7 +15,7 @@ SWEP.Primary.Force = nil
 SWEP.Primary.Tracer = 1
 SWEP.Primary.Spread = 0.03
 SWEP.Primary.Bulletcount = 1
-SWEP.ReloadTime = 4
+SWEP.ReloadTime = 3.5
 SWEP.ReloadSounds = { { 0, "weapons/m249/m249_coverup.wav" }, { 0.9, "weapons/m249/m249_boxout.wav" }, { 1.9, "weapons/m249/m249_boxin.wav" }, { 2.7, "weapons/m249/m249_chain.wav" }, { 3, "weapons/m249/m249_coverdown.wav" } }
 
 SWEP.HoldType = "ar2"

@@ -163,6 +163,65 @@ function CD2SendText( ply, ... )
     end
 end
 
+-- Takes three damage types from a NPC's damage log and calculates the skill orbs to give to players
+local round = math.Round
+local clamp = math.Clamp
+local bit_band = bit.band
+
+local weaponskillcolor = Color( 0, 225, 255)
+local strengthskillcolor = Color( 255, 251, 0)
+local explosiveskillcolor = Color( 0, 110, 255 )
+function CD2AssessSkillGainOrbs( victimnpc, damagelog )
+    if victimnpc.cd2_maxskillorbs == 0 then return end
+
+    for steamid, dmgtbl in pairs( damagelog ) do
+        local ply = player.GetBySteamID( steamid )
+        if !IsValid( ply ) then continue end
+        local maxskillorbs = victimnpc.cd2_maxskillorbs
+        local remaining_orbs = maxskillorbs
+
+        for dmgtype, damage in pairs( dmgtbl ) do
+            local bulletdmg = bit_band( dmgtype, DMG_BULLET ) == DMG_BULLET and damage or nil
+            local meleedmg = bit_band( dmgtype, DMG_CLUB ) == DMG_CLUB and damage or nil
+            local explosivedmg = ( bit_band( dmgtype, DMG_BLAST ) == DMG_BLAST ) and damage or nil
+            local damagetypecount = 0
+
+            if bulletdmg then damagetypecount = damagetypecount + 1 end
+            if meleedmg then damagetypecount = damagetypecount + 1 end
+            if explosivedmg then damagetypecount = damagetypecount + 1 end
+
+            if bulletdmg and remaining_orbs != 0 then
+                local orbcount = clamp( round( bulletdmg / ( victimnpc:GetMaxHealth() / ( maxskillorbs / damagetypecount ) ), 0 ), 0, maxskillorbs )
+                for i = 1, orbcount do
+                    if remaining_orbs <= 0 then break end
+                    remaining_orbs = remaining_orbs - 1
+                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "weapon", 0, weaponskillcolor )
+                end
+            end
+
+            if meleedmg and remaining_orbs != 0 then
+                local orbcount = clamp( round( meleedmg / ( victimnpc:GetMaxHealth() / ( maxskillorbs / damagetypecount ) ), 0 ), 0, maxskillorbs )
+                for i = 1, orbcount do
+                    if remaining_orbs <= 0 then break end
+                    remaining_orbs = remaining_orbs - 1
+                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "strength", 0, strengthskillcolor )
+                end
+            end
+
+            if explosivedmg and remaining_orbs != 0 then
+                local orbcount = clamp( round( explosivedmg / ( victimnpc:GetMaxHealth() / ( maxskillorbs / damagetypecount ) ), 0 ), 0, maxskillorbs )
+                for i = 1, orbcount do
+                    if remaining_orbs <= 0 then break end
+                    remaining_orbs = remaining_orbs - 1
+                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "explosive", 0, explosiveskillcolor )
+                end
+            end
+
+        end
+    end
+end
+--
+
 -- Sends a message to a player or players via the Text Box
 function CD2SendTextBoxMessage( ply, text )
     net.Start( "cd2net_sendtextboxmessage" ) 

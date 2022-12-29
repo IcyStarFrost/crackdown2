@@ -108,7 +108,7 @@ function ENT:HandleVoiceLines()
     end
 end
 
-function ENT:OnInjured( info )
+function ENT:OnInjured2( info )
 
     local voicelines = self.cd2_VoiceLines[ self.cd2_gender ].pain
     local line = voicelines[ random( #voicelines ) ]
@@ -227,6 +227,9 @@ function ENT:GuitarState()
     local hidingspot = random( 1, 2 ) == 1 and self:FindSpot( "random", { type = "hiding", pos = self:GetPos(), radius = 2000, stepup = 10, stepdown = 10 } ) or self:GetRandomPos( 1000 ) 
     if !hidingspot then self:SetState( "Idle" ) return end
 
+    net.Start( "cd2net_stopguitar" )
+    net.Broadcast()
+    
     self:MoveToPos( hidingspot )
     self:LookTo( self.cd2_NavArea:GetCenter(), 2 )
 

@@ -55,7 +55,7 @@ function ENT:AttackTarget( ent )
 end
 
 
-function ENT:OnInjured( info ) 
+function ENT:OnInjured2( info ) 
     local attacker = info:GetAttacker()
 
     if ( ( attacker:IsCD2NPC() or attacker:IsCD2Agent() ) and attacker:GetCD2Team() != self:GetCD2Team() ) then

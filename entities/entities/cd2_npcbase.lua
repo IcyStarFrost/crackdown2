@@ -16,9 +16,11 @@ ENT.cd2_RunSpeed = 300 -- Run speed
 ENT.cd2_WalkSpeed = 100 -- Walk speed
 ENT.cd2_CrouchSpeed = 80 -- Crouch speed
 ENT.cd2_damagedivider = 1 -- The amount we should divide damage caused by this npc
+ENT.cd2_maxskillorbs = 0 -- The max amount of skill orbs the player can get out of this NPC when they kill it
 --
 
 -- Util variables
+ENT.cd2_loggeddamage = {} -- A table of all the damage we have taken
 ENT.cd2_NextDoorCheck = 0 -- The next time we will check for a door to open
 ENT.cd2_FallVelocity = 0 -- How fast we are falling
 ENT.cd2_AnimUpdate = 0 -- The next time our animations will update
@@ -417,6 +419,16 @@ function ENT:OnContact( ent )
     end
 end
 
+function ENT:OnInjured( info )
+    local attacker = info:GetAttacker()
+    if !IsValid( attacker ) or !attacker:IsPlayer() then return end
+    self.cd2_loggeddamage[ attacker:SteamID() ] = self.cd2_loggeddamage[ attacker:SteamID() ] or {}
+
+    self.cd2_loggeddamage[ attacker:SteamID() ][ info:GetDamageType() ] = self.cd2_loggeddamage[ attacker:SteamID() ][ info:GetDamageType() ] or 0
+    self.cd2_loggeddamage[ attacker:SteamID() ][ info:GetDamageType() ] = self.cd2_loggeddamage[ attacker:SteamID() ][ info:GetDamageType() ] + info:GetDamage()
+
+    if self.OnInjured2 then self:OnInjured2( info ) end
+end
 
 function ENT:OnKilled( info )
 
@@ -425,6 +437,8 @@ function ENT:OnKilled( info )
     if IsValid( self:GetActiveWeapon() ) then self:GetActiveWeapon():Remove() end
     
     self:RemoveAllHooks()
+
+    CD2AssessSkillGainOrbs( self, self.cd2_loggeddamage )
 
     hook.Run( "OnCD2NPCKilled", self, info )
     

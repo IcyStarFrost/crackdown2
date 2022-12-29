@@ -39,7 +39,7 @@ function SWEP:PrimaryAttack()
 
     if SERVER then
         local rocket = ents.Create( "rpg_missile" )
-        rocket:SetPos( self:GetOwner():GetShootPos() )
+        rocket:SetPos( self:GetOwner():GetShootPos() + self:GetOwner():EyeAngles():Up() * 10 )
         rocket:SetAngles( self:GetOwner():EyeAngles() )
         rocket:SetOwner( self:GetOwner() )
         rocket:SetMoveType( MOVETYPE_FLYGRAVITY )

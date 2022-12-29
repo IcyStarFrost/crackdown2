@@ -76,7 +76,7 @@ CD2_DropPrimary = "cd2_smg"
 CD2_DropSecondary = "cd2_pistol"
 CD2_DropEquipment = "cd2_grenade"
 
-function CD2OpenDropMenu()
+function CD2OpenDropMenu( issupplypoint )
 
     surface.PlaySound( "crackdown2/ui/dropmenuopen.mp3" )
 
@@ -372,13 +372,19 @@ function CD2OpenDropMenu()
 
         function confirmbutton:DoClick()
             CD2_DropMenu:Remove()
-            net.Start( "cd2net_playerdropmenuconfirm" )
-            net.WriteString( CD2_DropPrimary )
-            net.WriteString( CD2_DropSecondary )
-            net.WriteString( CD2_DropEquipment )
-            net.WriteVector( CD2_SelectedSpawnPoint )
-            net.WriteAngle( CD2_SelectedSpawnAngle )
-            net.SendToServer()
+
+            if !issupplypoint then
+                net.Start( "cd2net_playerdropmenuconfirm" )
+                net.WriteString( CD2_DropPrimary )
+                net.WriteString( CD2_DropSecondary )
+                net.WriteString( CD2_DropEquipment )
+                net.WriteVector( CD2_SelectedSpawnPoint )
+                net.WriteAngle( CD2_SelectedSpawnAngle )
+                net.SendToServer()
+            else
+                
+
+            end
         end
 
     end )

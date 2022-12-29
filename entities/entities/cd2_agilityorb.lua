@@ -84,6 +84,7 @@ function ENT:OnCollected( ply )
 
     if CLIENT then
         sound.Play( "crackdown2/ambient/agilityorbcollect.mp3", self:GetPos(), 80, 100, 1 )    
+        CD2SetTextBoxText( "Well done. You found a Agility Orb!" )
     end
 
     if SERVER then

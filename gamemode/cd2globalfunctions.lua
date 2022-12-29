@@ -172,24 +172,27 @@ local weaponskillcolor = Color( 0, 225, 255)
 local strengthskillcolor = Color( 255, 251, 0)
 local explosiveskillcolor = Color( 0, 110, 255 )
 function CD2AssessSkillGainOrbs( victimnpc, damagelog )
-    if victimnpc.cd2_maxskillorbs == 0 then return end
+    if victimnpc.cd2_maxskillorbs == 0 then return end -- Do not run for npcs that don't allow skill orbs
 
     for steamid, dmgtbl in pairs( damagelog ) do
-        local ply = player.GetBySteamID( steamid )
+        local ply = player.GetBySteamID( steamid ) -- Get the damaging player
         if !IsValid( ply ) then continue end
-        local maxskillorbs = victimnpc.cd2_maxskillorbs
-        local remaining_orbs = maxskillorbs
+        local maxskillorbs = victimnpc.cd2_maxskillorbs -- The max amount of skill orbs that can drop
+        local remaining_orbs = maxskillorbs -- The remaining amount of skill orbs
 
         for dmgtype, damage in pairs( dmgtbl ) do
+            -- Getting Damage Type damage
             local bulletdmg = bit_band( dmgtype, DMG_BULLET ) == DMG_BULLET and damage or nil
             local meleedmg = bit_band( dmgtype, DMG_CLUB ) == DMG_CLUB and damage or nil
             local explosivedmg = ( bit_band( dmgtype, DMG_BLAST ) == DMG_BLAST ) and damage or nil
-            local damagetypecount = 0
 
+            -- Getting the amount of damage types that have been dealt onto the npc
+            local damagetypecount = 0
             if bulletdmg then damagetypecount = damagetypecount + 1 end
             if meleedmg then damagetypecount = damagetypecount + 1 end
             if explosivedmg then damagetypecount = damagetypecount + 1 end
 
+            -- Calculating the orb counts --
             if bulletdmg and remaining_orbs != 0 then
                 local orbcount = clamp( round( bulletdmg / ( victimnpc:GetMaxHealth() / ( maxskillorbs / damagetypecount ) ), 0 ), 0, maxskillorbs )
                 for i = 1, orbcount do

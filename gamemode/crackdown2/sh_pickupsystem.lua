@@ -14,6 +14,7 @@ local delay = 0
 hook.Add( "Tick", "crackdown2_pickupsystem", function()
 
     for k, ply in ipairs( player_GetAll() ) do
+        if !ply:IsCD2Agent() then continue end
 
         if IsValid( ply.cd2_HeldTarget ) and ply.cd2_HeldTarget:IsRagdoll() then
             local ent = ply.cd2_HeldTarget
@@ -26,6 +27,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
         end
 
         if IsValid( ply.cd2_HeldTarget ) and ply:KeyPressed( IN_ATTACK ) and !ply:KeyDown( IN_USE ) then
+            ply.cd2_pickupfailsafetime = CurTime() + 1
             ply:SetAnimation( PLAYER_ATTACK1 )
             local ent = ply.cd2_HeldTarget
             ent:SetParent()
@@ -38,7 +40,8 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
             local phys = ent:GetPhysicsObject()
 
             if IsValid( phys ) then
-                phys:ApplyForceCenter( ply:GetAimVector() * ( phys:GetMass() * 1500 ) )
+                local mult = ent:IsRagdoll() and 800000 or 1500
+                phys:ApplyForceCenter( ply:GetAimVector() * ( phys:GetMass() * mult ) )
             end
 
             timer.Simple( 1, function() if !IsValid( ent ) then return end ent:SetOwner( NULL ) ply:GetActiveWeapon():ExitPickupMode() end )
@@ -47,7 +50,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
 
         if CLIENT and ply != LocalPlayer() then continue end
 
-        local find = CD2FindInSphere( ply:GetPos(), 100, function( ent ) return isphysics[ ent:GetClass() ] and ent:GetNW2Int( "cd2_mass", 10000000 ) < ply:GetMaxPickupWeight() end )
+        local find = CD2FindInSphere( ply:GetPos(), 100, function( ent ) return isphysics[ ent:GetClass() ] and ent:GetNW2Int( "cd2_mass", 10000000 ) < ply:GetMaxPickupWeight() and ply:Trace( nil, ent:WorldSpaceCenter(), nil, nil ).Entity == ent end )
         ply.cd2_Pickuptarget = CD2GetClosestInTable( find, ply )
         if ply:KeyDown( IN_USE ) then ply.cd2_PickupDelay = ply.cd2_PickupDelay or CurTime() + 1 else ply.cd2_PickupDelay = nil end
         
@@ -65,8 +68,10 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
             ply.cd2_PickupDelay = math.huge
 
             ply.cd2_HeldTarget = ent
+            ply.cd2_pickupfailsafetime = CurTime() + 1
 
         elseif IsValid( ply.cd2_HeldTarget ) and ( ply.cd2_PickupDelay and CurTime() > ply.cd2_PickupDelay ) then
+            ply.cd2_pickupfailsafetime = CurTime() + 1
             local ent = ply.cd2_HeldTarget
             ent:SetParent()
             ent:SetPos( ply:HandsPos() )
@@ -81,6 +86,11 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
         end
 
         if ply.cd2_HeldTarget == NULL then
+            ply:GetActiveWeapon():ExitPickupMode()
+            ply.cd2_HeldTarget = nil
+        end
+
+        if !IsValid( ply.cd2_HeldTarget ) and IsValid( ply:GetActiveWeapon() ) and ply:GetActiveWeapon():GetPickupMode() and ( ply.cd2_pickupfailsafetime and CurTime() > ply.cd2_pickupfailsafetime ) then
             ply:GetActiveWeapon():ExitPickupMode()
             ply.cd2_HeldTarget = nil
         end

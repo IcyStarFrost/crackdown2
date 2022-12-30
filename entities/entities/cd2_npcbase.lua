@@ -501,7 +501,7 @@ function ENT:OnKilled( info )
         local primary = self.cd2_Weapon
         local equipment = self.cd2_Equipment
         hook.Add( "Tick", ragdoll, function()
-            if ragdoll:GetVelocity():IsZero() then
+            if ragdoll:GetVelocity():Length() <= 50 then
                 DropWeapons( ragdoll:GetPos() + Vector( 0, 0, 10 ), primary, equipment )
                 hook.Remove( "Tick", ragdoll )
             end

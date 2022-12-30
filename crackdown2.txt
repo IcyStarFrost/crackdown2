@@ -12,7 +12,7 @@
 		{
 			"name"		"cd2_keystothecitymode"
 			"text"		"Keys To The City"
-			"help"		"Enables the Keys To The City Sandbox mode. (Progress will not be saved or loaded in this mode)"
+			"help"		"Enables the Keys To The City Sandbox mode. (Player progress will not be saved or loaded in this mode)"
 			"type"		"CheckBox"
 			"default"	"0"
 			"singleplayer" "1"

@@ -61,8 +61,11 @@ if CLIENT then
     -- Reads a value from the Player's agent data
     function CD2FILESYSTEM:ReadPlayerData( var )
         local data = CD2FILESYSTEM:Read( "crackdown2/agentdata.dat", "compressed" )
+        CD2DebugMessage( "Reading from " .. LocalPlayer():Name() .. "'s Agent data: var = " .. var .. " | returned value = " .. tostring( data[ var ] ) )
         return data[ var ]
     end
 
-    CD2FILESYSTEM:Write( "crackdown2/agentdata.dat", {}, "compressed" )
+    if !file.Exists( "crackdown2/agentdata.dat", "DATA" ) then
+        CD2FILESYSTEM:Write( "crackdown2/agentdata.dat", {}, "compressed" )
+    end
 end

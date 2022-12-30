@@ -62,6 +62,7 @@ local TraceHull = util.TraceHull
 local FindInBox = ents.FindInBox
 local hulltbl = {}
 local meleeanims = { ACT_HL2MP_GESTURE_RANGE_ATTACK_FIST, ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE2 }
+local red = Color( 209, 42, 0 )
 
 -- Hold down use and press attack to melee
 hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
@@ -69,14 +70,14 @@ hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
 
     local wep = ply:GetActiveWeapon()
 
-    if IsValid( wep ) and !wep:GetIsReloading() and key == IN_ATTACK and ply:KeyDown( IN_USE ) and ( !ply.cd2_meleecooldown or CurTime() > ply.cd2_meleecooldown ) then
+    if ply:IsOnGround() and IsValid( wep ) and !wep:GetIsReloading() and key == IN_ATTACK and ply:KeyDown( IN_USE ) and ( !ply.cd2_meleecooldown or CurTime() > ply.cd2_meleecooldown ) then
         
         if IsValid( ply.cd2_HeldObject ) then
             BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE, true )" )
         else
             BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, " .. meleeanims[ random( #meleeanims ) ] .. ", true )" )
         end
-        if ply:IsOnGround() then ply:SetVelocity( ply:GetForward() * 500) end
+        ply:SetVelocity( ply:GetForward() * 500 )
         ply:EmitSound( "WeaponFrag.Throw", 80, 100, 1, CHAN_WEAPON )
 
         local start = ply:GetPos() + ply:GetForward() * 50 + Vector( 0, 0, 5 )
@@ -114,4 +115,74 @@ hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
         ply.cd2_meleecooldown = CurTime() + 0.5
     end 
 
+end )
+
+local sound_Play = sound.Play
+-- Ground pound ability
+
+-- While in air, hold use and press attack
+hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
+    if !ply:IsCD2Agent() then return end
+
+    if !ply:IsOnGround() and ply:KeyDown( IN_USE ) and key == IN_ATTACK and !ply.cd2_IsUsingGroundStrike then
+        local wep = ply:GetActiveWeapon()
+        if !IsValid( wep ) then return end
+        wep:SetPickupMode( true )
+        wep:SetHoldType( "melee" )
+
+        ply.cd2_IsUsingGroundStrike = true
+        ply:EmitSound( "crackdown2/ply/groundstrikeinit.mp3", 60 )
+        ply:EmitSound( "crackdown2/ply/die.mp3", 60 )
+        CD2CreateThread( function()
+
+            local trail1 = util.SpriteTrail( ply, ply:LookupAttachment( "anim_attachment_RH"), red, true, 20, 0, 1.5, 1 / ( 20 + 0 ) * 0.5, "trails/laser" )
+            local trail2 = util.SpriteTrail( ply, ply:LookupAttachment( "anim_attachment_LH"), red, true, 20, 0, 1.5, 1 / ( 20 + 0 ) * 0.5, "trails/laser" )
+
+            while !ply:IsOnGround() do
+                ply:SetVelocity( Vector( 0, 0, -10 ) )
+                coroutine.yield()
+            end
+
+            
+            ply:StopSound( "crackdown2/ply/die.mp3" )
+            ply:StopSound( "crackdown2/ply/groundstrikeinit.mp3" )
+            BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE2, true )" )
+
+            net.Start( "cd2net_playerlandingdecal" )
+            net.WriteVector( ply:WorldSpaceCenter() )
+            net.WriteBool( true  )
+            net.Broadcast()
+
+            wep:SetPickupMode( false )
+            wep:SetHoldType( wep.HoldType )
+
+
+        
+
+            local near = CD2FindInSphere( ply:GetPos(), 200, function( ent ) return ent != ply end )
+
+            for i = 1, #near do
+                local ent = near[ i ]
+                if !IsValid( ent ) then return end
+                local force = ent:IsCD2NPC() and 20000 or IsValid( hitphys ) and hitphys:GetMass() * 50 or 20000
+                local info = DamageInfo()
+                info:SetAttacker( ply )
+                info:SetInflictor( wep )
+                info:SetDamage( ply:GetMeleeDamage() * 4 )
+                info:SetDamageType( DMG_CLUB )
+                info:SetDamageForce( ( ent:WorldSpaceCenter() - ply:GetPos() ):GetNormalized() * force )
+                info:SetDamagePosition( ply:GetPos() )
+                ent:TakeDamageInfo( info )
+            end
+
+            sound_Play( "crackdown2/ply/groundstrike.mp3", ply:GetPos(), 80, 100, 1 )
+            sound_Play( "crackdown2/ply/hardland" .. random( 1, 2 ) .. ".wav", ply:GetPos(), 70, 100, 1 )
+            ply.cd2_IsUsingGroundStrike = false
+
+            if IsValid( trail1 ) then trail1:Remove() end
+            if IsValid( trail2 ) then trail2:Remove() end
+
+        end )
+
+    end
 end )

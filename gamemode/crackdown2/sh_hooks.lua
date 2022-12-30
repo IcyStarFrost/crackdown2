@@ -595,6 +595,29 @@ hook.Add( "PlayerHurt", "crackdown2_delayregen", function( ply, attacker, remain
     net.Send( ply )
 end )
 
+hook.Add( "DoPlayerDeath", "crackdown2_dropweaponssingleplayer", function( ply, attacker, dmginfo )
+    if !ply:IsCD2Agent() then return end
+    
+    if game.SinglePlayer() then
+        local weps = ply:GetWeapons()
+        for i = 1, #weps do 
+            local wep = weps[ i ]
+            if IsValid( wep ) then
+                ply:DropWeapon( wep, ply:GetPos() + VectorRand( -70, 70 ) )
+            end
+        end
+
+        local equipment = ents.Create( ply.cd2_Equipment )
+        equipment:SetPos( ply:WorldSpaceCenter() )
+        equipment:Spawn()
+
+        local phys = equipment:GetPhysicsObject()
+
+        if IsValid( phys ) then
+            phys:ApplyForceCenter( Vector( random( -8000, 8000 ), random( -8000, 8000 ), random( 0, 8000 ) ) )
+        end
+    end
+end )
 
 hook.Add( "PlayerCanPickupWeapon", "crackdown2_npcweapons", function( ply, wep )
     local wepowner = wep:GetOwner()

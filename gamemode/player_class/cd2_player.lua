@@ -1,6 +1,7 @@
 DEFINE_BASECLASS( "player_default" )
 
 local black = Color( 0, 0, 0 )
+local random = math.random
  
 local PLAYER = {} 
 
@@ -28,25 +29,7 @@ end
 
 function PLAYER:Death()
 
-    if game.SinglePlayer() then
-        local weps = self.Player:GetWeapons()
-        for i = 1, #weps do 
-            local wep = weps[ i ]
-            if IsValid( wep ) then
-                self.Player:DropWeapon( wep, self.Player:GetPos() + VectorRand( -70, 70 ) )
-            end
-        end
-
-        local equipment = ents.Create( self.Player.cd2_Equipment )
-        equipment:SetPos( self.Player:WorldSpaceCenter() )
-        equipment:Spawn()
-
-        local phys = equipment:GetPhysicsObject()
-
-        if IsValid( phys ) then
-            phys:ApplyForceCenter( Vector( random( -8000, 8000 ), random( -8000, 8000 ), random( 0, 8000 ) ) )
-        end
-    else
+    if !game.SinglePlayer() then
         self.Player.cd2_deathweapons = {}
         self.Player.cd2_deathequipment = self.Player.cd2_Equipment
         local weps = self.Player:GetWeapons()

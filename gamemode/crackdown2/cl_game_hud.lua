@@ -523,3 +523,70 @@ hook.Add( "PreDrawEffects", "crackdown2_peacekeepericons/cellicons", function()
     ----
 end )
 ----
+
+
+
+local HUDBlock = {
+    [ "CHudAmmo" ] = true,
+    [ "CHudBattery" ] = true,
+    [ "CHudHealth" ] = true,
+    [ "CHudSecondaryAmmo" ] = true,
+    [ "CHudWeapon" ] = true,
+    [ "CHudZoom" ] = true,
+    [ "CHudSuitPower" ] = true,
+    [ "CHUDQuickInfo" ] = true,
+    [ "CHudCrosshair" ] = true,
+    [ "CHudDamageIndicator" ] = true,
+    [ "CHudWeaponSelection" ] = true
+}
+
+hook.Add( "HUDShouldDraw", "crackdown2_hidehuds", function( name )
+    if HUDBlock[ name ] then return false end
+end )
+
+local modify = {
+	[ "$pp_colour_addr" ] = 0,
+	[ "$pp_colour_addg" ] = 0,
+	[ "$pp_colour_addb" ] = 0,
+	[ "$pp_colour_brightness" ] = 0,
+	[ "$pp_colour_contrast" ] = 1,
+	[ "$pp_colour_colour" ] = 1,
+	[ "$pp_colour_mulr" ] = 0,
+	[ "$pp_colour_mulg" ] = 0,
+	[ "$pp_colour_mulb" ] = 0
+}
+
+hook.Add( "RenderScreenspaceEffects", "crackdown2_lowhealthcolors", function()
+    local ply = LocalPlayer()
+    
+    if !ply:IsCD2Agent() then return end
+
+    if ply:Alive() and ply:GetNWHealth() < 70 then
+        modify[ "$pp_colour_addr" ] = Lerp( 2 * FrameTime(), modify[ "$pp_colour_addr" ], 0.15 )
+    else
+        modify[ "$pp_colour_addr" ] = Lerp( 2 * FrameTime(), modify[ "$pp_colour_addr" ], 0 )
+    end
+
+    if !ply:Alive() and !CD2_InSpawnPointMenu then
+        DrawBokehDOF( 5, 0, 1 )
+    end
+    
+    DrawColorModify( modify )
+end )
+
+hook.Add( "NeedsDepthPass", "crackdown2_bokehdepthpass", function()
+    return !LocalPlayer():Alive()
+end )
+
+-- Connect messages --
+hook.Add( "PlayerConnect", "crackdown2_connectmessage", function( name )
+    if game.SinglePlayer() then return end
+    CD2SetTextBoxText( name .. " joined the game" )
+end )
+
+gameevent.Listen( "player_disconnect" )
+
+hook.Add( "player_disconnect", "crackdown2_disconnectmessage", function( data )
+    if game.SinglePlayer() then return end
+    CD2SetTextBoxText( data.name .. " left the game (" .. data.reason .. ")"  )
+end )

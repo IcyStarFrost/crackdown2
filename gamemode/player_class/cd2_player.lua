@@ -7,11 +7,12 @@ local PLAYER = {}
 
 PLAYER.DisplayName = "Agent"
 
+-- These are the default movement variables. During gameplay the movement will change according to AgilitySkill
 PLAYER.WalkSpeed = 200
 PLAYER.RunSpeed  = 400
 PLAYER.JumpPower = 400
 
--- Health
+-- Health. During gameplay these settings will change according to StrengthSkill
 PLAYER.StartHealth = 100
 PLAYER.StartArmor = 100
 PLAYER.MaxHealth = 100
@@ -29,6 +30,7 @@ end
 
 function PLAYER:Death()
 
+    -- Save all weapons and equipment for if we decide to regenerate and drop them from then
     if !game.SinglePlayer() then
         self.Player.cd2_deathweapons = {}
         self.Player.cd2_deathequipment = self.Player.cd2_Equipment
@@ -63,6 +65,7 @@ function PLAYER:Spawn()
 
     ply:ScreenFade( SCREENFADE.IN, black, 2, 0.5 )
 
+    -- Respawn trail things
     CD2CreateThread( function()
         if !IsValid( ply ) then return end
 
@@ -83,7 +86,7 @@ end
 
 function PLAYER:SetupDataTables()
 
-    self.Player:NetworkVar( "String", 0, "CD2Team" )
+    self.Player:NetworkVar( "String", 0, "CD2Team" ) -- The team this player is in. Obviously mainly set to agency
 
     -- Skill Stats --
     -- These skills should be capped at 6
@@ -103,17 +106,19 @@ function PLAYER:SetupDataTables()
     self.Player:NetworkVar( "Int", 10, "SafeFallSpeed" ) -- The speed the player won't take damage from
     self.Player:NetworkVar( "Int", 11, "EquipmentCount" ) -- The amount of equipment the player can have
     self.Player:NetworkVar( "Int", 12, "MaxPickupWeight" ) -- The max weight the player can pick up
-    self.Player:NetworkVar( "Int", 13, "MaxEquipmentCount" )
+    self.Player:NetworkVar( "Int", 13, "MaxEquipmentCount" ) -- The max amount of a certain equipment a player can have
+    self.Player:NetworkVar( "Int", 13, "MeleeDamage" ) -- The amount of melee damage the player can deal
 
     self.Player:NetworkVar( "Bool", 0, "IsRechargingShield" ) -- If the Player's shields are recharging
     self.Player:NetworkVar( "Bool", 1, "IsRegeningHealth" ) -- If the Player's health is regenerating
     self.Player:NetworkVar( "Bool", 2, "CanRevive" ) -- If the player can be revived
 
-    self.Player:NetworkVar( "Float", 0, "NWHealth" ) -- Networked. Used for HUD
-    self.Player:NetworkVar( "Float", 1, "NWShields" ) -- Networked. Used for HUD
+    self.Player:NetworkVar( "Float", 0, "NWHealth" ) -- Networked. Used for HUD and regen
+    self.Player:NetworkVar( "Float", 1, "NWShields" ) -- Networked. Used for HUD and regen
 
-    self.Player:SetMaxPickupWeight( 200 )
-    self.Player:SetSafeFallSpeed( 600 )
+    self.Player:SetMeleeDamage( 25 ) -- By default, players can only deal 25 damage with melee. This will change according to StrengthSkill
+    self.Player:SetMaxPickupWeight( 200 ) -- By default, only pickup props with a mass of 200. This will change according to StrengthSkill
+    self.Player:SetSafeFallSpeed( 600 ) -- By default, the safe falling speed is 600. This will change according to AgilitySkill
 
 
 end

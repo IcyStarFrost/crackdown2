@@ -264,13 +264,14 @@ function ENT:Initialize()
     self:PhysicsInitShadow()
 
     self:SetShouldServerRagdoll( true )
+    self:AddFlags( FL_NPC )
 
     if SERVER and self.cd2_Weapon != "none" then self:Give( self.cd2_Weapon ) end
 
     if SERVER then
         local speed = self:GetCrouch() and self.cd2_CrouchSpeed or self:GetWalk() and self.cd2_WalkSpeed or self.cd2_RunSpeed
+        
         self.loco:SetDesiredSpeed( speed )
-
         self.loco:SetStepHeight( 30 )
 
         self.cd2_NavArea = navmesh.GetNavArea( self:WorldSpaceCenter(), 200 )

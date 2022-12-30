@@ -100,6 +100,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
             end
         end
 
+        -- Incase the held entity gets deleted
         if !IsValid( ply.cd2_HeldObject ) and ply:GetNW2Bool( "cd2_isholdingent", false ) then
             ply:SetNW2Bool( "cd2_isholdingent", false )
             ply:GetActiveWeapon():ExitPickupMode()

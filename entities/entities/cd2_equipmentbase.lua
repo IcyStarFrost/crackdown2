@@ -10,6 +10,7 @@ ENT.MaxGrenadeCount = 8 -- The amount of grenades a player can have
 ENT.TrailColor = color_white -- The trail color
 ENT.DelayTime = 3 -- The time before the grenade blows up. 0 for no timed explosive
 ENT.TickSound = nil -- The sound that will play as the grenade ticks
+ENT.RemoveOnInvalid = false -- If true, the equipment will remove itself if its thrower is invalid
 --
 
 -- Util vars
@@ -64,6 +65,7 @@ end
 
 function ENT:SetupDataTables()
     self:NetworkVar( "Entity", 0, "Thrower" )
+    self:NetworkVar( "Bool", 0, "HadThrower" )
 end
 
 -- Explosion code here
@@ -95,17 +97,28 @@ end
 function ENT:Think()
     if self.Exploded then return end
 
+    -- Set if we had a thrower
+    if IsValid( self:GetThrower() ) then self:SetHadThrower( true ) end
+
     if SERVER then
-        if !IsValid( self:GetThrower() ) and CurTime() > self.DeleteTime then
+
+        -- If our thrower is either invalid or dead, remove ourselves
+        if self.RemoveOnInvalid and ( !IsValid( self:GetThrower() ) or IsValid( self:GetThrower() ) and self:GetThrower():IsPlayer() and !self:GetThrower():Alive() ) and self:GetHadThrower() then
             self:Remove()
             return
-        elseif IsValid( self:GetThrower() ) then
+        end
+
+        -- If we aren't picked up by any Agent after 30 seconds, remove ourselves
+        if !IsValid( self:GetThrower() ) and !self:GetHadThrower() and CurTime() > self.DeleteTime then
+            self:Remove()
+            return
+        elseif IsValid( self:GetThrower() ) or self:GetHadThrower() then
             self.DeleteTime = CurTime() + 30
         end
     end
 
-    if SERVER and !IsValid( self:GetThrower() ) then
-
+    -- Custom Pickup code for equipment
+    if SERVER and !IsValid( self:GetThrower() ) and !self:GetHadThrower() then
         local nearents = CD2FindInSphere( self:GetPos(), 50, function( ent ) return ent:IsCD2Agent() and self:IsAmmoToPlayer( ent ) and ent:GetEquipmentCount() < ent:GetMaxEquipmentCount() end )
         local ply = nearents[ 1 ]
         if IsValid( ply ) then
@@ -115,15 +128,16 @@ function ENT:Think()
         end
     end
 
-    if !IsValid( self:GetThrower() ) then return end
+    if !IsValid( self:GetThrower() ) and !self:GetHadThrower() then return end
 
+    -- If time is up, booom
     if CurTime() > self.DelayCurTime and !self.Exploded then
         self:OnDelayEnd()
         self.Exploded = true
     end
 
+    -- Tick sounds
     if SERVER and self.TickSound and self.DelayTime > 0 and CurTime() > self.NextTickSound then
-
         self:EmitSound( self.TickSound, 70, 100 + max( 100, ( 1 / ( self.DelayCurTime - CurTime() ) ) * 60 ), 1, CHAN_WEAPON )
         self.NextTickSound = CurTime() + 0.1
     end
@@ -135,7 +149,7 @@ function ENT:Think()
 end
 
 
--- Returns if the player already has this weapon
+-- Returns if the player already has this equipment
 function ENT:IsAmmoToPlayer( ply )
     if CLIENT then
         local ply = LocalPlayer() 
@@ -171,7 +185,7 @@ function ENT:Draw()
     self:DrawModel()
 
     self.cd2_effectdelay = self.cd2_effectdelay or SysTime() + 0.5
-    if !IsValid( self:GetThrower() ) and self:GetVelocity():IsZero() then
+    if !IsValid( self:GetThrower() ) and !self:GetHadThrower() and self:GetVelocity():IsZero() then
         local wep = LocalPlayer():GetWeapon( self:GetClass() )
 
         if SysTime() < self.cd2_effectdelay or LocalPlayer():GetEquipmentCount() == LocalPlayer():GetMaxEquipmentCount() then 
@@ -192,10 +206,14 @@ function ENT:Draw()
 
         self:SetupBones()
         self:SetAngles( Angle( 0, SysTime() * 60, 0 ) )
+
+        -- For some reason this glitches out in single player and this is the way to atleast dampen that 
         self:SetPos( !game.SinglePlayer() and LerpVector( 3 * FrameTime(), self:GetPos(), self.cd2_effectpos + Vector( 0, 0, 40 ) ) or self.cd2_effectpos + Vector( 0, 0, 40 ) )
         
         self.cd2_lightbeamw = self.cd2_lightbeamw and Lerp( 1 * FrameTime(), self.cd2_lightbeamw, 30 ) or 0
         self.cd2_lightbeamh = self.cd2_lightbeamh and Lerp( 1 * FrameTime(), self.cd2_lightbeamh, 40 ) or 0
+
+        -- Light beam front
         cam.Start3D2D( self.cd2_effectpos, Angle( 0, 0 + SysTime() * 60, 90 ), 1 )
             surface_SetDrawColor( droppedexplosivecolor_alpha )
             surface_SetMaterial( lightbeam )
@@ -207,6 +225,7 @@ function ENT:Draw()
             end
         cam.End3D2D()
         
+        -- Light beam back
         cam.Start3D2D( self.cd2_effectpos, Angle( 0, 180 + SysTime() * 60, 90 ), 1 )
             surface_SetDrawColor( droppedexplosivecolor_alpha )
             surface_SetMaterial( lightbeam )
@@ -222,6 +241,7 @@ function ENT:Draw()
             
             surface_SetDrawColor( droppedexplosivecolor_alpha )
             
+            -- Rectangle things
             for i = 1, 4 do
                 local x, y = math_sin( SysTime() * util_SharedRandom( "x" .. i, 1, 4, self:EntIndex() ) ) * 300, math_cos( SysTime() * util_SharedRandom( "x" .. i, 1, 4, self:EntIndex() ) ) * 300
                 surface_SetMaterial( rectmat)

@@ -19,15 +19,17 @@ SWEP.Primary.Tracer = 1
 SWEP.Primary.TracerName = "Tracer"
 SWEP.Primary.Spread = 0.03
 SWEP.Primary.Bulletcount = 1
-SWEP.ReloadTime = 2
-SWEP.ReloadSounds = {}
+SWEP.ReloadTime = 2 -- The time it will take to reload
+SWEP.ReloadSounds = {} -- A table of tables with the first key being the time to play the sound and the second key being the path to the sound
 
 SWEP.IsExplosive = false -- If the weapon is explosive. used to render the dropped weapon color to yellow
 SWEP.DamageFalloffDiv = 200 -- The divisor amount to lower damage based on distance
 SWEP.LockOnRange = 2000 -- How far can the player lock onto targets
-SWEP.HoldType = "ar2"
-SWEP.Primary.ShootSound = ""
+SWEP.HoldType = "ar2" -- The holdtype this weapon will have
+SWEP.Primary.ShootSound = "" -- The shoot sound to play. Can be a table of sound paths
 
+
+-- Locals
 local ipairs = ipairs
 local IsValid = IsValid
 local random = math.random
@@ -51,6 +53,7 @@ local surface_DrawTexturedRectRotated = CLIENT and surface.DrawTexturedRectRotat
 local SysTime = SysTime
 local math_atan2 = math.atan2
 local util_SharedRandom = util.SharedRandom
+--
 
 
 local droppedguncolor_alpha = Color( 0, 153, 255, 50 )
@@ -58,7 +61,7 @@ local droppedexplosivecolor_alpha = Color( 255, 145, 0, 50 )
 
 function SWEP:Initialize()
     self:SetHoldType( self.HoldType )
-    self.DeleteTime = CurTime() + 30 -- The time until we will be deleted
+    self.DeleteTime = CurTime() + 30 -- The time until we will be deleted if we don't have a owner
 
     self:SetCollisionGroup( COLLISION_GROUP_WEAPON )
 
@@ -119,6 +122,7 @@ function SWEP:CanPrimaryAttack()
 
 end
 
+-- Modifies damage based on distance
 function SWEP:DamageFalloff( attacker, tr, info )
     local hitent = tr.Entity
     if !IsValid( hitent ) then return end
@@ -148,10 +152,11 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
 end
 
 function SWEP:SetupDataTables()
-    self:NetworkVar( "Bool", 0, "IsReloading" )
-    self:NetworkVar( "Bool", 1, "PickupMode" )
+    self:NetworkVar( "Bool", 0, "IsReloading" ) -- If the weapon is reloading
+    self:NetworkVar( "Bool", 1, "PickupMode" ) -- This will be set if the player picked up a object
 end
 
+-- Enters a pick up state where this weapon disables itself until the player drops their object
 function SWEP:EnterPickupMode()
     if self:GetPickupMode() then return end
 
@@ -161,6 +166,7 @@ function SWEP:EnterPickupMode()
     self:DrawShadow( false )
 end
 
+-- Return to normal state
 function SWEP:ExitPickupMode()
     if !self:GetPickupMode() then return end
 
@@ -170,6 +176,8 @@ function SWEP:ExitPickupMode()
     self:DrawShadow( true )
 end
 
+
+-- Play a small third person animation before switching
 function SWEP:Holster( wep )
     if self:GetPickupMode() then return end
     self:SetIsReloading( false )
@@ -206,7 +214,8 @@ local rectmat = Material( "crackdown2/effects/weaponrect.png" )
 local lightbeam = Material( "crackdown2/effects/weaponlightbeam.png" )
 local ammoicon = Material( "crackdown2/effects/ammo.png" )
 
--- Returns if the player already has this weapon
+-- Returns if the player already has this weapon.
+-- In this function's context, returns if this weapon can be picked up as ammo for the player
 function SWEP:IsAmmoToLocalPlayer()
     local ply = LocalPlayer() 
     return ply:HasWeapon( self:GetClass() )

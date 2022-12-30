@@ -144,6 +144,7 @@ function ENT:HandsPos()
     return attach.Pos
 end
 
+-- Returns our hand Angles
 function ENT:HandsAngles()
     local attach = self:GetAttachment( self:LookupAttachment( "anim_attachment_RH") )
     return attach.Ang

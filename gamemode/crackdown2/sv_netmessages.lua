@@ -1,57 +1,5 @@
 
-net.Receive( "cd2net_playerdropmenuconfirm", function( len, ply )
-    local primary = net.ReadString()
-    local secondary = net.ReadString()
-    local equipment = net.ReadString()
-    local spawnposition = net.ReadVector()
-    local spawnangles = net.ReadAngle()
-
-    if player_manager.GetPlayerClass( ply ) == "cd2_spectator" then
-        player_manager.SetPlayerClass( ply, "cd2_player" )
-        ply:Spectate( OBS_MODE_NONE )
-        CD2SetUpPlayer( ply )
-    end
-
-    --ply.cd2_spawnatposition = spawnposition
-    ply.cd2_WeaponSpawnDelay = CurTime() + 0.5
-    ply:Spawn()
-    ply:SetPos( spawnposition )
-    ply:SetAngles( spawnangles )
-    ply:SetEyeAngles( spawnangles )
-    ply:Give( primary )
-    ply:Give( secondary )
-
-    ply.cd2_Equipment = equipment
-    ply:SetEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
-    ply:SetMaxEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
-    ply.cd2_lastspawnprimary = primary
-    ply.cd2_lastspawnsecondary = secondary
-end )
-
-net.Receive( "cd2net_spawnatnearestspawn", function( len, ply )
-    local primary = net.ReadString()
-    local secondary = net.ReadString()
-    local equipment = net.ReadString()
-
-    if player_manager.GetPlayerClass( ply ) == "cd2_spectator" then
-        player_manager.SetPlayerClass( ply, "cd2_player" )
-        ply:Spectate( OBS_MODE_NONE )
-        CD2SetUpPlayer( ply )
-    end
-
-    ply.cd2_WeaponSpawnDelay = CurTime() + 0.5
-    ply.cd2_spawnatnearestspawn = true
-    ply:Spawn()
-    ply:Give( primary )
-    ply:Give( secondary )
-
-    ply:SetEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
-    ply:SetMaxEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
-    ply.cd2_Equipment = equipment
-    ply.cd2_lastspawnprimary = primary
-    ply.cd2_lastspawnsecondary = secondary
-end )
-
+-- Received when a player finishes picking new weapons or refreshing their old weapons in a Agency Tactical Location
 net.Receive( "cd2net_resupply", function( len, ply )
     local primary = net.ReadString()
     local secondary = net.ReadString()
@@ -66,55 +14,8 @@ net.Receive( "cd2net_resupply", function( len, ply )
     ply:Give( secondary )
 end )
 
-net.Receive( "cd2net_reviveplayer", function( len, ply ) 
-    local agent = net.ReadEntity()
-    if agent:Alive() or !agent:GetCanRevive() then return end
 
-    ply.cd2_WeaponSpawnDelay = CurTime() + 0.5
-    agent:Spawn()
-    agent:SetPos( ply:GetPos() + ply:GetForward() * 60 + Vector( 0, 0, 5 ) )
-    agent:Give( agent.cd2_lastspawnprimary )
-    agent:Give( agent.cd2_lastspawnsecondary )
-end )
-
-local random = math.random
-net.Receive( "cd2net_playerregenerate", function( len, ply )
-    if !ply:IsCD2Agent() then return end
-    ply:SetCanRevive( false )
-
-    if !game.SinglePlayer() and ply.cd2_deathweapons then
-        local weps = ply.cd2_deathweapons
-        local ragdoll = ply:GetRagdollEntity()
-        for i = 1, #ply.cd2_deathweapons do
-            
-            local class = ply.cd2_deathweapons[ i ][ 1 ]
-            local reserve = ply.cd2_deathweapons[ i ][ 2 ]
-
-            local wep = ents.Create( class ) 
-            wep:SetPos( ragdoll:GetPos() + Vector( 0, 0, 20 ) )
-            wep:Spawn()
-            wep:SetReserveAmmo( reserve )
-
-            local phys = wep:GetPhysicsObject()
-
-            if IsValid( phys ) then
-                phys:ApplyForceCenter( Vector( random( -600, 600 ), random( -600, 600 ), random( 0, 600 ) ) )
-            end
-        end
-
-        local equipment = ents.Create( ply.cd2_deathequipment )
-        equipment:SetPos( ragdoll:GetPos() + Vector( 0, 0, 20 ) )
-        equipment:Spawn()
-
-        local phys = equipment:GetPhysicsObject()
-
-        if IsValid( phys ) then
-            phys:ApplyForceCenter( Vector( random( -8000, 8000 ), random( -8000, 8000 ), random( 0, 8000 ) ) )
-        end
-
-    end
-end )
-
+-- Received when a dead player calls for help. Multiplayer only
 net.Receive( "cd2net_playercallforhelp", function( len, ply ) 
 
     for k, v in ipairs( player.GetAll() ) do

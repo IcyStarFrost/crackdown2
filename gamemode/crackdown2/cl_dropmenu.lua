@@ -108,7 +108,7 @@ function CD2OpenDropMenu( issupplypoint )
         local toptext = vgui.Create( "DLabel", CD2_DropMenu )
         toptext:SetFont( "crackdown2_dropmenutoptext" )
         toptext:SetSize( 100, 100 )
-        toptext:SetText( "             AGENCY REDEPLOYMENT PROGRAM" )
+        toptext:SetText( !issupplypoint and "             AGENCY REDEPLOYMENT PROGRAM" or "             AGENCY SUPPORT" )
         toptext:Dock( TOP )
 
         local line = vgui.Create( "DPanel", CD2_DropMenu )
@@ -166,7 +166,8 @@ function CD2OpenDropMenu( issupplypoint )
         function detailmidpanel:Paint( w, h ) 
         end
 
-
+        local PRIMARYROW 
+        local SECONDARYROW
         
         -- Helper function
         local function CreateWeaponRow( text, varname, statpanel, isequipment )
@@ -214,6 +215,11 @@ function CD2OpenDropMenu( issupplypoint )
                 return variable
             end
 
+            -- Returns the current table index
+            function row:GetIndex()
+                return tblindex
+            end
+
             local function CreateWeaponHolder( isselectingpanel, indexadd )
                 local variable = _G[ varname ]
 
@@ -234,6 +240,8 @@ function CD2OpenDropMenu( issupplypoint )
                 function mdlpanel:DoClick()
                     if isselectingpanel then return end
                     tblindex = tblindex + indexadd
+                    if PRIMARYROW == row and tblindex == SECONDARYROW:GetIndex() then tblindex = tblindex + ( tblindex > 0 and indexadd or -indexadd ) end
+                    if SECONDARYROW == row and tblindex == PRIMARYROW:GetIndex() then tblindex = tblindex + ( tblindex > 0 and indexadd or -indexadd ) end
                     if tblindex == 0 then tblindex = #weaponlist elseif tblindex > #weaponlist then tblindex = 1 end
                     surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
                 end
@@ -263,6 +271,8 @@ function CD2OpenDropMenu( issupplypoint )
 
 
                 function mdlpanel:LayoutEntity() end
+
+                
 
                 function panel:Think()
                     local sub = tblindex + indexadd
@@ -340,8 +350,8 @@ function CD2OpenDropMenu( issupplypoint )
         backbutton:Dock( LEFT ) ]]
         
         
-        CreateWeaponRow( "PRIMARY", "CD2_DropPrimary", detailtoppanel )
-        CreateWeaponRow( "SECONDARY", "CD2_DropSecondary", detailmidpanel )
+        PRIMARYROW = CreateWeaponRow( "PRIMARY", "CD2_DropPrimary", detailtoppanel )
+        SECONDARYROW = CreateWeaponRow( "SECONDARY", "CD2_DropSecondary", detailmidpanel )
         CreateWeaponRow( "EXPLOSIVE", "CD2_DropEquipment", detailbottompanel, true )
         
         function line:Paint( w, h )

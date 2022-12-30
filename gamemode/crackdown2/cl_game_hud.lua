@@ -206,9 +206,15 @@ local function RemoveHUDpanels()
     if IsValid( CD2_equipmentpnl ) then CD2_equipmentpnl:Remove() end
 end
 
+CD2_DrawTargetting = true -- Draws crosshair and target healthbars
+CD2_DrawHealthandShields = true -- Draws health and shields bars
+CD2_DrawWeaponInfo = true -- Draws weapon info and equipment
+CD2_DrawMinimap = true -- Draws the tracker
+
 hook.Add( "HUDPaint", "crackdown2_hud", function()
     local scrw, scrh, ply = ScrW(), ScrH(), LocalPlayer()
     if CD2_InDropMenu then RemoveHUDpanels() return end
+    if !CD2_DrawWeaponInfo then RemoveHUDpanels() end
 
     if !game.SinglePlayer() then
         for k, v in ipairs( player_GetAll() ) do
@@ -260,238 +266,244 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     end
 
     -- Crosshair --
-    surface_SetDrawColor( !CD2_lockon and shadedwhite or red )
-    draw_Circle( scrw / 2, scrh / 2, 2, 30 )
+    if CD2_DrawTargetting then
+        surface_SetDrawColor( !CD2_lockon and shadedwhite or red )
+        draw_Circle( scrw / 2, scrh / 2, 2, 30 )
 
-    if CD2_lockon then
-        surface_DrawLine( ( scrw / 2 ), ( scrh / 2 ) + 10, ( scrw / 2 ), ( scrh / 2 ) + 20 )
-        surface_DrawLine( ( scrw / 2 ), ( scrh / 2 ) - 10, ( scrw / 2 ), ( scrh / 2 ) - 20 )
-        surface_DrawLine( ( scrw / 2 ) + 10, ( scrh / 2 ), ( scrw / 2 ) + 20, ( scrh / 2 ) )
-        surface_DrawLine( ( scrw / 2 ) - 10, ( scrh / 2 ), ( scrw / 2 ) - 20, ( scrh / 2 ) )
+        if CD2_lockon then
+            surface_DrawLine( ( scrw / 2 ), ( scrh / 2 ) + 10, ( scrw / 2 ), ( scrh / 2 ) + 20 )
+            surface_DrawLine( ( scrw / 2 ), ( scrh / 2 ) - 10, ( scrw / 2 ), ( scrh / 2 ) - 20 )
+            surface_DrawLine( ( scrw / 2 ) + 10, ( scrh / 2 ), ( scrw / 2 ) + 20, ( scrh / 2 ) )
+            surface_DrawLine( ( scrw / 2 ) - 10, ( scrh / 2 ), ( scrw / 2 ) - 20, ( scrh / 2 ) )
+        end
     end
     ------
 
 
     -- Health and Shields --
-    local hp, maxhp, shield, maxshields, hpbars = ply:Health(), ply:GetMaxHealth(), clamp( ply:Armor(), 0, 100 ), ply:GetMaxArmor(), ( ceil( ply:Health() / 100 ) )
+    if CD2_DrawHealthandShields then
+        local hp, maxhp, shield, maxshields, hpbars = ply:Health(), ply:GetMaxHealth(), clamp( ply:Armor(), 0, 100 ), ply:GetMaxArmor(), ( ceil( ply:Health() / 100 ) )
 
-    hplerp = hplerp == -1 and hp or hplerp
-    shieldlerp = shieldlerp == -1 and shield or shieldlerp
+        hplerp = hplerp == -1 and hp or hplerp
+        shieldlerp = shieldlerp == -1 and shield or shieldlerp
 
-    local modulate =  ( ( hp % 100 ) / 100 ) * ScreenScale( 96 )
-    hplerp = Lerp( 30 * FrameTime(), hplerp, modulate == 0 and ScreenScale( 96 ) or modulate)
-    shieldlerp = Lerp( 30 * FrameTime(), shieldlerp, ( shield / maxshields ) * ScreenScale( 96 ) )
+        local modulate =  ( ( hp % 100 ) / 100 ) * ScreenScale( 96 )
+        hplerp = Lerp( 30 * FrameTime(), hplerp, modulate == 0 and ScreenScale( 96 ) or modulate)
+        shieldlerp = Lerp( 30 * FrameTime(), shieldlerp, ( shield / maxshields ) * ScreenScale( 96 ) )
 
-    surface_SetDrawColor( blackish )
-    surface_DrawRect( 70, 50, ScreenScale( 100 ), 35 )
-
-    if hpbars > 1 then
         surface_SetDrawColor( blackish )
-        surface_DrawRect( 70, 80, ScreenScale( 33.5 ), 13 )
+        surface_DrawRect( 70, 50, ScreenScale( 100 ), 35 )
 
-        for i = 1, hpbars do
-            if i == 1 then continue end
-            surface_SetDrawColor( orangeish )
-            draw_Circle( 60 + ( 20 * ( i - 1 ) ), 90, 8, 5 )
+        if hpbars > 1 then
+            surface_SetDrawColor( blackish )
+            surface_DrawRect( 70, 80, ScreenScale( 33.5 ), 13 )
+
+            for i = 1, hpbars do
+                if i == 1 then continue end
+                surface_SetDrawColor( orangeish )
+                draw_Circle( 60 + ( 20 * ( i - 1 ) ), 90, 8, 5 )
+            end
         end
+
+
+        surface_SetDrawColor( color_white )
+        surface_DrawRect( 75, 55, shieldlerp, 10 )
+
+        if hpbars == 1 then
+            hpred.r = math_max( 30, ( abs( math_sin( SysTime() * 1.5 ) * 163 ) ), ( abs( math_cos( SysTime() * 1.5 ) * 163 ) ) )
+            hpred.g = ( abs( math_sin( SysTime() * 1.5 ) * 12 ) )
+            hpred.b = ( abs( math_sin( SysTime() * 1.5 ) * 12 ) )
+        end
+
+        surface_SetDrawColor( hpbars > 1 and orangeish or hpred  )
+        surface_DrawRect( 75, 70, hplerp, 10 )
     end
-
-
-    surface_SetDrawColor( color_white )
-    surface_DrawRect( 75, 55, shieldlerp, 10 )
-
-    if hpbars == 1 then
-        hpred.r = math_max( 30, ( abs( math_sin( SysTime() * 1.5 ) * 163 ) ), ( abs( math_cos( SysTime() * 1.5 ) * 163 ) ) )
-        hpred.g = ( abs( math_sin( SysTime() * 1.5 ) * 12 ) )
-        hpred.b = ( abs( math_sin( SysTime() * 1.5 ) * 12 ) )
-    end
-
-    surface_SetDrawColor( hpbars > 1 and orangeish or hpred  )
-    surface_DrawRect( 75, 70, hplerp, 10 )
     ------
 
 
     -- Weapon Info --
-    local weapon = ply:GetActiveWeapon()
+    if CD2_DrawWeaponInfo then
+        local weapon = ply:GetActiveWeapon()
 
-    if IsValid( weapon ) then
-        local mdl = weapon:GetWeaponWorldModel()
+        if IsValid( weapon ) then
+            local mdl = weapon:GetWeaponWorldModel()
 
-        surface_SetDrawColor( blackish )
-        surface_DrawRect( scrw - 400, scrh - 130, 300, 30 )
+            surface_SetDrawColor( blackish )
+            surface_DrawRect( scrw - 400, scrh - 130, 300, 30 )
 
-        surface_SetDrawColor( blackish )
-        surface_DrawRect( scrw - 100, scrh - 140, 70, 40 )
+            surface_SetDrawColor( blackish )
+            surface_DrawRect( scrw - 100, scrh - 140, 70, 40 )
 
-        surface_SetDrawColor( blackish )
-        surface_DrawRect( scrw - 400, scrh - 100, 300, 60 )
+            surface_SetDrawColor( blackish )
+            surface_DrawRect( scrw - 400, scrh - 100, 300, 60 )
 
-        draw_DrawText( weapon:Ammo1(), "crackdown2_ammoreserve", scrw - 35, scrh - 140, color_white, TEXT_ALIGN_RIGHT )
+            draw_DrawText( weapon:Ammo1(), "crackdown2_ammoreserve", scrw - 35, scrh - 140, color_white, TEXT_ALIGN_RIGHT )
 
 
-        for i = 1, weapon:Clip1() do
-            local wscale = 300 / weapon:GetMaxClip1()
-            local x = ( scrw - 395 ) + ( wscale * ( i - 1 ) )
-            if x >= scrw - 395 and x + wscale / 2 <= scrw - 100 then
-                surface_SetDrawColor(color_white)
-                surface_DrawRect(x, scrh - 125, ceil( wscale / 2 ), 20)
+            for i = 1, weapon:Clip1() do
+                local wscale = 300 / weapon:GetMaxClip1()
+                local x = ( scrw - 395 ) + ( wscale * ( i - 1 ) )
+                if x >= scrw - 395 and x + wscale / 2 <= scrw - 100 then
+                    surface_SetDrawColor(color_white)
+                    surface_DrawRect(x, scrh - 125, ceil( wscale / 2 ), 20)
+                end
             end
+
+
+            if !IsValid( CD2_weaponpnl ) then
+                CD2_weaponpnl = vgui.Create( "DModelPanel", GetHUDPanel() )
+                CD2_weaponpnl:SetModel( mdl )
+                CD2_weaponpnl:SetPos( scrw - 400 , scrh - 100 )
+                CD2_weaponpnl:SetSize( 300, 60 )
+                CD2_weaponpnl:SetFOV( 50 )
+        
+                local ent = CD2_weaponpnl:GetEntity()
+                ent:SetMaterial( "models/debug/debugwhite" )
+                CD2_weaponpnl:SetCamPos( Vector( 0, 80, 0 ) )
+                CD2_weaponpnl:SetLookAt( ent:OBBCenter() )
+                
+        
+                local thinkpanel = vgui.Create( "DPanel", CD2_weaponpnl )
+        
+                function CD2_weaponpnl:PostDrawModel( ent ) 
+                    render.SuppressEngineLighting( false )
+                end
+        
+                function CD2_weaponpnl:PreDrawModel( ent ) 
+                    render.SuppressEngineLighting( true )
+                end
+                function CD2_weaponpnl:LayoutEntity() end
+                function thinkpanel:Paint( w, h ) end
+                function thinkpanel:Think()
+                    if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
+                    local wep = ply:GetActiveWeapon()
+                    if IsValid( CD2_weaponpnl ) and IsValid( wep ) then local ent = CD2_weaponpnl:GetEntity() ent:SetModel( wep:GetWeaponWorldModel() ) CD2_weaponpnl:SetLookAt( ent:OBBCenter() ) end
+                    
+                    if CD2_weaponpnl != self:GetParent() then
+                        self:GetParent():Remove()
+                    end
+                end
+            end
+
         end
 
+        
 
-        if !IsValid( CD2_weaponpnl ) then
-            CD2_weaponpnl = vgui.Create( "DModelPanel", GetHUDPanel() )
-            CD2_weaponpnl:SetModel( mdl )
-            CD2_weaponpnl:SetPos( scrw - 400 , scrh - 100 )
-            CD2_weaponpnl:SetSize( 300, 60 )
-            CD2_weaponpnl:SetFOV( 50 )
-    
-            local ent = CD2_weaponpnl:GetEntity()
+        surface_SetDrawColor( blackish )
+        surface_DrawRect( scrw - 120, scrh - 100, 90, 60 )
+
+
+        surface_SetDrawColor( linecol )
+        surface_DrawOutlinedRect( scrw - 120, scrh - 100, 90, 60, 2 )
+        surface_DrawOutlinedRect( scrw - 100, scrh - 140, 70, 40, 2 )
+        surface_DrawOutlinedRect( scrw - 400, scrh - 130, 300, 30, 2 )
+        surface_DrawOutlinedRect( scrw - 400, scrh - 100, 280, 60, 2 )
+
+        
+        
+        if !IsValid( CD2_equipmentpnl ) then
+            local mdl = scripted_ents.Get( CD2_DropEquipment ).WorldModel
+
+            CD2_equipmentpnl = vgui.Create( "DModelPanel", GetHUDPanel() )
+            CD2_equipmentpnl:SetModel( mdl )
+            CD2_equipmentpnl:SetPos( scrw - 135 , scrh - 85 )
+            CD2_equipmentpnl:SetSize( 64, 64 )
+            CD2_equipmentpnl:SetFOV( 60 )
+
+            local ent = CD2_equipmentpnl:GetEntity()
             ent:SetMaterial( "models/debug/debugwhite" )
-            CD2_weaponpnl:SetCamPos( Vector( 0, 80, 0 ) )
-            CD2_weaponpnl:SetLookAt( ent:OBBCenter() )
+            CD2_equipmentpnl:SetCamPos( Vector( 0, 15, 0 ) )
+            CD2_equipmentpnl:SetLookAt( ent:OBBCenter() )
             
-    
-            local thinkpanel = vgui.Create( "DPanel", CD2_weaponpnl )
-    
-            function CD2_weaponpnl:PostDrawModel( ent ) 
+
+            local thinkpanel = vgui.Create( "DPanel", CD2_equipmentpnl )
+
+            function CD2_equipmentpnl:PostDrawModel( ent ) 
                 render.SuppressEngineLighting( false )
             end
-    
-            function CD2_weaponpnl:PreDrawModel( ent ) 
+
+            function CD2_equipmentpnl:PreDrawModel( ent ) 
                 render.SuppressEngineLighting( true )
             end
-            function CD2_weaponpnl:LayoutEntity() end
+            function CD2_equipmentpnl:LayoutEntity() end
             function thinkpanel:Paint( w, h ) end
             function thinkpanel:Think()
                 if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
-                local wep = ply:GetActiveWeapon()
-                if IsValid( CD2_weaponpnl ) and IsValid( wep ) then local ent = CD2_weaponpnl:GetEntity() ent:SetModel( wep:GetWeaponWorldModel() ) CD2_weaponpnl:SetLookAt( ent:OBBCenter() ) end
-                
-                if CD2_weaponpnl != self:GetParent() then
+
+                if CD2_equipmentpnl != self:GetParent() then
                     self:GetParent():Remove()
                 end
             end
         end
 
+        draw_DrawText( ply:GetEquipmentCount(), "crackdown2_equipmentcount", scrw - 60, scrh - 90, color_white, TEXT_ALIGN_CENTER )
     end
-
-    
-
-    surface_SetDrawColor( blackish )
-    surface_DrawRect( scrw - 120, scrh - 100, 90, 60 )
-
-
-    surface_SetDrawColor( linecol )
-    surface_DrawOutlinedRect( scrw - 120, scrh - 100, 90, 60, 2 )
-    surface_DrawOutlinedRect( scrw - 100, scrh - 140, 70, 40, 2 )
-    surface_DrawOutlinedRect( scrw - 400, scrh - 130, 300, 30, 2 )
-    surface_DrawOutlinedRect( scrw - 400, scrh - 100, 280, 60, 2 )
-
-    
-    
-    if !IsValid( CD2_equipmentpnl ) then
-        local mdl = scripted_ents.Get( CD2_DropEquipment ).WorldModel
-
-        CD2_equipmentpnl = vgui.Create( "DModelPanel", GetHUDPanel() )
-        CD2_equipmentpnl:SetModel( mdl )
-        CD2_equipmentpnl:SetPos( scrw - 135 , scrh - 85 )
-        CD2_equipmentpnl:SetSize( 64, 64 )
-        CD2_equipmentpnl:SetFOV( 60 )
-
-        local ent = CD2_equipmentpnl:GetEntity()
-        ent:SetMaterial( "models/debug/debugwhite" )
-        CD2_equipmentpnl:SetCamPos( Vector( 0, 15, 0 ) )
-        CD2_equipmentpnl:SetLookAt( ent:OBBCenter() )
-        
-
-        local thinkpanel = vgui.Create( "DPanel", CD2_equipmentpnl )
-
-        function CD2_equipmentpnl:PostDrawModel( ent ) 
-            render.SuppressEngineLighting( false )
-        end
-
-        function CD2_equipmentpnl:PreDrawModel( ent ) 
-            render.SuppressEngineLighting( true )
-        end
-        function CD2_equipmentpnl:LayoutEntity() end
-        function thinkpanel:Paint( w, h ) end
-        function thinkpanel:Think()
-            if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
-
-            if CD2_equipmentpnl != self:GetParent() then
-                self:GetParent():Remove()
-            end
-        end
-    end
-
-    draw_DrawText( ply:GetEquipmentCount(), "crackdown2_equipmentcount", scrw - 60, scrh - 90, color_white, TEXT_ALIGN_CENTER )
-
-
-
     ------
 
 
     -- Lock on Entity health bars --
-    local lockables = CD2FindInLockableTragets( ply )
-    local target = ply.cd2_lockontarget or lockables[ 1 ]
+    if CD2_DrawTargetting then
+        local lockables = CD2FindInLockableTragets( ply )
+        local target = ply.cd2_lockontarget or lockables[ 1 ]
 
-    if IsValid( target ) then 
-        local toscreen = ( target:GetPos() + Vector( 0, 0, target:GetModelRadius() ) ):ToScreen()
-    
-        surface_SetDrawColor( blackish )
-        surface_DrawRect( toscreen.x - 30, toscreen.y, 60, 12 )
+        if IsValid( target ) then 
+            local toscreen = ( target:GetPos() + Vector( 0, 0, target:GetModelRadius() ) ):ToScreen()
+        
+            surface_SetDrawColor( blackish )
+            surface_DrawRect( toscreen.x - 30, toscreen.y, 60, 12 )
 
-        surface_SetDrawColor( orangeish )
-        surface_DrawRect( toscreen.x - 28, toscreen.y + 2, ( target:GetNWFloat( "cd2_health", 0 ) / target:GetMaxHealth() ) * 56, 8 )
-    
+            surface_SetDrawColor( orangeish )
+            surface_DrawRect( toscreen.x - 28, toscreen.y + 2, ( target:GetNWFloat( "cd2_health", 0 ) / target:GetMaxHealth() ) * 56, 8 )
+        
+        end
     end
     ------
 
 
     -- MiniMap --
-    local vel = ply:GetVelocity():Length()
-    vel = vel > 500 and vel or 0
-    addfov = Lerp( 1 * FrameTime(), addfov, vel % 10 )
+    if CD2_DrawMinimap then
+        local vel = ply:GetVelocity():Length()
+        vel = vel > 500 and vel or 0
+        addfov = Lerp( 1 * FrameTime(), addfov, vel % 10 )
 
-    render.PushRenderTarget( minimapRT )
+        render.PushRenderTarget( minimapRT )
 
-        mmTrace.start = ply:WorldSpaceCenter()
-        mmTrace.endpos = ply:GetPos() + Vector( 0, 0, 20000 )
-        mmTrace.mask = MASK_SOLID_BRUSHONLY
-        mmTrace.collisiongroup = COLLISION_GROUP_WORLD
-        local result = Trace( mmTrace )
+            mmTrace.start = ply:WorldSpaceCenter()
+            mmTrace.endpos = ply:GetPos() + Vector( 0, 0, 20000 )
+            mmTrace.mask = MASK_SOLID_BRUSHONLY
+            mmTrace.collisiongroup = COLLISION_GROUP_WORLD
+            local result = Trace( mmTrace )
 
-        render.RenderView( {
-            origin = ply:GetPos() + Vector( 0, 0, 20000 ),
-            angles = Angle( 90, CD2_viewangles[ 2 ], 0 ),
-            znear = result.Hit and result.HitPos:Distance( mmTrace.endpos ) or 10,
-            fov = 6 + addfov,
-            x = 0, y = 0,
-            w = 1024, h = 1024
-        } )
+            render.RenderView( {
+                origin = ply:GetPos() + Vector( 0, 0, 20000 ),
+                angles = Angle( 90, CD2_viewangles[ 2 ], 0 ),
+                znear = result.Hit and result.HitPos:Distance( mmTrace.endpos ) or 10,
+                fov = 6 + addfov,
+                x = 0, y = 0,
+                w = 1024, h = 1024
+            } )
 
-    render.PopRenderTarget()
+        render.PopRenderTarget()
 
-    surface_SetDrawColor( blackish )
-    draw_Circle( 200, scrh - 200, ScreenScale( 50 ), 30 )
+        surface_SetDrawColor( blackish )
+        draw_Circle( 200, scrh - 200, ScreenScale( 50 ), 30 )
 
-    surface_SetDrawColor( color_white )
-    surface_SetMaterial( minimapRTMat )
-    draw_Circle( 200, scrh - 200, ScreenScale( 50 ) - 10, 30 )
+        surface_SetDrawColor( color_white )
+        surface_SetMaterial( minimapRTMat )
+        draw_Circle( 200, scrh - 200, ScreenScale( 50 ) - 10, 30 )
 
-    surface_SetDrawColor( color_white )
-    surface_SetMaterial( playerarrow )
-    local _, angle = WorldToLocal( Vector(), ply:GetAngles(), ply:GetPos(), CD2_viewangles )
-    surface_DrawTexturedRectRotated( 200, scrh - 200, ScreenScale( 10 ), ScreenScale( 10 ), angle[ 2 ] )
+        surface_SetDrawColor( color_white )
+        surface_SetMaterial( playerarrow )
+        local _, angle = WorldToLocal( Vector(), ply:GetAngles(), ply:GetPos(), CD2_viewangles )
+        surface_DrawTexturedRectRotated( 200, scrh - 200, ScreenScale( 10 ), ScreenScale( 10 ), angle[ 2 ] )
 
---[[     local nearbyminimap = CD2FindInSphere( LocalPlayer():GetPos(), 2000, function( ent ) return ent:IsCD2NPC() end )
+    --[[     local nearbyminimap = CD2FindInSphere( LocalPlayer():GetPos(), 2000, function( ent ) return ent:IsCD2NPC() end )
 
-    for i = 1, #nearbyminimap do
-        local ent = nearbyminimap[ i ]
-        DrawEntOnMiniMap( ent )
-    end ]]
-    
+        for i = 1, #nearbyminimap do
+            local ent = nearbyminimap[ i ]
+            DrawEntOnMiniMap( ent )
+        end ]]
+    end
     ------
 
 end )

@@ -81,6 +81,7 @@ end
 local lookatcursorTime = 0
 local switchcooldown = 0
 function GM:CreateMove( cmd )
+    if CD2_PreventMovement then cmd:ClearMovement() cmd:ClearButtons() end
     local self = LocalPlayer()
 
     if !self:IsCD2Agent() then return end

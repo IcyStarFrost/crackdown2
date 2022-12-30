@@ -62,7 +62,7 @@ if CLIENT then
 
     -- Ambient music --
     local nexttrack = CurTime() + random( 90, 250 )
-    local tracks = { "sound/crackdown2/music/ambient/agency.mp3", "sound/crackdown2/music/ambient/hope.mp3", "sound/crackdown2/music/ambient/ambient1.mp3", "sound/crackdown2/music/ambient/ambient2.mp3", "sound/crackdown2/music/ambient/ambient3.mp3", "sound/crackdown2/music/ambient/ambient4.mp3", "sound/crackdown2/music/ambient/ambient5.mp3" }
+    local tracks = { "sound/crackdown2/music/ambient/agency.mp3", "sound/crackdown2/music/ambient/hope.mp3", "sound/crackdown2/music/ambient/ambient1.mp3", "sound/crackdown2/music/ambient/ambient2.mp3", "sound/crackdown2/music/ambient/ambient3.mp3", "sound/crackdown2/music/ambient/ambient4.mp3", "sound/crackdown2/music/ambient/ambient5.mp3", "sound/crackdown2/music/ambient/ambient6.mp3" }
     hook.Add( "Tick", "crackdown2_ambientmusic", function()
         if nexttrack and CurTime() > nexttrack then 
             nexttrack = nil

@@ -43,12 +43,17 @@ function PLAYER:Death()
         end
     end
 
+    self.Player:StripAmmo()
+
     net.Start( "cd2net_playerkilled" )
     net.Send( self.Player )
 end
 
 function PLAYER:Init()
     self.Player:SetCD2Team( "agency" )
+    self.Player:SetMeleeDamage( 25 ) -- By default, players can only deal 25 damage with melee. This will change according to StrengthSkill
+    self.Player:SetMaxPickupWeight( 200 ) -- By default, only pickup props with a mass of 200. This will change according to StrengthSkill
+    self.Player:SetSafeFallSpeed( 600 ) -- By default, the safe falling speed is 600. This will change according to AgilitySkill
 end
 
 function PLAYER:Spawn()
@@ -107,7 +112,7 @@ function PLAYER:SetupDataTables()
     self.Player:NetworkVar( "Int", 11, "EquipmentCount" ) -- The amount of equipment the player can have
     self.Player:NetworkVar( "Int", 12, "MaxPickupWeight" ) -- The max weight the player can pick up
     self.Player:NetworkVar( "Int", 13, "MaxEquipmentCount" ) -- The max amount of a certain equipment a player can have
-    self.Player:NetworkVar( "Int", 13, "MeleeDamage" ) -- The amount of melee damage the player can deal
+    self.Player:NetworkVar( "Int", 14, "MeleeDamage" ) -- The amount of melee damage the player can deal
 
     self.Player:NetworkVar( "Bool", 0, "IsRechargingShield" ) -- If the Player's shields are recharging
     self.Player:NetworkVar( "Bool", 1, "IsRegeningHealth" ) -- If the Player's health is regenerating
@@ -115,10 +120,6 @@ function PLAYER:SetupDataTables()
 
     self.Player:NetworkVar( "Float", 0, "NWHealth" ) -- Networked. Used for HUD and regen
     self.Player:NetworkVar( "Float", 1, "NWShields" ) -- Networked. Used for HUD and regen
-
-    self.Player:SetMeleeDamage( 25 ) -- By default, players can only deal 25 damage with melee. This will change according to StrengthSkill
-    self.Player:SetMaxPickupWeight( 200 ) -- By default, only pickup props with a mass of 200. This will change according to StrengthSkill
-    self.Player:SetSafeFallSpeed( 600 ) -- By default, the safe falling speed is 600. This will change according to AgilitySkill
 
 
 end

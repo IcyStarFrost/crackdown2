@@ -154,6 +154,16 @@ function CD2CreateSkillGainOrb( pos, ply, skillname, xp, col )
     orb:Spawn()
 end
 
+-- Creates a guide entity that spawns trailers that pathfinds from start to endpos
+function CD2CreateGuide( start, endpos )
+    local ent = ents.Create( "cd2_guidepather" )
+    ent:SetPos( start )
+    ent:SetGoalPosition( endpos )
+    ent:Spawn()
+    CD2DebugMessage( "Created Trailer Guide at ", start, " that ends at ", endpos  )
+    return ent
+end
+
 -- Sends a message to a player's or all player's chat
 function CD2SendText( ply, ... )
     net.Start( "cd2net_sendtext" )
@@ -256,6 +266,10 @@ function CD2QuickSpawnPeaceKeeperNPC()
     local ent = ents.Create( "cd2_peacekeeper" )
     ent:SetPos( Entity( 1 ):GetEyeTrace().HitPos )
     ent:Spawn()
+end
+
+function Cpos()
+    return Entity( 1 ):GetEyeTrace().HitPos
 end
 
 function Ctrace()

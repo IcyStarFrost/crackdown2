@@ -7,6 +7,7 @@ local input_GetKeyCode = input.GetKeyCode
 local input_GetKeyName = input.GetKeyName
 local draw_DrawText = draw.DrawText
 local IsValid = IsValid
+local upper = string.upper
 
 -- Begins the intro video
 function CD2BeginIntroVideo( endcallback )
@@ -20,14 +21,18 @@ function CD2BeginIntroVideo( endcallback )
 
     mediaclip:play()
 
+
+
+    local delay = SysTime() + 6 -- Delay for six seconds so the player doesn't see the youtube ui
+
     hook.Add( "KeyPress", "crackdown2_skipintro", function( ply, key )
         if !IsValid( CD2_videopanel ) then hook.Remove( "KeyPress", "crackdown2_skipintro" ) return end
-        if key == IN_USE and mediaclip:isValid() then
+        if key == IN_USE and mediaclip:isValid() and SysTime() > delay then
             CD2_videopanel:Remove()
         end
     end ) 
 
-    local delay = SysTime() + 6 -- Delay for six seconds so the player doesn't see the youtube ui
+
     local endskiptime = SysTime() + 14
     function CD2_videopanel:Think() if !mediaclip:isPlaying() and SysTime() > delay then if endcallback then endcallback() end hook.Remove( "KeyPress", "crackdown2_skipintro" ) self:Remove() end end
     function CD2_videopanel:OnRemove() if mediaclip:isValid() then mediaclip:stop() end end
@@ -46,7 +51,7 @@ function CD2BeginIntroVideo( endcallback )
             local code = input_GetKeyCode( usebind )
             local buttonname = input_GetKeyName( code )
 
-            draw_DrawText( "Press " .. buttonname .. " to skip first time playing intro", "crackdown2_equipmentcount", 50, h - 70, color_white, TEXT_ALIGN_LEFT )
+            draw_DrawText( "Press " .. upper( buttonname ) .. " to skip first time playing intro", "crackdown2_equipmentcount", 50, h - 70, color_white, TEXT_ALIGN_LEFT )
         end
     end
 

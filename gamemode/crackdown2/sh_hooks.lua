@@ -60,7 +60,7 @@ end
 
 -- Basic fall damage
 function GM:GetFallDamage( ply, speed ) 
-    if ply:IsCD2Agent() and speed < ply:GetSafeFallSpeed() or ply.cd2_IsUsingGroundStrike and speed < ( ply:GetSafeFallSpeed() * 1.5 ) then return 0 end
-    return max( 0, ceil( 0.2918 * speed - 141.75 ) )
+    if ply:IsCD2Agent() and ply.cd2_IsUsingGroundStrike then return 0 end
+    return max( 0, ceil( 0.2918 * speed - 141.75 ) - ply:GetSafeFallSpeed() )
 end
 

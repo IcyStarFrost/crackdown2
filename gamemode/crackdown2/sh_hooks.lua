@@ -2,6 +2,11 @@ local ceil = math.ceil
 local max = math.max
 
 
+
+--[[ models/player/combine_soldier.mdl
+models/player/combine_super_soldier.mdl
+models/player/soldier_stripped.mdl ]]
+
 -- Set playermodels
 function GM:PlayerSetModel( ply )
     ply:SetModel( "models/player/combine_super_soldier.mdl" )

@@ -192,7 +192,7 @@ function ENT:Draw()
 
         self:SetupBones()
         self:SetAngles( Angle( 0, SysTime() * 60, 0 ) )
-        self:SetPos( LerpVector( 3 * FrameTime(), self:GetPos(), self.cd2_effectpos + Vector( 0, 0, 40 ) ))
+        self:SetPos( !game.SinglePlayer() and LerpVector( 3 * FrameTime(), self:GetPos(), self.cd2_effectpos + Vector( 0, 0, 40 ) ) or self.cd2_effectpos + Vector( 0, 0, 40 ) )
         
         self.cd2_lightbeamw = self.cd2_lightbeamw and Lerp( 1 * FrameTime(), self.cd2_lightbeamw, 30 ) or 0
         self.cd2_lightbeamh = self.cd2_lightbeamh and Lerp( 1 * FrameTime(), self.cd2_lightbeamh, 40 ) or 0

@@ -41,3 +41,64 @@ function PLAYER:HandsAngles()
     local attach = self:GetAttachment( self:LookupAttachment( "anim_attachment_RH") )
     return attach.Ang
 end
+
+function PLAYER:StartLevelUpEffect()
+
+
+    
+    net.Start( "cd2net_playerlevelupeffect" )
+    net.WriteEntity( self ) 
+    net.Broadcast()
+
+    BroadcastLua( "Entity( " .. self:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_GMOD_GESTURE_BOW, true )" )
+    
+    CD2CreateThread( function()
+        coroutine.wait( 1 )
+        if !IsValid( self ) then return end
+        BroadcastLua( "Entity( " .. self:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_GMOD_GESTURE_TAUNT_ZOMBIE, true )" )
+
+        local near = CD2FindInSphere( self:GetPos(), 200, function( ent ) return ent != self end )
+
+        for i = 1, #near do
+            local ent = near[ i ]
+            if !IsValid( ent ) then return end
+            local force = ent:IsCD2NPC() and 20000 or IsValid( hitphys ) and hitphys:GetMass() * 10 or 20000
+            local info = DamageInfo()
+            info:SetAttacker( self )
+            info:SetDamage( 100 )
+            info:SetDamageType( DMG_CLUB + DMG_BLAST + DMG_BULLET )
+            info:SetDamageForce( ( ent:WorldSpaceCenter() - self:GetPos() ):GetNormalized() * force )
+            info:SetDamagePosition( self:GetPos() )
+            ent:TakeDamageInfo( info )
+        end
+    end )
+
+    
+    CD2CreateThread( function()
+
+        self:Freeze( true )
+
+        coroutine.wait( 3.5 )
+        if !IsValid( self ) then return end
+        
+
+        self:Freeze( false )
+
+    end )
+
+    CD2CreateThread( function()
+        if !IsValid( self ) then return end
+
+        for i = 1, 50 do
+            if !IsValid( self ) then return end
+
+            local trailer = ents.Create( "cd2_respawntrail" )
+            trailer:SetPos( self:WorldSpaceCenter() + VectorRand( -150, 150 ) )
+            trailer:SetPlayer( self )
+            trailer:Spawn()
+
+            coroutine.wait( 0.01 )
+        end
+    
+    end )
+end

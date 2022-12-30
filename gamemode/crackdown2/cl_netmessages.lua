@@ -188,3 +188,86 @@ end )
 net.Receive( "cd2net_sendtextboxmessage", function()
     CD2SetTextBoxText( net.ReadString() )
 end )
+
+local energy = Material( "crackdown2/effects/energy.png" )
+net.Receive( "cd2net_playerlevelupeffect", function() 
+    local ply = net.ReadEntity()
+    if !IsValid( ply ) then return end
+
+    CD2StartMusic( "sound/crackdown2/music/levelup.mp3", 4, false, true )
+    ply:EmitSound( "crackdown2/ply/spawnenergy.mp3", 70, 100, 1, CHAN_AUTO )
+
+    CD2CreateThread( function()
+
+        coroutine.wait( 1 )
+
+        local particle = ParticleEmitter( ply:GetPos() )
+        for i = 1, 150 do
+            
+            local part = particle:Add( energy, ply:GetPos() )
+    
+            if part then
+                part:SetStartSize( 20 )
+                part:SetEndSize( 20 ) 
+                part:SetStartAlpha( 255 )
+                part:SetEndAlpha( 0 )
+    
+                part:SetColor( 255, 255, 255 )
+                part:SetLighting( false )
+                part:SetCollide( false )
+    
+                part:SetDieTime( 2 )
+                part:SetGravity( Vector() )
+                part:SetAirResistance( 200 )
+                part:SetVelocity( Vector( math.sin( i ) * 1000, math.cos( i ) * 1000, 0 ) )
+                part:SetAngleVelocity( AngleRand( -1, 1 ) )
+            end
+    
+        end
+    
+        particle:Finish()
+
+    end )
+
+    CD2CreateThread( function()
+
+        coroutine.wait( 1 )
+
+
+        local particle = ParticleEmitter( ply:GetPos() )
+        for i = 1, 400 do
+            
+            local index = random( ply:GetBoneCount() )
+            local pos = ply:GetBonePosition( index )
+            if pos == ply:GetPos() then
+                local matrix = ply:GetBoneMatrix( index )
+                if !matrix then pos = ply:WorldSpaceCenter() else pos = matrix:GetTranslation() end
+            end
+            pos = pos or ply:WorldSpaceCenter()
+
+            local part = particle:Add( energy, pos )
+    
+            if part then
+                part:SetStartSize( 6 )
+                part:SetEndSize( 6 ) 
+                part:SetStartAlpha( 255 )
+                part:SetEndAlpha( 0 )
+    
+                part:SetColor( 255, 255, 255 )
+                part:SetLighting( false )
+                part:SetCollide( false )
+    
+                part:SetDieTime( 0.2 )
+                part:SetGravity( Vector() )
+                part:SetAirResistance( 200 )
+                part:SetVelocity( Vector() )
+                part:SetAngleVelocity( AngleRand( -4, 4 ) )
+            end
+    
+            coroutine.wait( 0.01 )
+        end
+    
+        particle:Finish()
+
+    end )
+end )

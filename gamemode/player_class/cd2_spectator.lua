@@ -29,11 +29,9 @@ end
 function PLAYER:Spawn()
     self.Player:Spectate( OBS_MODE_ROAMING )
 
-    net.Start( "cd2net_playmainmenumusic" )
-    net.Send( self.Player ) 
-
-    net.Start( "cd2net_openspawnpointmenu" )
+    net.Start( "cd2net_playerinitialspawn" )
     net.Send( self.Player )
+    
 end
 
 function PLAYER:SetupDataTables()

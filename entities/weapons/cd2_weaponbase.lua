@@ -334,7 +334,6 @@ function SWEP:Reload()
             self:SetClip1( count )
 
             if SERVER then 
-                print( count - oldclip )
                 self:GetOwner():RemoveAmmo( count - oldclip, self.Primary.Ammo )
             end
         else

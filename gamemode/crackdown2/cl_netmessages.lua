@@ -151,6 +151,23 @@ net.Receive( "cd2net_sendspawnvectors", function()
     CD2_SpawnPoints = util.JSONToTable( json )
 end )
 
+net.Receive( "cd2net_playerinitialspawn", function()
+    local delay = SysTime() + 6 
+    CD2CreateThread( function()
+        local clip = CD2BeginIntroVideo()
+
+        while clip:isPlaying() or SysTime() < delay do
+            coroutine.yield()
+        end
+
+        CD2OpenSpawnPointMenu()
+        
+        CD2StartMusic( "sound/crackdown2/music/mainmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
+            if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
+        end )
+    end )
+end )
+
 
 net.Receive( "cd2net_playguitar", function()
     local path = net.ReadString()

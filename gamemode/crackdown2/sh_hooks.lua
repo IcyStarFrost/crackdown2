@@ -42,6 +42,10 @@ function GM:AllowPlayerPickup()
     return false
 end
 
+function GM:PlayerCanHearPlayersVoice( listener, talker )
+    return player_manager.GetPlayerClass( listener ) != "cd2_spectator"
+end
+
 -- Disable default player name display
 function GM:HUDDrawTargetID()
 end

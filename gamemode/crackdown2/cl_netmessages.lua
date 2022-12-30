@@ -152,16 +152,15 @@ net.Receive( "cd2net_sendspawnvectors", function()
 end )
 
 net.Receive( "cd2net_playerinitialspawn", function()
-    local delay = SysTime() + 6 
     CD2CreateThread( function()
         local clip = CD2BeginIntroVideo()
 
-        while clip:isPlaying() or SysTime() < delay do
+        while IsValid( CD2_videopanel ) do
             coroutine.yield()
         end
 
         CD2OpenSpawnPointMenu()
-        
+
         CD2StartMusic( "sound/crackdown2/music/mainmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
             if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
         end )

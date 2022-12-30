@@ -44,8 +44,6 @@ end
 
 function PLAYER:StartLevelUpEffect()
 
-
-    
     net.Start( "cd2net_playerlevelupeffect" )
     net.WriteEntity( self ) 
     net.Broadcast()

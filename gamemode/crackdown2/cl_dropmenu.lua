@@ -2,10 +2,14 @@ local surface_SetDrawColor = surface.SetDrawColor
 local surface_DrawRect = surface.DrawRect
 local surface_DrawTexturedRect = surface.DrawTexturedRect
 local surface_DrawOutlinedRect = surface.DrawOutlinedRect
+local draw_DrawText = draw.DrawText
 local surface_SetMaterial = surface.SetMaterial
+local ceil = math.ceil
 local blackish = Color( 39, 39, 39)
 local fadedwhite = Color( 255, 255, 255, 10 )
+local orange = Color( 255, 115, 0 )
 local grey = Color( 100, 100, 100 )
+local lightgrey = Color( 143, 143, 143)
 local background = Material( "crackdown2/dropmenu/bg.png", "smooth" )
 local Lerp = Lerp
 local IsValid = IsValid
@@ -57,6 +61,25 @@ surface.CreateFont( "crackdown2_dropmenutext2", {
     font = "Agency FB",
 	extended = false,
 	size = 45,
+	weight = 500,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false,
+
+})
+
+surface.CreateFont( "crackdown2_weaponstattext", {
+    font = "Agency FB",
+	extended = false,
+	size = ceil( ScreenScale( 6.5 ) ),
 	weight = 500,
 	blursize = 0,
 	scanlines = 0,
@@ -129,21 +152,119 @@ function CD2OpenDropMenu( issupplypoint )
         
         coroutine.wait( 0 ) -- Delay so CD2_DropMenu can re-layout so we can get accurate position/sizing value
 
-        local function CreateWeaponStatsPanel()
+
+
+        local function CreateWeaponStatsPanel( isequipment )
             local panel = vgui.Create( "DPanel", weapondetailpanel )
             panel:DockMargin( 3, 3, 3, 3 )
             panel:SetSize( 250, weapondetailpanel:GetTall() / 3 )
             panel:Dock( TOP )
+            panel:InvalidateParent()
+
+            coroutine.wait( 0 )
     
             local label = vgui.Create( "DLabel", panel )
             label:SetFont( "crackdown2_dropmenutext2" )
-            label:SetSize( 100, 60 )
+            label:SetSize( 100, 50 )
             label:SetColor( Color( 218, 103, 10 ) )
             label:SetText( "  UNAVAILABLE" )
             label:Dock( TOP )
 
+            local statsholder = vgui.Create( "DPanel", panel )
+            statsholder:SetSize( 100, panel:GetTall() / 3 )
+            statsholder:Dock( BOTTOM )
+
+            local modelpanel = vgui.Create( "DModelPanel", panel )
+            modelpanel:SetSize( 100, panel:GetTall() / 3 )
+            modelpanel:SetModel( "models/error.mdl" )
+            modelpanel:Dock( TOP )
+            modelpanel:SetFOV( 50 )
+
+            local ent = modelpanel:GetEntity()
+            modelpanel:SetCamPos( Vector( -70, 70, 0 ) )
+            modelpanel:SetLookAt( ent:OBBCenter() + Vector( 0, 0, 5 ) )
+
+            local dmg 
+            local range 
+            local firerate
+            local feature
+
+            function statsholder:Paint( w, h )
+                surface_SetDrawColor( fadedwhite )
+                surface_DrawOutlinedRect( 0, 0, w, h, 2 )
+                draw_DrawText( !isequipment and "BULLET DAMAGE" or "DAMAGE", "crackdown2_weaponstattext", 10, 10, lightgrey, TEXT_ALIGN_LEFT )
+                draw_DrawText( !isequipment and "EFFECTIVE RANGE" or "BLAST RADIUS", "crackdown2_weaponstattext", 10, 35, lightgrey, TEXT_ALIGN_LEFT )
+
+                local scale = ScreenScale( 5 )
+
+                if dmg then
+
+                    for i = 1, 10 do
+                        surface_SetDrawColor( blackish )
+                        surface_DrawRect( ( panel:GetWide() / 2 ) + ( 20 * i ), 10, scale, scale )
+                    end
+
+                    for i = 1, dmg do
+                        surface_SetDrawColor( orange )
+                        surface_DrawRect( ( panel:GetWide() / 2 ) + ( 20 * i ), 10, scale, scale )
+                    end
+                end
+
+                if range then
+
+                    for i = 1, 10 do
+                        surface_SetDrawColor( blackish )
+                        surface_DrawRect( ( panel:GetWide() / 2 ) + ( 20 * i ), 35, scale, scale )
+                    end
+                    
+                    for i = 1, range do
+                        surface_SetDrawColor( orange )
+                        surface_DrawRect( ( panel:GetWide() / 2 ) + ( 20 * i ), 35, scale, scale )
+                    end
+                end
+
+                if !isequipment and firerate then
+
+                    for i = 1, 10 do
+                        surface_SetDrawColor( blackish )
+                        surface_DrawRect( ( panel:GetWide() / 2 ) + ( 20 * i ), 60, scale, scale )
+                    end
+
+                    for i = 1, firerate do
+                        surface_SetDrawColor( orange )
+                        surface_DrawRect( ( panel:GetWide() / 2 ) + ( 20 * i ), 60, scale, scale )
+                    end
+                end
+
+                if !isequipment then 
+                    draw_DrawText( "FIRE RATE", "crackdown2_weaponstattext", 10, 60, lightgrey, TEXT_ALIGN_LEFT )
+                end
+            end
+
+            local oldpaint = modelpanel.Paint
+
+            function modelpanel:Paint( w, h )
+                oldpaint( self, w, h )
+                local scale = ScreenScale( 9 )
+
+                if !isequipment and feature then
+                    draw_DrawText( "FEATURE", "crackdown2_weaponstattext", 10, h - scale, lightgrey, TEXT_ALIGN_LEFT )
+                    draw_DrawText( feature, "crackdown2_weaponstattext", 50, h - scale, lightgrey, TEXT_ALIGN_LEFT )
+                elseif isequipment and feature then
+                    draw_DrawText( "FEATURE", "crackdown2_weaponstattext", 10, h - scale, lightgrey, TEXT_ALIGN_LEFT )
+                    draw_DrawText( feature, "crackdown2_weaponstattext", 50, h - scale, lightgrey, TEXT_ALIGN_LEFT )
+                end
+            end
+
+            function modelpanel:LayoutEntity() end
+
             function panel:SetWeaponData( data )
                 label:SetText( "  " .. data.PrintName )
+                modelpanel:SetModel( data.WorldModel )
+                dmg = data.DropMenu_Damage
+                range = data.DropMenu_Range
+                firerate = data.DropMenu_FireRate
+                feature = data.DropMenu_Feature
             end
 
             return panel
@@ -151,7 +272,7 @@ function CD2OpenDropMenu( issupplypoint )
 
         local detailtoppanel = CreateWeaponStatsPanel()
         local detailmidpanel =  CreateWeaponStatsPanel()
-        local detailbottompanel =  CreateWeaponStatsPanel()
+        local detailbottompanel =  CreateWeaponStatsPanel( true )
 
         function detailtoppanel:Paint( w, h ) 
             surface_SetDrawColor( fadedwhite )
@@ -168,6 +289,7 @@ function CD2OpenDropMenu( issupplypoint )
 
         local PRIMARYROW 
         local SECONDARYROW
+        local EQUIPMENTROW
         
         -- Helper function
         local function CreateWeaponRow( text, varname, statpanel, isequipment )
@@ -352,7 +474,7 @@ function CD2OpenDropMenu( issupplypoint )
         
         PRIMARYROW = CreateWeaponRow( "PRIMARY", "CD2_DropPrimary", detailtoppanel )
         SECONDARYROW = CreateWeaponRow( "SECONDARY", "CD2_DropSecondary", detailmidpanel )
-        CreateWeaponRow( "EXPLOSIVE", "CD2_DropEquipment", detailbottompanel, true )
+        EQUIPMENTROW = CreateWeaponRow( "EXPLOSIVE", "CD2_DropEquipment", detailbottompanel, true )
         
         function line:Paint( w, h )
             surface_SetDrawColor( color_white )

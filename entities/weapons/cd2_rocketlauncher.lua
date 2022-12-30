@@ -20,6 +20,10 @@ SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 2
 SWEP.ReloadSounds = { { 0, "weapons/smg1/smg1_reload.wav" }, { 2, "weapons/slam/mine_mode.wav" } }
 
+SWEP.DropMenu_Damage = 10
+SWEP.DropMenu_Range = 6
+SWEP.DropMenu_FireRate = 1
+
 SWEP.IsExplosive = true
 SWEP.HoldType = "rpg"
 SWEP.Primary.ShootSound = "weapons/rpg/rocketfire1.wav"

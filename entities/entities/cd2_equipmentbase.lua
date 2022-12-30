@@ -13,6 +13,10 @@ ENT.TickSound = nil -- The sound that will play as the grenade ticks
 ENT.RemoveOnInvalid = false -- If true, the equipment will remove itself if its thrower is invalid
 --
 
+ENT.DropMenu_Damage = 0
+ENT.DropMenu_Range = 0
+
+
 -- Util vars
 ENT.NextTickSound = 0 -- Then next time the tick sound will play
 ENT.Exploded = false -- If the grenade exploded or not

@@ -22,6 +22,14 @@ SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 2 -- The time it will take to reload
 SWEP.ReloadSounds = {} -- A table of tables with the first key being the time to play the sound and the second key being the path to the sound
 
+
+-- Drop menu shown stats. These values must be clamped to 0 to 10!
+SWEP.DropMenu_Damage = 0
+SWEP.DropMenu_Range = 0
+SWEP.DropMenu_FireRate = 0
+SWEP.DropMenu_Feature = nil -- What makes this weapon unique. I.E UV 
+--
+
 SWEP.IsExplosive = false -- If the weapon is explosive. used to render the dropped weapon color to yellow
 SWEP.DamageFalloffDiv = 200 -- The divisor amount to lower damage based on distance
 SWEP.LockOnRange = 2000 -- How far can the player lock onto targets

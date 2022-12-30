@@ -10,6 +10,10 @@ ENT.TrailColor = Color( 255 ,174, 0)
 ENT.DelayTime = 3 -- The time before the grenade blows up. 0 for no timed explosive
 ENT.TickSound = "crackdown2/weapons/fragtick.mp3"
 
+ENT.DropMenu_Damage = 5
+ENT.DropMenu_Range = 5
+
+
 function ENT:OnDelayEnd()
 
     if CLIENT then

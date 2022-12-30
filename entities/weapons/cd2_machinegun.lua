@@ -18,5 +18,9 @@ SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 3.5
 SWEP.ReloadSounds = { { 0, "weapons/m249/m249_coverup.wav" }, { 0.9, "weapons/m249/m249_boxout.wav" }, { 1.9, "weapons/m249/m249_boxin.wav" }, { 2.7, "weapons/m249/m249_chain.wav" }, { 3, "weapons/m249/m249_coverdown.wav" } }
 
+SWEP.DropMenu_Damage = 7
+SWEP.DropMenu_Range = 5
+SWEP.DropMenu_FireRate = 7
+
 SWEP.HoldType = "ar2"
 SWEP.Primary.ShootSound = "weapons/m249/m249-1.wav"

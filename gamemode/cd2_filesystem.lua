@@ -5,6 +5,7 @@ local decompress = util.Decompress
 print( "Crackdown2 Console: File System has been loaded")
 
 file.CreateDir( "crackdown2" )
+file.CreateDir( "crackdown2/mapdata" )
 
 -- The gamemode's custom file system. This is what handles the saving, loading, and general data players have
 CD2FILESYSTEM = {}
@@ -47,6 +48,20 @@ function CD2FILESYSTEM:Read( filename, type )
 	return contents
 end
 
+-- Writes a value to the current map's data. These two are typically used to save/load Agility Orbs and more
+function CD2FILESYSTEM:WriteMapData( var, any )
+    if !file.Exists( "crackdown2/mapdata/" .. game.GetMap() ) then file.CreateDir( "crackdown2/mapdata/" .. game.GetMap() ) end
+    if !file.Exists( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "DATA" ) then CD2FILESYSTEM:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", {}, "compressed" ) end
+    local data = CD2FILESYSTEM:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "compressed" )
+    data[ var ] = any
+    CD2FILESYSTEM:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", data, "compressed" )
+end
+
+-- Reads from the current map's data. These two are typically used to save/load Agility Orbs and more
+function CD2FILESYSTEM:ReadMapData( var )
+    local data = CD2FILESYSTEM:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "compressed" )
+    return data and data[ var ]
+end
 
 if CLIENT then
 

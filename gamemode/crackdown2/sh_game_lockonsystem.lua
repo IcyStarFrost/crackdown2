@@ -81,11 +81,26 @@ hook.Add( "Think", "crackdown2_lockon", function()
 end )
 
 if SERVER then
+
+    -- Decaying Lock on Spread
+    hook.Add( "Tick", "crackdown2_lockonspreadhandle", function()
+        local players = player_GetAll()
+        for i = 1, #players do
+            local ply = players[ i ]
+            if !ply:IsCD2Agent() or !ply.cd2_LockOnPos then return end
+            
+            if ply:GetLockonSpreadDecay() > 0 then
+                ply:SetLockonSpreadDecay( Lerp( ply.cd2_LockOnPos == "body" and 10 * FrameTime() or 4 * FrameTime(), ply:GetLockonSpreadDecay(), 0 ) )
+            end
+        end
+    end )
+
+
     net.Receive( "cd2net_changelockonpos", function( len, ply )
         ply.cd2_LockOnPos = net.ReadString()
         
         if ply.cd2_LockOnPos == "head" then 
-            local dist = ply:GetPos():Distance( ply:GetNW2Entity( "cd2_lockontarget", nil ):GetPos() ) / 100
+            local dist = ply:GetPos():Distance( ply:GetNW2Entity( "cd2_lockontarget", nil ):GetPos() ) / 150
 
             ply:SetLockonSpreadDecay( dist * 0.08 ) 
         end

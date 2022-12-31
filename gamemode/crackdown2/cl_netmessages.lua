@@ -301,3 +301,79 @@ net.Receive( "cd2net_playerlevelupeffect", function()
 
     end )
 end )
+
+local flame = Material( "crackdown2/effects/flamelet1.png" )
+net.Receive( "cd2net_freakkill", function()
+    local ragdoll = net.ReadEntity()
+    if !IsValid( ragdoll ) then return end
+
+    CD2CreateThread( function()
+
+        local particle = ParticleEmitter( ragdoll:GetPos() )
+        for i = 1, 130 do
+            if !IsValid( ragdoll ) then particle:Finish() return end
+            
+            local index = random( ragdoll:GetBoneCount() )
+            local pos = ragdoll:GetBonePosition( index )
+            if pos == ragdoll:GetPos() then
+                local matrix = ragdoll:GetBoneMatrix( index )
+                if !matrix then pos = ragdoll:WorldSpaceCenter() else pos = matrix:GetTranslation() end
+            end
+            pos = pos or ragdoll:WorldSpaceCenter()
+
+            local part = particle:Add( flame, pos )
+    
+            if part then
+                part:SetStartSize( 6 )
+                part:SetEndSize( 6 ) 
+                part:SetStartAlpha( 255 )
+                part:SetEndAlpha( 0 )
+    
+                part:SetColor( 255, 255, 255 )
+                part:SetLighting( false )
+                part:SetCollide( false )
+    
+                part:SetDieTime( 0.2 )
+                part:SetGravity( Vector() )
+                part:SetAirResistance( 200 )
+                part:SetVelocity( Vector() )
+                part:SetAngleVelocity( AngleRand( -4, 4 ) )
+            end
+    
+            coroutine.wait( 0.01 )
+        end
+    
+        particle:Finish()
+
+    end )
+
+    ragdoll:CallOnRemove( "effect", function() 
+        sound.Play( "ambient/fire/gascan_ignite1.wav", ragdoll:GetPos(), 60, 100, 1 )
+        local particle = ParticleEmitter( ragdoll:GetPos() )
+        for i = 1, 60 do
+            if !IsValid( ragdoll ) then return end
+
+            local part = particle:Add( "particle/SmokeStack", ragdoll:GetPos() )
+    
+            if part then
+                part:SetStartSize( 10 )
+                part:SetEndSize( 10 ) 
+                part:SetStartAlpha( 255 )
+                part:SetEndAlpha( 0 )
+    
+                part:SetColor( 255, 255, 50 )
+                part:SetLighting( false )
+                part:SetCollide( true )
+    
+                part:SetDieTime( 2 )
+                part:SetGravity( Vector( 0, 0, -80 ) )
+                part:SetAirResistance( 200 )
+                part:SetVelocity( Vector( random( -200, 200 ), random( -200, 200 ), random( -200, 200 ) ) )
+                part:SetAngleVelocity( AngleRand( -1, 1 ) )
+            end
+    
+        end
+    
+        particle:Finish()
+    end )
+end )

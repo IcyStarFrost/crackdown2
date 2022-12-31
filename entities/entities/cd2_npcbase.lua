@@ -352,7 +352,7 @@ function ENT:Think()
     
 
 
-    if SERVER and CurTime() > self.cd2_AnimUpdate then
+    if SERVER and CurTime() > self.cd2_AnimUpdate and !self.cd2_dontupdateanims then
         if self:WaterLevel() != 0 then
             local info = DamageInfo()
             info:SetAttacker( Entity( 0 ) )
@@ -441,6 +441,23 @@ function ENT:OnLandOnGround()
 
 end
 
+function ENT:PlaySequenceAndWait( name, speed )
+
+    self.cd2_dontupdateanims = true
+	local len = self:SetSequence( name )
+	speed = speed or 1
+
+	self:ResetSequenceInfo()
+	self:SetCycle( 0 )
+	self:SetPlaybackRate( speed )
+
+	coroutine.wait( len / speed )
+
+    self.cd2_dontupdateanims = false
+
+end
+
+
 function ENT:OnNavAreaChanged( old, new )
     self.cd2_NavArea = new
 end
@@ -519,7 +536,7 @@ function ENT:OnKilled( info )
         ragdoll:Remove()
     end )
 
-    if self.OnKilled2 then self:OnKilled2( info ) end
+    if self.OnKilled2 then self:OnKilled2( info, ragdoll ) end
 end
 
 function ENT:BodyUpdate()

@@ -6,7 +6,7 @@ ENT.PrintName = "Freak"
 if CLIENT then language.Add( "cd2_freak", "Freak" ) end
 
 -- NPC Stats
-ENT.cd2_Health = 50 -- The health the NPC has
+ENT.cd2_Health = 80 -- The health the NPC has
 ENT.cd2_Team = "freak" -- The Team the NPC will be in. It will attack anything that isn't on its team
 ENT.cd2_SightDistance = 2000 -- How far this NPC can see
 ENT.cd2_Weapon = "none" -- The weapon this NPC will have
@@ -48,10 +48,33 @@ function ENT:ModelGet()
 end
 
 local random = math.random
+local sound_Play = sound.Play
 local rand = math.Rand 
 function ENT:Initialize2()
     self:SetModel( self:ModelGet() )
-    self:SetState( "MainThink" )
+    self:SetState( "SpawnAnim" )
+
+    if SERVER then
+        net.Start( "cd2net_playerlandingdecal" )
+        net.WriteVector( self:WorldSpaceCenter() )
+        net.WriteBool( false  )
+        net.Broadcast()
+
+        self:Hook( "EntityEmitSound", "hearing", function( snddata )
+            if IsValid( self:GetEnemy() ) then return end
+            local chan = snddata.Channel 
+            local pos = snddata.Pos or IsValid( snddata.Entity ) and snddata.Entity or nil
+            if self:GetRangeSquaredTo( pos ) > ( self.cd2_SightDistance * self.cd2_SightDistance ) or pos == self or pos == self:GetActiveWeapon() then return end
+
+            local trace = self:Trace( nil, pos, COLLISION_GROUP_WORLD )
+            
+            self.cd2_Goal = isentity( pos ) and pos:GetPos() or pos
+            if pos and chan == CHAN_WEAPON then self:LookTo( pos, 3 ) end
+        end )
+
+        sound_Play( "crackdown2/ply/hardland" .. random( 1, 2 ) .. ".wav", self:GetPos(), 65, 100, 1 )
+    end
+
     if SERVER then self.cd2_Path = Path( "Follow" ) self.loco:SetAcceleration( 2000 ) end
 end
 
@@ -103,6 +126,21 @@ function ENT:AttackTarget( ent )
     self:SetEnemy( ent )
     self.cd2_EnemyLastKnownPosition = ent:GetPos()
     self.cd2_CombatTimeout = CurTime() + 10
+end
+
+function ENT:OnKilled2( info, ragdoll )
+    ragdoll:EmitSound( "crackdown2/npc/freak/freakkill.mp3", 65 )
+
+    ragdoll:Ignite( 10 )
+
+    net.Start( "cd2net_freakkill" )
+    net.WriteEntity( ragdoll )
+    net.Broadcast()
+
+    timer.Simple( 2, function()
+        if !IsValid( ragdoll ) then return end
+        ragdoll:Remove()
+    end )
 end
 
 
@@ -169,6 +207,12 @@ function ENT:Swipe()
         self:GetEnemy():TakeDamageInfo( info )
     end )
     self.cd2_nextattack = CurTime() + 2
+end
+
+local anims = { "zombie_slump_rise_02_fast", "zombie_slump_rise_02_slow", "zombie_slump_rise_01" }
+function ENT:SpawnAnim()
+    self:PlaySequenceAndWait( anims[ random( #anims ) ], speed )
+    self:SetState( "MainThink" )
 end
 
 function ENT:MainThink()

@@ -10,19 +10,6 @@ if SERVER then
         if key == IN_JUMP and ply:IsOnGround() then ply:EmitSound( "crackdown2/ply/jump" .. random( 1, 4 ) .. ".wav", 60, 100, 0.2, CHAN_AUTO ) end
     end )
 
-    -- Decaying Lock on Spread
-    hook.Add( "Tick", "crackdown2_lockonspreadhandle", function()
-        local players = player_GetAll()
-        for i = 1, #players do
-            local ply = players[ i ]
-            if !ply:IsCD2Agent() or !ply.cd2_LockOnPos then return end
-            
-            if ply:GetLockonSpreadDecay() > 0 then
-                ply:SetLockonSpreadDecay( Lerp( ply.cd2_LockOnPos == "body" and 10 * FrameTime() or 2 * FrameTime(), ply:GetLockonSpreadDecay(), 0 ) )
-            end
-        end
-    end )
-
 end
 
 local actcommands = {

@@ -13,7 +13,7 @@ ENT.cd2_Equipment = "cd2_grenade" -- The equipment this npc can use
 ENT.cd2_RunSpeed = 200 -- Run speed
 ENT.cd2_WalkSpeed = 100 -- Walk speed
 ENT.cd2_CrouchSpeed = 80 -- Crouch speed
-ENT.cd2_damagedivider = 10
+ENT.cd2_damagedivider = 6
 
 
 function ENT:ModelGet()

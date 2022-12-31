@@ -18,6 +18,8 @@ SWEP.Primary.Force = nil
 SWEP.Primary.Tracer = 1
 SWEP.Primary.TracerName = "Tracer"
 SWEP.Primary.Spread = 0.03
+SWEP.Primary.LockOnSpread = 0
+
 SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 2 -- The time it will take to reload
 SWEP.ReloadSounds = {} -- A table of tables with the first key being the time to play the sound and the second key being the path to the sound
@@ -133,6 +135,18 @@ function SWEP:CanPrimaryAttack()
 
 end
 
+function SWEP:Think()
+    if !self:GetOwner():IsPlayer() or self:GetPickupMode() then return end
+    self.cd2_nextpassive = self.cd2_nextpassive or CurTime() + 1.5
+
+    if !self:GetOwner():GetVelocity():IsZero() or self:GetIsReloading() or self:GetNextPrimaryFire() + 1.5 > CurTime() then
+        self:SetHoldType( self.HoldType )
+        self.cd2_nextpassive = CurTime() + 1.5
+    elseif self:GetOwner():GetVelocity():IsZero() and CurTime() > self.cd2_nextpassive then
+        self:SetHoldType( "passive" )
+    end
+end
+
 -- Modifies damage based on distance
 function SWEP:DamageFalloff( attacker, tr, info )
     local hitent = tr.Entity
@@ -146,12 +160,13 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
     local owner = self:GetOwner()
 
     damage = owner:IsPlayer() and damage + ( 5 * owner:GetWeaponSkill() ) or damage
+    spread = owner:IsPlayer() and IsValid( owner:GetNW2Entity( "cd2_lockontarget", nil ) ) and Vector( self.Primary.LockOnSpread + owner:GetLockonSpreadDecay(), self.Primary.LockOnSpread + owner:GetLockonSpreadDecay() ) or Vector( spread, spread, 0 )
 
 	self.bullet = self.bullet or {}
 	self.bullet.Num	= num_bullets
 	self.bullet.Src	= owner:GetShootPos()
 	self.bullet.Dir	= IsValid( owner.cd2_lockontarget ) and ( owner.cd2_lockontarget:WorldSpaceCenter() - owner:GetShootPos() ):GetNormalized() or owner:GetAimVector()
-	self.bullet.Spread = owner:IsPlayer() and IsValid( owner:GetNW2Entity( "cd2_lockontarget", nil ) ) and Vector( 0.001, 0.001 ) or Vector( spread, spread, 0 )
+	self.bullet.Spread = spread
 	self.bullet.Tracer = tracer or 1
     self.bullet.TracerName = tracername or "Tracer"
 	self.bullet.Force = force or damage
@@ -160,6 +175,10 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
     self.bullet.Callback = function( attacker, tr, info ) self:DamageFalloff( attacker, tr, info ) end
 
 	owner:FireBullets( self.bullet )
+
+    if owner:IsPlayer() and owner.cd2_LockOnPos == "head" then
+        owner:SetLockonSpreadDecay( 0.1 )
+    end
 
 	self:ShootEffects()
 
@@ -191,17 +210,28 @@ function SWEP:ExitPickupMode()
 end
 
 
+function SWEP:Deploy()
+    local owner = self:GetOwner()
+    if !owner:IsPlayer() then return end
+    self.cd2_Ammocount = self.cd2_Ammocount or self.Primary.DefaultClip
+
+    owner:SetAmmo( self.cd2_Ammocount, self.Primary.Ammo )
+end
+
+
 -- Play a small third person animation before switching
 function SWEP:Holster( wep )
     if self:GetPickupMode() then return end
     self:SetIsReloading( false )
     self:SetHoldType( "passive" )
     self:GetOwner():EmitSound( "crackdown2/ply/switchweapon.wav", 70, 100, 0.5, CHAN_AUTO )
+    self.cd2_Ammocount = self:GetOwner():GetAmmoCount( self.Primary.Ammo )
 
     timer.Simple( 0.6, function()
         if !IsValid( self ) or !IsValid( self:GetOwner() ) then return end
         if SERVER then
             self:GetOwner():SetActiveWeapon( wep )
+            wep:Deploy()
         end
         self:SetHoldType( self.HoldType )
     end )
@@ -322,6 +352,8 @@ function SWEP:Reload()
 
     self:SetIsReloading( true )
 
+    self:SetHoldType( self.HoldType )
+
     if self:GetOwner():IsCD2NPC() and SERVER then
         local anim = self:GetOwner().cd2_holdtypetranslations[ self:GetHoldType() ].reload
         self:GetOwner():AddGesture( anim, true )
@@ -345,10 +377,11 @@ function SWEP:Reload()
             local reserve = self:GetOwner():GetAmmoCount( self.Primary.Ammo )
             local count = clamp( self.Primary.ClipSize, 0, reserve )
             local oldclip = self:Clip1()
-            self:SetClip1( count )
+            local newclip = clamp( self:Clip1() + count, 0, self.Primary.ClipSize )
+            self:SetClip1( newclip )
 
             if SERVER then 
-                self:GetOwner():RemoveAmmo( count - oldclip, self.Primary.Ammo )
+                self:GetOwner():RemoveAmmo( newclip - oldclip, self.Primary.Ammo )
             end
         else
             self:SetClip1( self:GetMaxClip1() )

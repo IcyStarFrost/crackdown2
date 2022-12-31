@@ -38,6 +38,13 @@ if SERVER then
         end
     end )
 
+    -- Scale headshots
+    hook.Add( "ScaleNPCDamage", "crackdown2_npcdamagescaling", function( npc, hitgroup, dmginfo )
+        if hitgroup == HITGROUP_HEAD then
+            dmginfo:ScaleDamage( 3 )
+        end
+    end )
+
 elseif CLIENT then
 
 

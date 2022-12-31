@@ -14,6 +14,7 @@ SWEP.Primary.Damage = 4
 SWEP.Primary.Force = nil
 SWEP.Primary.Tracer = 1
 SWEP.Primary.Spread = 0.06
+SWEP.Primary.LockOnSpread = 0.04
 SWEP.Primary.Bulletcount = 8
 SWEP.ReloadTime = 2
 SWEP.ReloadSounds = {}

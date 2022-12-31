@@ -31,9 +31,6 @@ hook.Add( "PlayerCanPickupWeapon", "crackdown2_npcweapons", function( ply, wep )
             activewep.cd2_Ammocount = ply:GetAmmoCount( activewep.Primary.Ammo )
             
             ply:PickupWeapon( wep )
-            if wep.cd2_Ammocount then
-                ply:SetAmmo( wep.cd2_Ammocount, wep.Primary.Ammo )
-            end
             ply:EmitSound( "items/ammo_pickup.wav", 60 )
             ply:SetActiveWeapon( wep )
 

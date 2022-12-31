@@ -16,6 +16,7 @@ SWEP.Primary.Damage = nil
 SWEP.Primary.Force = nil
 SWEP.Primary.Tracer = 5
 SWEP.Primary.Spread = 0.03
+SWEP.Primary.LockOnSpread = 0
 SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 2
 SWEP.ReloadSounds = { { 0, "weapons/smg1/smg1_reload.wav" }, { 2, "weapons/slam/mine_mode.wav" } }

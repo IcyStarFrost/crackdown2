@@ -138,8 +138,8 @@ function PLAYER:SetupDataTables()
 
     self.Player:NetworkVar( "Float", 0, "NWHealth" ) -- Networked. Used for HUD and regen
     self.Player:NetworkVar( "Float", 1, "NWShields" ) -- Networked. Used for HUD and regen
-
+    self.Player:NetworkVar( "Float", 7, "LockonSpreadDecay" ) -- This will increase spread but will decrease down to the weapon's set lock on spread
 
 end
- 
+
 player_manager.RegisterClass( "cd2_player", PLAYER, "player_default" )

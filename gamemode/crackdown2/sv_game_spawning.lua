@@ -45,7 +45,7 @@ net.Receive( "cd2net_playerdropmenuconfirm", function( len, ply )
     if player_manager.GetPlayerClass( ply ) == "cd2_spectator" then
         player_manager.SetPlayerClass( ply, "cd2_player" )
         ply:Spectate( OBS_MODE_NONE )
-        ply:LoadProgress()
+        ply:LoadProgress() -- Load their progress
     end
 
     --ply.cd2_spawnatposition = spawnposition
@@ -124,7 +124,7 @@ net.Receive( "cd2net_playerregenerate", function( len, ply )
             local wep = ents.Create( class ) 
             wep:SetPos( ragdoll:GetPos() + Vector( 0, 0, 20 ) )
             wep:Spawn()
-            wep:SetReserveAmmo( reserve )
+            wep.cd2_Ammocount = reserve
 
             local phys = wep:GetPhysicsObject()
 

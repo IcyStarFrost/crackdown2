@@ -48,6 +48,12 @@ local weaponskillcolor = Color( 0, 225, 255)
 local strengthskillcolor = Color( 255, 251, 0)
 local explosiveskillcolor = Color( 0, 110, 255 )
 local agilityskillcolor = Color( 72, 255, 0)
+local math_atan2 = math.atan2
+local math_deg = math.deg
+local math_sqrt = math.sqrt
+
+local cellwhite = Color( 255, 255, 255 )
+local celltargetred = Color( 255, 51, 0 )
 
 local hpred = Color( 163, 12, 12)
 
@@ -195,6 +201,7 @@ CD2_weaponpnl = nil
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local cell = Material( "crackdown2/ui/cell.png", "smooth" )
 local skillcircle = Material( "crackdown2/ui/skillcircle.png" )
+local hex = Material( "crackdown2/ui/hex.png", "smooth" )
 local peacekeepertrace = {}
 
 
@@ -210,26 +217,58 @@ local minimapRT = GetRenderTarget( "crackdown2_minimaprt", 1024, 1024 )
 local mmTrace = {}
 local addfov = 0
 local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
+local cellicon = Material( "crackdown2/ui/celltrackericon.png" )
 local minimapRTMat = CreateMaterial( "crackdown2_minimapmaterial", "UnlitGeneric", {
 	["$basetexture"] = "crackdown2_minimaprt",
 	["$translucent"] = 1,
 	["$vertexcolor"] = 1
 } )
 --
+local curfov = 90
+function WorldVectorToScreen(worldVector, origin, scale, rotation, radius, fov )
+    local relativePosition = worldVector - origin
+    relativePosition = relativePosition * ( 60 / curfov ) 
 
-local function DrawEntOnMiniMap( ent, icon, color, cull )
-    local radius = ScreenScale( 50 )
-    local entpos = ent:GetPos()
-    local plypos = LocalPlayer():GetPos()
-    entpos[ 3 ] = plypos[ 3 ]
-    local lpos, langle = WorldToLocal( entpos, ent:GetAngles(), plypos, CD2_viewangles )
+    local vel = LocalPlayer():GetVelocity():Length()
+    vel = vel > 500 and vel % 10 or 0
 
+    curfov = Lerp( 3 * FrameTime(), curfov, ( 90 + ( fov > 7 and fov * vel or 0 ) ) )
+
+    relativePosition:Rotate( Angle( 0, -rotation, 0 ) )
+
+    local angle = math_atan2( relativePosition.y, relativePosition.x )
+
+    angle = math_deg( angle )
+
+    local distance = relativePosition:Length()
+
+    local x = math_cos( math_rad( angle ) ) * distance * scale
+    local y = math_sin( math_rad( angle ) ) * distance * scale
+
+    local distance = math_sqrt( x ^ 2 + y ^ 2 )
+
+    if distance > radius then
+        local angle = math_atan2( y, x )
+        x = math_cos( angle ) * radius
+        y = math_sin( angle ) * radius
+    end
+
+    return Vector(x, y, 0)
+end
+
+
+local function DrawCoordsOnMiniMap( pos, ang, icon, iconsize, color, fov )
+    local radius = ScreenScale( 45 )
+    pos[ 3 ] = 0
+    local plypos = LocalPlayer():GetPos() plypos[ 3 ] = 0
+    
+    local _, angs = WorldToLocal( pos, Angle( 0, ang[ 2 ], 0 ), LocalPlayer():GetPos(), CD2_viewangles )
 
     surface_SetDrawColor( color or color_white )
     surface_SetMaterial( icon or playerarrow )
 
-
-    surface_DrawTexturedRectRotated( 200 + lpos[ 1 ], ( ScrH() - 200 ) - lpos[ 2 ], ScreenScale( 5 ), ScreenScale( 5 ), langle[ 2 ] )
+    local vec = WorldVectorToScreen( pos, plypos, 0.2, CD2_viewangles[ 2 ] - 90, radius, fov )
+    surface_DrawTexturedRectRotated( 200 + vec[ 1 ], ( ScrH() - 200 ) - vec[ 2 ], ScreenScale( iconsize ), ScreenScale( iconsize ), ( angs[ 2 ] ) )
 end
 
 local skillvars = {}
@@ -380,10 +419,18 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         draw_Circle( scrw / 2, scrh / 2, 2, 30 )
 
         if CD2_lockon then
+            local target = ply:GetNW2Entity( "cd2_lockontarget", nil )
             surface_DrawLine( ( scrw / 2 ), ( scrh / 2 ) + 10, ( scrw / 2 ), ( scrh / 2 ) + 20 )
             surface_DrawLine( ( scrw / 2 ), ( scrh / 2 ) - 10, ( scrw / 2 ), ( scrh / 2 ) - 20 )
             surface_DrawLine( ( scrw / 2 ) + 10, ( scrh / 2 ), ( scrw / 2 ) + 20, ( scrh / 2 ) )
             surface_DrawLine( ( scrw / 2 ) - 10, ( scrh / 2 ), ( scrw / 2 ) - 20, ( scrh / 2 ) )
+
+            if IsValid( target ) then
+                local spread = ply:GetLockonSpreadDecay() * 500
+                surface_SetDrawColor( shadedwhite )
+                surface_SetMaterial( hex )
+                surface_DrawTexturedRectRotated( ( scrw / 2 ), ( scrh / 2 ), spread, spread, ( SysTime() * 300 ) )
+            end
         end
     end
     ------
@@ -593,18 +640,20 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             mmTrace.mask = MASK_SOLID_BRUSHONLY
             mmTrace.collisiongroup = COLLISION_GROUP_WORLD
             local result = Trace( mmTrace )
+            local fov = 6 + addfov
 
             render.RenderView( {
                 origin = ply:GetPos() + Vector( 0, 0, 20000 ),
                 angles = Angle( 90, CD2_viewangles[ 2 ], 0 ),
                 znear = result.Hit and result.HitPos:Distance( mmTrace.endpos ) or 10,
-                fov = 6 + addfov,
+                fov = fov,
                 x = 0, y = 0,
                 w = 1024, h = 1024
             } )
 
         render.PopRenderTarget()
 
+        draw_NoTexture()
         surface_SetDrawColor( blackish )
         draw_Circle( 200, scrh - 200, ScreenScale( 50 ), 30 )
 
@@ -617,12 +666,26 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         local _, angle = WorldToLocal( Vector(), ply:GetAngles(), ply:GetPos(), CD2_viewangles )
         surface_DrawTexturedRectRotated( 200, scrh - 200, ScreenScale( 10 ), ScreenScale( 10 ), angle[ 2 ] )
 
-    --[[     local nearbyminimap = CD2FindInSphere( LocalPlayer():GetPos(), 2000, function( ent ) return ent:IsCD2NPC() end )
+        local nearbyminimap = CD2FindInSphere( LocalPlayer():GetPos(), 1500, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "cell" end )
 
+        -- Cell --
         for i = 1, #nearbyminimap do
             local ent = nearbyminimap[ i ]
-            DrawEntOnMiniMap( ent )
-        end ]]
+            DrawCoordsOnMiniMap( ent:GetPos(), ent:GetAngles(), cellicon, 4, ent:GetEnemy() == ply and celltargetred or cellwhite, fov )
+        end
+        --
+
+        -- Players --
+        local players = player_GetAll()
+
+        for i = 1, #players do
+            local otherplayer = players[ i ]
+            if IsValid( otherplayer ) and otherplayer != ply then
+                DrawCoordsOnMiniMap( otherplayer:GetPos(), otherplayer:EyeAngles(), playerarrow, 5, otherplayer:GetPlayerColor():ToColor(), fov )
+            end
+        end
+        --
+
     end
     ------
 

@@ -15,6 +15,7 @@ SWEP.Primary.Force = 3
 SWEP.Primary.Tracer = 1
 SWEP.Primary.TracerName = "AR2Tracer"
 SWEP.Primary.Spread = 0.05
+SWEP.Primary.LockOnSpread = 0
 SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 2
 SWEP.ReloadSounds = { { 0, "weapons/ar2/npc_ar2_reload.wav" } }

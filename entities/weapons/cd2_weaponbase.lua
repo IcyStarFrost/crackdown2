@@ -27,6 +27,7 @@ SWEP.ReloadSounds = {} -- A table of tables with the first key being the time to
 SWEP.DropMenu_Damage = 0
 SWEP.DropMenu_Range = 0
 SWEP.DropMenu_FireRate = 0
+SWEP.DropMenu_SkillLevel = 0 -- The skill level the player's Weapon skill needs to be in order to use this weapon
 SWEP.DropMenu_Feature = nil -- What makes this weapon unique. I.E UV 
 --
 
@@ -95,11 +96,13 @@ function SWEP:PrimaryAttack()
 
     self:TakePrimaryAmmo( 1 )
 
+    local pitchsub = self:GetOwner():IsPlayer() and ( 3 * self:GetOwner():GetWeaponSkill() ) or 0
+
     if istable( self.Primary.ShootSound ) then
         local snd = self.Primary.ShootSound[ random( #self.Primary.ShootSound ) ]
-        self:EmitSound( snd, 80, 100, 1, CHAN_WEAPON )
+        self:EmitSound( snd, 80, 100 - pitchsub, 1, CHAN_WEAPON )
     else
-        self:EmitSound( self.Primary.ShootSound, 80, 100, 1, CHAN_WEAPON )
+        self:EmitSound( self.Primary.ShootSound, 80, 100 - pitchsub, 1, CHAN_WEAPON )
     end
 
     if self:GetOwner():IsCD2NPC() then
@@ -140,12 +143,15 @@ function SWEP:DamageFalloff( attacker, tr, info )
 end
 
 function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer, tracername )
-    
+    local owner = self:GetOwner()
+
+    damage = owner:IsPlayer() and damage + ( 5 * owner:GetWeaponSkill() ) or damage
+
 	self.bullet = self.bullet or {}
 	self.bullet.Num	= num_bullets
-	self.bullet.Src	= self:GetOwner():GetShootPos()
-	self.bullet.Dir	= IsValid( self:GetOwner().cd2_lockontarget ) and ( self:GetOwner().cd2_lockontarget:WorldSpaceCenter() - self:GetOwner():GetShootPos() ):GetNormalized() or self:GetOwner():GetAimVector()
-	self.bullet.Spread = self:GetOwner():IsPlayer() and IsValid( self:GetOwner():GetNW2Entity( "cd2_lockontarget", nil ) ) and Vector( 0.001, 0.001 ) or Vector( spread, spread, 0 )
+	self.bullet.Src	= owner:GetShootPos()
+	self.bullet.Dir	= IsValid( owner.cd2_lockontarget ) and ( owner.cd2_lockontarget:WorldSpaceCenter() - owner:GetShootPos() ):GetNormalized() or owner:GetAimVector()
+	self.bullet.Spread = owner:IsPlayer() and IsValid( owner:GetNW2Entity( "cd2_lockontarget", nil ) ) and Vector( 0.001, 0.001 ) or Vector( spread, spread, 0 )
 	self.bullet.Tracer = tracer or 1
     self.bullet.TracerName = tracername or "Tracer"
 	self.bullet.Force = force or damage
@@ -153,7 +159,7 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
 	self.bullet.AmmoType = ammo_type or self.Primary.Ammo
     self.bullet.Callback = function( attacker, tr, info ) self:DamageFalloff( attacker, tr, info ) end
 
-	self:GetOwner():FireBullets( self.bullet )
+	owner:FireBullets( self.bullet )
 
 	self:ShootEffects()
 

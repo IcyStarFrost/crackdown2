@@ -19,7 +19,7 @@ SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 2
 SWEP.ReloadSounds = { { 0, "weapons/ar2/npc_ar2_reload.wav" } }
 
-
+SWEP.DropMenu_SkillLevel = 2
 SWEP.DropMenu_Damage = 3
 SWEP.DropMenu_Range = 5
 SWEP.DropMenu_FireRate = 5

@@ -19,6 +19,7 @@ SWEP.ReloadTime = 2
 SWEP.ReloadSounds = { { 0, "weapons/pistol/pistol_reload1.wav" } }
 SWEP.DamageFalloffDiv = 300
 
+SWEP.DropMenu_SkillLevel = 0
 SWEP.DropMenu_Damage = 4
 SWEP.DropMenu_Range = 2
 SWEP.DropMenu_FireRate = 4

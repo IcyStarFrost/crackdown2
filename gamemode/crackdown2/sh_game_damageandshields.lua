@@ -29,12 +29,7 @@ if SERVER then
 
     end )
 
-    -- Set the client's regen time
-    hook.Add( "PlayerHurt", "crackdown2_delayregen", function( ply, attacker, remaining, damagetaken )
-        ply.cd_NextRegenTime = CurTime() + 6
-        net.Start( "cd2net_playerhurt" )
-        net.Send( ply )
-    end )
+
 
     -- Ignite any player or npc if they have been damaged by explosions
     hook.Add( "PostEntityTakeDamage", "crackdown2_fireexplosions", function( ent, info )

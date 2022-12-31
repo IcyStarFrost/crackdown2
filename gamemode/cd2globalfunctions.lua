@@ -210,7 +210,7 @@ function CD2AssessSkillGainOrbs( victimnpc, damagelog )
                 for i = 1, orbcount do
                     if remaining_orbs <= 0 then break end
                     remaining_orbs = remaining_orbs - 1
-                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "weapon", 0, weaponskillcolor )
+                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Weapon", 0.2, weaponskillcolor )
                 end
             end
 
@@ -219,7 +219,7 @@ function CD2AssessSkillGainOrbs( victimnpc, damagelog )
                 for i = 1, orbcount do
                     if remaining_orbs <= 0 then break end
                     remaining_orbs = remaining_orbs - 1
-                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "strength", 0, strengthskillcolor )
+                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Strength", 1, strengthskillcolor )
                 end
             end
 
@@ -228,7 +228,7 @@ function CD2AssessSkillGainOrbs( victimnpc, damagelog )
                 for i = 1, orbcount do
                     if remaining_orbs <= 0 then break end
                     remaining_orbs = remaining_orbs - 1
-                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "explosive", 0, explosiveskillcolor )
+                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Explosive", 0.4, explosiveskillcolor )
                 end
             end
 

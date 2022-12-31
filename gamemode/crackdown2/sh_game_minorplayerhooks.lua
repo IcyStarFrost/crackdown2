@@ -84,7 +84,7 @@ if SERVER then
     local sound_Play = sound.Play
     hook.Add( "OnPlayerHitGround", "crackdown2_landingdecals", function( ply, inwater, onfloater, vel )
 
-        if vel >= 700 then
+        if vel >= 600 then
             net.Start( "cd2net_playerlandingdecal" )
             net.WriteVector( ply:WorldSpaceCenter() )
             net.WriteBool( vel >= 1000  )

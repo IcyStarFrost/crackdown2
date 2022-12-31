@@ -32,6 +32,7 @@ local math_cos = math.cos
 local math_sin = math.sin
 local ipairs = ipairs
 local SysTime = SysTime
+local surface_DrawCircle = surface.DrawCircle
 local abs = math.abs
 local surface_DrawTexturedRect = surface.DrawTexturedRect
 local WorldToLocal = WorldToLocal
@@ -43,6 +44,10 @@ local math_max = math.max
 local input_GetKeyName = input.GetKeyName
 local render_SetMaterial = render.SetMaterial
 local render_DrawSprite = render.DrawSprite
+local weaponskillcolor = Color( 0, 225, 255)
+local strengthskillcolor = Color( 255, 251, 0)
+local explosiveskillcolor = Color( 0, 110, 255 )
+local agilityskillcolor = Color( 72, 255, 0)
 
 local hpred = Color( 163, 12, 12)
 
@@ -125,16 +130,34 @@ surface.CreateFont( "crackdown2_agentnames", {
 
 })
 
-local function draw_Circle( x, y, radius, seg )
+local function draw_Circle( x, y, radius, seg, rotate )
+    rotate = rotate or 0
 	local cir = {}
 
 	table_insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
 	for i = 0, seg do
-		local a = math_rad( ( i / seg ) * -360 )
+		local a = math_rad( ( i / seg ) * -360 + rotate )
 		table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
 	end
 
-	local a = math_rad( 0 ) -- This is needed for non absolute segment counts
+	local a = math_rad( rotate ) -- This is needed for non absolute segment counts
+	table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
+
+	surface_DrawPoly( cir )
+end
+
+
+local function DrawSkillCircle( x, y, radius, arc, rotate )
+    local seg = 30
+	local cir = {}
+
+	table_insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
+	for i = 0, seg do
+		local a = math_rad( ( i / seg ) * -arc + rotate )
+		table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
+	end
+
+	local a = math_rad( rotate ) -- This is needed for non absolute segment counts
 	table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
 
 	surface_DrawPoly( cir )
@@ -171,7 +194,16 @@ CD2_equipmentpnl = nil
 CD2_weaponpnl = nil
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local cell = Material( "crackdown2/ui/cell.png", "smooth" )
+local skillcircle = Material( "crackdown2/ui/skillcircle.png" )
 local peacekeepertrace = {}
+
+
+local skillglow = Material( "crackdown2/ui/skillglow2.png" )
+local agilityicon = Material( "crackdown2/ui/agilityicon.png", "smooth" )
+local weaponicon = Material( "crackdown2/ui/weaponicon.png", "smooth" )
+local strengthicon = Material( "crackdown2/ui/strengthicon.png", "smooth" )
+local explosiveicon = Material( "crackdown2/ui/explosiveicon.png", "smooth" )
+--local drivingicon = Material( "crackdown2/ui/drivingicon.png", "smooth" )
 
 -- Minimap vars
 local minimapRT = GetRenderTarget( "crackdown2_minimaprt", 1024, 1024 )
@@ -198,6 +230,83 @@ local function DrawEntOnMiniMap( ent, icon, color, cull )
 
 
     surface_DrawTexturedRectRotated( 200 + lpos[ 1 ], ( ScrH() - 200 ) - lpos[ 2 ], ScreenScale( 5 ), ScreenScale( 5 ), langle[ 2 ] )
+end
+
+local skillvars = {}
+
+local function DrawSkillHex( x, y, icon, level, xp, col, skillname )
+    skillvars[ skillname ] = skillvars[ skillname ] or {}
+    skillvars[ skillname ].col = skillvars[ skillname ].col or col
+
+    draw_NoTexture()
+
+    -- Outlined circle pathing behind each skill dot
+    surface_DrawCircle( x, y, 30, 0, 0, 0 )
+
+    surface_SetDrawColor( color_white )
+    surface_SetMaterial( skillcircle )
+
+    -- White circle pathing behind each skill dot
+    DrawSkillCircle( x, y, 33, Lerp( xp / 100, ( 55 * level ), ( 55 * ( level + 1 ) ) ) , -160 )
+
+    draw_NoTexture()
+
+    surface_SetDrawColor( blackish )
+    draw_Circle( x, y, 25, 6, 30 ) -- Base hex
+
+    if icon then
+        surface_SetDrawColor( color_white )
+        surface_SetMaterial( icon )
+        draw_Circle( x, y, 30, 6, 30 )
+    end
+
+    draw_NoTexture()
+
+    local dotsize = 6
+    
+    -- Top left dot
+    surface_SetDrawColor( level == 6 and orangeish or blackish )
+    draw_Circle( x - 15, y - 25, dotsize, 20, 0 )
+    surface_DrawCircle( x - 15, y - 25, dotsize, 160, 160, 160, 30 )
+
+    -- Top right dot
+    surface_SetDrawColor( level >= 1 and orangeish or blackish )
+    draw_Circle( x + 15, y - 25, dotsize, 20, 0 )
+    surface_DrawCircle( x + 15, y - 25, dotsize, 160, 160, 160, 30 )
+
+    -- Right dot
+    surface_SetDrawColor( level >= 2 and orangeish or blackish )
+    draw_Circle( x + 30, y, dotsize, 20, 0 )
+    surface_DrawCircle( x + 30, y, dotsize, 160, 160, 160, 30 )
+
+    -- Left dot
+    surface_SetDrawColor( level >= 5 and orangeish or blackish )
+    draw_Circle( x - 30, y, dotsize, 20, 0 )
+    surface_DrawCircle( x - 30, y, dotsize, 160, 160, 160, 30 )
+
+    -- Bottom left dot
+    surface_SetDrawColor( level >= 4 and orangeish or blackish )
+    draw_Circle( x - 15, y + 25, dotsize, 20, 0 )
+    surface_DrawCircle( x - 15, y + 25, dotsize, 160, 160, 160, 30 )
+
+    -- Bottom right dot
+    surface_SetDrawColor( level >= 3 and orangeish or blackish )
+    draw_Circle( x + 15, y + 25, dotsize, 20, 0 )
+    surface_DrawCircle( x + 15, y + 25, dotsize, 160, 160, 160, 30 )
+
+    skillvars[ skillname ].col.a = Lerp( 3 * FrameTime(), skillvars[ skillname ].col.a, 0 )
+
+    if skillvars[ skillname ].col.a > 5 then
+        surface_SetDrawColor( skillvars[ skillname ].col )
+        surface_SetMaterial( skillglow )
+        draw_Circle( x, y, 40, 50, 30 )
+    end
+
+    if xp != skillvars[ skillname ].lastxp then
+        skillvars[ skillname ].col.a = 255
+    end
+    
+    skillvars[ skillname ].lastxp = xp
 end
 
 
@@ -278,6 +387,16 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         end
     end
     ------
+    
+    
+    
+
+    -- Skill Counters --
+    DrawSkillHex( 130, 170, agilityicon, ply:GetAgilitySkill(), ply:GetAgilityXP(), agilityskillcolor, "Agility" )
+    DrawSkillHex( 130, 170 * 1.5, weaponicon, ply:GetWeaponSkill(), ply:GetWeaponXP(), weaponskillcolor, "Weapon" )
+    DrawSkillHex( 130, 170 * 2, strengthicon, ply:GetStrengthSkill(), ply:GetStrengthXP(), strengthskillcolor, "Strength" )
+    DrawSkillHex( 130, 170 * 2.5, explosiveicon, ply:GetExplosiveSkill(), ply:GetExplosiveXP(), explosiveskillcolor, "Explosive" )
+    ------
 
 
     -- Health and Shields --
@@ -300,8 +419,9 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
             for i = 1, hpbars do
                 if i == 1 then continue end
+                draw_NoTexture()
                 surface_SetDrawColor( orangeish )
-                draw_Circle( 60 + ( 20 * ( i - 1 ) ), 90, 8, 5 )
+                draw_Circle( 60 + ( 20 * ( i - 1 ) ), 90, 8, 6, 30 )
             end
         end
 

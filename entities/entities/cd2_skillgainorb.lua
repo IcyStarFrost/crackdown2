@@ -65,6 +65,10 @@ end
 
 function ENT:OnRemove()
 
+    if SERVER then
+        CD2HandleSkillXP( self:GetPlayer(), self:GetSkill(), self:GetXP() )
+    end
+
     if CLIENT then
         if LocalPlayer() == self:GetPlayer() then
             surface.PlaySound( "crackdown2/ply/skillorbcollect.mp3" )
@@ -104,7 +108,7 @@ function ENT:SetupDataTables()
 
     self:NetworkVar( "String", 0, "Skill" )
 
-    self:NetworkVar( "Int", 0, "XP" )
+    self:NetworkVar( "Float", 0, "XP" )
 
     self:NetworkVar( "Vector", 0, "TrailColor" )
 end
@@ -130,7 +134,7 @@ function ENT:Think()
     end
 
     if self.cd2_SeekPlayer and IsValid( self:GetPlayer() ) then
-        self:SetPos( self:GetPos() + ( self:GetPlayer():WorldSpaceCenter() - self:GetPos() ):GetNormalized() * 20 )
+        self:SetPos( self:GetPos() + ( self:GetPlayer():WorldSpaceCenter() - self:GetPos() ):GetNormalized() * 10 )
 
         if self:GetPos():DistToSqr( self:GetPlayer():WorldSpaceCenter() ) <= ( 10 * 10 ) then
             self:Remove()

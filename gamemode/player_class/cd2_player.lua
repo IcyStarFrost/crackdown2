@@ -49,11 +49,27 @@ function PLAYER:Death()
     net.Send( self.Player )
 end
 
+
+
+
+
 function PLAYER:Init()
     self.Player:SetCD2Team( "agency" )
     self.Player:SetMeleeDamage( 25 ) -- By default, players can only deal 25 damage with melee. This will change according to StrengthSkill
     self.Player:SetMaxPickupWeight( 200 ) -- By default, only pickup props with a mass of 200. This will change according to StrengthSkill
-    self.Player:SetSafeFallSpeed( 50 ) -- By default, the safe falling speed is 600. This will change according to AgilitySkill
+    self.Player:SetSafeFallSpeed( 40 ) -- By default, the safe falling speed is 600. This will change according to AgilitySkill
+
+    self.Player:SetAgilitySkill( 1 )
+    self.Player:SetWeaponSkill( 1 )
+    self.Player:SetStrengthSkill( 1 )
+    self.Player:SetExplosiveSkill( 1 )
+    self.Player:SetDrivingSkill( 1 )
+
+    self.Player:SetAgilityXP( 0 )
+    self.Player:SetWeaponXP( 0 )
+    self.Player:SetStrengthXP( 0 )
+    self.Player:SetExplosiveXP( 0 )
+    self.Player:SetDrivingXP( 0 )
 end
 
 function PLAYER:Spawn()
@@ -69,6 +85,8 @@ function PLAYER:Spawn()
     net.Broadcast()
 
     ply:ScreenFade( SCREENFADE.IN, black, 2, 0.5 )
+
+    ply:BuildSkills()
 
     -- Respawn trail things
     CD2CreateThread( function()
@@ -101,18 +119,18 @@ function PLAYER:SetupDataTables()
     self.Player:NetworkVar( "Int", 3, "ExplosiveSkill" )
     self.Player:NetworkVar( "Int", 4, "DrivingSkill" )
 
-    self.Player:NetworkVar( "Int", 5, "AgilityXP" )
-    self.Player:NetworkVar( "Int", 6, "WeaponXP" )
-    self.Player:NetworkVar( "Int", 7, "StrengthXP" )
-    self.Player:NetworkVar( "Int", 8, "ExplosiveXP" )
-    self.Player:NetworkVar( "Int", 9, "DrivingXP" )
+    self.Player:NetworkVar( "Float", 2, "AgilityXP" )
+    self.Player:NetworkVar( "Float", 3, "WeaponXP" )
+    self.Player:NetworkVar( "Float", 4, "StrengthXP" )
+    self.Player:NetworkVar( "Float", 5, "ExplosiveXP" )
+    self.Player:NetworkVar( "Float", 6, "DrivingXP" )
     --
 
-    self.Player:NetworkVar( "Int", 10, "SafeFallSpeed" ) -- The speed the player won't take damage from
-    self.Player:NetworkVar( "Int", 11, "EquipmentCount" ) -- The amount of equipment the player can have
-    self.Player:NetworkVar( "Int", 12, "MaxPickupWeight" ) -- The max weight the player can pick up
-    self.Player:NetworkVar( "Int", 13, "MaxEquipmentCount" ) -- The max amount of a certain equipment a player can have
-    self.Player:NetworkVar( "Int", 14, "MeleeDamage" ) -- The amount of melee damage the player can deal
+    self.Player:NetworkVar( "Int", 5, "SafeFallSpeed" ) -- The speed the player won't take damage from
+    self.Player:NetworkVar( "Int", 6, "EquipmentCount" ) -- The amount of equipment the player can have
+    self.Player:NetworkVar( "Int", 7, "MaxPickupWeight" ) -- The max weight the player can pick up
+    self.Player:NetworkVar( "Int", 8, "MaxEquipmentCount" ) -- The max amount of a certain equipment a player can have
+    self.Player:NetworkVar( "Int", 9, "MeleeDamage" ) -- The amount of melee damage the player can deal
 
     self.Player:NetworkVar( "Bool", 0, "IsRechargingShield" ) -- If the Player's shields are recharging
     self.Player:NetworkVar( "Bool", 1, "IsRegeningHealth" ) -- If the Player's health is regenerating

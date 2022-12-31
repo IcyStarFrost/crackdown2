@@ -91,7 +91,7 @@ function ENT:OnCollected( ply )
         local orbcount = 4 * self:GetLevel()
 
         for i = 1, orbcount do
-            CD2CreateSkillGainOrb( self:GetPos(), ply, "nil", 0, Color( 0, 255, 0 ) )
+            CD2CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, Color( 0, 255, 0 ) )
         end
     end
 end

@@ -18,6 +18,7 @@ SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 2
 SWEP.ReloadSounds = { { 0, "weapons/smg1/smg1_reload.wav" } }
 
+SWEP.DropMenu_SkillLevel = 0
 SWEP.DropMenu_Damage = 3
 SWEP.DropMenu_Range = 4
 SWEP.DropMenu_FireRate = 7

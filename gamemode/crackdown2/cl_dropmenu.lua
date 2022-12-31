@@ -11,6 +11,7 @@ local orange = Color( 255, 115, 0 )
 local grey = Color( 100, 100, 100 )
 local lightgrey = Color( 143, 143, 143)
 local background = Material( "crackdown2/dropmenu/bg.png", "smooth" )
+local lockiconmat = Material( "crackdown2/ui/lock.png" )
 local Lerp = Lerp
 local IsValid = IsValid
 local pairs = pairs
@@ -103,6 +104,12 @@ function CD2OpenDropMenu( issupplypoint )
 
     surface.PlaySound( "crackdown2/ui/dropmenuopen.mp3" )
 
+    CD2_DropPrimary = CD2FILESYSTEM:ReadPlayerData( "cd2_dropprimary" ) or CD2_DropPrimary
+    CD2_DropSecondary = CD2FILESYSTEM:ReadPlayerData( "cd2_dropsecondary" ) or CD2_DropSecondary
+    CD2_DropEquipment = CD2FILESYSTEM:ReadPlayerData( "cd2_dropequipment" ) or CD2_DropEquipment
+
+
+
     CD2CreateThread( function()
 
         local fadepanel = vgui.Create( "DPanel" )
@@ -116,6 +123,7 @@ function CD2OpenDropMenu( issupplypoint )
             surface_DrawRect( 0, 0, w, h )
         end
 
+
         CD2_DropMenu = vgui.Create( "DPanel", GetHUDPanel() )
         CD2_DropMenu:Dock( FILL )
 
@@ -126,6 +134,12 @@ function CD2OpenDropMenu( issupplypoint )
             CD2_InDropMenu = false
             CD2_DropMenu:SetMouseInputEnabled( false )
             CD2_DropMenu:SetKeyBoardInputEnabled( false )
+        end
+
+        function CD2_DropMenu:Paint( w, h )
+            surface_SetDrawColor( grey )
+            surface_SetMaterial( background )
+            surface_DrawTexturedRect( 0, 0, w, h )
         end
 
         local toptext = vgui.Create( "DLabel", CD2_DropMenu )
@@ -149,9 +163,17 @@ function CD2OpenDropMenu( issupplypoint )
         weapondetailpanel:SetSize( 500, 200 )
         weapondetailpanel:Dock( RIGHT )
         weapondetailpanel:InvalidateParent( true )
+
+        function weapondetailpanel:Paint( w, h )
+            surface_SetDrawColor( fadedwhite )
+            surface_DrawOutlinedRect( 0, 0, w, h, 3 )
+        end
         
         coroutine.wait( 0 ) -- Delay so CD2_DropMenu can re-layout so we can get accurate position/sizing value
 
+
+        local plyweaponskill = CD2FILESYSTEM:ReadPlayerData( "cd2_skill_Weapon" ) or 1
+        local plyexplosiveskill = CD2FILESYSTEM:ReadPlayerData( "cd2_skill_Explosive" ) or 1
 
 
         local function CreateWeaponStatsPanel( isequipment )
@@ -187,7 +209,13 @@ function CD2OpenDropMenu( issupplypoint )
             local dmg 
             local range 
             local firerate
-            local feature
+            local skilllevel
+            local isexplosive
+
+            -- Returns if the player can use this weapon
+            function panel:PassesWeaponSkillTest()
+                return ( !isequipment and !isexplosive ) and skilllevel and skilllevel <= plyweaponskill or ( isequipment or isexplosive ) and skilllevel and skilllevel <= plyexplosiveskill
+            end
 
             function statsholder:Paint( w, h )
                 surface_SetDrawColor( fadedwhite )
@@ -245,14 +273,11 @@ function CD2OpenDropMenu( issupplypoint )
 
             function modelpanel:Paint( w, h )
                 oldpaint( self, w, h )
-                local scale = ScreenScale( 9 )
 
-                if !isequipment and feature then
-                    draw_DrawText( "FEATURE", "crackdown2_weaponstattext", 10, h - scale, lightgrey, TEXT_ALIGN_LEFT )
-                    draw_DrawText( feature, "crackdown2_weaponstattext", 50, h - scale, lightgrey, TEXT_ALIGN_LEFT )
-                elseif isequipment and feature then
-                    draw_DrawText( "FEATURE", "crackdown2_weaponstattext", 10, h - scale, lightgrey, TEXT_ALIGN_LEFT )
-                    draw_DrawText( feature, "crackdown2_weaponstattext", 50, h - scale, lightgrey, TEXT_ALIGN_LEFT )
+                if ( !isequipment and !isexplosive ) and skilllevel and skilllevel > plyweaponskill then
+                    draw_DrawText( "UNLOCKED AT FIREARMS LEVEL " .. skilllevel, "crackdown2_weaponstattext", 10, h - 20, lightgrey, TEXT_ALIGN_LEFT )
+                elseif ( isequipment or isexplosive ) and skilllevel and skilllevel > plyexplosiveskill then
+                    draw_DrawText( "UNLOCKED AT EXPLOSIVES LEVEL " .. skilllevel, "crackdown2_weaponstattext", 10, h - 20, lightgrey, TEXT_ALIGN_LEFT )
                 end
             end
 
@@ -264,7 +289,8 @@ function CD2OpenDropMenu( issupplypoint )
                 dmg = data.DropMenu_Damage
                 range = data.DropMenu_Range
                 firerate = data.DropMenu_FireRate
-                feature = data.DropMenu_Feature
+                skilllevel = data.DropMenu_SkillLevel
+                isexplosive = data.IsExplosive
             end
 
             return panel
@@ -358,6 +384,16 @@ function CD2OpenDropMenu( issupplypoint )
                 local ent = mdlpanel:GetEntity()
                 mdlpanel:SetCamPos( Vector( 0, 70, 0 ) )
                 mdlpanel:SetLookAt( ent:OBBCenter() )
+                mdlpanel:InvalidateParent()
+
+                coroutine.wait( 0 )
+
+                local w, h = mdlpanel:GetSize()
+                local lockicon = vgui.Create( "DImage", mdlpanel )
+                lockicon:SetSize( 32, 32 )
+                lockicon:SetPos( w - 32, 32 )
+                lockicon:SetMaterial( lockiconmat )
+                lockicon:Hide()
 
                 function mdlpanel:DoClick()
                     if isselectingpanel then return end
@@ -373,7 +409,16 @@ function CD2OpenDropMenu( issupplypoint )
                         ent = mdlpanel:GetEntity()
     
                         if IsValid( ent ) then
-
+                            
+                            
+                            if v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyexplosiveskill then
+                                lockicon:Show()
+                            elseif !v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyweaponskill then
+                                lockicon:Show()
+                            else
+                                lockicon:Hide()
+                            end
+                            
                             mdlpanel:SetModel( v.WorldModel )
                             mdlpanel:SetCamPos( Vector( 0, 70, 0 ) )
                             mdlpanel:SetLookAt( ent:OBBCenter() )
@@ -406,6 +451,14 @@ function CD2OpenDropMenu( issupplypoint )
                         ent = mdlpanel:GetEntity()
 
                         if IsValid( ent ) then
+
+                            if wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyexplosiveskill then
+                                lockicon:Show()
+                            elseif !wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyweaponskill then
+                                lockicon:Show()
+                            else
+                                lockicon:Hide()
+                            end
 
                             mdlpanel:SetModel( wepdata.WorldModel )
                             mdlpanel:SetCamPos( Vector( 0, 70, 0 ) )
@@ -460,6 +513,8 @@ function CD2OpenDropMenu( issupplypoint )
         bottombuttonspanel:Dock( BOTTOM )
         bottombuttonspanel:InvalidateParent( true )
 
+        function bottombuttonspanel:Paint() end
+
         coroutine.wait( 0 )
 
         local confirmbutton = vgui.Create( "DButton", bottombuttonspanel )
@@ -486,24 +541,22 @@ function CD2OpenDropMenu( issupplypoint )
             surface_DrawRect( 0, 0, w, h )
         end
 
-        function bottombuttonspanel:Paint() end
-
-        function weapondetailpanel:Paint( w, h )
-            surface_SetDrawColor( fadedwhite )
-            surface_DrawOutlinedRect( 0, 0, w, h, 3 )
-        end
+        
 
 
-        function CD2_DropMenu:Paint( w, h )
-            surface_SetDrawColor( grey )
-            surface_SetMaterial( background )
-            surface_DrawTexturedRect( 0, 0, w, h )
-        end
 
 
 
         function confirmbutton:DoClick()
+            local skilltest1 = detailtoppanel:PassesWeaponSkillTest()
+            local skilltest2 = detailmidpanel:PassesWeaponSkillTest()
+            local skilltest3 = detailbottompanel:PassesWeaponSkillTest()
+            if !skilltest1 or !skilltest2 or !skilltest3 then surface.PlaySound( "buttons/button10.wav" ) return end
             CD2_DropMenu:Remove()
+
+            CD2FILESYSTEM:WritePlayerData( "cd2_dropprimary", CD2_DropPrimary )
+            CD2FILESYSTEM:WritePlayerData( "cd2_dropsecondary", CD2_DropSecondary )
+            CD2FILESYSTEM:WritePlayerData( "cd2_dropequipment", CD2_DropEquipment )
 
             if !issupplypoint then
                 net.Start( "cd2net_playerdropmenuconfirm" )

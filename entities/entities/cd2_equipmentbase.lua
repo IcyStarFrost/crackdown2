@@ -3,6 +3,7 @@ AddCSLuaFile()
 ENT.Base = "base_anim"
 ENT.WorldModel = "models/weapons/w_grenade.mdl"
 ENT.PrintName = "Equipment"
+ENT.IsEquipment = true
 
 -- Equipment settings
 ENT.Cooldown = 3 -- The time before the grenade can be used again
@@ -13,6 +14,7 @@ ENT.TickSound = nil -- The sound that will play as the grenade ticks
 ENT.RemoveOnInvalid = false -- If true, the equipment will remove itself if its thrower is invalid
 --
 
+ENT.DropMenu_SkillLevel = 0
 ENT.DropMenu_Damage = 0
 ENT.DropMenu_Range = 0
 

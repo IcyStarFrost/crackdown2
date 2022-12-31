@@ -122,7 +122,7 @@ local sound_Play = sound.Play
 
 -- While in air, hold use and press attack
 hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
-    if !ply:IsCD2Agent() then return end
+    if !ply:IsCD2Agent() or ply:GetStrengthSkill() < 4 then return end
 
     if !ply:IsOnGround() and ply:KeyDown( IN_USE ) and key == IN_ATTACK and !ply.cd2_IsUsingGroundStrike then
         local wep = ply:GetActiveWeapon()

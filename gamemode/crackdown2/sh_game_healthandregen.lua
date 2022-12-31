@@ -22,7 +22,7 @@ hook.Add( "Tick", "crackdown2_regeneration", function()
                 ply:SetIsRechargingShield( true )
 
                 if ply.cd2_cancallshieldhook then hook.Run( "CD2_OnPlayerShieldRegen", ply ) ply.cd2_cancallshieldhook = false end
-                ply.cd_NextRegen = CurTime() + 0.05
+                ply.cd_NextRegen = CurTime() + 0.03
 
             elseif ply:GetNWHealth() < ply:GetMaxHealth() and ( !ply.cd_NextRegen or CurTime() > ply.cd_NextRegen ) then
 
@@ -30,7 +30,7 @@ hook.Add( "Tick", "crackdown2_regeneration", function()
                 ply:SetIsRegeningHealth( true )
                 
                 if ply.cd2_cancallhealthhook then hook.Run( "CD2_OnPlayerHealthRegen", ply ) ply.cd2_cancallhealthhook = false end
-                ply.cd_NextRegen = CurTime() + 0.05
+                ply.cd_NextRegen = CurTime() + 0.03
 
             end
             
@@ -96,6 +96,13 @@ if SERVER then
             end
         end
         nextupdate = CurTime() + 0.1
+    end )
+
+    -- Set the client's regen time
+    hook.Add( "PlayerHurt", "crackdown2_delayregen", function( ply, attacker, remaining, damagetaken )
+        ply.cd_NextRegenTime = CurTime() + 6
+        net.Start( "cd2net_playerhurt" )
+        net.Send( ply )
     end )
 end
 

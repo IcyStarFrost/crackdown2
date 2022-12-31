@@ -45,7 +45,7 @@ net.Receive( "cd2net_playerdropmenuconfirm", function( len, ply )
     if player_manager.GetPlayerClass( ply ) == "cd2_spectator" then
         player_manager.SetPlayerClass( ply, "cd2_player" )
         ply:Spectate( OBS_MODE_NONE )
-        CD2SetUpPlayer( ply )
+        ply:LoadProgress()
     end
 
     --ply.cd2_spawnatposition = spawnposition
@@ -74,7 +74,7 @@ net.Receive( "cd2net_spawnatnearestspawn", function( len, ply )
     if player_manager.GetPlayerClass( ply ) == "cd2_spectator" then
         player_manager.SetPlayerClass( ply, "cd2_player" )
         ply:Spectate( OBS_MODE_NONE )
-        CD2SetUpPlayer( ply )
+        ply:LoadProgress()
     end
 
     ply.cd2_WeaponSpawnDelay = CurTime() + 0.5

@@ -18,6 +18,7 @@ SWEP.Primary.Bulletcount = 8
 SWEP.ReloadTime = 2
 SWEP.ReloadSounds = {}
 
+SWEP.DropMenu_SkillLevel = 0
 SWEP.DropMenu_Damage = 4
 SWEP.DropMenu_Range = 2
 SWEP.DropMenu_FireRate = 3

@@ -16,6 +16,11 @@ function ENT:IsCD2Agent()
     return false
 end
 
+-- Returns the entity's Eye Pos. You can't override Nextbot's eyepos function so we are using this function to substitute it for NPCs and players
+function ENT:CD2EyePos()
+    return ( self:IsCD2NPC() and self:EyePos2() ) or ( ( self:IsPlayer() or self:IsNPC() ) and self:EyePos() )
+end
+
 function PLAYER:IsCD2Agent()
     return player_manager.GetPlayerClass( self ) == "cd2_player"
 end

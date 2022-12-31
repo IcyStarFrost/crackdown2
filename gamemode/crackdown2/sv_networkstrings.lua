@@ -21,6 +21,7 @@ util.AddNetworkString( "cd2net_sendtextboxmessage" )
 util.AddNetworkString( "cd2net_resupply" )
 util.AddNetworkString( "cd2net_playerlevelupeffect" )
 util.AddNetworkString( "cd2net_playerinitialspawn" )
+util.AddNetworkString( "cd2net_changelockonpos" )
 
 util.AddNetworkString( "cd2filesystem_requestplayerdata" )
 util.AddNetworkString( "cd2filesystem_dispatchplayerdata" )

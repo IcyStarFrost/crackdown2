@@ -2,6 +2,9 @@ local player_GetAll = player.GetAll
 
 -- Crackdown 2 Lockon system --
 local limitlockonsound = false
+
+if CLIENT then CD2_LockOnPos = "body" CD2_LastLockOnPos = "body" end
+
 hook.Add( "Think", "crackdown2_lockon", function()
 
     if SERVER then
@@ -14,6 +17,7 @@ hook.Add( "Think", "crackdown2_lockon", function()
             if ply:KeyDown( IN_ATTACK2 ) then
                 local wep = ply:GetActiveWeapon()
                 if !IsValid( wep ) then return end
+                ply.cd2_LockOnPos = ply.cd2_LockOnPos or "body"
                 
                 local lockables = CD2FindInLockableTragets( ply )
 
@@ -23,10 +27,12 @@ hook.Add( "Think", "crackdown2_lockon", function()
                 
 
                 if IsValid( ply:GetNW2Entity( "cd2_lockontarget", nil ) ) then
-                    ply:SetEyeAngles( ( ply:GetNW2Entity( "cd2_lockontarget", nil ):WorldSpaceCenter() - ply:EyePos() ):Angle() )
+                    local pos = ply.cd2_LockOnPos == "body" and ply:GetNW2Entity( "cd2_lockontarget", nil ):WorldSpaceCenter() or ply:GetNW2Entity( "cd2_lockontarget", nil ):CD2EyePos()
+                    ply:SetEyeAngles( ( pos - ply:EyePos() ):Angle() )
                 end
 
             else
+                ply.cd2_LockOnPos = nil
                 ply:SetNW2Entity( "cd2_lockontarget", NULL )
             end
 
@@ -34,6 +40,7 @@ hook.Add( "Think", "crackdown2_lockon", function()
     end
 
     if CLIENT then 
+
         local ply = LocalPlayer()
         if !IsValid( ply ) and !ply:IsCD2Agent() then return end
 
@@ -46,9 +53,18 @@ hook.Add( "Think", "crackdown2_lockon", function()
                 limitlockonsound = true
             end
 
-            local dir = ( lockontarget:WorldSpaceCenter() - CD2_vieworigin ):Angle() 
+            if CD2_LockOnPos != CD2_LastLockOnPos then
+                net.Start( "cd2net_changelockonpos" )
+                net.WriteString( CD2_LockOnPos )
+                net.SendToServer()
+                surface.PlaySound( "crackdown2/ply/switchlockonpos.mp3" ) 
+            end
+            CD2_LastLockOnPos = CD2_LockOnPos
+
+            local pos = CD2_LockOnPos == "body" and lockontarget:WorldSpaceCenter() or CD2_LockOnPos == "head" and lockontarget:CD2EyePos()
+            local dir = ( pos - CD2_vieworigin ):Angle() 
             dir:Normalize() -- Funny story with this, without this function, when you go below the target your view jumps straight down. No clue why but this fixed it
-            ply:SetEyeAngles( ( lockontarget:WorldSpaceCenter() - ply:EyePos() ):Angle() )
+            ply:SetEyeAngles( ( pos - ply:EyePos() ):Angle() )
             
             CD2_viewangles = dir
             CD2_viewlockedon = true
@@ -63,4 +79,12 @@ hook.Add( "Think", "crackdown2_lockon", function()
     end 
 
 end )
+
+if SERVER then
+    net.Receive( "cd2net_changelockonpos", function( len, ply )
+        ply.cd2_LockOnPos = net.ReadString()
+    end )
+end
+
+
 ------

@@ -102,6 +102,15 @@ function GM:CreateMove( cmd )
 
     plyangle[ 1 ] = CD2_viewangles[ 1 ]
 
+    
+    local lockontarget = self:GetNW2Entity( "cd2_lockontarget", nil )
+
+    if IsValid( lockontarget ) and cmd:GetMouseY() < 0 then
+        CD2_LockOnPos = "head"
+    elseif !IsValid( lockontarget ) or cmd:GetMouseY() > 0 then
+        CD2_LockOnPos = "body"
+    end
+
 
     if cmd:GetMouseWheel() != 0 and CurTime() > switchcooldown then 
         for k, wep in ipairs( self:GetWeapons() ) do

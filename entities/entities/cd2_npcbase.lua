@@ -394,7 +394,7 @@ function ENT:Think()
             self.loco:FaceTowards( pos )
 
 
-            local aimangle = ( pos - self:EyePos() ):Angle()
+            local aimangle = ( pos - self:EyePos2() ):Angle()
 
             local loca = self:WorldToLocalAngles( aimangle )
             local approachy = Lerp( 5 * FrameTime(), self:GetPoseParameter('head_yaw'), loca[2] )

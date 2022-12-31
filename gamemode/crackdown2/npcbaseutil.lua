@@ -19,7 +19,7 @@ end
 
 -- Simple trace function
 function ENT:Trace( start, endpos, col, mask )
-    normaltrace.start = start or self:EyePos()
+    normaltrace.start = start or self:EyePos2()
     normaltrace.endpos = ( isentity( endpos ) and endpos:WorldSpaceCenter() or endpos )
     normaltrace.filter = self
     normaltrace.mask = mask or MASK_SOLID
@@ -104,7 +104,7 @@ function ENT:CanSee( ent )
     if dot < 0.4 then return false end
 
     -- Finally tracing out sight line
-    vistrace.start = self:EyePos()
+    vistrace.start = self:EyePos2()
     vistrace.endpos = ent:WorldSpaceCenter()
     vistrace.filter = self
     local result = Trace( vistrace )
@@ -211,7 +211,7 @@ function ENT:GetShootPos()
 end
 
 -- Returns our Eyes position
-function ENT:EyePos()
+function ENT:EyePos2()
     local lookup = self:LookupAttachment( "eyes" )
     if lookup <= 0 then return self:WorldSpaceCenter() + Vector( 0, 0, 5 ) end
     return self:GetAttachment( lookup ).Pos

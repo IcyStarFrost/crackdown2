@@ -10,6 +10,8 @@ hook.Add( "DoPlayerDeath", "crackdown2_dropweaponssingleplayer", function( ply, 
             local wep = weps[ i ]
             if IsValid( wep ) then
                 ply:DropWeapon( wep, ply:GetPos() + VectorRand( -70, 70 ) )
+                print( ply:GetAmmoCount( wep.Primary.Ammo ), wep.Primary.Ammo )
+                wep.cd2_Ammocount = ply:GetAmmoCount( wep.Primary.Ammo )
             end
         end
 
@@ -22,6 +24,8 @@ hook.Add( "DoPlayerDeath", "crackdown2_dropweaponssingleplayer", function( ply, 
         if IsValid( phys ) then
             phys:ApplyForceCenter( Vector( random( -8000, 8000 ), random( -8000, 8000 ), random( 0, 8000 ) ) )
         end
+
+        ply:StripAmmo()
     end
 end )
 

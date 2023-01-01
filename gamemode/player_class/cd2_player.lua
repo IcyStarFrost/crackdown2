@@ -41,9 +41,10 @@ function PLAYER:Death()
                 self.Player.cd2_deathweapons[ #self.Player.cd2_deathweapons + 1 ] = { wep:GetClass(), wep:Ammo1() }
             end
         end
+        self.Player:StripAmmo()
     end
 
-    self.Player:StripAmmo()
+    
 
     net.Start( "cd2net_playerkilled" )
     net.Send( self.Player )

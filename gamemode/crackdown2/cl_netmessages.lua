@@ -377,3 +377,86 @@ net.Receive( "cd2net_freakkill", function()
         particle:Finish()
     end )
 end )
+
+net.Receive( "cd2net_explosion", function()
+    local pos = net.ReadVector()
+    local scale = net.ReadFloat()
+
+    local addvec = VectorRand( 20 * -scale, 20 * scale )
+    local particle = ParticleEmitter( pos, pos + addvec )
+
+
+    hook.Add( "Think", "crackdown2_explosionlight", function()
+        local light = DynamicLight( LocalPlayer():EntIndex() )
+        if ( light ) then
+            light.pos = pos
+            light.r = 255
+            light.g = 115
+            light.b = 0
+            light.brightness = 5
+            light.Decay = 1000
+            light.Size = 500 + ( scale > 1 and 600 * scale or 0)
+            light.DieTime = CurTime() + 5
+            hook.Remove( "Think", "crackdown2_explosionlight" )
+        end
+    end )
+
+    for i = 1, 25 + ( 5 * scale ) do
+        addvec = VectorRand( 20 * -scale, 20 * scale )
+        local part = particle:Add( "particle/SmokeStack", pos + addvec )
+
+        if part then
+            part:SetStartSize( 60 * scale )
+            part:SetEndSize( 45 * scale ) 
+            part:SetStartAlpha( 255 )
+            part:SetEndAlpha( 0 )
+
+            part:SetColor( 255, 115, 0 )
+            part:SetLighting( false )
+
+            part:SetDieTime( 2 )
+            part:SetGravity( Vector() )
+            part:SetAirResistance( 200 )
+
+            local randomvalue = 300 + ( scale > 1 and 300 * scale or 0 )
+
+            part:SetVelocity( Vector( random( -randomvalue, randomvalue ), random( -randomvalue, randomvalue ), random( -randomvalue, randomvalue ) ) )
+            part:SetAngleVelocity( AngleRand( -0.5, 0.5 ) )
+        end
+
+    end
+
+
+    particle:Finish()
+
+    addvec = VectorRand( 20 * -scale, 20 * scale )
+    local particle = ParticleEmitter( pos, pos + addvec )
+
+    for i = 1, 25 + ( 5 * scale ) do
+        addvec = VectorRand( 20 * -scale, 20 * scale )
+        local part = particle:Add( "particle/SmokeStack", pos + addvec )
+
+        if part then
+            part:SetStartSize( 60 * scale )
+            part:SetEndSize( 45 * scale ) 
+            part:SetStartAlpha( 255 )
+            part:SetEndAlpha( 0 )
+
+            part:SetColor( 100, 100, 100 )
+            part:SetLighting( false )
+
+            part:SetDieTime( 6 )
+            part:SetGravity( Vector() )
+            part:SetAirResistance( 200 )
+
+            local randomvalue = 300 + ( scale > 1 and 300 * scale or 0 )
+
+            part:SetVelocity( Vector( random( -randomvalue, randomvalue ), random( -randomvalue, randomvalue ), random( -randomvalue, randomvalue ) ) )
+            part:SetAngleVelocity( AngleRand( -0.5, 0.5 ) )
+        end
+
+    end
+
+    particle:Finish()
+
+end )

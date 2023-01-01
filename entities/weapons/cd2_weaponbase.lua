@@ -211,6 +211,14 @@ function SWEP:ExitPickupMode()
     self:DrawShadow( true )
 end
 
+function SWEP:Equip( newowner )
+    self.cd2_Ammocount = self.cd2_Ammocount or self.Primary.DefaultClip
+
+    if newowner:IsPlayer() then 
+        newowner:SetAmmo( self.cd2_Ammocount, self.Primary.Ammo )
+    end
+end
+
 
 function SWEP:Deploy()
     local owner = self:GetOwner()

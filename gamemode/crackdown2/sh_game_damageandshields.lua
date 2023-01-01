@@ -18,7 +18,7 @@ if SERVER then
             ent:SetArmor( shields - damage )
             hook.Run( "PlayerHurt", ent, info:GetAttacker(), ent:Health(), damage )
 
-            if info:IsExplosionDamage() then ent:Ignite( 4 ) end
+            if info:IsExplosionDamage() then if info:GetDamage() > 100 then ent:Stun( info:GetDamageForce() ) end ent:Ignite( 4 ) end
             return true
         elseif shields > 0 then
             info:SetDamage( damage - shields )
@@ -35,6 +35,7 @@ if SERVER then
     hook.Add( "PostEntityTakeDamage", "crackdown2_fireexplosions", function( ent, info )
         if info:IsExplosionDamage() and ( ent:IsPlayer() or ent:IsCD2NPC() ) then
             ent:Ignite( 4 )
+            if ent:IsPlayer() and info:GetDamage() > 100 then ent:Stun( info:GetDamageForce() ) end
         end
     end )
 

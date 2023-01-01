@@ -135,8 +135,12 @@ function SWEP:CanPrimaryAttack()
 
 end
 
+function SWEP:PreDrawViewModel()
+    return true
+end
+
 function SWEP:Think()
-    if !self:GetOwner():IsPlayer() or self:GetPickupMode() then return end
+    if !self:GetOwner():IsPlayer() or self:GetPickupMode() or self:GetIsHolstering() then return end
     self.cd2_nextpassive = self.cd2_nextpassive or CurTime() + 1.5
 
     if !self:GetOwner():GetVelocity():IsZero() or self:GetIsReloading() or self:GetNextPrimaryFire() + 1.5 > CurTime() then
@@ -189,6 +193,7 @@ end
 function SWEP:SetupDataTables()
     self:NetworkVar( "Bool", 0, "IsReloading" ) -- If the weapon is reloading
     self:NetworkVar( "Bool", 1, "PickupMode" ) -- This will be set if the player picked up a object
+    self:NetworkVar( "Bool", 2, "IsHolstering" )
 end
 
 -- Enters a pick up state where this weapon disables itself until the player drops their object
@@ -232,6 +237,7 @@ end
 -- Play a small third person animation before switching
 function SWEP:Holster( wep )
     if self:GetPickupMode() then return end
+    self:SetIsHolstering( true )
     self:SetIsReloading( false )
     self:SetHoldType( "passive" )
     self:GetOwner():EmitSound( "crackdown2/ply/switchweapon.wav", 70, 100, 0.5, CHAN_AUTO )
@@ -239,6 +245,7 @@ function SWEP:Holster( wep )
 
     timer.Simple( 0.6, function()
         if !IsValid( self ) or !IsValid( self:GetOwner() ) then return end
+        self:SetIsHolstering( false )
         if SERVER then
             self:GetOwner():SetActiveWeapon( wep )
             wep:Deploy()

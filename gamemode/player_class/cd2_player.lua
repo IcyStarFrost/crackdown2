@@ -112,6 +112,8 @@ function PLAYER:SetupDataTables()
 
     self.Player:NetworkVar( "String", 0, "CD2Team" ) -- The team this player is in. Obviously mainly set to agency
 
+    self.Player:NetworkVar( "Entity", 0, "Ragdoll" )
+
     -- Skill Stats --
     -- These skills should be capped at 6
     self.Player:NetworkVar( "Int", 0, "AgilitySkill" )
@@ -136,6 +138,7 @@ function PLAYER:SetupDataTables()
     self.Player:NetworkVar( "Bool", 0, "IsRechargingShield" ) -- If the Player's shields are recharging
     self.Player:NetworkVar( "Bool", 1, "IsRegeningHealth" ) -- If the Player's health is regenerating
     self.Player:NetworkVar( "Bool", 2, "CanRevive" ) -- If the player can be revived
+    self.Player:NetworkVar( "Bool", 3, "IsStunned" )
 
     self.Player:NetworkVar( "Float", 0, "NWHealth" ) -- Networked. Used for HUD and regen
     self.Player:NetworkVar( "Float", 1, "NWShields" ) -- Networked. Used for HUD and regen

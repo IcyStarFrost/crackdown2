@@ -177,6 +177,12 @@ function PLAYER:LoadProgress()
     end )
 end
 
+function PLAYER:Stun( force )
+    self:SetPos( self:GetPos() + Vector( 0, 0, 2 ) )
+    self:SetVelocity( force / 40 )
+    self:SetIsStunned( true )
+end
+
 
 function PLAYER:BuildSkills()
     local strength = self:GetStrengthSkill()

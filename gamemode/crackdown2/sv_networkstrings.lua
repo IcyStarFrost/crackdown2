@@ -24,6 +24,7 @@ util.AddNetworkString( "cd2net_playerinitialspawn" )
 util.AddNetworkString( "cd2net_changelockonpos" )
 util.AddNetworkString( "cd2net_freakkill" )
 util.AddNetworkString( "cd2net_explosion" )
+util.AddNetworkString( "cd2net_stunendsetpos" )
 
 util.AddNetworkString( "cd2filesystem_requestplayerdata" )
 util.AddNetworkString( "cd2filesystem_dispatchplayerdata" )

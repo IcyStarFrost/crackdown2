@@ -16,7 +16,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
 
     for i = 1, #players do
         local ply = players[ i ]
-        if !ply:IsCD2Agent() then continue end
+        if !ply:IsCD2Agent() or ply:GetIsStunned() then continue end
 
         local near = CD2FindInSphere( ply:GetPos(), 100, function( ent ) return isphysics[ ent:GetClass() ] and ent:GetNW2Int( "cd2_mass", math.huge ) < ply:GetMaxPickupWeight() and ply:Visible( ent ) end )
         ply:SetNW2Entity( "cd2_pickuptarget", CD2GetClosestInTable( near, ply ) )

@@ -610,7 +610,7 @@ hook.Add( "Think", "crackdown2_regeneratemenu", function()
     end
 
     -- Call for help --
-    if ply:KeyDown( IN_FORWARD ) then
+    if ply:KeyDown( IN_FORWARD ) and !game.SinglePlayer() then
         ply.cd2_callforhelpdelay = ply.cd2_callforhelpdelay or CurTime() + 1
         ply.cd2_callforhelpcooldown = ply.cd2_callforhelpcooldown or 0
 

@@ -7,12 +7,15 @@ local LerpAngle = LerpAngle
 local FrameTime = FrameTime
 local Trace = util.TraceLine
 local clamp = math.Clamp
-local calctable = {} -- Recycled table
-
-local plyangle -- The angle our player is facing
-CD2_viewlockedon = false
-local lockonoffset = Vector()
 local zerovec = Vector()
+local calctable = {} -- Recycled table
+local overridetable = {}
+
+CD2_plyangle = nil -- The angle our player is facing
+
+CD2_viewlockedon = false
+CD2_lockonoffset = Vector()
+
 local viewtrace = {}
 
 CD2_vieworigin = nil -- Our view origin
@@ -22,7 +25,8 @@ CD2_fieldofview = nil -- Our field of view
 function GM:CalcView( ply, origin, angles, fov, znear, zfar )
 
     if CD2_ViewOverride then
-        return CD2_ViewOverride( ply, origin, angles, fov, znear, zfar )
+        local result = CD2_ViewOverride( ply, origin, angles, fov, znear, zfar )
+        if result then return result end 
     end
 
     CD2_fieldofview = CD2_fieldofview or fov
@@ -30,17 +34,17 @@ function GM:CalcView( ply, origin, angles, fov, znear, zfar )
 
     if ply:Alive() then
 
-        viewtrace.start = ( origin + Vector( 0, 0, 18 ) ) + lockonoffset
-        viewtrace.endpos = ( ( origin + Vector( 0, 0, 18 ) ) - CD2_viewangles:Forward() * 130 ) + lockonoffset
+        viewtrace.start = ( origin + Vector( 0, 0, 18 ) ) + CD2_lockonoffset
+        viewtrace.endpos = ( ( origin + Vector( 0, 0, 18 ) ) - CD2_viewangles:Forward() * 130 ) + CD2_lockonoffset
         viewtrace.filter = ply
         local result = Trace( viewtrace )
         local pos = result.HitPos - result.Normal * 8
 
         if CD2_viewlockedon then
-            lockonoffset = LerpVector( 20 * FrameTime(), lockonoffset, ( CD2_viewangles:Right() * 30 - Vector( 0, 0, 10 ) ) )
+            CD2_lockonoffset = LerpVector( 20 * FrameTime(), CD2_lockonoffset, ( CD2_viewangles:Right() * 30 - Vector( 0, 0, 10 ) ) )
             CD2_fieldofview = Lerp( 20 * FrameTime(), CD2_fieldofview, 60 )
         else
-            lockonoffset = LerpVector( 20 * FrameTime(), lockonoffset, zerovec )
+            CD2_lockonoffset = LerpVector( 20 * FrameTime(), CD2_lockonoffset, zerovec )
             CD2_fieldofview = Lerp( 20 * FrameTime(), CD2_fieldofview, fov )
         end
 
@@ -91,9 +95,9 @@ function GM:CreateMove( cmd )
 
     local vec = Vector( cmd:GetForwardMove(), -cmd:GetSideMove(), 0 )
 
-    if !plyangle then
+    if !CD2_plyangle then
         CD2_viewangles = self:EyeAngles()
-        plyangle = CD2_viewangles * 1
+        CD2_plyangle = CD2_viewangles * 1
     end
 
     vec:Rotate( Angle( CD2_viewangles[ 1 ], CD2_viewangles[ 2 ], CD2_viewangles[ 3 ] ) )
@@ -103,7 +107,7 @@ function GM:CreateMove( cmd )
     
     CD2_viewangles[ 1 ] = clamp( CD2_viewangles[ 1 ] +  cmd:GetMouseY() * 0.02, -90, 90 )
 
-    plyangle[ 1 ] = CD2_viewangles[ 1 ]
+    CD2_plyangle[ 1 ] = CD2_viewangles[ 1 ]
 
     
     local lockontarget = self:GetNW2Entity( "cd2_lockontarget", nil )
@@ -123,14 +127,14 @@ function GM:CreateMove( cmd )
     end
     if cmd:KeyDown( IN_ATTACK ) and !cmd:KeyDown( IN_USE ) or cmd:KeyDown( IN_ATTACK2 ) or cmd:KeyDown( IN_GRENADE1 ) then lookatcursorTime = CurTime() + 1 end
     
-    if CurTime() < lookatcursorTime then plyangle = CD2_viewangles * 1 cmd:SetViewAngles( CD2_viewangles ) return end
+    if CurTime() < lookatcursorTime then CD2_plyangle = CD2_viewangles * 1 cmd:SetViewAngles( CD2_viewangles ) return end
 
     if cmd:GetForwardMove() != 0 or cmd:GetSideMove() != 0 then
-        plyangle = vec:Angle()
-        cmd:SetViewAngles( LerpAngle( FrameTime() * 20, cmd:GetViewAngles(), plyangle ) )
+        CD2_plyangle = vec:Angle()
+        cmd:SetViewAngles( LerpAngle( FrameTime() * 20, cmd:GetViewAngles(), CD2_plyangle ) )
         cmd:SetForwardMove( self:GetRunSpeed() )
         cmd:SetSideMove( 0 )
     else
-        cmd:SetViewAngles( plyangle )
+        cmd:SetViewAngles( CD2_plyangle )
     end
 end

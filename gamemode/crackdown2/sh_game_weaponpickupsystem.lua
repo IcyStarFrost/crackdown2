@@ -1,6 +1,7 @@
 local clamp = math.Clamp
 local ceil = math.ceil
 hook.Add( "PlayerCanPickupWeapon", "crackdown2_npcweapons", function( ply, wep )
+    if wep:WaterLevel() != 0 then return false end
     local wepowner = wep:GetOwner()
     if IsValid( wepowner ) and wepowner:IsCD2NPC() then
         return false

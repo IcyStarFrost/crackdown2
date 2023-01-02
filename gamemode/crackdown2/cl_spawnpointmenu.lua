@@ -44,6 +44,7 @@ surface.CreateFont( "crackdown2_spawnpointmenubottomtext", {
 
 function CD2OpenSpawnPointMenu()
 
+    CD2_DrawBlackbars = false
     surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
 
     net.Start( "cd2net_playerregenerate" )

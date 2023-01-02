@@ -285,6 +285,8 @@ end
 function SWEP:DrawWorldModel()
     self:DrawModel()
 
+    if self:WaterLevel() != 0 then return false end
+
     self.cd2_effectdelay = self.cd2_effectdelay or SysTime() + 0.5
     if !IsValid( self:GetOwner() ) and self:GetVelocity():IsZero() then
         local wep = LocalPlayer():GetWeapon( self:GetClass() )

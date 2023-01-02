@@ -17,6 +17,7 @@ net.Receive( "cd2net_playerkilled", function()
         if LocalPlayer():Alive() and SysTime() > time then channel:FadeOut() end
     end )
 
+    CD2_DrawBlackbars = true
     surface.PlaySound( "crackdown2/ply/die.mp3" )
 
 end )
@@ -51,7 +52,7 @@ end )
 -- Respawn music
 net.Receive( "cd2net_playerrespawn", function()
     
-    
+    CD2_DrawBlackbars = false 
     CD2StartMusic( "sound/crackdown2/music/playerspawn.mp3", 1, false, true )
 
 end )

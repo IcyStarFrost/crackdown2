@@ -96,6 +96,7 @@ local beam = Material( "crackdown2/effects/beam.png", "smooth" )
 ENT.SunBeamMult = 0.25
 ENT.SunBeamDark = 0
 ENT.SunSize = 0.05
+ENT.SunDistance = 500
 function ENT:OnBeamStart()
     if SERVER then
         self:SetBeamActive( true )
@@ -121,8 +122,16 @@ function ENT:OnBeamStart()
             cam.Start2D()
                 local pos = core:GetPos()
                 local screen = pos:ToScreen()
-            
-                local dist_mult = -math.Clamp( CD2_vieworigin:Distance( pos ) / 500, 0, 1 ) + 1
+
+                if self:GetIsCharging() then
+                    local time = self:GetChargeDuration()
+                    self.cd2_currentbeamlerp = 0
+                    self.cd2_currentbeamlerp = self.cd2_currentlerp + FrameTime()
+                    
+                    self.SunDistance = Lerp( self.cd2_currentbeamlerp / time, self.SunDistance, 1500 )
+                end
+
+                local dist_mult = -clamp( CD2_vieworigin:Distance( pos ) / self.SunDistance, 0, 1 ) + 1
             
                 DrawSunbeams( self.SunBeamDark, dist_mult * self.SunBeamMult * ( math.Clamp( CD2_viewangles:Forward():Dot( ( pos - CD2_vieworigin ):GetNormalized() ) - 0.5, 0, 1 ) * 2 ) ^ 5, self.SunSize, screen.x / ScrW(), screen.y / ScrH() )
             cam.End2D()
@@ -179,6 +188,29 @@ function ENT:StartIntroMusic()
     self.cd2_intromusic = CD2StartMusic( string.StripExtension( self:GetSoundTrack() ) .. "_intro.mp3", 590, true, false, nil, nil, nil, nil, nil, function( chan )
         if !IsValid( self ) then chan:FadeOut() end
     end )
+end
+
+
+function ENT:BeaconDetonate()
+    if SERVER then
+        self:SetIsDetonated( true )
+        self:SetIsCharging( false )
+        self:PlayClientSound( "crackdown2/ambient/beacon/beacondetonate.mp3", self:GetPos(), 5 )
+
+        CD2CreateThread( function()
+        
+            coroutine.wait( 4 )
+            self:PlayClientSound( "crackdown2/ambient/beacon/beaconfinish.mp3", self:GetPos(), 5 )
+
+            coroutine.wait( 5 )
+
+            self:Remove()
+        
+        end )
+    elseif CLIENT then
+        if LocalPlayer():GetPos():DistToSqr( self:GetPos() ) > ( 2500 * 2500 ) then return end
+        
+    end
 end
 
 local energy = Material( "crackdown2/effects/energy.png" )
@@ -273,7 +305,7 @@ function ENT:Think()
         end
 
         if self:GetIsCharging() and CurTime() > self.cd2_curtimeduration then
-            self:Remove()
+            self:BeaconDetonate()
         end
 
         if self:GetIsDropping() and self:GetPos():DistToSqr( self:GetBeaconPos() ) > ( 20 * 20 ) then
@@ -378,7 +410,6 @@ function ENT:Think()
 
                 local time = self:GetChargeDuration() - 10
                 self.cd2_systimedparticledur = self.cd2_systimedparticledur or SysTime() + time
-                    print( self.cd2_systimedparticledur - SysTime(), ( self.cd2_systimedparticledur - SysTime() ) / 30  )
                 self.cd2_nextenergyparticle = SysTime() + ( ( self.cd2_systimedparticledur - SysTime() ) / 30 )
             end
         end

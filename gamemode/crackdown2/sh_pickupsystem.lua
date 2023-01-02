@@ -6,7 +6,8 @@ local IsValid = IsValid
 local isphysics = {
     [ "prop_physics" ] = true,
     [ "prop_physics_multiplayer" ] = true,
-    [ "prop_ragdoll" ] = true
+    [ "prop_ragdoll" ] = true,
+    [ "func_physbox" ] = true
 }
 
 -- New rewritten pick up system

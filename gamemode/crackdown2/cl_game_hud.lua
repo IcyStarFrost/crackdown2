@@ -358,6 +358,7 @@ CD2_DrawTargetting = true -- Draws crosshair and target healthbars
 CD2_DrawHealthandShields = true -- Draws health and shields bars
 CD2_DrawWeaponInfo = true -- Draws weapon info and equipment
 CD2_DrawMinimap = true -- Draws the tracker
+CD2_DrawBlackbars = false -- Draws the top and bottom black bars
 
 hook.Add( "HUDPaint", "crackdown2_hud", function()
     local scrw, scrh, ply = ScrW(), ScrH(), LocalPlayer()
@@ -375,15 +376,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
     if CD2_InSpawnPointMenu or !ply:IsCD2Agent() then RemoveHUDpanels() return end
 
-    if !ply:Alive() then 
-        local usebind = input_LookupBinding( "+use" ) or "e"
-        local code = input_GetKeyCode( usebind )
-        local buttonname = input_GetKeyName( code )
-
-        local reloadbind = input_LookupBinding( "+reload" ) or "r"
-        local rcode = input_GetKeyCode( reloadbind )
-        local reloadname = input_GetKeyName( rcode )
-        
+    if CD2_DrawBlackbars then
         hlerp1 = hlerp1 or -150
         hlerp2 = hlerp2 or scrh
 
@@ -394,6 +387,20 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
         surface_DrawRect( 0, hlerp1, scrw, 150 )
         surface_DrawRect( 0, hlerp2, scrw, 150 )
+    else
+        hlerp1 = -100
+        hlerp2 = scrh
+    end
+
+    if !ply:Alive() then 
+        local usebind = input_LookupBinding( "+use" ) or "e"
+        local code = input_GetKeyCode( usebind )
+        local buttonname = input_GetKeyName( code )
+
+        local reloadbind = input_LookupBinding( "+reload" ) or "r"
+        local rcode = input_GetKeyCode( reloadbind )
+        local reloadname = input_GetKeyName( rcode )
+        
 
         CD2DrawInputbar( scrw / 2.1, 200, upper( buttonname ), "Regenerate" )
         CD2DrawInputbar( scrw / 2, 250, upper( reloadname ), "Regenerate at nearest spawn" )
@@ -408,9 +415,6 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
         RemoveHUDpanels()
         return 
-    else
-        hlerp1 = -100
-        hlerp2 = scrh
     end
 
     -- Crosshair --

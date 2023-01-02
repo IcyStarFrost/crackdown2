@@ -78,6 +78,10 @@ end
 function ENT:OnDelayEnd()
 end
 
+function ENT:GetPrintName()
+    return self.PrintName
+end
+
 -- Make the equipment bounce less
 function ENT:PhysicsCollide( data, phys )
     phys:SetVelocity( data.OurNewVelocity / 2)
@@ -124,7 +128,7 @@ function ENT:Think()
     end
 
     -- Custom Pickup code for equipment
-    if SERVER and !IsValid( self:GetThrower() ) and !self:GetHadThrower() then
+    if SERVER and !IsValid( self:GetThrower() ) and !self:GetHadThrower() and self:WaterLevel() == 0 then
         local nearents = CD2FindInSphere( self:GetPos(), 50, function( ent ) return ent:IsCD2Agent() and self:IsAmmoToPlayer( ent ) and ent:GetEquipmentCount() < ent:GetMaxEquipmentCount() end )
         local ply = nearents[ 1 ]
         if IsValid( ply ) then
@@ -133,6 +137,8 @@ function ENT:Think()
             self:Remove()
         end
     end
+
+
 
     if !IsValid( self:GetThrower() ) and !self:GetHadThrower() then return end
 
@@ -190,11 +196,13 @@ end
 function ENT:Draw()
     self:DrawModel()
 
+    if self:WaterLevel() != 0 then return false end
+
     self.cd2_effectdelay = self.cd2_effectdelay or SysTime() + 0.5
     if !IsValid( self:GetThrower() ) and !self:GetHadThrower() and self:GetVelocity():IsZero() then
         local wep = LocalPlayer():GetWeapon( self:GetClass() )
 
-        if SysTime() < self.cd2_effectdelay or LocalPlayer():GetEquipmentCount() == LocalPlayer():GetMaxEquipmentCount() then 
+        if SysTime() < self.cd2_effectdelay or ( LocalPlayer():GetEquipmentCount() == LocalPlayer():GetMaxEquipmentCount() and LocalPlayer().cd2_Equipment == self:GetClass() ) then 
             self:SetupBones()
             self:SetPos( self:GetNetworkOrigin() )
             self:SetAngles( self:GetNetworkAngles() )

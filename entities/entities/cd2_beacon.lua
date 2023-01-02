@@ -56,8 +56,6 @@ end
 function ENT:SetupDataTables()
     self:NetworkVar( "String", 0, "SoundTrack" )
 
-    self:NetworkVar( "Int", 0, "ChargeTime" )
-
     self:NetworkVar( "Bool", 0, "IsCharging" )
     self:NetworkVar( "Bool", 1, "IsDetonated" )
     self:NetworkVar( "Bool", 2, "IsDropping" )
@@ -94,14 +92,21 @@ end
 
 local beaconblue = Color( 0, 217, 255 )
 local beam = Material( "crackdown2/effects/beam.png", "smooth" )
+
+ENT.SunBeamMult = 0.25
+ENT.SunBeamDark = 0
+ENT.SunSize = 0.05
 function ENT:OnBeamStart()
     if SERVER then
         self:SetBeamActive( true )
+        self:SetChargeDuration( 200 )
+        self.cd2_curtimeduration = CurTime() + 200
         self.cd2_BeaconChargeStart = CurTime() + 10
     elseif CLIENT then
         local beamlerp
         local starttime = SysTime()
         local endtime = SysTime() + 10
+        
         hook.Add( "PreDrawEffects", self, function()
             local emitter = self:GetEmitter()
             local core = self:GetCore()
@@ -112,6 +117,15 @@ function ENT:OnBeamStart()
             render.DrawBeam( emitter:GetPos(), beamlerp, 50, 1, 50, beaconblue )
 
             beamlerp = LerpVector( clamp( ( SysTime() - starttime ) / ( endtime - starttime ), 0, 1 ), beamlerp, core:GetPos() )
+
+            cam.Start2D()
+                local pos = core:GetPos()
+                local screen = pos:ToScreen()
+            
+                local dist_mult = -math.Clamp( CD2_vieworigin:Distance( pos ) / 500, 0, 1 ) + 1
+            
+                DrawSunbeams( self.SunBeamDark, dist_mult * self.SunBeamMult * ( math.Clamp( CD2_viewangles:Forward():Dot( ( pos - CD2_vieworigin ):GetNormalized() ) - 0.5, 0, 1 ) * 2 ) ^ 5, self.SunSize, screen.x / ScrW(), screen.y / ScrH() )
+            cam.End2D()
         end )
 
         CD2CreateThread( function() 
@@ -146,15 +160,23 @@ function ENT:DropBeacon()
 
     BroadcastLua( "Entity(" .. self:EntIndex() .. "):StartIntroMusic()" )
 
-    self:SetSoundTrack( "sound/crackdown2/music/beacon/industrialfreaks.mp3" )
+    self:SetSoundTrack( "sound/crackdown2/music/beacon/ptb.mp3" )
     self:SetIsDropping( true )
     self:SetRingPos( self.Ring:GetPos() )
     self:SetBeaconPos( result.HitPos )
     self:SetActive( true )
 end
 
+function ENT:PlayClientSound( path, pos, volume )
+    net.Start( "cd2net_beaconplaysound" ) 
+    net.WriteString( path ) 
+    net.WriteFloat( volume )
+    net.WriteVector( pos )
+    net.Broadcast()
+end
+
 function ENT:StartIntroMusic()
-    self.cd2_intromusic = CD2StartMusic( string.StripExtension( self:GetSoundTrack() ) .. "_intro.mp3", 590, false, false, nil, nil, nil, nil, nil, function( chan )
+    self.cd2_intromusic = CD2StartMusic( string.StripExtension( self:GetSoundTrack() ) .. "_intro.mp3", 590, true, false, nil, nil, nil, nil, nil, function( chan )
         if !IsValid( self ) then chan:FadeOut() end
     end )
 end
@@ -179,10 +201,8 @@ function ENT:BeginBeaconCharge()
         self.Core:SetParent()
         self.Core:SetPos( self:GetPos() + Vector( 0, 0, 70 ) )
         self.cd2_chargestart = CurTime()
-        self.cd2_curtimeduration = CurTime() + 200
-        self:SetChargeDuration( 200 )
         self:SetIsCharging( true )
-        self:EmitSound( "crackdown2/ambient/beacon/beaconshellbreak.mp3", 110 )
+        self:PlayClientSound( "crackdown2/ambient/beacon/beaconshellbreak.mp3", self.Core:GetPos(), 5 )
     elseif CLIENT then
         if IsValid( self.cd2_beaconambient ) then self.cd2_beaconambient:Stop() end
         sound.PlayFile( "sound/crackdown2/ambient/beacon/beaconambientcharge.mp3", "3d mono", function( snd, id, name )
@@ -247,7 +267,9 @@ function ENT:Think()
             local time = self:GetChargeDuration()
             self.cd2_currentlerp = 0
             self.cd2_currentlerp = self.cd2_currentlerp + FrameTime()
-            self.Core:SetPos( LerpVector( self.cd2_currentlerp / time, self.Core:GetPos(), ( self:GetPos() + Vector( 0, 0, 70 ) ) + Vector( 0, 0, 70 ) ) )
+            self.Core:SetPos( LerpVector( self.cd2_currentlerp / time, self.Core:GetPos(), ( self:GetPos() + Vector( 0, 0, 70 ) ) + Vector( 0, 0, 90 ) ) )
+
+            self.Core:SetAngles( Angle( CurTime() * 200, CurTime() * 200, CurTime() * 200 ) / ( self.cd2_curtimeduration - CurTime() )  )
         end
 
         if self:GetIsCharging() and CurTime() > self.cd2_curtimeduration then
@@ -263,7 +285,7 @@ function ENT:Think()
             self:SetIsDropping( false )
             self:ReturnRing()
             self:SetPos( self:GetBeaconPos() )
-            self:EmitSound( "crackdown2/ambient/beacon/beaconland.mp3", 110 )
+            self:PlayClientSound( "crackdown2/ambient/beacon/beaconland.mp3", self:GetPos(), 5 )
             BroadcastLua( "Entity(" .. self:EntIndex() .. "):OnLand()" )
             self:OnLand()
 
@@ -275,7 +297,7 @@ function ENT:Think()
             BroadcastLua( "Entity(" .. self:EntIndex() .. "):OnBeamStart()" )
             self:OnBeamStart()
             self:SetRingReturning( false )
-            self:EmitSound( "crackdown2/ambient/beacon/beaconcharge.mp3", 110 )
+            self:PlayClientSound( "crackdown2/ambient/beacon/beaconcharge.mp3", self.Core:GetPos(), 5 )
         end
 
     elseif CLIENT then
@@ -294,10 +316,46 @@ function ENT:Think()
                 light.DieTime = CurTime() + 5
             end
 
+            if !self.cd2_nextenergycoreparticle or SysTime() > self.cd2_nextenergycoreparticle then
+                local particle = ParticleEmitter( self:GetCore():GetPos() )
+                local part = particle:Add( energy, self:GetCore():GetPos() )
+
+                self.cd2_coreparticlesize = self.cd2_coreparticlesize or 4
+                self.cd2_coreparticlevelocity = self.cd2_coreparticlevelocity or 0
+
+                local time = self:GetChargeDuration() / 2
+                self.cd2_currentlerp = 0
+                self.cd2_currentlerp = self.cd2_currentlerp + FrameTime()
+                
+                self.cd2_coreparticlevelocity = Lerp( self.cd2_currentlerp / time, self.cd2_coreparticlevelocity, 500 )
+                self.cd2_coreparticlesize = Lerp( self.cd2_currentlerp / time, self.cd2_coreparticlesize, 80 )
+    
+                if part then
+                    part:SetStartSize( self.cd2_coreparticlesize )
+                    part:SetEndSize( self.cd2_coreparticlesize ) 
+                    part:SetStartAlpha( 255 )
+                    part:SetEndAlpha( 0 )
+        
+                    part:SetColor( 255, 255, 255 )
+                    part:SetLighting( false )
+                    part:SetCollide( false )
+        
+                    part:SetDieTime( 3 )
+                    part:SetGravity( Vector() )
+                    part:SetAirResistance( 100 )
+                    part:SetVelocity( VectorRand( -50 - self.cd2_coreparticlevelocity, 50 + self.cd2_coreparticlevelocity ) )
+                    part:SetAngleVelocity( AngleRand( -1, 1 ) )
+                end
+
+                particle:Finish()
+                self.cd2_nextenergycoreparticle = SysTime() + 0.08
+            end
+
             if !self.cd2_nextenergyparticle or SysTime() > self.cd2_nextenergyparticle then
+
                 local particle = ParticleEmitter( self:GetCore():GetPos() + VectorRand( -600, 600 ) )
-                    local part = particle:Add( energy, self:GetCore():GetPos() + VectorRand( -600, 600 )  )
-            
+                    local part = particle:Add( energy, self:GetCore():GetPos() + VectorRand( -600, 600 ) )
+                    
                     if part then
                         local size = random( 20, 50 )
                         part:SetStartSize( size )
@@ -317,7 +375,11 @@ function ENT:Think()
                     end
 
                 particle:Finish()
-                self.cd2_nextenergyparticle = SysTime() + random( 1, 2 )
+
+                local time = self:GetChargeDuration() - 10
+                self.cd2_systimedparticledur = self.cd2_systimedparticledur or SysTime() + time
+                    print( self.cd2_systimedparticledur - SysTime(), ( self.cd2_systimedparticledur - SysTime() ) / 30  )
+                self.cd2_nextenergyparticle = SysTime() + ( ( self.cd2_systimedparticledur - SysTime() ) / 30 )
             end
         end
 
@@ -359,6 +421,7 @@ end
 if SERVER then
     util.AddNetworkString( "cd2net_beaconscale" )
     util.AddNetworkString( "cd2net_beaconduration" )
+    util.AddNetworkString( "cd2net_beaconplaysound" )
 
     net.Receive( "cd2net_beaconduration", function( len, ply )
         local beacon = net.ReadEntity()
@@ -376,6 +439,20 @@ elseif CLIENT then
         local mat = Matrix()
         mat:Scale( scale )
         ent:EnableMatrix( "RenderMultiply", mat )
+    end )
+
+    net.Receive( "cd2net_beaconplaysound", function()
+        local path = net.ReadString()
+        local volume = net.ReadFloat()
+        local pos = net.ReadVector()
+
+        sound.PlayFile( "sound/" .. path, "3d mono noplay", function( snd, id, name )
+            if id then return end
+            snd:SetVolume( volume )
+            snd:SetPos( pos )
+            snd:Set3DFadeDistance( 700, 1000000000 )
+            snd:Play()
+        end )
     end )
 
 end

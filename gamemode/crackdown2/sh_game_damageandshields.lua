@@ -34,7 +34,7 @@ if SERVER then
     -- Ignite any player or npc if they have been damaged by explosions
     hook.Add( "PostEntityTakeDamage", "crackdown2_fireexplosions", function( ent, info )
         if info:IsExplosionDamage() and ( ent:IsPlayer() or ent:IsCD2NPC() ) then
-            ent:Ignite( 4 )
+            if info:GetDamage() > 50 then ent:Ignite( 4 ) end
             if ent:IsPlayer() and info:GetDamage() > 100 then ent:Stun( info:GetDamageForce() ) end
         end
     end )

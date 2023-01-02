@@ -1,18 +1,23 @@
 local players_GetAll = player.GetAll
 local Trace = util.TraceLine
 local viewtrace = {}
+local IsValid = IsValid
 local zerovec = Vector()
 local calctable = {}
 local shouldoverride = true
+local LerpVector = LerpVector
+local Lerp = Lerp
+local FrameTime = FrameTime
 
 
--- Because gmod's CreateRagdoll function for players actually sucks
+-- Because gmod's CreateRagdoll function for players actually sucks.
+-- Getting the position of the ragdoll was unreliable and gave only the position the ragdoll was spawned. So here's this function
 function CD2CreateRagdoll( ply )
     local ragdoll = ents.Create( "prop_ragdoll" )
     ragdoll:SetModel( ply:GetModel() )
     ragdoll:SetPos( ply:GetPos() )
     ragdoll:SetOwner( ply )
-    ragdoll:AddEffects( EF_BONEMERGE )
+    ragdoll:AddEffects( EF_BONEMERGE ) -- Pretty much sets up the bones for us
     ragdoll:SetParent( ply )
     ragdoll:Spawn()
     ply:SetRagdoll( ragdoll )
@@ -28,6 +33,7 @@ function CD2CreateRagdoll( ply )
 
 end
 
+-- The stun system. When the player is hurt with a certain amount of explosive damage, they will be stunned and ragdolled for 3 seconds before getting back up
 hook.Add( "Tick", "crackdown2_stunsystem", function()
 
     if SERVER then
@@ -38,7 +44,7 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
 
             if !IsValid( ply ) or !ply:IsCD2Agent() then continue end
 
-            if ply:GetIsStunned() and ply:Alive() then
+            if ply:GetIsStunned() and ply:Alive() then -- If the player is currently stunned and alive
 
                 if !IsValid( ply:GetRagdoll() ) then
                     CD2CreateRagdoll( ply )
@@ -49,10 +55,13 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
                 ply:SetPos( ply:GetRagdoll():GetPos() )
                 ply:SetAngles( Angle( 0, ply:GetRagdoll():GetAngles()[ 2 ], 0 ) )
                 ply:SetVelocity( -ply:GetVelocity() )
-                ply:Freeze( true )
+                ply:Freeze( true ) -- Prevent any inputs
 
+                -- Time is up
                 if ply.cd2_stunendtime and CurTime() > ply.cd2_stunendtime then
                     ply:SetIsStunned( false )
+
+                    -- Entity responsible for the rising animation. This is dumb but gmod forced us
                     local riseent = ents.Create( "cd2_riseent" )
                     riseent:SetPos( ply:GetPos() )
                     riseent:SetAngles( Angle( 0, ply:EyeAngles()[ 2 ], 0 ) )
@@ -80,6 +89,8 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
 
     elseif CLIENT then 
 
+
+        -- Override the view so it follows the ragdoll
         local ply = LocalPlayer()
         if !ply:IsCD2Agent() or !IsValid( ply ) then return end
         local ragdoll = ply:GetRagdoll()
@@ -89,6 +100,7 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
 
             CD2_ViewOverride = function( ply2, origin, angles, fov, znear, zfar )
                 if !IsValid( ragdoll ) or CD2_InSpawnPointMenu then return end
+
                 viewtrace.start = ( ragdoll:GetPos() + Vector( 0, 0, 18 ) )
                 viewtrace.endpos = ( ( ragdoll:GetPos() + Vector( 0, 0, 18 ) ) - CD2_viewangles:Forward() * 130 )
                 viewtrace.filter = { ply, ragdoll }
@@ -111,11 +123,6 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
 
             shouldoverride = false
         elseif ( !ply:GetIsStunned() or !ply:Alive() ) and !shouldoverride then 
-
-            net.Start( "cd2net_stunendsetpos" )
-            net.WriteVector( lastpos )
-            net.SendToServer()
-
             CD2_ViewOverride = nil
             shouldoverride = true
         end

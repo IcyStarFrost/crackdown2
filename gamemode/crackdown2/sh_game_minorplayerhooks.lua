@@ -62,9 +62,11 @@ if CLIENT then
 
     -- Ambient music --
     local nexttrack = CurTime() + random( 90, 250 )
-    local tracks = { "sound/crackdown2/music/ambient/agency.mp3", "sound/crackdown2/music/ambient/hope.mp3", "sound/crackdown2/music/ambient/ambient1.mp3", "sound/crackdown2/music/ambient/ambient2.mp3", "sound/crackdown2/music/ambient/ambient3.mp3", "sound/crackdown2/music/ambient/ambient4.mp3", "sound/crackdown2/music/ambient/ambient5.mp3", "sound/crackdown2/music/ambient/ambient6.mp3" }
+    
     hook.Add( "Tick", "crackdown2_ambientmusic", function()
         if nexttrack and CurTime() > nexttrack then 
+            local tracks = { "sound/crackdown2/music/ambient/agency.mp3", "sound/crackdown2/music/ambient/hope.mp3",  }
+            for i = 1, 14 do tracks[ #tracks + 1 ] = "sound/crackdown2/music/ambient/height" .. i .. ".mp3" end
             nexttrack = nil
 
             CD2StartMusic( tracks[ random( #tracks ) ], 0, false, true, nil, nil, nil, nil, nil, function( chan )

@@ -61,7 +61,7 @@ elseif CLIENT then
 
             hook.Add( "Think", "crackdown2_shieldofflinesoundhandler", function()
                 if !IsValid( snd ) or snd:GetState() == GMOD_CHANNEL_STOPPED then hook.Remove( "Think", "crackdown2_shieldofflinesoundhandler" ) return end
-                if !ply:Alive() or ply:GetNWShields() > 30 then hook.Remove( "Think", "crackdown2_shieldofflinesoundhandler" ) snd:Stop() return end
+                if !ply:Alive() or ply:GetNWShields() > 30 or ply:GetNWShields() <= 0 then hook.Remove( "Think", "crackdown2_shieldofflinesoundhandler" ) snd:Stop() return end
             end )
 
         end )

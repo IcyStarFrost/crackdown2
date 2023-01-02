@@ -6,6 +6,7 @@ local blackish = Color( 39, 39, 39 )
 local gold = Color( 255, 209, 5 )
 local draw_NoTexture = draw.NoTexture
 local orange = Color( 218, 103, 10 )
+local random = math.random
 local input_GetKeyName = input.GetKeyName
 local input_LookupBinding = input.LookupBinding
 local upper = string.upper
@@ -43,7 +44,7 @@ surface.CreateFont( "crackdown2_spawnpointmenubottomtext", {
 
 function CD2OpenSpawnPointMenu()
 
-    surface.PlaySound( "crackdown2/ui/dropmenuopen.mp3" )
+    surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
 
     net.Start( "cd2net_playerregenerate" )
     net.SendToServer()

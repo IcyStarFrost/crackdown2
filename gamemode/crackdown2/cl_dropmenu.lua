@@ -5,6 +5,7 @@ local surface_DrawOutlinedRect = surface.DrawOutlinedRect
 local draw_DrawText = draw.DrawText
 local surface_SetMaterial = surface.SetMaterial
 local ceil = math.ceil
+local random = math.random
 local blackish = Color( 39, 39, 39)
 local fadedwhite = Color( 255, 255, 255, 10 )
 local orange = Color( 255, 115, 0 )
@@ -102,7 +103,7 @@ CD2_DropEquipment = "cd2_grenade"
 
 function CD2OpenDropMenu( issupplypoint )
 
-    surface.PlaySound( "crackdown2/ui/dropmenuopen.mp3" )
+    surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
 
     CD2_DropPrimary = CD2FILESYSTEM:ReadPlayerData( "cd2_dropprimary" ) or CD2_DropPrimary
     CD2_DropSecondary = CD2FILESYSTEM:ReadPlayerData( "cd2_dropsecondary" ) or CD2_DropSecondary

@@ -49,15 +49,25 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
                 ply:SetPos( ply:GetRagdoll():GetPos() )
                 ply:SetAngles( Angle( 0, ply:GetRagdoll():GetAngles()[ 2 ], 0 ) )
                 ply:SetVelocity( -ply:GetVelocity() )
+                ply:Freeze( true )
 
                 if ply.cd2_stunendtime and CurTime() > ply.cd2_stunendtime then
                     ply:SetIsStunned( false )
+                    local riseent = ents.Create( "cd2_riseent" )
+                    riseent:SetPos( ply:GetPos() )
+                    riseent:SetAngles( Angle( 0, ply:EyeAngles()[ 2 ], 0 ) )
+                    riseent:SetParent( ply )
+                    riseent:SetPlayer( ply )
+                    riseent:Spawn()
+                    riseent.Callback = function( self )
+                        ply:SetNoDraw( false )
+                        ply:Freeze( false )
+                    end
                 end
 
             elseif ( !ply:GetIsStunned() or !ply:Alive() ) and IsValid( ply:GetRagdoll() ) then
                 ply:GetRagdoll():Remove()
                 ply:SetIsStunned( false )
-                ply:SetNoDraw( false )
             else
                 ply.cd2_stunendtime = CurTime() + 3
             end
@@ -76,7 +86,6 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
 
         if IsValid( ragdoll ) and ply:Alive() and ply:GetIsStunned() and shouldoverride then
             lastpos = ragdoll:GetPos()
-            CD2_PreventMovement = true
 
             CD2_ViewOverride = function( ply2, origin, angles, fov, znear, zfar )
                 if !IsValid( ragdoll ) or CD2_InSpawnPointMenu then return end
@@ -107,7 +116,6 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
             net.WriteVector( lastpos )
             net.SendToServer()
 
-            CD2_PreventMovement = false
             CD2_ViewOverride = nil
             shouldoverride = true
         end

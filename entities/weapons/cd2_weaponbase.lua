@@ -367,7 +367,7 @@ function SWEP:DrawWorldModel()
 end
 
 function SWEP:Reload()
-    if self:GetIsReloading() or self:GetOwner():IsPlayer() and self:GetOwner():GetAmmoCount( self.Primary.Ammo ) <= 0 or self:Clip1() == self:GetMaxClip1() or self:GetPickupMode() then return end
+    if self:GetIsReloading() or ( self:GetOwner():IsPlayer() and !self:GetOwner().cd2_infiniteammo and self:GetOwner():GetAmmoCount( self.Primary.Ammo ) <= 0 ) or self:Clip1() == self:GetMaxClip1() or self:GetPickupMode() then return end
 
     self:SetIsReloading( true )
 
@@ -391,7 +391,7 @@ function SWEP:Reload()
         if !IsValid( self ) or !IsValid( self:GetOwner() ) or self:GetOwner():GetActiveWeapon() != self or !self:GetIsReloading() then return end
         self:SetIsReloading( false )
 
-        if self:GetOwner():IsPlayer() then
+        if self:GetOwner():IsPlayer() and !self:GetOwner().cd2_infiniteammo then
 
             local reserve = self:GetOwner():GetAmmoCount( self.Primary.Ammo )
             local count = clamp( self.Primary.ClipSize, 0, reserve )

@@ -190,7 +190,7 @@ function CD2DrawInputbar( x, y, keyname, text )
 end
 
 local explosives = {}
-local explosiveicon = Material( "crackdown2/ui/explosive.png" )
+local fireicon = Material( "crackdown2/ui/explosive.png" )
 
 local hplerp = -1
 local shieldlerp = -1
@@ -601,6 +601,14 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             function thinkpanel:Think()
                 if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
 
+                if IsValid( CD2_equipmentpnl ) then
+                    local mdl = scripted_ents.Get( CD2_DropEquipment ).WorldModel
+                    local ent = CD2_equipmentpnl:GetEntity()
+
+                    if IsValid( ent ) and ent:GetModel() != mdl then ent:SetModel( mdl ) end
+                end
+                
+
                 if CD2_equipmentpnl != self:GetParent() then
                     self:GetParent():Remove()
                 end
@@ -695,6 +703,11 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
 end )
 
+local explosivemodels = {
+    [ "models/props_c17/oildrum001_explosive.mdl" ] = true,
+    [ "models/props_junk/gascan001a.mdl" ] = true
+}
+
 -- Peacekeeper/Cell logos --
 hook.Add( "PreDrawEffects", "crackdown2_peacekeepericons/cellicons", function()
     local scrw, scrh, ply = ScrW(), ScrH(), LocalPlayer()
@@ -708,6 +721,16 @@ hook.Add( "PreDrawEffects", "crackdown2_peacekeepericons/cellicons", function()
 
         render_SetMaterial( peacekeeper )
         render_DrawSprite( v:GetPos() + Vector( 0, 0, 100 ), 32, 20, color_white )
+    end
+    ----
+
+    -- Explosives --
+    local near = CD2FindInSphere( ply:GetPos(), 1500, function( ent ) return explosivemodels[ ent:GetModel() ] end )
+
+    for k, v in ipairs( near ) do
+
+        render_SetMaterial( fireicon )
+        render_DrawSprite( v:GetPos() + Vector( 0, 0, v:GetModelRadius() + 40 ), 16, 16, color_white )
     end
     ----
 

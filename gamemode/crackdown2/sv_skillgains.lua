@@ -15,14 +15,16 @@ function CD2HandleSkillXP( ply, skillname, xp )
 
     xpsetfunc( ply, xpgetfunc( ply ) + finalxp )
 
-    CD2FILESYSTEM:WritePlayerData( ply, "cd2_skillxp_" .. skillname, xpgetfunc( ply ) )
+    if !KeysToTheCity() then CD2FILESYSTEM:WritePlayerData( ply, "cd2_skillxp_" .. skillname, xpgetfunc( ply ) ) end
 
     if ceil( xpgetfunc( ply )  ) >= 100 then
         levelsetfunc( ply, levelgetfunc( ply ) + 1 ) 
         xpsetfunc( ply, 0 )
 
-        CD2FILESYSTEM:WritePlayerData( ply, "cd2_skill_" .. skillname, levelgetfunc( ply ) )
-        CD2FILESYSTEM:WritePlayerData( ply, "cd2_skillxp_" .. skillname, 0 )
+        if !KeysToTheCity() then
+            CD2FILESYSTEM:WritePlayerData( ply, "cd2_skill_" .. skillname, levelgetfunc( ply ) )
+            CD2FILESYSTEM:WritePlayerData( ply, "cd2_skillxp_" .. skillname, 0 )
+        end
         CD2CreateThread( function()
 
             while IsValid( ply ) and !ply:IsOnGround() do

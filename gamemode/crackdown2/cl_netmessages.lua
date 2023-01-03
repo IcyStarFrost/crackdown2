@@ -53,7 +53,7 @@ end )
 net.Receive( "cd2net_playerrespawn", function()
     
     CD2_DrawBlackbars = false 
-    CD2StartMusic( "sound/crackdown2/music/playerspawn.mp3", 1, false, true )
+    CD2StartMusic( "sound/crackdown2/music/playerspawn.mp3", 3, false, true )
 
 end )
 
@@ -153,7 +153,7 @@ net.Receive( "cd2net_sendspawnvectors", function()
 end )
 
 net.Receive( "cd2net_playerinitialspawn", function()
-    local isreturningplayer = CD2FILESYSTEM:ReadPlayerData( "c_isreturningplayer" )
+    local isreturningplayer = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_isreturningplayer" ) or true
 
     -- If the player is new to the gamemode, then play the intro video
     if !isreturningplayer then

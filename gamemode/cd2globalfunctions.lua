@@ -248,9 +248,10 @@ function CD2SendTextBoxMessage( ply, text )
     end
 end
 
+
 -- Returns if the server is currently running Keys to the city mode
 function KeysToTheCity()
-    return GetConVar( "cd2_keystothecity" ):GetBool()
+    return GetConVar( "cd2_keystothecitymode" ):GetBool()
 end
 
 -- Quick test functions

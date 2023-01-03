@@ -115,7 +115,7 @@ if CLIENT then
             limit = true
         elseif ply:GetNWHealth() > 70 and limit then
             if IsValid( lowhealthchannel ) then lowhealthchannel:FadeOut() end
-            CD2StartMusic( "sound/crackdown2/music/healthregenerated.mp3", 4, false, true )
+            CD2StartMusic( "sound/crackdown2/music/healthregenerated.mp3", 2, false, true )
             ply:SetDSP( 1 )
             limit = false
         end

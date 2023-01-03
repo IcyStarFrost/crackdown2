@@ -4,6 +4,7 @@ if SERVER then
 
     -- Shield system
     hook.Add( "EntityTakeDamage", "crackdown2_shieldsystem", function( ent, info ) 
+        if ent.cd2_godmode then return true end
         local attacker = info:GetAttacker()
         if attacker:IsCD2NPC() then info:SetDamage( info:GetDamage() / attacker.cd2_damagedivider ) end
 

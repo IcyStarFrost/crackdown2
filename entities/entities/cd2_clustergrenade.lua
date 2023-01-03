@@ -51,6 +51,10 @@ function ENT:CreateCluster()
 
     cluster:AddCallback( "PhysicsCollide", function()
 
+        local effect = EffectData()
+        effect:SetOrigin( cluster:GetPos() )
+        util.Effect( "Explosion", effect, true, true )
+
         util.Decal( "Scorch", cluster:GetPos(), cluster:GetPos() - Vector( 0, 0, 50 ), cluster )
     
         if SERVER then

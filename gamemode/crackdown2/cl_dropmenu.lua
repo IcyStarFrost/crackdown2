@@ -215,7 +215,7 @@ function CD2OpenDropMenu( issupplypoint )
 
             -- Returns if the player can use this weapon
             function panel:PassesWeaponSkillTest()
-                return ( !isequipment and !isexplosive ) and skilllevel and skilllevel <= plyweaponskill or ( isequipment or isexplosive ) and skilllevel and skilllevel <= plyexplosiveskill
+                return !KeysToTheCity() and ( !isequipment and !isexplosive ) and skilllevel and skilllevel <= plyweaponskill or ( isequipment or isexplosive ) and skilllevel and skilllevel <= plyexplosiveskill or KeysToTheCity()
             end
 
             function statsholder:Paint( w, h )
@@ -275,9 +275,9 @@ function CD2OpenDropMenu( issupplypoint )
             function modelpanel:Paint( w, h )
                 oldpaint( self, w, h )
 
-                if ( !isequipment and !isexplosive ) and skilllevel and skilllevel > plyweaponskill then
+                if !KeysToTheCity() and ( !isequipment and !isexplosive ) and skilllevel and skilllevel > plyweaponskill then
                     draw_DrawText( "UNLOCKED AT FIREARMS LEVEL " .. skilllevel, "crackdown2_weaponstattext", 10, h - 20, lightgrey, TEXT_ALIGN_LEFT )
-                elseif ( isequipment or isexplosive ) and skilllevel and skilllevel > plyexplosiveskill then
+                elseif !KeysToTheCity() and ( isequipment or isexplosive ) and skilllevel and skilllevel > plyexplosiveskill then
                     draw_DrawText( "UNLOCKED AT EXPLOSIVES LEVEL " .. skilllevel, "crackdown2_weaponstattext", 10, h - 20, lightgrey, TEXT_ALIGN_LEFT )
                 end
             end
@@ -412,9 +412,9 @@ function CD2OpenDropMenu( issupplypoint )
                         if IsValid( ent ) then
                             
                             
-                            if v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyexplosiveskill then
+                            if !KeysToTheCity() and v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyexplosiveskill then
                                 lockicon:Show()
-                            elseif !v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyweaponskill then
+                            elseif !KeysToTheCity() and !v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyweaponskill then
                                 lockicon:Show()
                             else
                                 lockicon:Hide()
@@ -453,9 +453,9 @@ function CD2OpenDropMenu( issupplypoint )
 
                         if IsValid( ent ) then
 
-                            if wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyexplosiveskill then
+                            if !KeysToTheCity() and wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyexplosiveskill then
                                 lockicon:Show()
-                            elseif !wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyweaponskill then
+                            elseif !KeysToTheCity() and !wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyweaponskill then
                                 lockicon:Show()
                             else
                                 lockicon:Hide()
@@ -555,9 +555,11 @@ function CD2OpenDropMenu( issupplypoint )
             if !skilltest1 or !skilltest2 or !skilltest3 then surface.PlaySound( "buttons/button10.wav" ) return end
             CD2_DropMenu:Remove()
 
-            CD2FILESYSTEM:WritePlayerData( "cd2_dropprimary", CD2_DropPrimary )
-            CD2FILESYSTEM:WritePlayerData( "cd2_dropsecondary", CD2_DropSecondary )
-            CD2FILESYSTEM:WritePlayerData( "cd2_dropequipment", CD2_DropEquipment )
+            if !KeysToTheCity() then
+                CD2FILESYSTEM:WritePlayerData( "cd2_dropprimary", CD2_DropPrimary )
+                CD2FILESYSTEM:WritePlayerData( "cd2_dropsecondary", CD2_DropSecondary )
+                CD2FILESYSTEM:WritePlayerData( "cd2_dropequipment", CD2_DropEquipment )
+            end
 
             if !issupplypoint then
                 net.Start( "cd2net_playerdropmenuconfirm" )

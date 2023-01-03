@@ -33,11 +33,11 @@ end )
 
 -- Activated when the +grenade1 bind is pressed
 hook.Add( "KeyPress", "crackdown2_equipmentuse", function( ply, key )
-    if key == IN_GRENADE1 and ply:GetEquipmentCount() > 0 and ( !ply.cd2_grenadecooldown or CurTime() > ply.cd2_grenadecooldown ) then
+    if key == IN_GRENADE1 and ( ply:GetEquipmentCount() > 0 or ply.cd2_infiniteammo ) and ( !ply.cd2_grenadecooldown or CurTime() > ply.cd2_grenadecooldown ) then
 
         CD2CreateThread( function()
 
-            ply:SetEquipmentCount( ply:GetEquipmentCount() - 1 )
+            if !ply.cd2_infiniteammo then ply:SetEquipmentCount( ply:GetEquipmentCount() - 1 ) end
 
             local tbl = scripted_ents.Get( CLIENT and CD2_DropEquipment or ply.cd2_Equipment )
             ply.cd2_grenadecooldown = CurTime() + tbl.Cooldown

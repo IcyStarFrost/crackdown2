@@ -63,3 +63,22 @@ function GM:GetFallDamage( ply, speed )
     return max( 0, ceil( 0.2918 * speed - 141.75 ) - ply:GetSafeFallSpeed() )
 end
 
+local explosivemodels = {
+    [ "models/props_c17/oildrum001_explosive.mdl" ] = 1,
+    [ "models/props_junk/gascan001a.mdl" ] = 0.6
+}
+
+if SERVER then
+hook.Add( "OnEntityCreated", "crackdown2_explosivepropeffects", function( ent )
+    timer.Simple( 0, function()
+        if !IsValid( ent ) or explosivemodels[ ent:GetModel() ] == nil then return end
+        ent:CallOnRemove( "explosiveeffect", function()
+            net.Start( "cd2net_explosion" )
+            net.WriteVector( ent:GetPos() )
+            net.WriteFloat( explosivemodels[ ent:GetModel() ] )
+            net.Broadcast()
+        end )
+    end )
+end )
+
+end

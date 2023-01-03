@@ -20,11 +20,6 @@ function CD2DebugMessage( ... )
 end
 
 
--- Returns if ply can lock onto ent
-function CD2CanLockOn( ply, ent )
-    return ( ent:IsCD2NPC() or ent:IsPlayer() and ent:IsCD2Agent() ) and ent != ply and ( ent:GetCD2Team() != ply:GetCD2Team() and ent:GetCD2Team() != "civilian" ) or ent:AlwaysLockon() or false
-end
-
 -- Throws the specified equipment to the position. Owned by thrower
 function CD2ThrowEquipment( class, thrower, pos )
     local grenade = ents.Create( class )
@@ -121,6 +116,12 @@ function CD2GetClosestInTable( tbl, target )
     return closest
 end
 
+
+-- Returns if ply can lock onto ent
+function CD2CanLockOn( ply, ent )
+    return ( ent:IsCD2NPC() or ent:IsPlayer() and ent:IsCD2Agent() ) and ent != ply and ( ent:GetCD2Team() != ply:GetCD2Team() and ent:GetCD2Team() != "civilian" ) or ent:AlwaysLockon() or false
+end
+
 local ents_FindInCone = ents.FindInCone
 -- Finds targets that the ply can lock onto using their view
 function CD2FindInLockableTragets( ply )
@@ -129,8 +130,9 @@ function CD2FindInLockableTragets( ply )
     local entities = {}
     local cone = ents_FindInCone( CLIENT and CD2_vieworigin or ply:EyePos(), CLIENT and CD2_viewangles:Forward() or ply:EyeAngles():Forward(), wep.LockOnRange, 0.99 )
 
-    for k, v in ipairs( cone ) do
-        if CD2CanLockOn( ply, v ) and ( CLIENT and ply:Trace( CD2_vieworigin, v:WorldSpaceCenter() ).Entity == v or SERVER and ply:Visible( v ) ) then entities[ #entities + 1 ] = v end
+    for i = 1, #cone do
+        local ent = cone[ i ]
+        if CD2CanLockOn( ply, ent ) and ( CLIENT and ply:Trace( CD2_vieworigin, ent:WorldSpaceCenter() ).Entity == ent or SERVER and ply:Visible( ent ) ) then entities[ #entities + 1 ] = ent end
     end
 
     return entities

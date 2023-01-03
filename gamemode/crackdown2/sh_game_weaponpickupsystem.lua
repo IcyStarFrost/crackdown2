@@ -18,11 +18,14 @@ hook.Add( "PlayerCanPickupWeapon", "crackdown2_npcweapons", function( ply, wep )
     end
 
     if !haswep and ( !ply.cd2_WeaponSpawnDelay or CurTime() > ply.cd2_WeaponSpawnDelay ) and !IsValid( ply.cd2_HeldObject ) then
+
         ply:SetNW2Entity( "cd2_targetweapon", wep )
         ply:SetNW2Float( "cd2_weapondrawcur", CurTime() + 0.1 )
-        if ply:KeyDown( IN_USE ) then ply.cd2_PickupWeaponDelay = ply.cd2_PickupWeaponDelay or CurTime() + 1 else ply.cd2_PickupWeaponDelay = nil end
+        local activewep = ply:GetActiveWeapon()
 
-        if ply.cd2_PickupWeaponDelay and CurTime() > ply.cd2_PickupWeaponDelay then
+        if ply:KeyDown( IN_RELOAD ) then ply.cd2_PickupWeaponDelay = ply.cd2_PickupWeaponDelay or CurTime() + 1 else ply.cd2_PickupWeaponDelay = nil end
+
+        if ply.cd2_PickupWeaponDelay and CurTime() > ply.cd2_PickupWeaponDelay or ( activewep:Ammo1() == 0 and activewep:Clip1() == 0 ) then
 
             local activewep = ply:GetActiveWeapon()
 
@@ -56,7 +59,7 @@ hook.Add( "HUDPaint", "crackdown2_pickupweaponpaint", function()
     local curwep = ply:GetActiveWeapon()
     if !IsValid( wep ) or !IsValid( curwep ) or CurTime() > render then return end
 
-    local usebind = input_LookupBinding( "+use" ) or "e"
+    local usebind = input_LookupBinding( "+reload" ) or "r"
     local code = input_GetKeyCode( usebind )
     local buttonname = input_GetKeyName( code )
     

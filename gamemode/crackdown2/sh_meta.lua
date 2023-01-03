@@ -9,7 +9,7 @@ end
 
 -- Returns if the entity should always be able to be locked on
 function ENT:AlwaysLockon()
-    return self.cd2_AlwaysLockon or false
+    return self.cd2_AlwaysLockon or self:GetNW2Bool( "cd2_alwayslockon", false ) or false
 end
 
 function ENT:IsCD2Agent()

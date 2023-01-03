@@ -28,13 +28,13 @@ if CLIENT then
     
     })
     
-    if IsValid( CD2_KeysToTheCityMenu ) then CD2_KeysToTheCityMenu:Remove() end
-
-
-
     
-    --hook.Add( "PostGamemodeLoaded", "crackdown2_keystothecitymenu", function()
+
+
+    function CreateKeysTotheCityMenu()
         if !KeysToTheCity() then return end
+
+        if IsValid( CD2_KeysToTheCityMenu ) then CD2_KeysToTheCityMenu:Remove() end
 
         hook.Add( "Think", "crackdown2_showhidekttcmenu", function()
             if !IsValid( CD2_KeysToTheCityMenu ) then return end
@@ -205,54 +205,19 @@ if CLIENT then
                 net.SendToServer()
             end )
         end
---[[         AddOption( "Spawn SMG", "Weapons", "Button", { default = false }, function( pnl )
-            net.Start( "cd2net_kttc_spawnnpc" )
-            net.WriteString( "cd2_smg" )
-            net.WriteAngle( CD2_viewangles )
-            net.SendToServer()
-        end )
 
-        AddOption( "Spawn Agency Assault Rifle", "Weapons", "Button", { default = false }, function( pnl )
-            net.Start( "cd2net_kttc_spawnnpc" )
-            net.WriteString( "cd2_assaultrifle" )
-            net.WriteAngle( CD2_viewangles )
-            net.SendToServer()
-        end )
+        --
 
-        AddOption( "Spawn Agency Sniper", "Weapons", "Button", { default = false }, function( pnl )
-            net.Start( "cd2net_kttc_spawnnpc" )
-            net.WriteString( "cd2_sniper" )
-            net.WriteAngle( CD2_viewangles )
-            net.SendToServer()
-        end )
-
-        AddOption( "Spawn Machine Gun", "Weapons", "Button", { default = false }, function( pnl )
-            net.Start( "cd2net_kttc_spawnnpc" )
-            net.WriteString( "cd2_machinegun" )
-            net.WriteAngle( CD2_viewangles )
-            net.SendToServer()
-        end )
-
-        AddOption( "Spawn Shotgun", "Weapons", "Button", { default = false }, function( pnl )
-            net.Start( "cd2net_kttc_spawnnpc" )
-            net.WriteString( "cd2_shotgun" )
-            net.WriteAngle( CD2_viewangles )
-            net.SendToServer()
-        end )
-
-        AddOption( "Spawn Rocket Launcher", "Weapons", "Button", { default = false }, function( pnl )
-            net.Start( "cd2net_kttc_spawnnpc" )
-            net.WriteString( "cd2_rocketlauncher" )
-            net.WriteAngle( CD2_viewangles )
-            net.SendToServer()
-        end )
-
-        AddOption( "Spawn Pistol", "Weapons", "Button", { default = false }, function( pnl )
-            net.Start( "cd2net_kttc_spawnnpc" )
-            net.WriteString( "cd2_pistol" )
-            net.WriteAngle( CD2_viewangles )
-            net.SendToServer()
-        end ) ]]
+        -- Equipment --
+        for ClassName, basetable in pairs( scripted_ents.GetList() ) do
+            if basetable.Base != "cd2_equipmentbase" then continue end
+            AddOption( "Spawn " .. basetable.t.PrintName, "Equipment", "Button", { default = false }, function( pnl )
+                net.Start( "cd2net_kttc_spawnnpc" )
+                net.WriteString( ClassName )
+                net.WriteAngle( CD2_viewangles )
+                net.SendToServer()
+            end )
+        end
         --
 
         
@@ -501,7 +466,12 @@ if CLIENT then
             end
         end
     
-    --end )
+    end 
+
+
+    CreateKeysTotheCityMenu()
+    
+    hook.Add( "PostGamemodeLoaded", "crackdown2_keystothecitymenu", CreateKeysTotheCityMenu )
 
 
 
@@ -515,6 +485,7 @@ elseif SERVER then
 
 
     net.Receive( "cd2net_kttc_godmode", function( len, ply )
+        if !KeysToTheCity() then return end
         ply.cd2_godmode = net.ReadBool()
     end )
 

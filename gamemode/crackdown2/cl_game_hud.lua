@@ -240,7 +240,7 @@ function WorldVectorToScreen(worldVector, origin, scale, rotation, radius, fov )
 
     angle = math_deg( angle )
 
-    local distance = relativePosition:Length()
+    local distance = relativePosition:Length() * 0.7
 
     local x = math_cos( math_rad( angle ) ) * distance * scale
     local y = math_sin( math_rad( angle ) ) * distance * scale
@@ -692,8 +692,8 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
         for i = 1, #players do
             local otherplayer = players[ i ]
-            if IsValid( otherplayer ) and otherplayer != ply then
-                DrawCoordsOnMiniMap( otherplayer:GetPos(), otherplayer:EyeAngles(), playerarrow, 5, otherplayer:GetPlayerColor():ToColor(), fov )
+            if IsValid( otherplayer ) and otherplayer:IsCD2Agent() and otherplayer != ply then
+                DrawCoordsOnMiniMap( otherplayer:GetPos(), otherplayer:EyeAngles(), playerarrow, 10, otherplayer:GetPlayerColor():ToColor(), fov )
             end
         end
         --

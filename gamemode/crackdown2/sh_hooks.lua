@@ -72,6 +72,7 @@ if SERVER then
 hook.Add( "OnEntityCreated", "crackdown2_explosivepropeffects", function( ent )
     timer.Simple( 0, function()
         if !IsValid( ent ) or explosivemodels[ ent:GetModel() ] == nil then return end
+        ent:SetNW2Bool( "cd2_alwayslockon", true )
         ent:CallOnRemove( "explosiveeffect", function()
             net.Start( "cd2net_explosion" )
             net.WriteVector( ent:GetPos() )

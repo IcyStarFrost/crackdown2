@@ -98,11 +98,24 @@ net.Receive( "cd2net_reviveplayer", function( len, ply )
     local agent = net.ReadEntity()
     if agent:Alive() or !agent:GetCanRevive() then return end
 
-    ply.cd2_WeaponSpawnDelay = CurTime() + 0.5
+    agent.cd2_WeaponSpawnDelay = CurTime() + 0.5
     agent:Spawn()
     agent:SetPos( ply:GetPos() + ply:GetForward() * 60 + Vector( 0, 0, 5 ) )
-    agent:Give( agent.cd2_lastspawnprimary )
-    agent:Give( agent.cd2_lastspawnsecondary )
+    local primary = agent:Give( agent.cd2_lastspawnprimary )
+    local secondary = agent:Give( agent.cd2_lastspawnsecondary )
+
+    local weps = agent.cd2_deathweapons
+    for i = 1, #weps do
+        local class = weps[ i ][ 1 ]
+        local reserve = weps[ i ][ 2 ]
+
+        if class == primary:GetClass() then
+            agent:SetAmmo( reserve, primary.Primary.Ammo )
+        elseif class == secondary:GetClass() then
+            agent:SetAmmo( reserve, secondary.Primary.Ammo )
+        end
+    end
+
 end )
 
 
@@ -116,10 +129,10 @@ net.Receive( "cd2net_playerregenerate", function( len, ply )
     if !game.SinglePlayer() and ply.cd2_deathweapons then
         local weps = ply.cd2_deathweapons
         local ragdoll = ply:GetRagdollEntity()
-        for i = 1, #ply.cd2_deathweapons do
+        for i = 1, #weps do
             
-            local class = ply.cd2_deathweapons[ i ][ 1 ]
-            local reserve = ply.cd2_deathweapons[ i ][ 2 ]
+            local class = weps[ i ][ 1 ]
+            local reserve = weps[ i ][ 2 ]
 
             local wep = ents.Create( class ) 
             wep:SetPos( ragdoll:GetPos() + Vector( 0, 0, 20 ) )

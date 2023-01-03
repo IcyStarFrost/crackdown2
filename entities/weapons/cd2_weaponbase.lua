@@ -78,7 +78,7 @@ function SWEP:Initialize()
 
     if SERVER then
         hook.Add( "Tick", self, function()
-            if !IsValid( self:GetOwner() ) and CurTime() > self.DeleteTime then
+            if !IsValid( self:GetOwner() ) and CurTime() > self.DeleteTime or ( self.cd2_Ammocount and self.cd2_Ammocount == 0 ) then
                 self:Remove()
             elseif IsValid( self:GetOwner() ) then
                 self.DeleteTime = CurTime() + 30

@@ -388,14 +388,14 @@ net.Receive( "cd2net_explosion", function()
 
 
     hook.Add( "Think", "crackdown2_explosionlight", function()
-        local light = DynamicLight( LocalPlayer():EntIndex() )
+        local light = DynamicLight( random( 0, 1000000 ) )
         if ( light ) then
             light.pos = pos
             light.r = 255
             light.g = 115
             light.b = 0
             light.brightness = 5
-            light.Decay = 1000
+            light.Decay = 800
             light.Size = 500 + ( scale > 1 and 600 * scale or 0)
             light.DieTime = CurTime() + 5
             hook.Remove( "Think", "crackdown2_explosionlight" )
@@ -450,7 +450,7 @@ net.Receive( "cd2net_explosion", function()
             part:SetGravity( Vector() )
             part:SetAirResistance( 200 )
 
-            local randomvalue = 300 + ( scale > 1 and 300 * scale or 0 )
+            local randomvalue = 200 + ( scale > 1 and 200 * scale or 0 )
 
             part:SetVelocity( Vector( random( -randomvalue, randomvalue ), random( -randomvalue, randomvalue ), random( -randomvalue, randomvalue ) ) )
             part:SetAngleVelocity( AngleRand( -0.5, 0.5 ) )

@@ -134,6 +134,7 @@ net.Receive( "cd2net_reviveplayer", function( len, ply )
     local agent = net.ReadEntity()
     if agent:Alive() or !agent:GetCanRevive() then return end
 
+    agent.cd2_revived = true
     agent.cd2_WeaponSpawnDelay = CurTime() + 0.5
 
     agent:Spawn()

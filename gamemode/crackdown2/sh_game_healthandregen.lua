@@ -7,7 +7,7 @@ hook.Add( "Tick", "crackdown2_regeneration", function()
         local players = player_GetAll() 
         for i = 1, #players do
             local ply = players[ i ]
-            if !IsValid( ply ) or !ply:IsCD2Agent() then continue end
+            if !IsValid( ply ) or !ply:IsCD2Agent() or !ply:Alive() then continue end
 
             if ply:Armor() == ply:GetMaxArmor() then
                 ply.cd2_cancallShieldsound = true

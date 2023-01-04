@@ -78,8 +78,14 @@ function PLAYER:Spawn()
 
     ply:SetCanRevive( true )
 
-    net.Start( "cd2net_playerrespawn" )
-    net.Send( ply )
+    if ply.cd2_revived then
+        ply.cd2_revived = false
+        net.Start( "cd2net_playerrespawn_revive" )
+        net.Send( ply )
+    else
+        net.Start( "cd2net_playerrespawn" )
+        net.Send( ply )
+    end
 
     net.Start( "cd2net_playerspawnlight" )
     net.WriteEntity( ply )

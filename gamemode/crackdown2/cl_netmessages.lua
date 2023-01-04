@@ -53,7 +53,14 @@ end )
 net.Receive( "cd2net_playerrespawn", function()
     
     CD2_DrawBlackbars = false 
-    CD2StartMusic( "sound/crackdown2/music/playerspawn.mp3", 3, false, true )
+     CD2StartMusic( "sound/crackdown2/music/playerspawn.mp3", 3, false, true )
+
+end )
+
+net.Receive( "cd2net_playerrespawn_revive", function()
+    
+    CD2_DrawBlackbars = false 
+    CD2StartMusic( "sound/crackdown2/music/revive.mp3", 3, false, true )
 
 end )
 

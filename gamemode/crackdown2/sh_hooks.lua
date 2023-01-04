@@ -63,6 +63,10 @@ function GM:GetFallDamage( ply, speed )
     return max( 0, ceil( 0.2918 * speed - 141.75 ) - ply:GetSafeFallSpeed() )
 end
 
+function GM:PlayerStartVoice()
+
+end
+
 local explosivemodels = {
     [ "models/props_c17/oildrum001_explosive.mdl" ] = 1,
     [ "models/props_junk/gascan001a.mdl" ] = 0.6

@@ -20,7 +20,13 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
         if !ply:IsCD2Agent() or ply:GetIsStunned() then continue end
 
         local near = CD2FindInSphere( ply:GetPos(), 100, function( ent ) return ( isphysics[ ent:GetClass() ] or ent.cd2_allowpickup ) and ent:GetNW2Int( "cd2_mass", math.huge ) < ply:GetMaxPickupWeight() and ply:Visible( ent ) end )
-        ply:SetNW2Entity( "cd2_pickuptarget", CD2GetClosestInTable( near, ply ) )
+        
+        if ( !ply.cd2_meleecooldown or CurTime() > ply.cd2_meleecooldown ) then
+            ply:SetNW2Entity( "cd2_pickuptarget", CD2GetClosestInTable( near, ply ) )
+        else
+            ply:SetNW2Entity( "cd2_pickuptarget", nil )
+        end
+
 
         -- Held key
         if ply:KeyDown( IN_USE ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) then ply.cd2_PickupDelay = ply.cd2_PickupDelay or CurTime() + 1 else ply.cd2_PickupDelay = nil end

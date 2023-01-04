@@ -74,47 +74,65 @@ hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
     local wep = ply:GetActiveWeapon()
 
     if ply:IsOnGround() and IsValid( wep ) and !wep:GetIsReloading() and key == IN_ATTACK and ply:KeyDown( IN_USE ) and ( !ply.cd2_meleecooldown or CurTime() > ply.cd2_meleecooldown ) then
-        
+        local nearby = CD2FindInSphere( ply:GetPos(), 300, function( ent ) return ent:IsCD2NPC() end )
+        local closest = CD2GetClosestInTable( nearby, ply )
+        if IsValid( closest ) then
+            local dir = ( closest:CD2EyePos() - ply:EyePos() ):Angle()
+            dir:Normalize()
+            net.Start( "cd2net_setplayerangle" )
+            net.WriteAngle( dir )
+            net.Send( ply )
+        end
+
         if IsValid( ply.cd2_HeldObject ) then
             BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE, true )" )
         else
             BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, " .. meleeanims[ random( #meleeanims ) ] .. ", true )" )
         end
-        ply:SetVelocity( ply:GetForward() * 500 )
-        ply:EmitSound( "WeaponFrag.Throw", 80, 100, 1, CHAN_WEAPON )
 
-        local start = ply:GetPos() + ply:GetForward() * 50 + Vector( 0, 0, 5 )
-        local mins = Vector( -70, -70, 0 )
-        local maxs = Vector( 70, 70, 53 )
-        local entities = FindInBox( start + mins, start + maxs )
+        CD2CreateThread( function()
+            coroutine.wait( 0.1 )
+            if !IsValid( ply ) then return end
+            ply:SetVelocity( ply:GetForward() * 500 )
+            ply:EmitSound( "WeaponFrag.Throw", 80, 100, 1, CHAN_WEAPON )
+            local start = ply:GetPos() + ply:GetForward() * 50 + Vector( 0, 0, 5 )
+            local mins = Vector( -70, -70, 0 )
+            local maxs = Vector( 70, 70, 53 )
+            local entities = FindInBox( start + mins, start + maxs )
 
-        if #entities > 0 then
-            for i = 1, #entities do
-                local hitent = entities[ i ]
-                if !IsValid( hitent ) then continue end
+            if #entities > 0 then
+                for i = 1, #entities do
+                    local hitent = entities[ i ]
+                    if !IsValid( hitent ) then continue end
 
-                local trace = ply:Trace( nil, hitent:WorldSpaceCenter() )
+                    local trace = ply:Trace( nil, hitent:WorldSpaceCenter() )
 
-                if hitent != ply and hitent != ply.cd2_HeldObject and ( trace.Entity == hitent or !trace.Hit ) then
-                    hitent:EmitSound( "physics/flesh/flesh_impact_hard" .. random( 1, 6 ) .. ".wav")
-                    local heldobjectphys = IsValid( ply.cd2_HeldObject ) and ply.cd2_HeldObject:GetPhysicsObject()
-                    local add = IsValid( heldobjectphys ) and heldobjectphys:GetMass() / 10 or 0
+                    if hitent != ply and hitent != ply.cd2_HeldObject and ( trace.Entity == hitent or !trace.Hit ) then
+                        hitent:EmitSound( "physics/flesh/flesh_impact_hard" .. random( 1, 6 ) .. ".wav")
+                        local heldobjectphys = IsValid( ply.cd2_HeldObject ) and ply.cd2_HeldObject:GetPhysicsObject()
+                        local add = IsValid( heldobjectphys ) and heldobjectphys:GetMass() / 10 or 0
 
-                    local hitphys = hitent:GetPhysicsObject()
-                    local force = hitent:IsCD2NPC() and 20000 or IsValid( hitphys ) and hitphys:GetMass() * 10 or 20000
-                    local normal = ( hitent:WorldSpaceCenter() - ply:WorldSpaceCenter() ):GetNormalized()
-                    
-                    local info = DamageInfo()
-                    info:SetAttacker( ply )
-                    info:SetInflictor( wep )
-                    info:SetDamage( ply:GetMeleeDamage() + add )
-                    info:SetDamageType( DMG_CLUB )
-                    info:SetDamageForce( normal * force )
-                    hitent:TakeDamageInfo( info )
+                        local hitphys = hitent:GetPhysicsObject()
+                        local force = hitent:IsCD2NPC() and 20000 or IsValid( hitphys ) and hitphys:GetMass() * 10 or 20000
+                        local normal = ( hitent:WorldSpaceCenter() - ply:WorldSpaceCenter() ):GetNormalized()
+                        
+                        local info = DamageInfo()
+                        info:SetAttacker( ply )
+                        info:SetInflictor( wep )
+                        info:SetDamage( ply:GetMeleeDamage() + add )
+                        info:SetDamageType( DMG_CLUB )
+                        info:SetDamageForce( normal * force )
+                        hitent:TakeDamageInfo( info )
+                    end
                 end
             end
-        end
+            ply:Freeze( true )
+            coroutine.wait( 0.5 )
+            if !IsValid( ply ) then return end
+            ply:Freeze( false )
+        end )
         
+        ply.cd2_PickupDelay = math.huge
         ply.cd2_meleecooldown = CurTime() + 0.5
     end 
 

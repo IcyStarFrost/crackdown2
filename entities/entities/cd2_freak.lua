@@ -115,8 +115,6 @@ end
 function ENT:OnInjured2( info ) 
     local attacker = info:GetAttacker()
 
-    self:PlayPainSound( "npc/zombie/zombie_pain" .. random( 1, 6 ) .. ".wav" )
-
     if ( ( attacker:IsCD2NPC() or attacker:IsCD2Agent() ) and attacker:GetCD2Team() != self:GetCD2Team() ) then
         self:AttackTarget( attacker )
     end
@@ -130,6 +128,7 @@ end
 
 function ENT:OnKilled2( info, ragdoll )
     ragdoll:EmitSound( "crackdown2/npc/freak/freakkill.mp3", 65 )
+    ragdoll:EmitSound( "crackdown2/npc/freak/die" .. random( 1, 7 ) .. ".mp3", 70, 100, 1, CHAN_VOICE )
 
     ragdoll:Ignite( 10 )
 
@@ -196,7 +195,7 @@ function ENT:Swipe()
 
     CD2CreateThread( function()
         self:PlayGesture( ACT_GMOD_GESTURE_RANGE_ZOMBIE )
-        self:EmitSound( "npc/zombie/zo_attack" .. random( 1, 2 ) .. ".wav", 70, 100, 1, CHAN_VOICE )
+        --self:EmitSound( "npc/zombie/zo_attack" .. random( 1, 2 ) .. ".wav", 70, 100, 1, CHAN_VOICE )
         coroutine.wait( 1 )
         if !IsValid( self ) or !IsValid( self:GetEnemy() ) or self:GetRangeSquaredTo( self:GetEnemy() ) > ( 60 * 60 ) then return end
         self:GetEnemy():EmitSound( "npc/zombie/claw_strike" .. random( 1, 3 ) .. ".wav", 70, 100, 1, CHAN_WEAPON )
@@ -217,7 +216,7 @@ end
 
 function ENT:MainThink()
 
-    self:PlayVoiceSound( "npc/zombie/zombie_voice_idle" .. random( 1, 14 ) .. ".wav", rand( 3, 10 ) )
+    --self:PlayVoiceSound( "npc/zombie/zombie_voice_idle" .. random( 1, 14 ) .. ".wav", rand( 3, 10 ) )
 
     if IsValid( self:GetEnemy() ) and self:GetRangeSquaredTo( self:GetEnemy() ) <= ( 60 * 60 ) then
         self:LookTo( self:GetEnemy(), 3 )

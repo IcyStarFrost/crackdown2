@@ -240,7 +240,7 @@ function WorldVectorToScreen(worldVector, origin, scale, rotation, radius, fov )
 
     angle = math_deg( angle )
 
-    local distance = relativePosition:Length() * 0.7
+    local distance = relativePosition:Length()
 
     local x = math_cos( math_rad( angle ) ) * distance * scale
     local y = math_sin( math_rad( angle ) ) * distance * scale
@@ -466,13 +466,13 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
         if hpbars > 1 then
             surface_SetDrawColor( blackish )
-            surface_DrawRect( ceil( ScreenScale( 31 ) ), 80, ScreenScale( 36.5 ), 13 )
+            surface_DrawRect( 70, 80, ScreenScale( 30 ), 13 )
 
             for i = 1, hpbars do
                 if i == 1 then continue end
                 draw_NoTexture()
                 surface_SetDrawColor( orangeish )
-                draw_Circle( 60 + ( 20 * ( i - 1 ) ), 90, ceil( ScreenScale( 3.5 ) ), 6, 30 )
+                draw_Circle( 60 + ( 20 * ( i - 1 ) ), 90, ceil( ScreenScale( 2.5 ) ), 6, 30 )
             end
         end
 

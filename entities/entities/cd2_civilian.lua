@@ -108,8 +108,23 @@ function ENT:HandleVoiceLines()
     end
 end
 
-function ENT:OnInjured2( info )
+function ENT:OnKilled2( info, ragdoll )
+    local voicelines = self.cd2_VoiceLines[ self.cd2_gender ].death
+    local line = voicelines[ random( #voicelines ) ]
+    ragdoll:EmitSound( line, 70, 100, 1, CHAN_VOICE )
 
+    voicelines = self.cd2_VoiceLines[ self.cd2_gender ].fire
+    line = voicelines[ random( #voicelines ) ]
+
+    timer.Simple( 3, function()
+        if !IsValid( ragdoll ) or !ragdoll:IsOnFire() then return end
+        ragdoll:EmitSound( line, 70, 100, 1, CHAN_VOICE )
+    end )
+    
+end
+
+function ENT:OnInjured2( info )
+    if ( self:Health() - info:GetDamage() ) <= 0 then return end
     local voicelines = self.cd2_VoiceLines[ self.cd2_gender ].pain
     local line = voicelines[ random( #voicelines ) ]
     self:PlayPainSound( line )
@@ -231,6 +246,7 @@ local songs = {
 }
 
 function ENT:GuitarState()
+    if !IsValid( self.cd2_NavArea ) then self:SetState( "Idle" ) return end
     local endtime = CurTime() + rand( 150, 300 )
 
     local hidingspot = random( 1, 2 ) == 1 and self:FindSpot( "random", { type = "hiding", pos = self:GetPos(), radius = 2000, stepup = 10, stepdown = 10 } ) or self:GetRandomPos( 1000 ) 

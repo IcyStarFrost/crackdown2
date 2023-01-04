@@ -76,13 +76,14 @@ net.Receive( "cd2net_spawnatnearestspawn", function( len, ply )
         if !game.SinglePlayer() and ply.cd2_deathweapons then
             local weps = ply.cd2_deathweapons
             local ragdoll = ply:GetRagdollEntity()
+            local pos = IsValid( ragdoll ) and ragdoll:GetPos() or ply:GetPos()
             for i = 1, #weps do
                 
                 local class = weps[ i ][ 1 ]
                 local reserve = weps[ i ][ 2 ]
 
                 local wep = ents.Create( class ) 
-                wep:SetPos( ragdoll:GetPos() + Vector( 0, 0, 20 ) )
+                wep:SetPos( pos + Vector( 0, 0, 20 ) )
                 wep:Spawn()
                 wep.cd2_Ammocount = reserve
 
@@ -95,7 +96,7 @@ net.Receive( "cd2net_spawnatnearestspawn", function( len, ply )
             end
 
             local equipment = ents.Create( ply.cd2_deathequipment )
-            equipment:SetPos( ragdoll:GetPos() + Vector( 0, 0, 20 ) )
+            equipment:SetPos( pos + Vector( 0, 0, 20 ) )
             equipment:Spawn()
 
             local phys = equipment:GetPhysicsObject()

@@ -24,9 +24,7 @@ function ENT:ModelGet()
 end
 
 function ENT:MainThink2()
-    if self:CanSpeak() and self:GetActiveWeapon():GetIsReloading() then
-        self:PlayVoiceSound( "crackdown2/vo/cell/male/reload" .. random( 1, 3 ) .. ".wav", rand( 5, 10 ) )
-    elseif self:CanSpeak() and IsValid( self:GetEnemy() ) then
-        self:PlayVoiceSound( "crackdown2/vo/cell/male/attack" .. random( 1, 10 ) .. ".wav", rand( 5, 15 ) )
+    if self:CanSpeak() and IsValid( self:GetEnemy() ) then
+        self:PlayVoiceSound( "crackdown2/vo/cell/male2/idle" .. random( 1, 4 ) .. ".wav", rand( 5, 15 ) )
     end
 end

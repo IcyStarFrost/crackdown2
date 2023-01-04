@@ -89,6 +89,19 @@ function CD2GetRandomWeapon()
     return weps[ random( #weps ) ]
 end
 
+-- Returns a random CD2 equipment classname
+function CD2GetRandomEquipment()
+    local equipment = {}
+
+    for ClassName, tbl in pairs( scripted_ents.GetList() ) do
+        if tbl.Base == "cd2_equipmentbase" then
+            equipment[ #equipment + 1 ] = ClassName
+        end
+    end
+
+    return equipment[ random( #equipment ) ]
+end
+
 -- Find in Sphere function with a filter function
 local FindInSphere = ents.FindInSphere
 function CD2FindInSphere( pos, radius, filter )

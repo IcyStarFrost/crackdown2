@@ -11,8 +11,8 @@ ENT.DelayTime = 3 -- The time before the grenade blows up. 0 for no timed explos
 ENT.TickSound = "weapons/grenade/tick1.wav"
 
 ENT.DropMenu_SkillLevel = 0
-ENT.DropMenu_Damage = 5
-ENT.DropMenu_Range = 5
+ENT.DropMenu_Damage = 8
+ENT.DropMenu_Range = 7
 
 ENT.Clusters = {}
 

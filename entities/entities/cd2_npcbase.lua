@@ -350,7 +350,13 @@ function ENT:Think()
 
     if SERVER then self.cd2_FallVelocity = !self:IsOnGround() and self.loco:GetVelocity()[ 3 ] or self.cd2_FallVelocity end
     
+    if SERVER and ( self.cd2_NextRegenTime and CurTime() > self.cd2_NextRegenTime ) and self:Health() < self:GetMaxHealth() then
 
+        if !self.cd2_NextRegen or CurTime() > self.cd2_NextRegen then
+            self:SetHealth( self:Health() + 1 )
+            self.cd2_NextRegen = CurTime() + 0.03
+        end
+    end
 
     if SERVER and CurTime() > self.cd2_AnimUpdate and !self.cd2_dontupdateanims then
         if self:WaterLevel() != 0 then
@@ -471,6 +477,7 @@ end
 
 function ENT:OnInjured( info )
     local attacker = info:GetAttacker()
+    self.cd2_NextRegenTime = CurTime() + 6
     if self.OnInjured2 then self:OnInjured2( info ) end
     if !IsValid( attacker ) or !attacker:IsPlayer() then return end
     self.cd2_loggeddamage[ attacker:SteamID() ] = self.cd2_loggeddamage[ attacker:SteamID() ] or {}
@@ -511,6 +518,7 @@ end
 function ENT:OnKilled( info )
 
     local ragdoll = self:BecomeRagdoll( info )
+    if info:IsExplosionDamage() and info:GetDamage() > 100 then ragdoll:Ignite( 6 ) end
 
     local shoulddrop = IsValid( self:GetActiveWeapon() )
 

@@ -240,7 +240,7 @@ function SWEP:Holster( wep )
     self:SetIsHolstering( true )
     self:SetIsReloading( false )
     self:SetHoldType( "passive" )
-    self:GetOwner():EmitSound( "crackdown2/ply/switchweapon.wav", 70, 100, 0.5, CHAN_AUTO )
+    self:GetOwner():EmitSound( "crackdown2/ply/weaponswitch" .. random( 1, 2 ) .. ".mp3", 70, 100, 0.5, CHAN_AUTO )
     self.cd2_Ammocount = self:GetOwner():GetAmmoCount( self.Primary.Ammo )
 
     timer.Simple( 0.6, function()

@@ -49,6 +49,10 @@ net.Receive( "cd2net_playerspawnlight", function()
 
 end )
 
+net.Receive( "cd2net_setplayerangle", function()
+    CD2_plyangle = net.ReadAngle()
+end )
+
 -- Respawn music
 net.Receive( "cd2net_playerrespawn", function()
     

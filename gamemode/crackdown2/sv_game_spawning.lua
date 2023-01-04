@@ -1,4 +1,5 @@
 local plycolor = Vector( 1, 1, 1 )
+local random = math.random
 
 -- Set the player's class
 hook.Add( "PlayerSpawn", "crackdown2_setplayerclass", function( ply )
@@ -71,23 +72,58 @@ net.Receive( "cd2net_spawnatnearestspawn", function( len, ply )
     local secondary = net.ReadString() -- The secondary weapon the player originally had
     local equipment = net.ReadString() -- The equipment the player originally had
 
-    if player_manager.GetPlayerClass( ply ) == "cd2_spectator" then
-        player_manager.SetPlayerClass( ply, "cd2_player" )
-        ply:Spectate( OBS_MODE_NONE )
-        if !KeysToTheCity() then ply:LoadProgress() end
-    end
+    CD2CreateThread( function()
+        if !game.SinglePlayer() and ply.cd2_deathweapons then
+            local weps = ply.cd2_deathweapons
+            local ragdoll = ply:GetRagdollEntity()
+            for i = 1, #weps do
+                
+                local class = weps[ i ][ 1 ]
+                local reserve = weps[ i ][ 2 ]
 
-    ply.cd2_WeaponSpawnDelay = CurTime() + 0.5
-    ply.cd2_spawnatnearestspawn = true
-    ply:Spawn()
-    ply:Give( primary )
-    ply:Give( secondary )
+                local wep = ents.Create( class ) 
+                wep:SetPos( ragdoll:GetPos() + Vector( 0, 0, 20 ) )
+                wep:Spawn()
+                wep.cd2_Ammocount = reserve
 
-    ply:SetEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
-    ply:SetMaxEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
-    ply.cd2_Equipment = equipment
-    ply.cd2_lastspawnprimary = primary
-    ply.cd2_lastspawnsecondary = secondary
+                local phys = wep:GetPhysicsObject()
+
+                if IsValid( phys ) then
+                    phys:ApplyForceCenter( Vector( random( -600, 600 ), random( -600, 600 ), random( 0, 600 ) ) )
+                end
+                coroutine.yield()
+            end
+
+            local equipment = ents.Create( ply.cd2_deathequipment )
+            equipment:SetPos( ragdoll:GetPos() + Vector( 0, 0, 20 ) )
+            equipment:Spawn()
+
+            local phys = equipment:GetPhysicsObject()
+
+            if IsValid( phys ) then
+                phys:ApplyForceCenter( Vector( random( -8000, 8000 ), random( -8000, 8000 ), random( 0, 8000 ) ) )
+            end
+
+        end
+
+        if player_manager.GetPlayerClass( ply ) == "cd2_spectator" then
+            player_manager.SetPlayerClass( ply, "cd2_player" )
+            ply:Spectate( OBS_MODE_NONE )
+            if !KeysToTheCity() then ply:LoadProgress() end
+        end
+
+        ply.cd2_WeaponSpawnDelay = CurTime() + 0.5
+        ply.cd2_spawnatnearestspawn = true
+        ply:Spawn()
+        ply:Give( primary )
+        ply:Give( secondary )
+
+        ply:SetEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
+        ply:SetMaxEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
+        ply.cd2_Equipment = equipment
+        ply.cd2_lastspawnprimary = primary
+        ply.cd2_lastspawnsecondary = secondary
+    end )
 end )
 
 
@@ -99,8 +135,27 @@ net.Receive( "cd2net_reviveplayer", function( len, ply )
     if agent:Alive() or !agent:GetCanRevive() then return end
 
     agent.cd2_WeaponSpawnDelay = CurTime() + 0.5
+
     agent:Spawn()
     agent:SetPos( ply:GetPos() + ply:GetForward() * 60 + Vector( 0, 0, 5 ) )
+    agent:EmitSound( "crackdown2/ply/revived.mp3", 80 )
+
+    agent:SetNoDraw( true )
+    agent:Freeze( true )
+    agent.cd2_godmode = true
+
+    local riseent = ents.Create( "cd2_riseent" )
+    riseent:SetPos( agent:GetPos() )
+    riseent:SetAngles( Angle( 0, agent:EyeAngles()[ 2 ], 0 ) )
+    riseent:SetParent( agent )
+    riseent:SetPlayer( agent )
+    riseent:Spawn()
+    riseent.Callback = function( self )
+        agent:SetNoDraw( false )
+        agent:Freeze( false )
+        agent.cd2_godmode = false
+    end
+
     local primary = agent:Give( agent.cd2_lastspawnprimary )
     local secondary = agent:Give( agent.cd2_lastspawnsecondary )
 

@@ -87,7 +87,8 @@ if SERVER then
         local players = player_GetAll()
         for i = 1, #players do
             local ply = players[ i ]
-            if !ply:IsCD2Agent() or !ply.cd2_LockOnPos then return end
+            ply.cd2_LockOnPos = ply.cd2_LockOnPos or "body"
+            if !ply:IsCD2Agent() then return end
             
             if ply:GetLockonSpreadDecay() > 0 then
                 ply:SetLockonSpreadDecay( Lerp( ply.cd2_LockOnPos == "body" and 10 * FrameTime() or 4 * FrameTime(), ply:GetLockonSpreadDecay(), 0 ) )

@@ -466,13 +466,13 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
         if hpbars > 1 then
             surface_SetDrawColor( blackish )
-            surface_DrawRect( 70, 80, ScreenScale( 33.5 ), 13 )
+            surface_DrawRect( ceil( ScreenScale( 31 ) ), 80, ScreenScale( 36.5 ), 13 )
 
             for i = 1, hpbars do
                 if i == 1 then continue end
                 draw_NoTexture()
                 surface_SetDrawColor( orangeish )
-                draw_Circle( 60 + ( 20 * ( i - 1 ) ), 90, 8, 6, 30 )
+                draw_Circle( 60 + ( 20 * ( i - 1 ) ), 90, ceil( ScreenScale( 3.5 ) ), 6, 30 )
             end
         end
 

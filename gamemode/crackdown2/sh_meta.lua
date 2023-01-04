@@ -193,8 +193,8 @@ function PLAYER:BuildSkills()
     self:SetMeleeDamage( 25 * strength )
     self:SetMaxPickupWeight( 200 * strength )
 
-    self:SetHealth( 100 * strength )
-    self:SetMaxHealth( 100 * strength )
+    self:SetHealth( 100 * ( strength < 6 and strength or 5 ) )
+    self:SetMaxHealth( 100 * ( strength < 6 and strength or 5 ) )
 
     self:SetSafeFallSpeed( 40 * agility )
     self:SetJumpPower( 400 + ( agility > 1 and 50 * agility or 0 ) )

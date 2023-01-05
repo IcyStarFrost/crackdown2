@@ -125,6 +125,7 @@ function ENT:ControlMovement( pos, update )
         if self.loco:IsStuck() then
             self.loco:Jump()
             self.loco:ClearStuck()
+            self:HandleStuck()
         end
 
 

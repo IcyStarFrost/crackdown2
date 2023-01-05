@@ -86,6 +86,17 @@ if SERVER then
     local sound_Play = sound.Play
     hook.Add( "OnPlayerHitGround", "crackdown2_landingdecals", function( ply, inwater, onfloater, vel )
 
+        -- Deal damage to the entity below
+        if IsValid( ply:GetGroundEntity() ) then
+            local info = DamageInfo()
+            info:SetDamage( vel / 10 )
+            info:SetDamageType( DMG_FALL )
+            info:SetDamagePosition( ply:GetPos() )
+            info:SetDamageForce( Vector( 0, 0, 10000 ) )
+            info:SetAttacker( ply )
+            ply:GetGroundEntity():TakeDamageInfo( info )
+        end
+
         if vel >= 600 then
             net.Start( "cd2net_playerlandingdecal" )
             net.WriteVector( ply:WorldSpaceCenter() )

@@ -25,6 +25,9 @@ ENT.cd2_NextDoorCheck = 0 -- The next time we will check for a door to open
 ENT.cd2_FallVelocity = 0 -- How fast we are falling
 ENT.cd2_AnimUpdate = 0 -- The next time our animations will update
 ENT.cd2_PhysicsUpdate = 0 -- The next time our physics will update
+ENT.cd2_NextPVScheck = 0 -- The next time we will check if we are in a player's pvs
+ENT.cd2_StuckTimes = 0 -- The amount of times we got stuck
+ENT.cd2_ClearStuckTimes = 0 -- The next time we will reset our stuck times
 ENT.cd2_facetarget = nil -- The target we are facing
 ENT.cd2_NextSpeak = 0 -- The next time we will speak
 ENT.cd2_NextPainSound = 0 --The next time we can play a pain sound
@@ -252,7 +255,6 @@ local abs = math.abs
 
 
 function ENT:Initialize()
-
     -- Set health
     self:SetHealth( self.cd2_Health )
     if SERVER then self:SetMaxHealth( self.cd2_Health ) end
@@ -356,6 +358,11 @@ function ENT:Think()
             self:SetHealth( self:Health() + 1 )
             self.cd2_NextRegen = CurTime() + 0.03
         end
+    end
+
+    if SERVER and CurTime() > self.cd2_NextPVScheck then
+        self:VisCheck()
+        self.cd2_NextPVScheck = CurTime() + 5
     end
 
     if SERVER and CurTime() > self.cd2_AnimUpdate and !self.cd2_dontupdateanims then
@@ -475,6 +482,18 @@ function ENT:OnContact( ent )
     end
 end
 
+function ENT:HandleStuck()
+    if CurTime() > self.cd2_ClearStuckTimes then self.cd2_StuckTimes = 0 end
+
+    if self.cd2_StuckTimes > 2 then
+        self:TakeDamage( self:GetMaxHealth() + 1, Entity( 0 ) )
+    end
+
+    self.cd2_ClearStuckTimes = CurTime() + 10
+    self.cd2_StuckTimes = self.cd2_StuckTimes + 1
+
+end
+
 function ENT:OnInjured( info )
     local attacker = info:GetAttacker()
     self.cd2_NextRegenTime = CurTime() + 6
@@ -549,7 +568,7 @@ end
 
 function ENT:BodyUpdate()
 
-    if !self.loco:GetVelocity():IsZero() then
+    if !self.loco:GetVelocity():IsZero() and self:IsOnGround() then
         self:BodyMoveXY()
         return
     end

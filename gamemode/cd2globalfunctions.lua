@@ -196,6 +196,7 @@ local clamp = math.Clamp
 local bit_band = bit.band
 
 local weaponskillcolor = Color( 0, 225, 255)
+local agilityskillcolor = Color( 0, 255, 0 )
 local strengthskillcolor = Color( 255, 251, 0)
 local explosiveskillcolor = Color( 0, 110, 255 )
 function CD2AssessSkillGainOrbs( victimnpc, damagelog )
@@ -212,14 +213,26 @@ function CD2AssessSkillGainOrbs( victimnpc, damagelog )
             local bulletdmg = bit_band( dmgtype, DMG_BULLET ) == DMG_BULLET and damage or nil
             local meleedmg = bit_band( dmgtype, DMG_CLUB ) == DMG_CLUB and damage or nil
             local explosivedmg = ( bit_band( dmgtype, DMG_BLAST ) == DMG_BLAST ) and damage or nil
+            local agilitybonus = ( bit_band( dmgtype, DMG_FALL ) == DMG_FALL ) and damage or nil
 
             -- Getting the amount of damage types that have been dealt onto the npc
             local damagetypecount = 0
             if bulletdmg then damagetypecount = damagetypecount + 1 end
             if meleedmg then damagetypecount = damagetypecount + 1 end
             if explosivedmg then damagetypecount = damagetypecount + 1 end
+            if agilitybonus then damagetypecount = damagetypecount + 1 end
 
             -- Calculating the orb counts --
+
+            if agilitybonus and remaining_orbs != 0 then
+                local orbcount = clamp( round( agilitybonus / ( victimnpc:GetMaxHealth() / ( maxskillorbs / damagetypecount ) ), 0 ), 0, maxskillorbs )
+                for i = 1, orbcount do
+                    if remaining_orbs <= 0 then break end
+                    remaining_orbs = remaining_orbs - 1
+                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Agility", 2, agilityskillcolor )
+                end
+            end
+
             if bulletdmg and remaining_orbs != 0 then
                 local orbcount = clamp( round( bulletdmg / ( victimnpc:GetMaxHealth() / ( maxskillorbs / damagetypecount ) ), 0 ), 0, maxskillorbs )
                 for i = 1, orbcount do

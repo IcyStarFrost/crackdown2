@@ -65,7 +65,6 @@ ENT.cd2_VoiceLines = {
             "crackdown2/vo/civ/male/fire2.mp3",
             "crackdown2/vo/civ/male/fire3.mp3",
             "crackdown2/vo/civ/male/fire4.mp3",
-            "crackdown2/vo/civ/male/fire5.mp3",
         },
 
         [ "pain" ] = {

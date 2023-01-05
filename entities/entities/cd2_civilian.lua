@@ -224,7 +224,9 @@ function ENT:EquipGuitar()
 end
 
 function ENT:Panicked()
+
     if self.cd2_FirstPanic then coroutine.wait( 1 ) self.cd2_FirstPanic = false self:LookTo() end
+    self:PlaySequenceAndWait( random( 1, 2 ) == 1 and "lookoutrun" or "startle_behind" )
 
     local areas = GetAwayNavmesh( self.cd2_Panickedlocation, 3000 )
     local pos

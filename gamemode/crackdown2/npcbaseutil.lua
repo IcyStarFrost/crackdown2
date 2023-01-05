@@ -369,3 +369,14 @@ function ENT:PlayPainSound( path )
     self:EmitSound( path, 70, 100, 1, CHAN_VOICE )
     self.cd2_NextPainSound = CurTime() + SoundDuration( path )
 end
+
+-- Checks if we are within any player's PVS and aren't too far. If not, remove ourselves
+function ENT:VisCheck()
+    local players = player.GetAll()
+    local withinPVS = false
+    for i = 1, #players do
+        local ply = players[ i ]
+        if ply:IsCD2Agent() and ply:TestPVS( self ) and self:GetRangeSquaredTo( ply ) < ( 3000 * 3000 ) then withinPVS = true end
+    end
+    if !withinPVS then self:Remove() end
+end

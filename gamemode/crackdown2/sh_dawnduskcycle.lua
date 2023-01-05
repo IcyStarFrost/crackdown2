@@ -16,7 +16,7 @@ if SERVER then
     hook.Add( "Tick", "crackdown2_dawnduskcycle", function()
 
         if CurTime() > debugupdate then
-            CD2DebugMessage( "Next time change will occur in " .. tostring( math.Round( CD2_NextTimeChange, 0 ) ) .. " seconds" )
+            CD2DebugMessage( "Next time change will occur in " .. tostring( math.Round( CD2_NextTimeChange - CurTime(), 0 ) ) .. " seconds" )
             debugupdate = CurTime() + 60
         end
 

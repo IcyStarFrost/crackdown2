@@ -485,7 +485,7 @@ end
 function ENT:HandleStuck()
     if CurTime() > self.cd2_ClearStuckTimes then self.cd2_StuckTimes = 0 end
 
-    if self.cd2_StuckTimes > 2 then
+    if self.cd2_StuckTimes > 4 then
         self:TakeDamage( self:GetMaxHealth() + 1, Entity( 0 ) )
     end
 

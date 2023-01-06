@@ -53,9 +53,12 @@ function ENT:MoveToPos( pos, options )
 	while path:IsValid() do
         if self.cd2_stopmovement then self.cd2_stopmovement = nil self:SetIsMoving( false ) break end
 
-		path:Update( self )
+        if !self:GetIsDisabled() then
+		    path:Update( self )
+            self:DoorCheck()
+        end
 
-        self:DoorCheck()
+        
 
 		if GetConVar( "developer" ):GetBool() then
 			path:Draw()
@@ -64,6 +67,7 @@ function ENT:MoveToPos( pos, options )
         if self.cd2_RecomputeMove then path:Compute( self, ( isentity( self.cd2_MoveGoal ) and self.cd2_MoveGoal:GetPos() or self.cd2_MoveGoal ) ) end
         
 		if self.loco:IsStuck() then
+            self.loco:Jump()
 			self:HandleStuck()
 			return "stuck"
 		end
@@ -370,13 +374,13 @@ function ENT:PlayPainSound( path )
     self.cd2_NextPainSound = CurTime() + SoundDuration( path )
 end
 
--- Checks if we are within any player's PVS and aren't too far. If not, remove ourselves
+-- Checks if we should be removed if we aren't within a Player's PVS
 function ENT:VisCheck()
     local players = player.GetAll()
     local withinPVS = false
     for i = 1, #players do
         local ply = players[ i ]
-        if ply:IsCD2Agent() and ply:TestPVS( self ) and self:GetRangeSquaredTo( ply ) < ( 3000 * 3000 ) then withinPVS = true end
+        if ply:IsCD2Agent() and self:GetRangeSquaredTo( ply ) < ( 3000 * 3000 ) then withinPVS = true end
     end
     if !withinPVS then self:Remove() end
 end

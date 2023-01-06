@@ -298,6 +298,7 @@ function ENT:SetupDataTables()
     self:NetworkVar( "Bool", 0, "Crouch" )
     self:NetworkVar( "Bool", 1, "Walk" )
     self:NetworkVar( "Bool", 2, "IsMoving" )
+    self:NetworkVar( "Bool", 3, "IsDisabled" )
 
     self:NetworkVar( "Int", 0, "SightDistance" )
 
@@ -487,6 +488,8 @@ function ENT:HandleStuck()
 
     if self.cd2_StuckTimes > 4 then
         self:TakeDamage( self:GetMaxHealth() + 1, Entity( 0 ) )
+    elseif self.cd2_StuckTimes == 2 and IsValid( self.cd2_NavArea ) then
+        self:SetPos( self.cd2_NavArea:GetCenter() )
     end
 
     self.cd2_ClearStuckTimes = CurTime() + 10
@@ -567,6 +570,7 @@ function ENT:OnKilled( info )
 end
 
 function ENT:BodyUpdate()
+    if game.SinglePlayer() and self:GetRangeSquaredTo( Entity( 1 ) ) > ( 2500 * 2500 ) then return end
 
     if !self.loco:GetVelocity():IsZero() and self:IsOnGround() then
         self:BodyMoveXY()
@@ -581,6 +585,8 @@ end
 function ENT:RunBehaviour()
 
     while true do
+
+        while self:GetIsDisabled() do coroutine.yield() end
 
         local func = self[ self:GetState() ]
 

@@ -78,6 +78,7 @@ function SWEP:Initialize()
 
     if SERVER then
         hook.Add( "Tick", self, function()
+            if self:GetPermanentDrop() then return end
             if !IsValid( self:GetOwner() ) and CurTime() > self.DeleteTime or ( self.cd2_Ammocount and self.cd2_Ammocount == 0 ) then
                 self:Remove()
             elseif IsValid( self:GetOwner() ) then
@@ -194,6 +195,7 @@ function SWEP:SetupDataTables()
     self:NetworkVar( "Bool", 0, "IsReloading" ) -- If the weapon is reloading
     self:NetworkVar( "Bool", 1, "PickupMode" ) -- This will be set if the player picked up a object
     self:NetworkVar( "Bool", 2, "IsHolstering" )
+    self:NetworkVar( "Bool", 3, "PermanentDrop" )
 end
 
 -- Enters a pick up state where this weapon disables itself until the player drops their object
@@ -219,6 +221,7 @@ end
 function SWEP:Equip( newowner )
     self.cd2_Ammocount = self.cd2_Ammocount or self.Primary.DefaultClip
 
+    self:SetPermanentDrop( false )
     if newowner:IsPlayer() then 
         newowner:SetAmmo( self.cd2_Ammocount, self.Primary.Ammo )
     end

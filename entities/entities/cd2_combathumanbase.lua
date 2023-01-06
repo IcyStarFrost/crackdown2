@@ -140,6 +140,8 @@ end
 
 function ENT:MainThink()
 
+    while self:GetIsDisabled() do coroutine.yield() end
+
     -- If we can see our enemy then shoot them and remember their position
     if IsValid( self:GetEnemy() ) and self:CanAttack( self:GetEnemy() ) then
         self:LookTo( self:GetEnemy(), 3 )

@@ -96,6 +96,14 @@ function ENT:OnCollected( ply )
     end
 end
 
+-- Returns if this orb was collected by the player
+function ENT:IsCollectedBy( ply )
+    for k, v in pairs( self.cd2_missingplayers ) do
+        if k == ply:SteamID() then return false end
+    end
+    return true
+end
+
 function ENT:CheckPlayers()
     if CLIENT then return end
     local shouldremove = true

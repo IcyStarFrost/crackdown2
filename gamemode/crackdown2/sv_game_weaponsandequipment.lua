@@ -39,7 +39,7 @@ hook.Add( "KeyPress", "crackdown2_equipmentuse", function( ply, key )
 
             if !ply.cd2_infiniteammo then ply:SetEquipmentCount( ply:GetEquipmentCount() - 1 ) end
 
-            local tbl = scripted_ents.Get( CLIENT and CD2_DropEquipment or ply.cd2_Equipment )
+            local tbl = scripted_ents.Get( ply:GetEquipment() )
             ply.cd2_grenadecooldown = CurTime() + tbl.Cooldown
 
             BroadcastLua( "Entity( " .. ply:EntIndex() .. " ):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_GMOD_GESTURE_ITEM_THROW, true )" )
@@ -51,7 +51,7 @@ hook.Add( "KeyPress", "crackdown2_equipmentuse", function( ply, key )
 
             if SERVER then
                 local pos = ply:GetEyeTrace().HitPos
-                CD2ThrowEquipment( ply.cd2_Equipment , ply, pos )
+                CD2ThrowEquipment( ply:GetEquipment(), ply, pos )
             end
 
         end )
@@ -69,7 +69,7 @@ local red = Color( 209, 42, 0 )
 
 -- Hold down use and press attack to melee
 hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
-    if !ply:IsCD2Agent() then return end
+    if !ply:IsCD2Agent() or !ply:GetCanUseMelee() then return end
 
     local wep = ply:GetActiveWeapon()
 

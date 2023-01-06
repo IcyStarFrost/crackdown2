@@ -216,6 +216,8 @@ end
 
 function ENT:MainThink()
 
+    while self:GetIsDisabled() do coroutine.yield() end
+
     --self:PlayVoiceSound( "npc/zombie/zombie_voice_idle" .. random( 1, 14 ) .. ".wav", rand( 3, 10 ) )
 
     if IsValid( self:GetEnemy() ) and self:GetRangeSquaredTo( self:GetEnemy() ) <= ( 60 * 60 ) then

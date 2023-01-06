@@ -15,6 +15,7 @@ function ENT:Initialize()
 
         self.PathVectors = {}
 
+        if !IsValid( self.Path ) then self:Remove() return end
         for k, v in ipairs( self.Path:GetAllSegments() ) do
             self.PathVectors[ #self.PathVectors + 1 ] = v.pos 
         end
@@ -24,6 +25,7 @@ function ENT:Initialize()
         sound.PlayFile( "sound/crackdown2/ambient/guideambient.mp3", "3d mono", function( snd, id, name )
             if id then return end
         
+            snd:Set3DFadeDistance( 300, 1000000000 )
             snd:EnableLooping( true )
             hook.Add( "Think", self, function()
                 if self:GetReachedDestination() then snd:Stop() hook.Remove( "Think", self ) return end
@@ -39,7 +41,7 @@ function ENT:Initialize()
 
             for i = 1, #self.PathVectors do
                 if !IsValid( self ) then return end
-                local vector = self.PathVectors[ i ]
+                local vector = self.PathVectors[ i ] + Vector( 0, 0, 5 )
 
                 while IsValid( self ) and self:GetPos():DistToSqr( vector ) > ( 20 * 20 ) do
                     self:SetPos( self:GetPos() + ( vector - self:GetPos() ):GetNormalized() * 10 )

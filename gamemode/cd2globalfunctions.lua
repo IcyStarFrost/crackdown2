@@ -276,6 +276,40 @@ function CD2SendTextBoxMessage( ply, text )
     end
 end
 
+local RandomPairs = RandomPairs
+function CD2GetClosestNavAreas( pos, dist )
+    local areas = {} 
+    for k, v in ipairs( navmesh.GetAllNavAreas() ) do
+        if IsValid( v ) and v:GetClosestPointOnArea( pos ):DistToSqr( pos ) <= ( dist * dist ) then
+            areas[ #areas + 1 ] = v
+        end
+    end
+    return areas
+end
+
+-- Returns a list of nav areas that are specifically filtered
+function CD2GetNavmeshFiltered()
+    local areas = {} 
+    for k, v in ipairs( navmesh.GetAllNavAreas() ) do
+        if IsValid( v ) and !v:IsUnderwater() and v:GetSizeX() > 40 and v:GetSizeY() > 40 then
+            areas[ #areas + 1 ] = v
+        end
+    end
+    return areas
+end
+
+-- Returns a random position on the navmesh
+function CD2GetRandomPos( dist, pos ) 
+    local areas = dist and CD2GetClosestNavAreas( pos, dist ) or CD2GetNavmeshFiltered()
+
+    for k, v in RandomPairs( areas ) do
+        if IsValid( v ) then
+            return v:GetRandomPoint()
+        end
+    end
+end
+
+
 
 -- Returns if the server is currently running Keys to the city mode
 function KeysToTheCity()

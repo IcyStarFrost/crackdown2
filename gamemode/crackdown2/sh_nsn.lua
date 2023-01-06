@@ -115,12 +115,13 @@ if SERVER then
     end )
 
     hook.Add( "Tick", "crackdown2_naturalspawningnpcs", function()
+        if game.SinglePlayer() and ( !IsValid( Entity( 1 ) ) or !Entity( 1 ):IsCD2Agent() or Entity( 1 ).cd2_InTutorial ) then return end
         CD2_MaxCivilians = CD2IsDay() and 15 or !CD2IsDay() and 6
 
 
         -- Civilians --
         if GetCivilianCount() < CD2_MaxCivilians and CurTime() > CD2_NextCivilianSpawn then
-            SpawnNPC( nil, "cd2_civilian", GetRandomPlayer() )
+            local civ = SpawnNPC( nil, "cd2_civilian", GetRandomPlayer() )
             CD2_NextCivilianSpawn = CD2IsDay() and CurTime() + 1 or !CD2IsDay() and CurTime() + 4
         end
         --
@@ -130,7 +131,7 @@ if SERVER then
                 local lead = SpawnNPC( nil, "cd2_smgcellsoldier", GetRandomPlayer() )
 
                 if IsValid( lead ) and GetCellCount() < CD2_MaxCell then
-                    SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), "cd2_shotguncellsoldier", GetRandomPlayer() )
+                    local other = SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), "cd2_shotguncellsoldier", GetRandomPlayer() )
                 end
 
                 CD2_NextCellSpawn = CurTime() + rand( 1, 25 )
@@ -142,7 +143,7 @@ if SERVER then
             local lead = SpawnNPC( nil, "cd2_peacekeeper", GetRandomPlayer() )
 
             if IsValid( lead ) and GetPeaceKeeperCount() < CD2_MaxPeaceKeepers then
-                SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), "cd2_peacekeeper", GetRandomPlayer() )
+                local other = SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), "cd2_peacekeeper", GetRandomPlayer() )
             end
 
             CD2_NextPeaceKeeperSpawn = CurTime() + rand( 1, 30 )

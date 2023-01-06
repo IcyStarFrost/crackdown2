@@ -58,7 +58,7 @@ net.Receive( "cd2net_playerdropmenuconfirm", function( len, ply )
     ply:Give( primary )
     ply:Give( secondary )
 
-    ply.cd2_Equipment = equipment
+    ply:SetEquipment( equipment )
     ply:SetEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
     ply:SetMaxEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
     ply.cd2_lastspawnprimary = primary
@@ -121,7 +121,7 @@ net.Receive( "cd2net_spawnatnearestspawn", function( len, ply )
 
         ply:SetEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
         ply:SetMaxEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
-        ply.cd2_Equipment = equipment
+        ply:SetEquipment( equipment )
         ply.cd2_lastspawnprimary = primary
         ply.cd2_lastspawnsecondary = secondary
     end )

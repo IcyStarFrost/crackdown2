@@ -55,7 +55,10 @@ end
 
 
 function PLAYER:Init()
+    self.Player:SetCanUseLockon( true )
+    self.Player:SetCanUseMelee( true )
     self.Player:SetCD2Team( "agency" )
+    self.Player:SetEquipment( "cd2_grenade" )
     self.Player:SetMeleeDamage( 25 ) -- By default, players can only deal 25 damage with melee. This will change according to StrengthSkill
     self.Player:SetMaxPickupWeight( 200 ) -- By default, only pickup props with a mass of 200. This will change according to StrengthSkill
     self.Player:SetSafeFallSpeed( 40 ) -- By default, the safe falling speed is 600. This will change according to AgilitySkill
@@ -117,6 +120,7 @@ end
 function PLAYER:SetupDataTables()
 
     self.Player:NetworkVar( "String", 0, "CD2Team" ) -- The team this player is in. Obviously mainly set to agency
+    self.Player:NetworkVar( "String", 1, "Equipment" )
 
     self.Player:NetworkVar( "Entity", 0, "Ragdoll" )
 
@@ -144,7 +148,9 @@ function PLAYER:SetupDataTables()
     self.Player:NetworkVar( "Bool", 0, "IsRechargingShield" ) -- If the Player's shields are recharging
     self.Player:NetworkVar( "Bool", 1, "IsRegeningHealth" ) -- If the Player's health is regenerating
     self.Player:NetworkVar( "Bool", 2, "CanRevive" ) -- If the player can be revived
-    self.Player:NetworkVar( "Bool", 3, "IsStunned" )
+    self.Player:NetworkVar( "Bool", 3, "IsStunned" ) -- If the player is stunned
+    self.Player:NetworkVar( "Bool", 4, "CanUseLockon" ) -- if this player can lock onto things
+    self.Player:NetworkVar( "Bool", 5, "CanUseMelee" ) -- If this player can melee
 
     self.Player:NetworkVar( "Float", 0, "NWHealth" ) -- Networked. Used for HUD and regen
     self.Player:NetworkVar( "Float", 1, "NWShields" ) -- Networked. Used for HUD and regen

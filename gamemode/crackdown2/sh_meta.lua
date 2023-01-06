@@ -201,3 +201,9 @@ function PLAYER:BuildSkills()
     self:SetWalkSpeed( 200 + ( agility > 1 and 50 * agility or 0 ) )
     self:SetRunSpeed( 400 + ( agility > 1 and 50 * agility or 0 ) )
 end
+
+function PLAYER:PlayDirectorVoiceLine( path ) 
+    net.Start( "cd2net_playdirectorsound" )
+    net.WriteString( path )
+    net.Send( self )
+end

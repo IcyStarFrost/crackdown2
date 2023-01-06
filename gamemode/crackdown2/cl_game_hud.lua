@@ -360,6 +360,11 @@ CD2_DrawWeaponInfo = true -- Draws weapon info and equipment
 CD2_DrawMinimap = true -- Draws the tracker
 CD2_DrawBlackbars = false -- Draws the top and bottom black bars
 
+CD2_DrawAgilitySkill = true
+CD2_DrawFirearmSkill = true
+CD2_DrawStrengthSkill = true
+CD2_DrawExplosiveSkill = true
+
 hook.Add( "HUDPaint", "crackdown2_hud", function()
     local scrw, scrh, ply = ScrW(), ScrH(), LocalPlayer()
     if CD2_InDropMenu then RemoveHUDpanels() return end
@@ -441,12 +446,15 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     
     
     
-
+    
+    
+    
+    
     -- Skill Counters --
-    DrawSkillHex( 130, 170, agilityicon, ply:GetAgilitySkill(), ply:GetAgilityXP(), agilityskillcolor, "Agility" )
-    DrawSkillHex( 130, 170 * 1.5, weaponicon, ply:GetWeaponSkill(), ply:GetWeaponXP(), weaponskillcolor, "Weapon" )
-    DrawSkillHex( 130, 170 * 2, strengthicon, ply:GetStrengthSkill(), ply:GetStrengthXP(), strengthskillcolor, "Strength" )
-    DrawSkillHex( 130, 170 * 2.5, explosiveicon, ply:GetExplosiveSkill(), ply:GetExplosiveXP(), explosiveskillcolor, "Explosive" )
+    if CD2_DrawAgilitySkill then DrawSkillHex( 130, 170, agilityicon, ply:GetAgilitySkill(), ply:GetAgilityXP(), agilityskillcolor, "Agility" ) end
+    if CD2_DrawFirearmSkill then DrawSkillHex( 130, 170 * 1.5, weaponicon, ply:GetWeaponSkill(), ply:GetWeaponXP(), weaponskillcolor, "Weapon" ) end
+    if CD2_DrawStrengthSkill then DrawSkillHex( 130, 170 * 2, strengthicon, ply:GetStrengthSkill(), ply:GetStrengthXP(), strengthskillcolor, "Strength" ) end
+    if CD2_DrawExplosiveSkill then DrawSkillHex( 130, 170 * 2.5, explosiveicon, ply:GetExplosiveSkill(), ply:GetExplosiveXP(), explosiveskillcolor, "Explosive" ) end
     ------
 
 
@@ -556,66 +564,66 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
                 end
             end
 
-        end
-
-        
-
-        surface_SetDrawColor( blackish )
-        surface_DrawRect( scrw - 120, scrh - 100, 90, 60 )
-
-
-        surface_SetDrawColor( linecol )
-        surface_DrawOutlinedRect( scrw - 120, scrh - 100, 90, 60, 2 )
-        surface_DrawOutlinedRect( scrw - 100, scrh - 140, 70, 40, 2 )
-        surface_DrawOutlinedRect( scrw - 400, scrh - 130, 300, 30, 2 )
-        surface_DrawOutlinedRect( scrw - 400, scrh - 100, 280, 60, 2 )
-
-        
-        
-        if !IsValid( CD2_equipmentpnl ) then
-            local mdl = scripted_ents.Get( CD2_DropEquipment ).WorldModel
-
-            CD2_equipmentpnl = vgui.Create( "DModelPanel", GetHUDPanel() )
-            CD2_equipmentpnl:SetModel( mdl )
-            CD2_equipmentpnl:SetPos( scrw - 135 , scrh - 85 )
-            CD2_equipmentpnl:SetSize( 64, 64 )
-            CD2_equipmentpnl:SetFOV( 60 )
-
-            local ent = CD2_equipmentpnl:GetEntity()
-            ent:SetMaterial( "models/debug/debugwhite" )
-            CD2_equipmentpnl:SetCamPos( Vector( 0, 15, 0 ) )
-            CD2_equipmentpnl:SetLookAt( ent:OBBCenter() )
+            surface_SetDrawColor( blackish )
+            surface_DrawRect( scrw - 120, scrh - 100, 90, 60 )
+    
+    
+            surface_SetDrawColor( linecol )
+            surface_DrawOutlinedRect( scrw - 120, scrh - 100, 90, 60, 2 )
+            surface_DrawOutlinedRect( scrw - 100, scrh - 140, 70, 40, 2 )
+            surface_DrawOutlinedRect( scrw - 400, scrh - 130, 300, 30, 2 )
+            surface_DrawOutlinedRect( scrw - 400, scrh - 100, 280, 60, 2 )
+    
             
-
-            local thinkpanel = vgui.Create( "DPanel", CD2_equipmentpnl )
-
-            function CD2_equipmentpnl:PostDrawModel( ent ) 
-                render.SuppressEngineLighting( false )
-            end
-
-            function CD2_equipmentpnl:PreDrawModel( ent ) 
-                render.SuppressEngineLighting( true )
-            end
-            function CD2_equipmentpnl:LayoutEntity() end
-            function thinkpanel:Paint( w, h ) end
-            function thinkpanel:Think()
-                if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
-
-                if IsValid( CD2_equipmentpnl ) then
-                    local mdl = scripted_ents.Get( CD2_DropEquipment ).WorldModel
-                    local ent = CD2_equipmentpnl:GetEntity()
-
-                    if IsValid( ent ) and ent:GetModel() != mdl then ent:SetModel( mdl ) end
-                end
+            
+            if !IsValid( CD2_equipmentpnl ) then
+                local mdl = scripted_ents.Get( ply:GetEquipment() ).WorldModel
+    
+                CD2_equipmentpnl = vgui.Create( "DModelPanel", GetHUDPanel() )
+                CD2_equipmentpnl:SetModel( mdl )
+                CD2_equipmentpnl:SetPos( scrw - 135 , scrh - 85 )
+                CD2_equipmentpnl:SetSize( 64, 64 )
+                CD2_equipmentpnl:SetFOV( 60 )
+    
+                local ent = CD2_equipmentpnl:GetEntity()
+                ent:SetMaterial( "models/debug/debugwhite" )
+                CD2_equipmentpnl:SetCamPos( Vector( 0, 15, 0 ) )
+                CD2_equipmentpnl:SetLookAt( ent:OBBCenter() )
                 
-
-                if CD2_equipmentpnl != self:GetParent() then
-                    self:GetParent():Remove()
+    
+                local thinkpanel = vgui.Create( "DPanel", CD2_equipmentpnl )
+    
+                function CD2_equipmentpnl:PostDrawModel( ent ) 
+                    render.SuppressEngineLighting( false )
+                end
+    
+                function CD2_equipmentpnl:PreDrawModel( ent ) 
+                    render.SuppressEngineLighting( true )
+                end
+                function CD2_equipmentpnl:LayoutEntity() end
+                function thinkpanel:Paint( w, h ) end
+                function thinkpanel:Think()
+                    if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
+    
+                    if IsValid( CD2_equipmentpnl ) then
+                        local mdl = scripted_ents.Get( ply:GetEquipment() ).WorldModel
+                        local ent = CD2_equipmentpnl:GetEntity()
+    
+                        if IsValid( ent ) and ent:GetModel() != mdl then ent:SetModel( mdl ) end
+                    end
+                    
+    
+                    if CD2_equipmentpnl != self:GetParent() then
+                        self:GetParent():Remove()
+                    end
                 end
             end
+    
+            draw_DrawText( ply:GetEquipmentCount(), "crackdown2_equipmentcount", scrw - 60, scrh - 90, color_white, TEXT_ALIGN_CENTER )
+
         end
 
-        draw_DrawText( ply:GetEquipmentCount(), "crackdown2_equipmentcount", scrw - 60, scrh - 90, color_white, TEXT_ALIGN_CENTER )
+        
     end
     ------
 

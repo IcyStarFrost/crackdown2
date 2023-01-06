@@ -57,14 +57,14 @@ end )
 net.Receive( "cd2net_playerrespawn", function()
     
     CD2_DrawBlackbars = false 
-     CD2StartMusic( "sound/crackdown2/music/playerspawn.mp3", 3, false, true )
+     CD2StartMusic( "sound/crackdown2/music/playerspawn.mp3", 2, false, true )
 
 end )
 
 net.Receive( "cd2net_playerrespawn_revive", function()
     
     CD2_DrawBlackbars = false 
-    CD2StartMusic( "sound/crackdown2/music/revive.mp3", 3, false, true )
+    CD2StartMusic( "sound/crackdown2/music/revive.mp3", 2, false, true )
 
 end )
 
@@ -163,8 +163,19 @@ net.Receive( "cd2net_sendspawnvectors", function()
     CD2_SpawnPoints = util.JSONToTable( json )
 end )
 
+net.Receive( "cd2net_playdirectorsound", function()
+    local path = net.ReadString()
+    sound.PlayFile( path, "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
+end )
+
+net.Receive( "cd2net_tutorial_activatehud", function()
+    local variable = net.ReadString()
+    _G[ variable ] = true
+end )
+
 net.Receive( "cd2net_playerinitialspawn", function()
-    local isreturningplayer = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_isreturningplayer" ) or true
+    local isreturningplayer = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_isreturningplayer" ) or KeysToTheCity() and true
+    local completedtutorial = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_completedtutorial" ) or KeysToTheCity() and true
 
     -- If the player is new to the gamemode, then play the intro video
     if !isreturningplayer then
@@ -175,15 +186,42 @@ net.Receive( "cd2net_playerinitialspawn", function()
                 coroutine.yield()
             end
 
-            CD2OpenSpawnPointMenu()
+            CD2_DrawAgilitySkill = false
+            CD2_DrawFirearmSkill = false
+            CD2_DrawStrengthSkill = false
+            CD2_DrawExplosiveSkill = false
 
-            CD2StartMusic( "sound/crackdown2/music/mainmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
-                if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
-            end )
+            CD2_DrawTargetting = false
+            CD2_DrawHealthandShields = false
+            CD2_DrawWeaponInfo = false
+            CD2_DrawMinimap = false
+            CD2_DrawBlackbars = false
+
+            net.Start( "cd2net_starttutorial" )
+            net.SendToServer()
+
         end )
 
         CD2FILESYSTEM:WritePlayerData( "c_isreturningplayer", true )
-    else -- If not then let them get in game already
+    else -- If not then let them get in game already. If they haven't completed the tutorial then run it
+
+        if !completedtutorial then
+
+            CD2_DrawAgilitySkill = false
+            CD2_DrawFirearmSkill = false
+            CD2_DrawStrengthSkill = false
+            CD2_DrawExplosiveSkill = false
+
+            CD2_DrawTargetting = false
+            CD2_DrawHealthandShields = false
+            CD2_DrawWeaponInfo = false
+            CD2_DrawMinimap = false
+            CD2_DrawBlackbars = false
+
+            net.Start( "cd2net_starttutorial" )
+            net.SendToServer()
+            return
+        end
 
         CD2OpenSpawnPointMenu()
         CD2StartMusic( "sound/crackdown2/music/mainmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
@@ -236,7 +274,7 @@ net.Receive( "cd2net_playerlevelupeffect", function()
     local ply = net.ReadEntity()
     if !IsValid( ply ) then return end
 
-    CD2StartMusic( "sound/crackdown2/music/levelup.mp3", 4, false, true )
+    CD2StartMusic( "sound/crackdown2/music/levelup.mp3", 3, false, true )
     ply:EmitSound( "crackdown2/ply/spawnenergy.mp3", 70, 100, 1, CHAN_AUTO )
 
     CD2CreateThread( function()

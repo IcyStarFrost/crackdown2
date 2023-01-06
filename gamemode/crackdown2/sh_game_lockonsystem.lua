@@ -11,7 +11,7 @@ hook.Add( "Think", "crackdown2_lockon", function()
         local players = player_GetAll() 
         for i = 1, #players do
             local ply = players[ i ]
-            if !ply:Alive() or !ply:IsCD2Agent() then continue end
+            if !ply:Alive() or !ply:IsCD2Agent() or !ply:GetCanUseLockon() then continue end
             
 
             if ply:KeyDown( IN_ATTACK2 ) then

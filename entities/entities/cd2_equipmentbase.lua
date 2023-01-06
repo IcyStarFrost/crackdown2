@@ -72,6 +72,7 @@ end
 function ENT:SetupDataTables()
     self:NetworkVar( "Entity", 0, "Thrower" )
     self:NetworkVar( "Bool", 0, "HadThrower" )
+    self:NetworkVar( "Bool", 1, "PermanentDrop" )
 end
 
 -- Explosion code here
@@ -119,23 +120,44 @@ function ENT:Think()
         end
 
         -- If we aren't picked up by any Agent after 30 seconds, remove ourselves
-        if !IsValid( self:GetThrower() ) and !self:GetHadThrower() and CurTime() > self.DeleteTime then
+
+        if !self:GetPermanentDrop() and !IsValid( self:GetThrower() ) and !self:GetHadThrower() and CurTime() > self.DeleteTime then
             self:Remove()
             return
-        elseif IsValid( self:GetThrower() ) or self:GetHadThrower() then
+        elseif self:GetPermanentDrop() or IsValid( self:GetThrower() ) or self:GetHadThrower() then
             self.DeleteTime = CurTime() + 30
         end
+
     end
 
     -- Custom Pickup code for equipment
     if SERVER and !IsValid( self:GetThrower() ) and !self:GetHadThrower() and self:WaterLevel() == 0 then
-        local nearents = CD2FindInSphere( self:GetPos(), 50, function( ent ) return ent:IsCD2Agent() and self:IsAmmoToPlayer( ent ) and ent:GetEquipmentCount() < ent:GetMaxEquipmentCount() end )
-        local ply = nearents[ 1 ]
-        if IsValid( ply ) then
-            ply:SetEquipmentCount( clamp( ply:GetEquipmentCount() + ( ply:GetMaxEquipmentCount() / 4 ), 0, ply:GetMaxEquipmentCount() ) )
-            ply:EmitSound( "items/ammo_pickup.wav", 60 )
-            self:Remove()
+
+        local nearpickupents = CD2FindInSphere( self:GetPos(), 50, function( ent ) return ent:IsCD2Agent() end )
+        for i = 1, #nearpickupents do
+            local ply = nearpickupents[ i ]
+
+            if IsValid( ply ) and self:IsAmmoToPlayer( ply ) and ply:GetEquipmentCount() < ply:GetMaxEquipmentCount() then
+                ply:SetEquipmentCount( clamp( ply:GetEquipmentCount() + ( ply:GetMaxEquipmentCount() / 4 ), 0, ply:GetMaxEquipmentCount() ) )
+                ply:EmitSound( "items/ammo_pickup.wav", 60 )
+                self:Remove()
+            elseif IsValid( ply ) and !self:IsAmmoToPlayer( ply ) and !IsValid( ply:GetNW2Entity( "cd2_targetweapon", nil )) then
+
+                ply:SetNW2Entity( "cd2_targetequipment", wep )
+                ply:SetNW2Float( "cd2_equipmentdrawcur", CurTime() + 0.1 )
+
+                if ply.cd2_PickupWeaponDelay and CurTime() > ply.cd2_PickupWeaponDelay or ( ply:GetEquipmentCount() == 0 ) then
+                    ply:SetEquipment( self:GetClass() )
+                    ply:SetMaxEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
+                    ply:SetEquipmentCount( self.MaxGrenadeCount )
+                    self:Remove()
+                    ply.cd2_PickupDelay = math.huge
+                    ply.cd2_PickupWeaponDelay = math.huge
+                end
+
+            end
         end
+
     end
 
 
@@ -165,11 +187,9 @@ end
 function ENT:IsAmmoToPlayer( ply )
     if CLIENT then
         local ply = LocalPlayer() 
-        local equipment = ply.cd2_Equipment
-        return ply.cd2_Equipment == self:GetClass()
+        return ply:GetEquipment() == self:GetClass()
     elseif SERVER then
-        local equipment = ply.cd2_Equipment
-        return ply.cd2_Equipment == self:GetClass()
+        return ply:GetEquipment() == self:GetClass()
     end
 end
 

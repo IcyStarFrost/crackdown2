@@ -9,18 +9,22 @@ if SERVER then
     util.AddNetworkString( "cd2net_dawndusk_changetime" )
 
     SetGlobalBool( "cd2_isday", true )
+    
     CD2_NextTimeChange = CurTime() + 720
+    CD2_FreezeTime = false -- Freezes time
 
+    local lasttime = CD2_NextTimeChange
     local debugupdate = CurTime() + 60
 
     hook.Add( "Tick", "crackdown2_dawnduskcycle", function()
-
+        if CD2_FreezeTime then CD2_NextTimeChange = lasttime - CurTime() return end
         if CurTime() > debugupdate then
-            CD2DebugMessage( "Next time change will occur in " .. tostring( math.Round( CD2_NextTimeChange - CurTime(), 0 ) ) .. " seconds" )
+            CD2DebugMessage( "Next time change will occur in " .. tostring( string.NiceTime( CD2_NextTimeChange - CurTime(), 0 ) ) )
             debugupdate = CurTime() + 60
         end
 
         if CurTime() > CD2_NextTimeChange then
+            CD2_NextFreakSpawn = CurTime() + 10
             SetGlobalBool( "cd2_isday", !GetGlobalBool( "cd2_isday", false ) )
 
             CD2DebugMessage( "Time is now changing to " .. ( GetGlobalBool( "cd2_isday", false ) and "Dawn" or "Dusk" ) )
@@ -31,6 +35,8 @@ if SERVER then
 
             CD2_NextTimeChange = CurTime() + 720
         end
+
+        lasttime = CD2_NextTimeChange
     end )
 
 elseif CLIENT then

@@ -37,6 +37,8 @@ function ENT:RunBehaviour()
         self.Path:Compute( self, self:GetGoalPosition() )
     end
 
+    self:DispatchTrailer()
+
     while true do 
 
         if CurTime() > self.NextTrailer then

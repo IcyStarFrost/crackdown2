@@ -27,6 +27,7 @@ ENT.cd2_AnimUpdate = 0 -- The next time our animations will update
 ENT.cd2_PhysicsUpdate = 0 -- The next time our physics will update
 ENT.cd2_NextPVScheck = 0 -- The next time we will check if we are in a player's pvs
 ENT.cd2_StuckTimes = 0 -- The amount of times we got stuck
+ENT.cd2_ShouldcheckPVS = true -- In singleplayer, if the npc should check if it's within the player's PVS and disable it self if it isn't
 ENT.cd2_ClearStuckTimes = 0 -- The next time we will reset our stuck times
 ENT.cd2_facetarget = nil -- The target we are facing
 ENT.cd2_NextSpeak = 0 -- The next time we will speak
@@ -283,9 +284,21 @@ function ENT:Initialize()
         self:HandleCollision( data )
     end )
     
+    if CLIENT then self.cd2_candrawmodel = true self.cd2_nextdrawmodelcheck = CurTime() + 1 end
 
     if self.Initialize2 then self:Initialize2() end
     
+end
+
+function ENT:Draw()
+    if CurTime() > self.cd2_nextdrawmodelcheck then
+        self.cd2_candrawmodel = self:GetPos():DistToSqr( LocalPlayer():GetPos() ) <= ( 3000 * 3000 )
+        self.cd2_nextdrawmodelcheck = CurTime() + 1
+    end
+
+    if self.cd2_candrawmodel then
+        self:DrawModel()
+    end
 end
 
 function ENT:SetupDataTables()
@@ -305,6 +318,7 @@ function ENT:SetupDataTables()
     if self.SetupDataTables2 then self:SetupDataTables2() end
 
 end
+
 
 function ENT:HandleCollision( data )
     local collider = data.HitEntity
@@ -335,6 +349,13 @@ end
 
 function ENT:Think()
 
+    if SERVER and self.cd2_ShouldcheckPVS then
+        if game.SinglePlayer() and !Entity( 1 ):TestPVS( self ) or CD2_DisableAllAI then
+            self:SetIsDisabled( true )
+        elseif game.SinglePlayer() and Entity( 1 ):TestPVS( self ) and !CD2_DisableAllAI then 
+            self:SetIsDisabled( false )
+        end
+    end
 
     if CurTime() > self.cd2_PhysicsUpdate then
         local phys = self:GetPhysicsObject()
@@ -347,7 +368,7 @@ function ENT:Think()
         self.cd2_PhysicsUpdate = CurTime() + 0.05
     end
 
-    if IsValid( self:GetActiveWeapon() ) and self:GetActiveWeapon():Clip1() == 0 then
+    if !self:GetIsDisabled() and IsValid( self:GetActiveWeapon() ) and self:GetActiveWeapon():Clip1() == 0 then
         self:GetActiveWeapon():Reload()
     end
 
@@ -398,7 +419,7 @@ function ENT:Think()
     end
 
 
-    if SERVER then
+    if SERVER and !self:GetIsDisabled() then
 
         if self.cd2_facetarget then
             if self.cd2_faceend and CurTime() > self.cd2_faceend then self.cd2_faceend = nil self.cd2_facetarget = nil return end

@@ -26,3 +26,30 @@ net.Receive( "cd2net_playercallforhelp", function( len, ply )
         CD2SendTextBoxMessage( v, ply:Name() .. " needs to be revived!" )
     end
 end )
+
+local IsGenerating = false
+net.Receive( "cd2net_generatenavmesh", function( len, ply )
+    if IsGenerating then return end
+
+    ply:ConCommand( "nav_max_view_distance 1" )
+    ply:ConCommand( "nav_generate" )
+
+    IsGenerating = true
+end )
+
+local oldtime = CD2_FreezeTime
+net.Receive( "cd2net_playeropenintelconsole", function( len, ply )
+    if !game.SinglePlayer() then return end
+    local isopened = net.ReadBool()
+
+    if isopened then
+        oldtime = CD2_FreezeTime
+        CD2_FreezeTime = true
+        CD2_DisableAllAI = true
+    else
+        CD2_FreezeTime = oldtime
+        CD2_DisableAllAI = false
+    end
+    
+    
+end )

@@ -174,6 +174,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         local ent = ents.Create( "cd2_freak" )
         ent:SetPos( pos )
         ent:SetIsDisabled( true )
+        ent.cd2_ShouldcheckPVS = false
         ent:Spawn()
 
         while IsValid( ent ) do coroutine.yield() end
@@ -193,6 +194,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         local ent = ents.Create( "cd2_freak" )
         ent:SetPos( pos )
+        ent.cd2_ShouldcheckPVS = false
         ent:SetIsDisabled( true )
         ent:Spawn()
 
@@ -214,6 +216,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         shotgun:Spawn()
 
         while !IsValid( shotgun:GetOwner() ) do coroutine.yield() end
+
+        CD2SendTextBoxMessage( ply, "Move your mouse wheel to switch to your secondary" )
 
         if IsValid( guide ) then guide:Remove() end
 
@@ -334,6 +338,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         
         while IsValid( grenade ) do coroutine.yield() end
 
+        CD2SendTextBoxMessage( ply, "Bind a key to +grenade1 and press that key to throw grenades. Example console command, bind g +grenade1" )
+
         if IsValid( guide ) then guide:Remove() end
 
         ply:SetEquipmentCount( 8 )
@@ -342,12 +348,15 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         coroutine.wait( 8 )
 
+        CD2SendTextBoxMessage( ply, "Press your +grenade1 bind/key to throw a grenade" )
+
         local freaks = {}
         pos = !InPacificCity() and CD2GetRandomPos( 500, ply:GetPos() ) or Vector( 1807.129517, -1427.410889, -35.290722 )
         
         for i = 1, 5 do
             local ent = ents.Create( "cd2_freak" )
             ent:SetPos( pos + Vector( random( -100, 100 ), random( -100, 100 ) ) )
+            ent.cd2_ShouldcheckPVS = false
             ent:SetIsDisabled( true )
             freaks[ #freaks + 1 ] = ent
             ent:Spawn()

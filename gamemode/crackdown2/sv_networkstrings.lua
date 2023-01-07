@@ -30,6 +30,8 @@ util.AddNetworkString( "cd2net_setplayerangle" )
 util.AddNetworkString( "cd2net_starttutorial" )
 util.AddNetworkString( "cd2net_playdirectorsound" )
 util.AddNetworkString( "cd2net_tutorial_activatehud" )
+util.AddNetworkString( "cd2net_playeropenintelconsole" )
+util.AddNetworkString( "cd2net_generatenavmesh" )
 
 util.AddNetworkString( "cd2filesystem_requestplayerdata" )
 util.AddNetworkString( "cd2filesystem_dispatchplayerdata" )

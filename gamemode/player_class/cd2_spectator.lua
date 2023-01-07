@@ -30,6 +30,7 @@ function PLAYER:Spawn()
     self.Player:Spectate( OBS_MODE_ROAMING )
 
     net.Start( "cd2net_playerinitialspawn" )
+    net.WriteBool( navmesh.IsLoaded() )
     net.Send( self.Player )
     
 end

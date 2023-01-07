@@ -26,6 +26,6 @@ end
 
 function ENT:MainThink2()
     if self:CanSpeak() and IsValid( self:GetEnemy() ) then
-        self:PlayVoiceSound( "crackdown2/vo/cell/male2/idle" .. random( 1, 4 ) .. ".wav", rand( 5, 15 ) )
+        self:PlayVoiceSound( "crackdown2/vo/cell/male2/idle" .. random( 1, 4 ) .. ".mp3", rand( 5, 15 ) )
     end
 end

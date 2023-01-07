@@ -173,9 +173,59 @@ net.Receive( "cd2net_tutorial_activatehud", function()
     _G[ variable ] = true
 end )
 
+local surface_DrawTexturedRect = surface.DrawTexturedRect
+local surface_SetMaterial = surface.SetMaterial
+local surface_SetDrawColor = surface.SetDrawColor
+local surface_DrawRect = surface.DrawRect
+local background = Material( "crackdown2/dropmenu/bg.png", "smooth" )
+local black = Color( 0, 0, 0 )
+local blackish = Color( 39, 39, 39)
+local grey = Color( 100, 100, 100 )
 net.Receive( "cd2net_playerinitialspawn", function()
+    CD2_HasNavMesh = net.ReadBool()
+
     local isreturningplayer = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_isreturningplayer" ) or KeysToTheCity() and true
     local completedtutorial = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_completedtutorial" ) or KeysToTheCity() and true
+
+    if !CD2_HasNavMesh then
+        local pnl = vgui.Create( "DPanel", GetHUDPanel() )
+        pnl:Dock( FILL ) 
+        pnl:MakePopup()
+        
+        local lbl = vgui.Create("DLabel", pnl )
+        lbl:SetFont( "crackdown2_dropmenutoptext" )
+        lbl:SetText( "This map does not have a Navigation Mesh! The CRACKDOWN 2 Gamemode requires you to play on a map with a Navigation Mesh! Press the button below to generate a Navigation Mesh or play a map that has one" )
+        lbl:SetWrap( true )
+        lbl:SetSize( ScrW() / 2, 500 )
+        lbl:SetPos( ( ScrW() / 3 ), ( ScrH() / 5 ) - 250 )
+
+        local button = vgui.Create( "DButton", pnl )
+        button:SetSize( 200, 30 )
+        button:SetPos( ( ScrW() / 2 ) - 30, ( ScrH() / 2 ) - 15 )
+        button:SetText( "Generate NavMesh" )
+
+        function button:DoClick()
+            lbl:SetText( "Please wait while a nav mesh generates..")
+            net.Start( "cd2net_generatenavmesh" )
+            net.SendToServer()
+        end
+
+        function button:Paint( w, h )
+            surface_SetDrawColor( blackish )
+            surface_DrawRect( 0, 0, w, h )
+        end
+
+        CD2StartMusic( "sound/crackdown2/music/mainmenu.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
+            if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
+        end )
+
+        function pnl:Paint( w, h ) 
+            surface_SetDrawColor( grey )
+            surface_SetMaterial( background )
+            surface_DrawTexturedRect( 0, 0, w, h )
+        end
+        return
+    end
 
     -- If the player is new to the gamemode, then play the intro video
     if !isreturningplayer then
@@ -190,6 +240,7 @@ net.Receive( "cd2net_playerinitialspawn", function()
             CD2_DrawFirearmSkill = false
             CD2_DrawStrengthSkill = false
             CD2_DrawExplosiveSkill = false
+            CD2_CanOpenAgencyConsole = false
 
             CD2_DrawTargetting = false
             CD2_DrawHealthandShields = false
@@ -211,6 +262,7 @@ net.Receive( "cd2net_playerinitialspawn", function()
             CD2_DrawFirearmSkill = false
             CD2_DrawStrengthSkill = false
             CD2_DrawExplosiveSkill = false
+            CD2_CanOpenAgencyConsole = false
 
             CD2_DrawTargetting = false
             CD2_DrawHealthandShields = false
@@ -356,47 +408,7 @@ local flame = Material( "crackdown2/effects/flamelet1.png" )
 net.Receive( "cd2net_freakkill", function()
     local ragdoll = net.ReadEntity()
     if !IsValid( ragdoll ) then return end
-
-    CD2CreateThread( function()
-
-        local particle = ParticleEmitter( ragdoll:GetPos() )
-        for i = 1, 130 do
-            if !IsValid( ragdoll ) then particle:Finish() return end
-            
-            local index = random( ragdoll:GetBoneCount() )
-            local pos = ragdoll:GetBonePosition( index )
-            if pos == ragdoll:GetPos() then
-                local matrix = ragdoll:GetBoneMatrix( index )
-                if !matrix then pos = ragdoll:WorldSpaceCenter() else pos = matrix:GetTranslation() end
-            end
-            pos = pos or ragdoll:WorldSpaceCenter()
-
-            local part = particle:Add( flame, pos )
     
-            if part then
-                part:SetStartSize( 6 )
-                part:SetEndSize( 6 ) 
-                part:SetStartAlpha( 255 )
-                part:SetEndAlpha( 0 )
-    
-                part:SetColor( 255, 255, 255 )
-                part:SetLighting( false )
-                part:SetCollide( false )
-    
-                part:SetDieTime( 0.2 )
-                part:SetGravity( Vector() )
-                part:SetAirResistance( 200 )
-                part:SetVelocity( Vector() )
-                part:SetAngleVelocity( AngleRand( -4, 4 ) )
-            end
-    
-            coroutine.wait( 0.01 )
-        end
-    
-        particle:Finish()
-
-    end )
-
     ragdoll:CallOnRemove( "effect", function() 
         sound.Play( "ambient/fire/gascan_ignite1.wav", ragdoll:GetPos(), 60, 100, 1 )
         local particle = ParticleEmitter( ragdoll:GetPos() )

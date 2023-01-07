@@ -36,6 +36,101 @@ function ENT:Initialize()
 
             return viewtbl
         end
+
+        local function DrawCredit( toptext, bottomtext )
+            local object = {}
+            local drawing = true
+            local showtext = CurTime() + 3
+            local topcolor = Color( 255, 115, 0, 0 )
+            local bottomcolor = Color( 255, 255, 255, 0 )
+            
+            function object:IsValid() return drawing end
+
+            hook.Add( "HUDPaint", self, function()
+                if CurTime() < showtext then
+                    topcolor.a = Lerp( 3 * FrameTime(), topcolor.a, 255 )
+                    bottomcolor.a = Lerp( 3 * FrameTime(), bottomcolor.a, 255 )
+                else
+                    topcolor.a = Lerp( 3 * FrameTime(), topcolor.a, 0 )
+                    bottomcolor.a = Lerp( 3 * FrameTime(), bottomcolor.a, 0 )
+                    if topcolor.a < 10 and bottomcolor.a < 10 then
+                        drawing = false
+                        hook.Remove( "HUDPaint", self )
+                    end
+                end
+
+                draw.DrawText( toptext, "crackdown2_dropmenutext1", 200, ScrH() / 2, topcolor, TEXT_ALIGN_LEFT )
+                draw.DrawText( bottomtext, "crackdown2_dropmenutext1", 200, ScrH() / 2 + 60, bottomcolor, TEXT_ALIGN_LEFT )
+            end )
+
+            return object
+        end
+
+        CD2CreateThread( function()
+
+            local credit = DrawCredit( "CRACKDOWN 2", "Garry's Mod Gamemode Recreation by StarFrost" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Game Developer:", "Ruffian Games" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "CRACKDOWN Series Founder:", "David Jones of Realtime Worlds" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Creative Director:", "Billy Thomson" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Producor:", "James Cope" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Leads:", "Stuart Campbell\nIain Donald\nMike Enoch\nChris Gottgetreu" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Leads:", "Steve Iannetta\nRoss Nicoll\nNeil Pollock\nPaul Simms" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Design:", "Ed Campbell\nMartin Livingston\nSean Noonan" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Design:", "Dean Smith\nGraham Wright" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Code:", "Leigh Bird\nBarry Cairns\nRobert Cowsill\nTerryDrever" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Code:", "Neil Duffield\nKarim El-Shakankiri\nDuncan Harrison\nAndrew Heywood" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Code:", "David Hynd\nJohn Hynd\nS L\nPeter Mackay" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Code:", "Will Sykes\nCraig Thomson\nRichard Welsh" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Art:", "Ryan Astley\nKevin Dunlop\nCarlos Garcia\nPaul Large" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Art:", "Stewart Neal\nNeil Macnaughton\nPaulie Simms\nRichard Wazejewski" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original QA:", "Kevin Black\nSean Branney\nAmy Buttress\nGregor Hare" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original QA:", "David Hoare\nSimon Kilroy\nEwan Mckenzie\nJohn Pettie" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Studio:", "Steven Randell\nKirsty Scott\nGavin Howie" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Development Director:", "Gareth Noyce" )
+            while credit:IsValid() do coroutine.yield() end
+
+            credit = DrawCredit( "Original Studio Head:", "Gaz Liddon" )
+            while credit:IsValid() do coroutine.yield() end
+
+
+        end )
+
     end
 
     if SERVER then
@@ -56,7 +151,7 @@ function ENT:Initialize()
                         while IsValid( self ) and self:GetPos():DistToSqr( vector ) > ( 20 * 20 ) do
                             local ang = ( vector - self:GetPos() ):Angle() ang[ 1 ] = ang[ 1 ] + 20 ang[ 3 ] = 0
                             self:SetAngles( ang )
-                            self:SetPos( self:GetPos() + ( vector - self:GetPos() ):GetNormalized() * 5 )
+                            self:SetPos( self:GetPos() + ( vector - self:GetPos() ):GetNormalized() * 10 )
                             coroutine.yield()
                         end
         

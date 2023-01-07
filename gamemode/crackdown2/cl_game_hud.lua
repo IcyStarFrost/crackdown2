@@ -367,7 +367,7 @@ CD2_DrawExplosiveSkill = true
 
 hook.Add( "HUDPaint", "crackdown2_hud", function()
     local scrw, scrh, ply = ScrW(), ScrH(), LocalPlayer()
-    if CD2_InDropMenu then RemoveHUDpanels() return end
+    if CD2_InDropMenu or IsValid( CD2_AgencyConsole ) then RemoveHUDpanels() return end
     if !CD2_DrawWeaponInfo then RemoveHUDpanels() end
 
     if !game.SinglePlayer() then
@@ -788,6 +788,12 @@ local modify = {
 
 hook.Add( "RenderScreenspaceEffects", "crackdown2_lowhealthcolors", function()
     local ply = LocalPlayer()
+
+    if CD2IsDay() then
+        modify[ "$pp_colour_brightness" ] = Lerp( 0.1 * FrameTime(), modify[ "$pp_colour_brightness" ], 0 )
+    else
+        modify[ "$pp_colour_brightness" ] = Lerp( 0.1 * FrameTime(), modify[ "$pp_colour_brightness" ], -0.2 )
+    end
     
     if !ply:IsCD2Agent() then return end
 

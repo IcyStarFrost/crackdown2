@@ -1,0 +1,19 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "crackdown2/map/yellowcitadelwall"
+	"$surfaceprop" "metal"
+	"%keywords" "combine"
+
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[ .56 .56 .75 ]"
+	"$envmapcontrast" 1
+	"$envmapsaturation" 1
+
+	"LightmappedGeneric_DX9"
+	{
+		"$bumpmap" "metal/metalwall078a_normal"
+		"$normalmapalphaenvmapmask" 1
+		"$envmaptint" "[ .09 .1 .12]"
+	}
+
+}

@@ -183,7 +183,7 @@ end
 --
 
 function ENT:SetupDataTables2()
-    self:NetworkVar( "Bool", 3, "IsPanicked" )
+    self:NetworkVar( "Bool", 4, "IsPanicked" )
 end
 
 local function GetNavmeshFiltered()
@@ -226,12 +226,14 @@ end
 function ENT:Panicked()
 
     if self.cd2_FirstPanic then coroutine.wait( 1 ) self.cd2_FirstPanic = false self:LookTo() end
+
     self:PlaySequenceAndWait( random( 1, 2 ) == 1 and "lookoutrun" or "startle_behind" )
 
     local areas = GetAwayNavmesh( self.cd2_Panickedlocation, 3000 )
     local pos
-    
+
     for k, v in RandomPairs( areas ) do
+
         if IsValid( v ) then pos = v:GetRandomPoint() break end
     end
     

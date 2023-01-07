@@ -114,7 +114,7 @@ function ENT:Think()
     if SERVER then
 
         -- If our thrower is either invalid or dead, remove ourselves
-        if self.RemoveOnInvalid and ( !IsValid( self:GetThrower() ) or IsValid( self:GetThrower() ) and self:GetThrower():IsPlayer() and !self:GetThrower():Alive() ) and self:GetHadThrower() then
+        if self.RemoveOnInvalid and ( !IsValid( self:GetThrower() ) or IsValid( self:GetThrower() ) and self:GetThrower():IsPlayer() and !self:GetThrower():Alive() ) and self:GetHadThrower() or self.cd2_equipmentcount and self.cd2_equipmentcount == 0 then
             self:Remove()
             return
         end
@@ -138,18 +138,41 @@ function ENT:Think()
             local ply = nearpickupents[ i ]
 
             if IsValid( ply ) and self:IsAmmoToPlayer( ply ) and ply:GetEquipmentCount() < ply:GetMaxEquipmentCount() then
-                ply:SetEquipmentCount( clamp( ply:GetEquipmentCount() + ( ply:GetMaxEquipmentCount() / 4 ), 0, ply:GetMaxEquipmentCount() ) )
+                ply:SetEquipmentCount( self.cd2_equipmentcount or clamp( ply:GetEquipmentCount() + ( ply:GetMaxEquipmentCount() / 4 ), 0, ply:GetMaxEquipmentCount() ) )
                 ply:EmitSound( "items/ammo_pickup.wav", 60 )
                 self:Remove()
             elseif IsValid( ply ) and !self:IsAmmoToPlayer( ply ) and !IsValid( ply:GetNW2Entity( "cd2_targetweapon", nil )) then
 
-                ply:SetNW2Entity( "cd2_targetequipment", wep )
+                ply:SetNW2Entity( "cd2_targetequipment", self )
                 ply:SetNW2Float( "cd2_equipmentdrawcur", CurTime() + 0.1 )
 
-                if ply.cd2_PickupWeaponDelay and CurTime() > ply.cd2_PickupWeaponDelay or ( ply:GetEquipmentCount() == 0 ) then
+                if ply:KeyDown( IN_RELOAD ) then ply.cd2_PickupWeaponDelay = ply.cd2_PickupWeaponDelay or CurTime() + 1 else ply.cd2_PickupWeaponDelay = nil end
+
+                if IsValid( ply:GetNW2Entity( "cd2_targetequipment", nil ) ) and ply.cd2_PickupWeaponDelay and CurTime() > ply.cd2_PickupWeaponDelay or ( ply:GetEquipmentCount() == 0 ) then
+                    local oldequipment = ply:GetEquipment()
+                    local oldcount = ply:GetEquipmentCount()
+
                     ply:SetEquipment( self:GetClass() )
-                    ply:SetMaxEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
-                    ply:SetEquipmentCount( self.MaxGrenadeCount )
+                    ply:SetMaxEquipmentCount( self.MaxGrenadeCount )
+                    ply:SetEquipmentCount( self.cd2_equipmentcount or self.MaxGrenadeCount )
+
+                    ply:EmitSound( "items/ammo_pickup.wav", 60 )
+
+                    local droppedequipment = ents.Create( oldequipment )
+                    droppedequipment:SetPos( ply:GetShootPos() )
+                    droppedequipment.cd2_equipmentcount = oldcount
+                    droppedequipment:Spawn()
+
+                    local phys = droppedequipment:GetPhysicsObject()
+                    local pos = ply:GetPos() + ply:GetForward() * 50
+                    local dist = clamp( droppedequipment:GetPos():Distance( pos ) * 150, 0, 100000 )
+                
+                    local arc = ( ( LerpVector( 0.5, droppedequipment:GetPos(), pos ) + Vector( 0, 0, 100 ) ) - droppedequipment:GetPos() ):GetNormalized()
+                    if IsValid( phys ) then
+                        phys:ApplyForceCenter( arc * dist )
+                        phys:SetAngleVelocity( VectorRand( -500, 500 ) )
+                    end
+
                     self:Remove()
                     ply.cd2_PickupDelay = math.huge
                     ply.cd2_PickupWeaponDelay = math.huge
@@ -162,18 +185,20 @@ function ENT:Think()
 
 
 
-    if !IsValid( self:GetThrower() ) and !self:GetHadThrower() then return end
+    if IsValid( self:GetThrower() ) or self:GetHadThrower() then
 
-    -- If time is up, booom
-    if CurTime() > self.DelayCurTime and !self.Exploded then
-        self:OnDelayEnd()
-        self.Exploded = true
-    end
+        -- If time is up, booom
+        if CurTime() > self.DelayCurTime and !self.Exploded then
+            self:OnDelayEnd()
+            self.Exploded = true
+        end
 
-    -- Tick sounds
-    if SERVER and self.TickSound and self.DelayTime > 0 and CurTime() > self.NextTickSound then
-        self:EmitSound( self.TickSound, 70, 100 + max( 100, ( 1 / ( self.DelayCurTime - CurTime() ) ) * 60 ), 1, CHAN_WEAPON )
-        self.NextTickSound = CurTime() + 0.1
+        -- Tick sounds
+        if SERVER and self.TickSound and self.DelayTime > 0 and CurTime() > self.NextTickSound then
+            self:EmitSound( self.TickSound, 70, 100 + max( 100, ( 1 / ( self.DelayCurTime - CurTime() ) ) * 60 ), 1, CHAN_WEAPON )
+            self.NextTickSound = CurTime() + 0.1
+        end
+
     end
 
 

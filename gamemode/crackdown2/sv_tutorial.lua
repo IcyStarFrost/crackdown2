@@ -1,5 +1,5 @@
 local random = math.random
-
+util.AddNetworkString( "cd2net_introduction_music" )
 
 net.Receive( "cd2net_starttutorial", function( len, ply )
 
@@ -19,9 +19,9 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         CD2_FreezeTime = game.SinglePlayer()
     
         ply:Spawn()
-        ply:SetPos( spawn:GetPos() )
-        ply:SetAngles( spawn:GetAngles() )
-        ply:SetEyeAngles( spawn:GetAngles() )
+        ply:SetPos( !InPacificCity() and spawn:GetPos() or Vector( -996.168945, 2360.628906, 593.605408 ) )
+        ply:SetAngles( !InPacificCity() and spawn:GetAngles() or Angle( 0, 90, 0 ) )
+        ply:SetEyeAngles( !InPacificCity() and spawn:GetAngles() or Angle( 0, 90, 0 ) )
 
         ply:Freeze( true )
         ply.cd2_godmode = true
@@ -62,18 +62,36 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         coroutine.wait( 4 )
 
-        local uptrace = ply:Trace( nil, ply:GetPos() + Vector( 0, 0, 1000 ) )
-        local pos = uptrace.HitPos - Vector( 0, 0, 100 )
+        local guide
+        if !InPacificCity() then
 
-        ply:SetPos( pos )
+            local uptrace = ply:Trace( nil, ply:GetPos() + Vector( 0, 0, 1000 ) )
+            local pos = uptrace.HitPos - Vector( 0, 0, 100 )
 
-        net.Start( "cd2net_playerspawnlight" )
-        net.WriteEntity( ply )
-        net.Broadcast()
+            ply:SetPos( pos )
 
-        coroutine.wait( 0.5 )
+            net.Start( "cd2net_playerspawnlight" )
+            net.WriteEntity( ply )
+            net.Broadcast()
 
+            coroutine.wait( 0.5 )
+
+        else
+            ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag3.mp3" ) 
+
+            coroutine.wait( 8 )
+
+            guide = CD2CreateGuide( ply:GetPos(), Vector( -1073.387817, 3436.303955, 122.956322 ) )
+
+            CD2SendTextBoxMessage( ply, "Jump off the edge" )
+            
+            ply:Freeze( false )
+        end
+
+        while ply:IsOnGround() do coroutine.yield() end 
         while !ply:IsOnGround() do coroutine.yield() end
+
+        if IsValid( guide ) then guide:Remove() end
 
         ply:SetHealth( 30 )
         ply:SetArmor( 0 )
@@ -103,8 +121,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag5.mp3" ) 
 
-        local pos = CD2GetRandomPos( 1000, ply:GetPos() )
-
+        local pos = !InPacificCity() and CD2GetRandomPos( 1000, ply:GetPos() ) or Vector( -519.097351, 3134.323486, 349.921356 )
+        
         local agilityorb = ents.Create( "cd2_agilityorb" )
         agilityorb:SetPos( pos )
         agilityorb:SetLevel( 1 )
@@ -129,7 +147,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag6.mp3" ) 
 
-        pos = CD2GetRandomPos( 2000, ply:GetPos() )
+        pos = !InPacificCity() and CD2GetRandomPos( 2000, ply:GetPos() ) or Vector( 2770.546875, 958.698730, 153.634186 )
 
         local guide = CD2CreateGuide( ply:GetPos(), pos )
 
@@ -149,8 +167,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         coroutine.wait( 14 )
 
-        pos = CD2GetRandomPos( 500, ply:GetPos() )
-
+        pos = !InPacificCity() and CD2GetRandomPos( 500, ply:GetPos() ) or Vector( 2862.898682, 775.964539, 71.023209 )
+        
         local guide = CD2CreateGuide( ply:GetPos(), pos )
 
         local ent = ents.Create( "cd2_freak" )
@@ -184,12 +202,13 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag9.mp3" ) 
 
+        pos = InPacificCity() and Vector( 2770.546875, 958.698730, 153.634186 ) or nil
         local trace = ply:Trace( ply:WorldSpaceCenter(), ply:GetPos() + ply:GetForward() * 400 ).HitPos
 
-        local guide = CD2CreateGuide( ply:GetPos(), trace )
+        local guide = CD2CreateGuide( ply:GetPos(), pos or trace )
 
         local shotgun = ents.Create( "cd2_shotgun" )
-        shotgun:SetPos( trace )
+        shotgun:SetPos( pos or trace )
         shotgun:SetPermanentDrop( true )
         shotgun.cd2_reservedplayer = ply
         shotgun:Spawn()
@@ -235,7 +254,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag10_finish.mp3" ) 
 
-        pos = CD2GetRandomPos( 3000, ply:GetPos() )
+        pos = !InPacificCity() and CD2GetRandomPos( 3000, ply:GetPos() ) or Vector( 1939.180298, -800.069397, 126.819649 )
 
         local guide = CD2CreateGuide( ply:GetPos(), pos )
 
@@ -293,6 +312,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         coroutine.wait( 1 )
 
+        ply:SetCanUseMelee( false )
+
         net.Start( "cd2net_tutorial_activatehud" )
         net.WriteString( "CD2_DrawExplosiveSkill" )
         net.Send( ply )
@@ -300,15 +321,79 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag13.mp3" )
 
+        local pos = InPacificCity() and Vector( 2254.297119, -975.715820, 153.978546 )
         local trace = ply:Trace( ply:WorldSpaceCenter(), ply:GetPos() + ply:GetForward() * 400 ).HitPos
 
-        local guide = CD2CreateGuide( ply:GetPos(), trace )
+        local guide = CD2CreateGuide( ply:GetPos(), pos or trace )
 
         local grenade = ents.Create( "cd2_grenade" )
-        grenade:SetPos( trace )
+        grenade:SetPos( pos or trace )
         grenade:SetPermanentDrop( true )
         grenade.cd2_reservedplayer = ply
         grenade:Spawn()
+        
+        while IsValid( grenade ) do coroutine.yield() end
+
+        if IsValid( guide ) then guide:Remove() end
+
+        ply:SetEquipmentCount( 8 )
+
+        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag14.mp3" )
+
+        coroutine.wait( 8 )
+
+        local freaks = {}
+        pos = !InPacificCity() and CD2GetRandomPos( 500, ply:GetPos() ) or Vector( 1807.129517, -1427.410889, -35.290722 )
+        
+        for i = 1, 5 do
+            local ent = ents.Create( "cd2_freak" )
+            ent:SetPos( pos + Vector( random( -100, 100 ), random( -100, 100 ) ) )
+            ent:SetIsDisabled( true )
+            freaks[ #freaks + 1 ] = ent
+            ent:Spawn()
+        end
+
+        while true do
+            local shouldbreak = true
+            for i = 1, #freaks do
+                local freak = freaks[ i ]
+                if IsValid( freak ) then shouldbreak = false end 
+            end
+            if shouldbreak then break end
+            coroutine.wait( 0.2 )
+        end
+
+        coroutine.wait( 2 )
+
+        ply:Freeze( true )
+        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag15.mp3" )
+
+        coroutine.wait( 13 )
+
+        ply:SetNW2Bool( "cd2_inintroduction", true )
+
+        net.Start( "cd2net_introduction_music" )
+        net.Send( ply )
+
+        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag16.mp3" )
+
+        coroutine.wait( 3 )
+
+        local cam = ents.Create( "cd2_introcam" )
+        cam:SetPos( ply:GetPos() )
+        cam:SetAngles( ply:GetAngles() )
+        cam:SetPlayer( ply )
+        cam:Spawn()
+
+        coroutine.wait( 3 )
+
+        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/introduction.mp3" )
+
+        coroutine.wait( 103 )
+
+        if IsValid( cam ) then cam:Remove() end
+
+        ply:SetNW2Bool( "cd2_inintroduction", false )
 
     end )
 

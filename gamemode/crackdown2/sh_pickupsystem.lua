@@ -17,7 +17,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
 
     for i = 1, #players do
         local ply = players[ i ]
-        if !ply:IsCD2Agent() or ply:GetIsStunned() then continue end
+        if !ply:IsCD2Agent() or ply:GetIsStunned() or !IsValid( ply:GetActiveWeapon() ) then continue end
 
         local near = CD2FindInSphere( ply:GetPos(), 100, function( ent ) return ( isphysics[ ent:GetClass() ] or ent.cd2_allowpickup ) and ent:GetNW2Int( "cd2_mass", math.huge ) < ply:GetMaxPickupWeight() and ply:Visible( ent ) end )
         
@@ -45,6 +45,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
 
             ent:SetOwner( ply )
             ent:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
+            ent:Use( ply, ply, USE_TOGGLE )
 
             ply:SetNW2Bool( "cd2_isholdingent", true )
             ply.cd2_HeldObject = ent

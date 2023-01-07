@@ -510,3 +510,9 @@ net.Receive( "cd2net_explosion", function()
     particle:Finish()
 
 end )
+
+net.Receive( "cd2net_introduction_music", function()
+    CD2StartMusic( "sound/crackdown2/music/flythrough.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
+        if !LocalPlayer():GetNW2Bool( "cd2_inintroduction", false ) then CD2Musicchannel:FadeOut() end
+    end )
+end )

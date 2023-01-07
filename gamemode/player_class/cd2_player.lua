@@ -59,6 +59,7 @@ function PLAYER:Init()
     self.Player:SetCanUseMelee( true )
     self.Player:SetCD2Team( "agency" )
     self.Player:SetEquipment( "cd2_grenade" )
+    self.Player:SetMaxEquipmentCount( 8 )
     self.Player:SetMeleeDamage( 25 ) -- By default, players can only deal 25 damage with melee. This will change according to StrengthSkill
     self.Player:SetMaxPickupWeight( 200 ) -- By default, only pickup props with a mass of 200. This will change according to StrengthSkill
     self.Player:SetSafeFallSpeed( 40 ) -- By default, the safe falling speed is 600. This will change according to AgilitySkill

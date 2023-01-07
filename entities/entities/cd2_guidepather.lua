@@ -8,6 +8,9 @@ function ENT:Initialize()
     self.NextTrailer = CurTime() + 2
     self.Path = Path( "Follow" )
 
+    self.loco:SetDeathDropHeight( 10000000 )
+    self.loco:SetJumpHeight( 100000000 )
+
     self:SetMoveType( MOVETYPE_NONE )
     self:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
 

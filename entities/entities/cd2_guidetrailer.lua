@@ -15,6 +15,8 @@ function ENT:Initialize()
 
         self.PathVectors = {}
 
+
+
         if !IsValid( self.Path ) then self:Remove() return end
         for k, v in ipairs( self.Path:GetAllSegments() ) do
             self.PathVectors[ #self.PathVectors + 1 ] = v.pos 

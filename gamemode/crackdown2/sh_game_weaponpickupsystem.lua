@@ -1,6 +1,7 @@
 local clamp = math.Clamp
 local ceil = math.ceil
 hook.Add( "PlayerCanPickupWeapon", "crackdown2_npcweapons", function( ply, wep )
+    if !wep.IsCD2Weapon then return false end
     if IsValid( wep.cd2_reservedplayer ) and ply != wep.cd2_reservedplayer then return false end
     if wep:WaterLevel() != 0 then return false end
     local wepowner = wep:GetOwner()
@@ -87,5 +88,5 @@ hook.Add( "HUDPaint", "crackdown2_pickupequipmentpaint", function()
     local buttonname = input_GetKeyName( code )
     
     local screen = ( equipment:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
-    CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), "Hold to Equip " .. equipment:GetPrintName() .. " / Drop " .. scripted_ents.Get( ply.cd2_Equipment ).t.PrintName )
+    CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), "Hold to Equip " .. equipment:GetPrintName() .. " / Drop " .. scripted_ents.Get( ply.cd2_Equipment ).PrintName )
 end )

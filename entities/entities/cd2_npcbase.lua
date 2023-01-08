@@ -352,9 +352,11 @@ function ENT:Think()
     if SERVER and self.cd2_ShouldcheckPVS then
         if game.SinglePlayer() and !Entity( 1 ):TestPVS( self ) or CD2_DisableAllAI then
             self:SetIsDisabled( true )
+            if !Entity( 1 ):TestPVS( self ) and self.cd2_pvsremovetime and CurTime() > self.cd2_pvsremovetime then self:Remove() end
         elseif game.SinglePlayer() and Entity( 1 ):TestPVS( self ) and !CD2_DisableAllAI then 
             self:SetIsDisabled( false )
         end
+        if Entity( 1 ):TestPVS( self ) then self.cd2_pvsremovetime = CurTime() + 10 end
     end
 
     if CurTime() > self.cd2_PhysicsUpdate then

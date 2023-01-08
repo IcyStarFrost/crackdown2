@@ -93,7 +93,7 @@ end
 local beaconblue = Color( 0, 217, 255 )
 local beam = Material( "crackdown2/effects/beam.png", "smooth" )
 
-ENT.SunBeamMult = 0.25
+ENT.SunBeamMult = 0.20
 ENT.SunBeamDark = 0
 ENT.SunSize = 0.05
 ENT.SunDistance = 500
@@ -169,7 +169,6 @@ function ENT:DropBeacon()
 
     BroadcastLua( "Entity(" .. self:EntIndex() .. "):StartIntroMusic()" )
 
-    self:SetSoundTrack( "sound/crackdown2/music/beacon/ptb.mp3" )
     self:SetIsDropping( true )
     self:SetRingPos( self.Ring:GetPos() )
     self:SetBeaconPos( result.HitPos )

@@ -245,6 +245,11 @@ if CLIENT then
             net.WriteAngle( CD2_viewangles )
             net.SendToServer()
         end )
+
+        AddOption( "Spawn Beacon", "Agency", "Button", { default = false }, function( pnl )
+            net.Start( "cd2net_kttc_spawnbeacon" )
+            net.SendToServer()
+        end )
         --
 
         -- Civilians --
@@ -400,6 +405,18 @@ if CLIENT then
             net.WriteBool( pnl:GetValue() )
             net.SendToServer()
         end )
+
+        AddOption( "Freeze Time", "global", "Check", { default = false }, function( pnl )
+            pnl:SetValue( !pnl:GetValue() )
+            net.Start( "cd2net_kttc_freezetime" )
+            net.WriteBool( pnl:GetValue() )
+            net.SendToServer()
+        end )
+
+        AddOption( "Skip to Next Dawn/Dusk", "global", "Button", { default = false }, function( pnl )
+            net.Start( "cd2net_kttc_nexttime" )
+            net.SendToServer()
+        end )
         
         -------------------------
 
@@ -482,7 +499,54 @@ elseif SERVER then
     util.AddNetworkString( "cd2net_kttc_spawnnpc" )
     util.AddNetworkString( "cd2net_kttc_spawnprop" )
     util.AddNetworkString( "cd2net_kttc_setskill" )
+    util.AddNetworkString( "cd2net_kttc_nexttime" )
+    util.AddNetworkString( "cd2net_kttc_freezetime" )
+    util.AddNetworkString( "cd2net_kttc_spawnbeacon" )
 
+    local Trace = util.TraceLine
+    local tracetable = {}
+    local random = math.random
+    
+    local sndtracks = { "sound/crackdown2/music/beacon/ptb.mp3", "sound/crackdown2/music/beacon/industrialfreaks.mp3" }
+    net.Receive( "cd2net_kttc_spawnbeacon", function( len, ply )
+        local pos = ply:GetPos() + ply:GetForward() * 100
+
+        if !util.IsInWorld( pos ) then return end
+
+        tracetable.start = pos
+        tracetable.endpos = pos + Vector( 0, 0, 4000 )
+        tracetable.mask = MASK_SOLID_BRUSHONLY
+        tracetable.collisiongroup = COLLISION_GROUP_WORLD
+
+        local result = Trace( tracetable )
+
+        local beacon = ents.Create( "cd2_beacon" )
+        beacon:SetPos( result.HitPos - Vector( 0, 0, 50 ) )
+        beacon:SetSoundTrack( sndtracks[ random( #sndtracks ) ] )
+        beacon:Spawn()
+
+        timer.Simple( 0.1, function() beacon:DropBeacon() end )
+    end )
+
+    net.Receive( "cd2net_kttc_nexttime", function( len, ply )
+        if !KeysToTheCity() then return end
+        CD2_NextFreakSpawn = CurTime() + 10
+        SetGlobalBool( "cd2_isday", !GetGlobalBool( "cd2_isday", false ) )
+
+        CD2DebugMessage( "Time is now changing to " .. ( GetGlobalBool( "cd2_isday", false ) and "Dawn" or "Dusk" ) )
+
+        net.Start( "cd2net_dawndusk_changetime" )
+        net.WriteBool( GetGlobalBool( "cd2_isday", false ) )
+        net.Broadcast()
+
+        CD2_NextTimeChange = CurTime() + 720
+    end )
+
+    net.Receive( "cd2net_kttc_freezetime", function( len, ply )
+        if !KeysToTheCity() then return end
+        local bool = net.ReadBool()
+        CD2_FreezeTime = bool
+    end )
 
     net.Receive( "cd2net_kttc_godmode", function( len, ply )
         if !KeysToTheCity() then return end

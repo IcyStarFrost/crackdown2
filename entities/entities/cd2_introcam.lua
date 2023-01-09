@@ -62,8 +62,9 @@ function ENT:RunBehaviour()
 
     while true do
 
-        if !IsValid( self.Path ) or self.CamFollower:GetPos():DistToSqr( self.Path:GetEnd() ) <= ( 50 * 50 ) then
-            self.Path:Compute( self, CD2GetRandomPos() )
+        if !IsValid( self.Path ) or self.CamFollower:GetPos():DistToSqr( self.Path:GetEnd() ) <= ( 50 * 50 ) or self.cd2_recompute then
+            self.Path:Compute( self, self.cd2_gotoposition or CD2GetRandomPos() )
+            self.cd2_recompute = false
         end
 
         coroutine.yield()

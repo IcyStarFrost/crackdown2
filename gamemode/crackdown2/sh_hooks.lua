@@ -73,6 +73,10 @@ local explosivemodels = {
 }
 
 if SERVER then
+    hook.Add( "InitPostEntity", "crackdown2_generatemapKTTC", function() timer.Simple( 1, function() if KeysToTheCity() and navmesh.IsLoaded() then CD2GenerateMapData() end end ) end )
+end
+
+if SERVER then
 hook.Add( "OnEntityCreated", "crackdown2_explosivepropeffects", function( ent )
     timer.Simple( 0, function()
         if !IsValid( ent ) or explosivemodels[ ent:GetModel() ] == nil then return end

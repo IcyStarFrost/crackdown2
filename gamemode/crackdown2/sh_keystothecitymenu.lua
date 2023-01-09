@@ -262,19 +262,15 @@ if CLIENT then
         --
 
         -- Cell --
-        AddOption( "Spawn Cell SMG Soldier", "Cell", "Button", { default = false }, function( pnl )
-            net.Start( "cd2net_kttc_spawnnpc" )
-            net.WriteString( "cd2_smgcellsoldier" )
-            net.WriteAngle( CD2_viewangles )
-            net.SendToServer()
-        end )
-
-        AddOption( "Spawn Cell Shotgun Soldier", "Cell", "Button", { default = false }, function( pnl )
-            net.Start( "cd2net_kttc_spawnnpc" )
-            net.WriteString( "cd2_shotguncellsoldier" )
-            net.WriteAngle( CD2_viewangles )
-            net.SendToServer()
-        end )
+        for ClassName, basetable in pairs( scripted_ents.GetList() ) do
+            if basetable.Base != "cd2_combathumanbase" or basetable.t.cd2_Team != "cell" then continue end
+            AddOption( "Spawn " .. basetable.t.PrintName, "Cell", "Button", { default = false }, function( pnl )
+                net.Start( "cd2net_kttc_spawnnpc" )
+                net.WriteString( ClassName )
+                net.WriteAngle( CD2_viewangles )
+                net.SendToServer()
+            end )
+        end
         --
 
         -- Freaks -- 
@@ -489,8 +485,6 @@ if CLIENT then
     CreateKeysTotheCityMenu()
     
     hook.Add( "PostGamemodeLoaded", "crackdown2_keystothecitymenu", CreateKeysTotheCityMenu )
-
-
 
 elseif SERVER then
 

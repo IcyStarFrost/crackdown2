@@ -2,6 +2,10 @@ AddCSLuaFile()
 
 ENT.Base = "base_anim"
 
+local IsValid = IsValid
+local sin = math.sin 
+local cos = math.cos
+
 function ENT:Initialize()
 
     if CLIENT then
@@ -24,17 +28,31 @@ function ENT:Initialize()
         CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
             if !IsValid( self ) then CD2_ViewOverride = nil return end
 
-            currentviewpos = LerpVector( 1 * FrameTime(), currentviewpos, self:Trace( self:GetPos() + Vector( 0, 0, 5 ), self:GetPos() + Vector( 0, 0, 1000 ) ).HitPos - Vector( 0, 0, 10 ) )
-            currentviewangles = LerpAngle( 0.3 * FrameTime(), currentviewangles, self:GetAngles() )
+            if !self.cd2_showbeginningtacticallocation then
+                currentviewpos = LerpVector( 1 * FrameTime(), currentviewpos, self:Trace( self:GetPos() + Vector( 0, 0, 5 ), self:GetPos() + Vector( 0, 0, 1000 ) ).HitPos - Vector( 0, 0, 10 ) )
+                currentviewangles = LerpAngle( 0.3 * FrameTime(), currentviewangles, self:GetAngles() )
 
-            viewtbl.origin = currentviewpos
-            viewtbl.angles = currentviewangles
-            viewtbl.fov = 60
-            viewtbl.znear = znear
-            viewtbl.zfar = zfar
-            viewtbl.drawviewer = true
+                viewtbl.origin = currentviewpos
+                viewtbl.angles = currentviewangles
+                viewtbl.fov = 60
+                viewtbl.znear = znear
+                viewtbl.zfar = zfar
+                viewtbl.drawviewer = true
 
-            return viewtbl
+                return viewtbl
+            else
+                currentviewpos = LerpVector( 0.5 * FrameTime(), currentviewpos, GetGlobal2Vector( "cd2_beginnerlocation", nil ) + Vector( sin( SysTime() / 5 ) * 4000, cos( SysTime() / 5 ) * 4000, 1000 ) )
+                currentviewangles = LerpAngle( 1 * FrameTime(), currentviewangles, ( GetGlobal2Vector( "cd2_beginnerlocation", nil ) - currentviewpos ):Angle() )
+
+                viewtbl.origin = currentviewpos
+                viewtbl.angles = currentviewangles
+                viewtbl.fov = 60
+                viewtbl.znear = znear
+                viewtbl.zfar = zfar
+                viewtbl.drawviewer = true
+
+                return viewtbl
+            end
         end
 
         local function DrawCredit( toptext, bottomtext )
@@ -67,9 +85,16 @@ function ENT:Initialize()
         end
 
         CD2CreateThread( function()
+            coroutine.wait( 90 )
+            self.cd2_showbeginningtacticallocation = true
+        end )
+
+        CD2CreateThread( function()
 
             local credit = DrawCredit( "CRACKDOWN 2", "Garry's Mod Gamemode Recreation by StarFrost" )
             while credit:IsValid() do coroutine.yield() end
+
+
 
             credit = DrawCredit( "Original Game Developer:", "Ruffian Games" )
             while credit:IsValid() do coroutine.yield() end

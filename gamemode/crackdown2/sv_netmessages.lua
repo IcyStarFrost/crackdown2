@@ -9,7 +9,7 @@ net.Receive( "cd2net_resupply", function( len, ply )
     ply:StripWeapons()
     ply:SetEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
     ply:SetMaxEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
-    ply.cd2_Equipment = equipment
+    ply:SetEquipment( equipment )
     ply:Give( primary )
     ply:Give( secondary )
 end )

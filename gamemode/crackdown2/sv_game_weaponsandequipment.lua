@@ -14,8 +14,9 @@ hook.Add( "DoPlayerDeath", "crackdown2_dropweaponssingleplayer", function( ply, 
             end
         end
 
-        local equipment = ents.Create( ply.cd2_Equipment )
+        local equipment = ents.Create( ply:GetEquipment() )
         equipment:SetPos( ply:WorldSpaceCenter() )
+        equipment.cd2_equipmentcount = ply:GetEquipmentCount()
         equipment:Spawn()
 
         local phys = equipment:GetPhysicsObject()

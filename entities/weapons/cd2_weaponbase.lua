@@ -162,11 +162,14 @@ function SWEP:DamageFalloff( attacker, tr, info )
     info:SetDamage( info:GetDamage() - sub )
 end
 
+function SWEP:FireCallback( attacker, tr, info )
+end
+
 function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer, tracername )
     local owner = self:GetOwner()
 
     damage = owner:IsPlayer() and damage + ( 5 * owner:GetWeaponSkill() ) or damage
-    spread = owner:IsPlayer() and IsValid( owner:GetNW2Entity( "cd2_lockontarget", nil ) ) and Vector( self.Primary.LockOnSpread + owner:GetLockonSpreadDecay(), self.Primary.LockOnSpread + owner:GetLockonSpreadDecay() ) or Vector( spread, spread, 0 )
+    spread = owner.cd2_spreadoverride or owner:IsPlayer() and IsValid( owner:GetNW2Entity( "cd2_lockontarget", nil ) ) and Vector( self.Primary.LockOnSpread + owner:GetLockonSpreadDecay(), self.Primary.LockOnSpread + owner:GetLockonSpreadDecay() ) or Vector( spread, spread, 0 )
 
 	self.bullet = self.bullet or {}
 	self.bullet.Num	= num_bullets
@@ -178,7 +181,7 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
 	self.bullet.Force = force or damage
 	self.bullet.Damage = damage
 	self.bullet.AmmoType = ammo_type or self.Primary.Ammo
-    self.bullet.Callback = function( attacker, tr, info ) self:DamageFalloff( attacker, tr, info ) end
+    self.bullet.Callback = function( attacker, tr, info ) self:FireCallback( attacker, tr, info ) self:DamageFalloff( attacker, tr, info ) end
 
 	owner:FireBullets( self.bullet )
 

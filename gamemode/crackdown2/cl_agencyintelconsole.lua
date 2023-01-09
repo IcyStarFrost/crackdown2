@@ -1,6 +1,5 @@
 
 local blur = Material( "pp/blurscreen" )
-CD2_AgencyConsole = nil
 CD2_CanOpenAgencyConsole = true
 local surface_DrawRect = surface.DrawRect
 local surface_SetDrawColor = surface.SetDrawColor
@@ -9,11 +8,82 @@ local blackish = Color( 39, 39, 39)
 local mmTrace = {}
 local Trace = util.TraceLine
 local fadedwhite = Color( 255, 255, 255, 10 )
+local math_deg = math.deg
+local math_rad = math.rad
+local math_sqrt = math.sqrt
+local math_atan2 = math.atan2
+local math_cos = math.cos
+local player_GetAll = player.GetAll
+local math_sin = math.sin
+local surface_SetDrawColor = surface.SetDrawColor
+local surface_SetMaterial = surface.SetMaterial
+local surface_DrawTexturedRectRotated = surface.DrawTexturedRectRotated
+local curfov = 90
+local clamp = math.Clamp
+local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
+local cellicon = Material( "crackdown2/ui/celltrackericon.png" )
+local cellwhite = Color( 255, 255, 255 )
+local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
+local celltargetred = Color( 255, 51, 0 )
+
+local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
+local cell = Material( "crackdown2/ui/cell.png", "smooth" )
+
+local function WorldVectorToScreen2( pnl, pos, origin, rotation, scale, radius )
+    local relativePosition = pos - origin
+
+    relativePosition:Rotate( Angle( 0, -rotation, 0 ) )
+
+    local angle = math_atan2( relativePosition.y, relativePosition.x )
+    angle = math_deg( angle )
+
+    local distance = relativePosition:Length()
+
+    local x = math_cos( math_rad( angle ) ) * distance * scale
+    local y = math_sin( math_rad( angle ) ) * distance * scale
+
+    return Vector( x, y )
+end
+
+local function DrawCoordsOnMap( pnl, pos, origin, ang, icon, iconsize, color, fov )
+    local radius = math.Distance( 0, 0, pnl:GetWide(), pnl:GetTall() )
+
+    pos[ 3 ] = 0
+    
+    local _, angs = WorldToLocal( pos, Angle( 0, ang[ 2 ], 0 ), LocalPlayer():GetPos(), Angle() )
+
+    surface_SetDrawColor( color or color_white )
+    surface_SetMaterial( icon or playerarrow )
+
+    local vec = WorldVectorToScreen2( pnl, pos, origin, -90, radius / ( fov * 390 ), radius )
+    surface_DrawTexturedRectRotated( ( pnl:GetWide() / 2 ) + vec[ 1 ], ( pnl:GetTall() / 2 ) - vec[ 2 ], ScreenScale( iconsize ), ScreenScale( iconsize ), angs[ 2 ] )
+end
+
+surface.CreateFont( "crackdown2_intelconsolebuttontext", {
+    font = "Agency FB",
+	extended = false,
+	size = 30,
+	weight = 500,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false,
+
+})
+
 
 function OpenIntelConsole()
 
     if IsValid( CD2_AgencyConsole ) then 
-        CD2_AgencyConsole:Remove() surface.PlaySound( "crackdown2/ui/ui_back.mp3" )
+        CD2_AgencyConsole:Remove() 
+        surface.PlaySound( "crackdown2/ui/ui_back.mp3" )
         
         net.Start( "cd2net_playeropenintelconsole" )
         net.WriteBool( false )
@@ -64,6 +134,19 @@ function OpenIntelConsole()
     rightpnl:DockMargin( 30, 200, 30, 200 )
     rightpnl:Dock( LEFT )
 
+    local iscontrollingview = false
+
+    local controlview = vgui.Create( "DButton", leftpnl )
+    controlview:SetSize( 100, 40 )
+    controlview:SetFont( "crackdown2_intelconsolebuttontext" )
+    controlview:SetText( "Control Map View" )
+    controlview:Dock( TOP )
+
+    function controlview:DoClick()
+        iscontrollingview = !iscontrollingview
+        surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
+    end
+
     local function Paint( self, w, h )
         surface_SetDrawColor( blackish )
         surface_DrawRect( 0, 0, w, h )
@@ -71,8 +154,40 @@ function OpenIntelConsole()
         surface_SetDrawColor( fadedwhite )
         surface_DrawOutlinedRect( 0, 0, w, h, 3 )
     end
+
+    controlview.Paint = Paint
     leftpnl.Paint = Paint
     rightpnl.Paint = Paint
+
+    local viewoffset = Vector()
+    local znear
+
+    function midpnl:Think()
+        if iscontrollingview then
+
+            if LocalPlayer():KeyDown( IN_JUMP ) then
+                znear = znear - 50
+            elseif LocalPlayer():KeyDown( IN_DUCK ) then
+                znear = znear + 50
+            end
+
+            if LocalPlayer():KeyDown( IN_FORWARD ) then
+                viewoffset.x = viewoffset.x + 50
+            end
+
+            if LocalPlayer():KeyDown( IN_BACK ) then
+                viewoffset.x = viewoffset.x - 50
+            end
+            
+            if LocalPlayer():KeyDown( IN_MOVERIGHT ) then
+                viewoffset.y = viewoffset.y - 50
+            end
+
+            if LocalPlayer():KeyDown( IN_MOVELEFT ) then
+                viewoffset.y = viewoffset.y + 50
+            end
+        end
+    end
 
     function midpnl:Paint( w, h )
         surface_SetDrawColor( blackish )
@@ -86,17 +201,66 @@ function OpenIntelConsole()
 
         local x, y = self:GetPos()
 
+        znear = znear or result.Hit and result.HitPos:Distance( mmTrace.endpos )
         render.RenderView( {
-            origin = LocalPlayer():GetPos() + Vector( 0, 0, 20000 ),
+            origin = LocalPlayer():GetPos() + Vector( 0, 0, 20000 ) + viewoffset,
             angles = Angle( 90, 0, 0 ),
-            znear = result.Hit and result.HitPos:Distance( mmTrace.endpos ) or 10,
-            fov = 20,
+            znear = !iscontrollingview and result.Hit and result.HitPos:Distance( mmTrace.endpos ) or iscontrollingview and znear or 10,
+            fov = 30,
             x = x, y = y,
             w = w, h = h
         } )
 
-        surface_SetDrawColor( fadedwhite )
-        surface_DrawOutlinedRect( 0, 0, w, h, 3 )
+        local plypos = LocalPlayer():GetPos()
+        plypos[ 3 ] = 0
+
+        local entities = ents.GetAll()
+        local nearbyminimap = CD2FindInSphere( LocalPlayer():GetPos(), 3000, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "cell" end )
+
+        -- Cell --
+        for i = 1, #nearbyminimap do
+            local ent = nearbyminimap[ i ]
+            DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, ent:GetAngles(), cellicon, 4, ent:GetEnemy() == LocalPlayer() and celltargetred or cellwhite, 30 )
+        end
+        --
+
+        -- Tacticle Locations --
+        for i = 1, #entities do
+            local ent = entities[ i ]
+
+            if IsValid( ent ) and ent:GetClass() == "cd2_locationmarker" then 
+                DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, Angle(), ent:GetLocationType() == "cell" and cell or peacekeeper, 20, ent:GetLocationType() == "cell" and celltargetred or color_white, 30 )
+            elseif IsValid( ent ) and ent:GetClass() == "cd2_agencyhelicopter" then
+                DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, ent:GetAngles(), heloicon, 20, color_white, 30 )
+            end
+        end
+
+        
+        --
+
+--[[         -- Beacons --
+        for i = 1, #entities do
+            local location = entities[ i ]
+    
+            if IsValid( location ) and location:GetClass() == "cd2_locationmarker" then 
+                DrawCoordsOnMap( self, location:GetPos() - viewoffset, plypos, Angle(), location:GetLocationType() == "cell" and cell or peacekeeper, 20, location:GetLocationType() == "cell" and celltargetred or color_white, 30 )
+            end
+        end
+        -- ]]
+
+        
+        -- Players --
+        local players = player_GetAll()
+
+        for i = 1, #players do
+            local otherplayer = players[ i ]
+            if IsValid( otherplayer ) and otherplayer:IsCD2Agent() then
+                DrawCoordsOnMap( self, otherplayer:GetPos() - viewoffset, plypos, otherplayer:EyeAngles(), playerarrow, ScreenScale( 3 ), otherplayer:GetPlayerColor():ToColor(), 30 )
+            end
+        end
+        --
+
+    
     end
 
 

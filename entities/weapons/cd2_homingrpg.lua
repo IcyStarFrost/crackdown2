@@ -4,7 +4,7 @@ DEFINE_BASECLASS( "cd2_weaponbase" )
 
 SWEP.Base = "cd2_weaponbase"
 SWEP.WorldModel = "models/weapons/w_rocket_launcher.mdl"
-SWEP.PrintName = "Rocket Launcher"
+SWEP.PrintName = "Homing Missile Launcher"
 
 SWEP.Primary.Ammo = "RPG_Round"
 SWEP.Primary.ClipSize = 3
@@ -22,7 +22,7 @@ SWEP.ReloadTime = 2
 SWEP.ReloadSounds = { { 0, "weapons/smg1/smg1_reload.wav" }, { 2, "weapons/slam/mine_mode.wav" } }
 
 SWEP.DropMenu_SkillLevel = 4
-SWEP.DropMenu_Damage = 10
+SWEP.DropMenu_Damage = 7
 SWEP.DropMenu_Range = 6
 SWEP.DropMenu_FireRate = 1
 
@@ -57,10 +57,22 @@ function SWEP:PrimaryAttack()
         rocket:SetAngles( self:GetOwner():IsCD2NPC() and ( self:GetOwner():GetEnemy():GetPos() - self:GetOwner():CD2EyePos() ):Angle() or self:GetOwner():EyeAngles() )
         rocket:SetOwner( self:GetOwner() )
         rocket:SetMoveType( MOVETYPE_FLYGRAVITY )
-        rocket:SetAbsVelocity( self:GetForward() * 2000 + Vector( 0, 0, 128 ) )
+        rocket:SetAbsVelocity( self:GetForward() * 1500 + Vector( 0, 0, 128 ) )
         rocket:SetCollisionGroup( COLLISION_GROUP_DEBRIS ) -- SetOwner should prevent collision but it doesn't
         rocket:SetSaveValue( "m_flDamage", 150 + ( skilllevel > 1 and 50 * skilllevel or 0 ) ) -- Gmod RPG only does 150 damage
         rocket:Spawn()
+
+        CD2CreateThread( function()
+            local target = self:GetOwner():IsPlayer() and self:GetOwner():GetNW2Entity( "cd2_lockontarget", nil ) or self:GetOwner():IsCD2NPC() and self:GetOwner():GetEnemy()
+            
+            while true do 
+                if !IsValid( target ) or !IsValid( rocket ) then return end
+                rocket:SetAngles( LerpAngle( 10 * FrameTime(), rocket:GetAngles(), ( target:GetPos() - rocket:GetPos() ):Angle() ) )
+                rocket:SetLocalVelocity( rocket:GetForward() * 1500 )
+                coroutine.yield()
+            end
+            
+        end )
 
         rocket:CallOnRemove( "explodeeffects", function()
 

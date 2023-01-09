@@ -28,7 +28,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         
         coroutine.wait( 3 )
 
-        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag1.mp3" ) 
+--[[         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag1.mp3" ) 
 
         coroutine.wait( 21 )
 
@@ -121,7 +121,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag5.mp3" ) 
 
-        local pos = !InPacificCity() and CD2GetRandomPos( 1000, ply:GetPos() ) or Vector( -519.097351, 3134.323486, 349.921356 )
+        local pos = !InPacificCity() and CD2GetRandomPos( 3000, ply:GetPos() ) or Vector( -519.097351, 3134.323486, 349.921356 )
         
         local agilityorb = ents.Create( "cd2_agilityorb" )
         agilityorb:SetPos( pos )
@@ -147,7 +147,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag6.mp3" ) 
 
-        pos = !InPacificCity() and CD2GetRandomPos( 2000, ply:GetPos() ) or Vector( 2770.546875, 958.698730, 153.634186 )
+        pos = !InPacificCity() and CD2GetRandomPos( 3000, ply:GetPos() ) or Vector( 2770.546875, 958.698730, 153.634186 )
 
         local guide = CD2CreateGuide( ply:GetPos(), pos )
 
@@ -372,7 +372,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             coroutine.wait( 0.2 )
         end
 
-        coroutine.wait( 2 )
+        coroutine.wait( 2 ) ]]
 
         ply:Freeze( true )
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag15.mp3" )
@@ -394,6 +394,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         cam:SetPlayer( ply )
         cam:Spawn()
 
+        CD2GenerateMapData()
+
         coroutine.wait( 3 )
 
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/introduction.mp3" )
@@ -404,6 +406,59 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         ply:SetNW2Bool( "cd2_inintroduction", false )
 
-    end )
+        ply.cd2_InTutorial = false
 
+        net.Start( "cd2net_enablehud" )
+        net.Send( ply )
+
+        local locationpos = GetGlobal2Vector( "cd2_beginnerlocation" )
+        local playerspawnpos = CD2GetRandomPos( 2000, locationpos )
+        local ang = ( locationpos - playerspawnpos ):Angle() ang[ 1 ] = 0 ang[ 3 ] = 0
+
+        ply:SetCanUseLockon( true )
+        ply:SetCanUseMelee( true )
+        CD2_FreezeTime = false
+    
+        ply:Spawn()
+        ply:SetPos( playerspawnpos )
+        ply:SetAngles( ang )
+        ply:SetEyeAngles( ang )
+
+        ply.cd2_WeaponSpawnDelay = CurTime() + 0.5
+        ply:SetEquipmentCount( scripted_ents.Get( "cd2_grenade" ).MaxGrenadeCount )
+        ply:SetMaxEquipmentCount( scripted_ents.Get( "cd2_grenade" ).MaxGrenadeCount )
+        ply:SetEquipment( "cd2_grenade" )
+        ply:Give( "cd2_assaultrifle" )
+        ply:Give( "cd2_shotgun" )
+
+        ply:Freeze( true )
+        ply.cd2_godmode = true
+
+        coroutine.wait( 1 )
+
+        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/intel1.mp3" )
+
+        coroutine.wait( 4 )
+
+        ply:SendLua( "OpenIntelConsole()" )
+        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/intel2.mp3" )
+
+        coroutine.wait( 9 )
+
+        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/intel3.mp3" )
+
+        coroutine.wait( 18 )
+
+        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firsttactical.mp3" )
+
+        coroutine.wait( 5 )
+
+        
+
+        ply:Freeze( false )
+        ply.cd2_godmode = false
+
+
+    end )
+    
 end )

@@ -28,6 +28,7 @@ local precachetable = {
     "models/player/group03/male_09.mdl",
 
     "models/player/police.mdl",
+    "models/player/combine_soldier.mdl",
     "models/player/combine_super_soldier.mdl",
     "models/player/zombie_classic.mdl"
 }

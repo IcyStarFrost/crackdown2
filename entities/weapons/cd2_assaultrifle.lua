@@ -22,7 +22,7 @@ SWEP.ReloadSounds = { { 0, "weapons/ar2/npc_ar2_reload.wav" } }
 
 SWEP.DamageFalloffDiv = 400
 
-SWEP.DropMenu_SkillLevel = 2
+SWEP.DropMenu_SkillLevel = 1
 SWEP.DropMenu_Damage = 3
 SWEP.DropMenu_Range = 5
 SWEP.DropMenu_FireRate = 5

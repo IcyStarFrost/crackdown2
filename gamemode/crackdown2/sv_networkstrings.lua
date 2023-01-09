@@ -32,6 +32,8 @@ util.AddNetworkString( "cd2net_playdirectorsound" )
 util.AddNetworkString( "cd2net_tutorial_activatehud" )
 util.AddNetworkString( "cd2net_playeropenintelconsole" )
 util.AddNetworkString( "cd2net_generatenavmesh" )
+util.AddNetworkString( "cd2net_locationcaptured" )
+util.AddNetworkString( "cd2net_enablehud" )
 
 util.AddNetworkString( "cd2filesystem_requestplayerdata" )
 util.AddNetworkString( "cd2filesystem_dispatchplayerdata" )

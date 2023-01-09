@@ -77,17 +77,22 @@ if SERVER then
     -- These functions are only used on the server. Completely useless to use on the client
     -- Writes a value to the current map's data. These two are typically used to save/load Agility Orbs and more
     function CD2FILESYSTEM:WriteMapData( var, any )
-        if !file.Exists( "crackdown2/mapdata/" .. game.GetMap() ) then file.CreateDir( "crackdown2/mapdata/" .. game.GetMap() ) end
+        if !file.Exists( "crackdown2/mapdata/" .. game.GetMap(), "DATA" ) then file.CreateDir( "crackdown2/mapdata/" .. game.GetMap() ) end
         if !file.Exists( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "DATA" ) then CD2FILESYSTEM:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", {}, "compressed" ) end
         local data = CD2FILESYSTEM:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "compressed" )
         data[ var ] = any
         CD2FILESYSTEM:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", data, "compressed" )
     end
 
+    -- Removes the data file related to this map
+    function CD2FILESYSTEM:ClearMapData()
+        file.Delete( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat" )
+    end
+
     -- Reads from the current map's data. These two are typically used to save/load Agility Orbs and more
     function CD2FILESYSTEM:ReadMapData( var )
         local data = CD2FILESYSTEM:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "compressed" )
-        return data and data[ var ]
+        return var != "TABLE" and data and data[ var ] or var == "TABLE" and data
     end
 
     -- Requests the specified variable value from the provided player's Agent data

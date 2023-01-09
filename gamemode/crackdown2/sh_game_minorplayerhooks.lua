@@ -7,7 +7,21 @@ if SERVER then
     -- Jump sounds
     hook.Add( "KeyPress", "crackdown2_jump", function( ply, key ) 
         if !ply:IsCD2Agent() then return end
-        if key == IN_JUMP and ply:IsOnGround() then ply:EmitSound( "crackdown2/ply/jump" .. random( 1, 4 ) .. ".wav", 60, 100, 0.2, CHAN_AUTO ) end
+        if key == IN_JUMP and 
+        ply:IsOnGround() then ply:EmitSound( "crackdown2/ply/jump" .. random( 1, 4 ) .. ".wav", 60, 100, 0.2, CHAN_AUTO ) end
+    end )
+
+    hook.Add( "OnCD2NPCKilled", "crackdown2_firstcellkill", function( npc, info )
+        local attacker = info:GetAttacker()
+        if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadFirstCellKill then return end
+        CD2FILESYSTEM:RequestPlayerData( attacker, "cd2_hadfirstcellkill", function( val )
+            if !val then
+                attacker:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firstcellkill.mp3" )
+                CD2FILESYSTEM:WritePlayerData( attacker, "cd2_hadfirstcellkill", true )
+            else
+                attacker.cd2_hadFirstCellKill = true
+            end
+        end )
     end )
 
 end

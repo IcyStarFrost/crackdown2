@@ -3,11 +3,14 @@ local ceil = math.ceil
 
 -- Gives XP to the player according to their skill level
 function CD2HandleSkillXP( ply, skillname, xp )
+    if !IsValid( ply ) then return end
     local finalxp = xp
     local levelsetfunc = ply[ "Set" .. skillname .. "Skill" ] 
     local levelgetfunc = ply[ "Get" .. skillname .. "Skill" ] 
     local xpsetfunc = ply[ "Set" .. skillname .. "XP" ]
     local xpgetfunc = ply[ "Get" .. skillname .. "XP" ]
+
+    if !levelgetfunc or !levelsetfunc then return end
 
     finalxp = finalxp / levelgetfunc( ply )
 

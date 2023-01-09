@@ -28,14 +28,16 @@ end
 function ENT:Draw()
     if !self.cd2_missingplayers[ LocalPlayer():SteamID() ] then return end
 
+    local isfar = LocalPlayer():GetPos():DistToSqr( self:GetPos() ) >= ( 2000 * 2000 )
+
     self.cd2_color.a = max( abs( math_sin( SysTime() * 2 ) ) * 255, abs( math_cos( SysTime() * 2 ) ) * 255 )
 
     render.SetColorMaterial()
-    render.DrawSphere( self:GetPos(), 15, 50, 50, self.cd2_color )
+    render.DrawSphere( self:GetPos(), 15, isfar and 5 or 50, isfar and 5 or 50, self.cd2_color )
 
     for i = 1, self:GetLevel() do
         render.SetColorMaterial()
-        render.DrawSphere( ( self:GetPos() + Vector( 0, 0, 20 ) ) + Vector( 0, 0, 20 * i ) , 5, 30, 30, self.cd2_color )
+        render.DrawSphere( ( self:GetPos() + Vector( 0, 0, 20 ) ) + Vector( 0, 0, 20 * i ) , 5, isfar and 5 or 30, isfar and 5 or 30, self.cd2_color )
     end
 
     cam.Start3D2D( self:GetPos(), Angle( 0, CD2_viewangles[ 2 ] + -90, 90 ), 2 )
@@ -46,6 +48,8 @@ function ENT:Draw()
 
 --[[     render.SetMaterial( beam )
     render.DrawSprite( self:GetPos(), 100, 500, self.cd2_color ) ]]
+
+    if isfar then return end
 
     local dlight = DynamicLight( self:EntIndex() )
 
@@ -67,8 +71,6 @@ end
 function ENT:SetupDataTables()
     self:NetworkVar( "Int", 0, "Level" )
     self:NetworkVar( "Bool", 0, "IsCollected" )
-
-    self:SetLevel( 1 )
 end
 
 function ENT:OnRemove()
@@ -81,6 +83,7 @@ end
 
 function ENT:OnCollected( ply )
     CD2DebugMessage( ply:Name() .. " collected a agility orb " .. self:EntIndex() )
+    self.cd2_missingplayers[ ply:SteamID() ] = false
 
     if CLIENT then
         sound.Play( "crackdown2/ambient/agilityorbcollect.mp3", self:GetPos(), 80, 100, 1 )    
@@ -94,6 +97,8 @@ function ENT:OnCollected( ply )
             CD2CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, Color( 0, 255, 0 ) )
         end
     end
+
+    hook.Run( "CD2_OnAgilityOrbCollected", self, ply )
 end
 
 -- Returns if this orb was collected by the player
@@ -119,9 +124,8 @@ function ENT:Think()
 
     local near = CD2FindInSphere( self:GetPos(), 40, function( ent ) return ent:IsCD2Agent() and self.cd2_missingplayers[ ent:SteamID() ] end )
 
-    for k, v in ipairs( near ) do
-        self:OnCollected( v )
-        self.cd2_missingplayers[ v:SteamID() ] = false
+    for i = 1, #near do
+        self:OnCollected( near[ i ] )
     end
 
     if CLIENT then
@@ -139,6 +143,7 @@ function ENT:Think()
                 if id then print( id, name ) end
                 self.cd2_agilitysound = snd
                 snd:EnableLooping( true )
+                snd:Set3DFadeDistance( 400, 1000000000 )
             end )
         end
 
@@ -149,8 +154,8 @@ function ENT:Think()
     end
 
     if CLIENT then
-        self:SetNextClientThink( CurTime() + 0.1)
+        self:SetNextClientThink( CurTime() + 0.3 )
     end
-    self:NextThink( CurTime() + 0.1 )
+    self:NextThink( CurTime() + 0.3 )
     return true
 end

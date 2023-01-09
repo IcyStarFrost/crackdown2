@@ -145,7 +145,8 @@ net.Receive( "cd2net_playersoftland", function()
 end )
 
 net.Receive( "cd2net_opendropmenu", function() 
-    CD2OpenDropMenu()
+    local isresupply = net.ReadBool()
+    CD2OpenDropMenu( isresupply )
 end )
 
 net.Receive( "cd2net_openspawnpointmenu", function() 
@@ -283,6 +284,19 @@ net.Receive( "cd2net_playerinitialspawn", function()
     end
 end )
 
+net.Receive( "cd2net_enablehud", function()
+    CD2_DrawAgilitySkill = true
+    CD2_DrawFirearmSkill = true
+    CD2_DrawStrengthSkill = true
+    CD2_DrawExplosiveSkill = true
+    CD2_CanOpenAgencyConsole = true
+
+    CD2_DrawTargetting = true
+    CD2_DrawHealthandShields = true
+    CD2_DrawWeaponInfo = true
+    CD2_DrawMinimap = true
+    CD2_DrawBlackbars = false
+end )
 
 net.Receive( "cd2net_playguitar", function()
     local path = net.ReadString()
@@ -326,10 +340,11 @@ net.Receive( "cd2net_playerlevelupeffect", function()
     local ply = net.ReadEntity()
     if !IsValid( ply ) then return end
 
-    CD2StartMusic( "sound/crackdown2/music/levelup.mp3", 3, false, true )
-    ply:EmitSound( "crackdown2/ply/spawnenergy.mp3", 70, 100, 1, CHAN_AUTO )
-
     CD2CreateThread( function()
+        while !ply:Alive() do coroutine.yield() end
+
+        CD2StartMusic( "sound/crackdown2/music/levelup.mp3", 3, false, true )
+        ply:EmitSound( "crackdown2/ply/spawnenergy.mp3", 70, 100, 1, CHAN_AUTO )
 
         coroutine.wait( 1 )
 
@@ -362,6 +377,7 @@ net.Receive( "cd2net_playerlevelupeffect", function()
     end )
 
     CD2CreateThread( function()
+        while !ply:Alive() do coroutine.yield() end
 
         coroutine.wait( 1 )
 
@@ -527,4 +543,8 @@ net.Receive( "cd2net_introduction_music", function()
     CD2StartMusic( "sound/crackdown2/music/flythrough.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
         if !LocalPlayer():GetNW2Bool( "cd2_inintroduction", false ) then CD2Musicchannel:FadeOut() end
     end )
+end )
+
+net.Receive( "cd2net_locationcaptured", function()
+    CD2StartMusic( "sound/crackdown2/music/locationcaptured.mp3", 100 )
 end )

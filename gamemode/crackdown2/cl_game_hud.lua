@@ -7,20 +7,15 @@ local ceil = math.ceil
 local surface_DrawPoly = surface.DrawPoly
 local surface_SetDrawColor = surface.SetDrawColor
 local surface_DrawLine = surface.DrawLine
-local FrameTime = FrameTime
 local draw_DrawText = draw.DrawText
-local Lerp = Lerp
-local ScreenScale = ScreenScale
 local upper = string.upper
 local Trace = util.TraceLine
 local surface_SetMaterial = surface.SetMaterial
 local surface_DrawRect = surface.DrawRect
 local player_GetAll = player.GetAll
 local draw_NoTexture = draw.NoTexture
-local IsValid = IsValid
 local surface_SetFont = surface.SetFont
 local surface_GetTextSize = surface.GetTextSize
-local table_Copy = table.Copy
 local shadedwhite = Color( 177, 177, 177 )
 local red = Color( 163, 12, 12)
 local orangeish = Color( 202, 79, 22)
@@ -30,12 +25,9 @@ local grey = Color( 61, 61, 61)
 local linecol = Color( 61, 61, 61, 100 )
 local math_cos = math.cos
 local math_sin = math.sin
-local ipairs = ipairs
-local SysTime = SysTime
 local surface_DrawCircle = surface.DrawCircle
 local abs = math.abs
 local surface_DrawTexturedRect = surface.DrawTexturedRect
-local WorldToLocal = WorldToLocal
 local surface_DrawOutlinedRect = surface.DrawOutlinedRect
 local surface_DrawTexturedRectRotated = surface.DrawTexturedRectRotated
 local input_LookupBinding = input.LookupBinding
@@ -196,14 +188,14 @@ local hplerp = -1
 local shieldlerp = -1
 local hlerp1
 local hlerp2
-CD2_equipmentpnl = nil
-CD2_weaponpnl = nil
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local cell = Material( "crackdown2/ui/cell.png", "smooth" )
+local upicon = Material( "crackdown2/ui/up.png", "smooth" )
+local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
+local downicon = Material( "crackdown2/ui/down.png", "smooth" )
 local skillcircle = Material( "crackdown2/ui/skillcircle.png" )
 local hex = Material( "crackdown2/ui/hex.png", "smooth" )
 local peacekeepertrace = {}
-
 
 local skillglow = Material( "crackdown2/ui/skillglow2.png" )
 local agilityicon = Material( "crackdown2/ui/agilityicon.png", "smooth" )
@@ -223,21 +215,13 @@ local minimapRTMat = CreateMaterial( "crackdown2_minimapmaterial", "UnlitGeneric
 	["$translucent"] = 1,
 	["$vertexcolor"] = 1
 } )
---
-local curfov = 90
-function WorldVectorToScreen(worldVector, origin, scale, rotation, radius, fov )
-    local relativePosition = worldVector - origin
-    relativePosition = relativePosition * ( 60 / curfov ) 
 
-    local vel = LocalPlayer():GetVelocity():Length()
-    vel = vel > 500 and vel % 10 or 0
-
-    curfov = Lerp( 3 * FrameTime(), curfov, ( 90 + ( fov > 7 and fov * vel or 0 ) ) )
+local function WorldVectorToScreen2( pos, origin, rotation, scale, radius )
+    local relativePosition = pos - origin
 
     relativePosition:Rotate( Angle( 0, -rotation, 0 ) )
 
     local angle = math_atan2( relativePosition.y, relativePosition.x )
-
     angle = math_deg( angle )
 
     local distance = relativePosition:Length()
@@ -245,15 +229,15 @@ function WorldVectorToScreen(worldVector, origin, scale, rotation, radius, fov )
     local x = math_cos( math_rad( angle ) ) * distance * scale
     local y = math_sin( math_rad( angle ) ) * distance * scale
 
-    local distance = math_sqrt( x ^ 2 + y ^ 2 )
+    sqr = math_sqrt( x ^ 2 + y ^ 2 )
 
-    if distance > radius then
+    if sqr > radius then
         local angle = math_atan2( y, x )
         x = math_cos( angle ) * radius
         y = math_sin( angle ) * radius
     end
 
-    return Vector(x, y, 0)
+    return Vector( x, y )
 end
 
 
@@ -267,7 +251,7 @@ local function DrawCoordsOnMiniMap( pos, ang, icon, iconsize, color, fov )
     surface_SetDrawColor( color or color_white )
     surface_SetMaterial( icon or playerarrow )
 
-    local vec = WorldVectorToScreen( pos, plypos, 0.2, CD2_viewangles[ 2 ] - 90, radius, fov )
+    local vec = WorldVectorToScreen2( pos, plypos, CD2_viewangles[ 2 ] - 90, radius / ( fov * 170 ), radius ) --WorldVectorToScreen( pos, plypos, 0.2, CD2_viewangles[ 2 ] - 90, radius, fov )
     surface_DrawTexturedRectRotated( 200 + vec[ 1 ], ( ScrH() - 200 ) - vec[ 2 ], ScreenScale( iconsize ), ScreenScale( iconsize ), ( angs[ 2 ] ) )
 end
 
@@ -353,6 +337,8 @@ local function RemoveHUDpanels()
     if IsValid( CD2_weaponpnl ) then CD2_weaponpnl:Remove() end
     if IsValid( CD2_equipmentpnl ) then CD2_equipmentpnl:Remove() end
 end
+
+CD2_CheapMinimap = true
 
 CD2_DrawTargetting = true -- Draws crosshair and target healthbars
 CD2_DrawHealthandShields = true -- Draws health and shields bars
@@ -649,52 +635,74 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
     -- MiniMap --
     if CD2_DrawMinimap then
-        local vel = ply:GetVelocity():Length()
-        vel = vel > 500 and vel or 0
-        addfov = Lerp( 1 * FrameTime(), addfov, vel % 10 )
+        local fov = 15
 
-        render.PushRenderTarget( minimapRT )
+        if !CD2_CheapMinimap then
+            local vel = ply:GetVelocity():Length()
+            vel = vel > 500 and vel or 0
+            addfov = Lerp( 1 * FrameTime(), addfov, vel % 10 )
 
-            mmTrace.start = ply:WorldSpaceCenter()
-            mmTrace.endpos = ply:GetPos() + Vector( 0, 0, 20000 )
-            mmTrace.mask = MASK_SOLID_BRUSHONLY
-            mmTrace.collisiongroup = COLLISION_GROUP_WORLD
-            local result = Trace( mmTrace )
-            local fov = 6 + addfov
+            render.PushRenderTarget( minimapRT )
 
-            render.RenderView( {
-                origin = ply:GetPos() + Vector( 0, 0, 20000 ),
-                angles = Angle( 90, CD2_viewangles[ 2 ], 0 ),
-                znear = result.Hit and result.HitPos:Distance( mmTrace.endpos ) or 10,
-                fov = fov,
-                x = 0, y = 0,
-                w = 1024, h = 1024
-            } )
+                mmTrace.start = ply:WorldSpaceCenter()
+                mmTrace.endpos = ply:GetPos() + Vector( 0, 0, 20000 )
+                mmTrace.mask = MASK_SOLID_BRUSHONLY
+                mmTrace.collisiongroup = COLLISION_GROUP_WORLD
+                local result = Trace( mmTrace )
+                fov = 15 + addfov
 
-        render.PopRenderTarget()
+                render.RenderView( {
+                    origin = ply:GetPos() + Vector( 0, 0, 20000 ),
+                    angles = Angle( 90, CD2_viewangles[ 2 ], 0 ),
+                    znear = result.Hit and result.HitPos:Distance( mmTrace.endpos ) or 10,
+                    fov = fov,
+                    x = 0, y = 0,
+                    w = 1024, h = 1024
+                } )
+
+            render.PopRenderTarget()
+        end
 
         draw_NoTexture()
         surface_SetDrawColor( blackish )
         draw_Circle( 200, scrh - 200, ScreenScale( 50 ), 30 )
 
-        surface_SetDrawColor( color_white )
-        surface_SetMaterial( minimapRTMat )
-        draw_Circle( 200, scrh - 200, ScreenScale( 50 ) - 10, 30 )
+        if !CD2_CheapMinimap then
+            surface_SetDrawColor( color_white )
+            surface_SetMaterial( minimapRTMat )
+            draw_Circle( 200, scrh - 200, ScreenScale( 50 ) - 10, 30 )
+        end
 
         surface_SetDrawColor( color_white )
         surface_SetMaterial( playerarrow )
         local _, angle = WorldToLocal( Vector(), ply:GetAngles(), ply:GetPos(), CD2_viewangles )
         surface_DrawTexturedRectRotated( 200, scrh - 200, ScreenScale( 10 ), ScreenScale( 10 ), angle[ 2 ] )
 
-        local nearbyminimap = CD2FindInSphere( LocalPlayer():GetPos(), 1500, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "cell" end )
+        local nearbyminimap = CD2FindInSphere( LocalPlayer():GetPos(), 3500, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "cell" end )
 
         -- Cell --
         for i = 1, #nearbyminimap do
             local ent = nearbyminimap[ i ]
-            DrawCoordsOnMiniMap( ent:GetPos(), ent:GetAngles(), cellicon, 4, ent:GetEnemy() == ply and celltargetred or cellwhite, fov )
+            local z = ent:GetPos().z
+            local icon = z > ply:GetPos().z + 50 and upicon or z < ply:GetPos().z - 50 and downicon or cellicon
+            DrawCoordsOnMiniMap( ent:GetPos(), CD2_viewangles, icon, 4, ent:GetEnemy() == ply and celltargetred or cellwhite, fov )
         end
         --
-
+        
+        
+        -- Tacticle Locations | Helicopters --
+        local ents_ = ents.GetAll()
+        for i = 1, #ents_ do
+            local ent = ents_[ i ]
+    
+            if IsValid( ent ) and ent:GetClass() == "cd2_locationmarker" then 
+                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), ent:GetLocationType() == "cell" and cell or peacekeeper, 10, ent:GetLocationType() == "cell" and celltargetred or color_white, fov )
+            elseif IsValid( ent ) and ent:GetClass() == "cd2_agencyhelicopter" then
+                DrawCoordsOnMiniMap( ent:GetPos(), ent:GetAngles(), heloicon, 15, color_white, fov )
+            end
+        end
+        --
+        
         -- Players --
         local players = player_GetAll()
 

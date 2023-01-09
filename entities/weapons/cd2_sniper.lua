@@ -29,3 +29,22 @@ SWEP.DamageFalloffDiv = 400 -- The divisor amount to lower damage based on dista
 SWEP.LockOnRange = 3000 -- How far can the player lock onto targets
 SWEP.HoldType = "ar2"
 SWEP.Primary.ShootSound = { "weapons/m4a1/m4a1-1.wav" }
+
+local white = Color( 255, 255, 255, 50 )
+function SWEP:FireCallback( attacker, tr, info )
+    if CLIENT then return end
+
+    local trail = ents.Create( "base_anim" )
+    trail:SetPos( tr.StartPos )
+    trail:SetNoDraw( true )
+    trail:Spawn()
+
+    util.SpriteTrail( trail, 0, white, true, 2, 40, 4, 1 / ( 2 + 40 ) * 0.5, "trails/smoke" )
+
+    timer.Simple( 0, function() trail:SetPos( tr.HitPos ) end )
+    
+
+    timer.Simple( 4.5, function()
+        if IsValid( trail ) then trail:Remove() end
+    end )
+end

@@ -17,6 +17,16 @@
 			"default"	"0"
 			"singleplayer" "1"
 		}
+		
+		2	
+		{
+			"name"		"cd2_enableconsolemessages"
+			"text"		"Enable Debug Messages"
+			"help"		"Enables debug messages to print to the console"
+			"type"		"CheckBox"
+			"default"	"0"
+			"singleplayer" "1"
+		}
 	
 	}
 }

@@ -23,6 +23,8 @@ function CD2HandleSkillXP( ply, skillname, xp )
     if ceil( xpgetfunc( ply )  ) >= 100 then
         levelsetfunc( ply, levelgetfunc( ply ) + 1 ) 
         xpsetfunc( ply, 0 )
+        
+        hook.Run( "CD2_OnLevelUp", ply, skillname )
 
         if !KeysToTheCity() then
             CD2FILESYSTEM:WritePlayerData( ply, "cd2_skill_" .. skillname, levelgetfunc( ply ) )

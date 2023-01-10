@@ -11,9 +11,70 @@ if SERVER then
         ply:IsOnGround() then ply:EmitSound( "crackdown2/ply/jump" .. random( 1, 4 ) .. ".wav", 60, 100, 0.2, CHAN_AUTO ) end
     end )
 
+    hook.Add( "CD2_OnLevelUp", "crackdown2_levelup", function( ply, skill )
+        if KeysToTheCity() then return end
+
+        if !ply.cd2_firstagilityimprove then
+            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstagilityimprove", function( val )
+                if !val then
+                    timer.Simple( 2, function()
+                        if !IsValid( ply ) then return end
+                        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/agility_improve.mp3" )
+                    end )
+                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstagilityimprove", true )
+                else
+                    ply.cd2_firstagilityimprove = true
+                end
+            end )
+        end
+
+        if !ply.cd2_firstfirearmimprove then
+            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstfirearmimprove", function( val )
+                if !val then
+                    timer.Simple( 2, function()
+                        if !IsValid( ply ) then return end
+                        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firearm_improve.mp3" )
+                    end )
+                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstfirearmimprove", true )
+                else
+                    ply.cd2_firstfirearmimprove = true
+                end
+            end )
+        end
+
+        if !ply.cd2_firststrengthimprove then
+            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firststrengthimprove", function( val )
+                if !val then
+                    timer.Simple( 2, function()
+                        if !IsValid( ply ) then return end
+                        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/strength_improve.mp3" )
+                    end )
+                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firststrengthimprove", true )
+                else
+                    ply.cd2_firststrengthimprove = true
+                end
+            end )
+        end
+
+        if !ply.cd2_firstexplosiveimprove then
+            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstexplosiveimprove", function( val )
+                if !val then
+                    timer.Simple( 2, function()
+                        if !IsValid( ply ) then return end
+                        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/explosive_improve.mp3" )
+                    end )
+                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstexplosiveimprove", true )
+                else
+                    ply.cd2_firstexplosiveimprove = true
+                end
+            end )
+        end
+
+    end )
+
     hook.Add( "OnCD2NPCKilled", "crackdown2_firstcellkill", function( npc, info )
         local attacker = info:GetAttacker()
-        if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadFirstCellKill then return end
+        if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadFirstCellKill or KeysToTheCity() then return end
         CD2FILESYSTEM:RequestPlayerData( attacker, "cd2_hadfirstcellkill", function( val )
             if !val then
                 attacker:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firstcellkill.mp3" )

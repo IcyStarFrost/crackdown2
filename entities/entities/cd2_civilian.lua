@@ -297,7 +297,7 @@ function ENT:Idle()
     self:EndPanicAnim()
 
     self:SetWalk( true )
-    local pos = self:GetRandomPos() 
+    local pos = self:GetRandomPos( 1500 ) 
     self:MoveToPos( pos )
     self:SetWalk( false )
 

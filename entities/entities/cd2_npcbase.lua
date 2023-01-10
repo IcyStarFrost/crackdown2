@@ -351,13 +351,13 @@ end
 function ENT:Think()
 
     if SERVER and self.cd2_ShouldcheckPVS then
-        if game.SinglePlayer() and !Entity( 1 ):TestPVS( self ) or CD2_DisableAllAI then
+        if game.SinglePlayer() and !Entity( 1 ):TestPVS( self ) and Entity( 1 ):SqrRangeTo( self ) > ( 1500 * 1500 )  or CD2_DisableAllAI then
             self:SetIsDisabled( true )
             if !Entity( 1 ):TestPVS( self ) and CurTime() > self.cd2_pvsremovetime then self:Remove() end
         elseif game.SinglePlayer() and Entity( 1 ):TestPVS( self ) and !CD2_DisableAllAI then 
             self:SetIsDisabled( false )
         end
-        if Entity( 1 ):TestPVS( self ) then self.cd2_pvsremovetime = CurTime() + 10 end
+        if Entity( 1 ):TestPVS( self ) or Entity( 1 ):SqrRangeTo( self ) < ( 1500 * 1500 ) then self.cd2_pvsremovetime = CurTime() + 10 end
     end
 
     if CurTime() > self.cd2_PhysicsUpdate then
@@ -592,7 +592,7 @@ function ENT:OnKilled( info )
         local primary = self.cd2_Weapon
         local equipment = self.cd2_Equipment
         hook.Add( "Tick", ragdoll, function()
-            if ragdoll:GetVelocity():Length() <= 50 then
+            if ragdoll:GetVelocity():LengthSqr() <= ( 50 * 50 ) then
                 DropWeapons( ragdoll:GetPos() + Vector( 0, 0, 10 ), primary, equipment )
                 hook.Remove( "Tick", ragdoll )
             end

@@ -246,7 +246,7 @@ function ENT:Draw()
     if self:WaterLevel() != 0 then return false end
 
     self.cd2_effectdelay = self.cd2_effectdelay or SysTime() + 0.5
-    if !IsValid( self:GetThrower() ) and !self:GetHadThrower() and self:GetVelocity():IsZero() then
+    if !IsValid( self:GetThrower() ) and !self:GetHadThrower() and self:GetVelocity():IsZero() and LocalPlayer():SqrRangeTo( self ) < ( 2000 * 2000 ) then
         local wep = LocalPlayer():GetWeapon( self:GetClass() )
 
         if !LocalPlayer():IsCD2Agent() or SysTime() < self.cd2_effectdelay or ( LocalPlayer():GetEquipmentCount() == LocalPlayer():GetMaxEquipmentCount() and LocalPlayer().cd2_Equipment == self:GetClass() ) then 

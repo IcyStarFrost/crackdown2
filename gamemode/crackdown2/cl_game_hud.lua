@@ -52,82 +52,6 @@ local hpred = Color( 163, 12, 12)
 
 CD2_lockon = false
 
-surface.CreateFont( "crackdown2_ammoreserve", {
-    font = "Agency FB",
-	extended = false,
-	size = 40,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-
-})
-
-surface.CreateFont( "crackdown2_inputbarkey", {
-    font = "Agency FB",
-	extended = false,
-	size = 30,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-
-})
-
-surface.CreateFont( "crackdown2_equipmentcount", {
-    font = "Agency FB",
-	extended = false,
-	size = 45,
-	weight = 1000,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-
-})
-
-surface.CreateFont( "crackdown2_agentnames", {
-    font = "Agency FB",
-	extended = false,
-	size = 20,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = true,
-	additive = false,
-	outline = false,
-
-})
-
 local function draw_Circle( x, y, radius, seg, rotate )
     rotate = rotate or 0
 	local cir = {}
@@ -165,7 +89,7 @@ end
 
 function CD2DrawInputbar( x, y, keyname, text )
 
-    surface_SetFont( "crackdown2_inputbarkey" )
+    surface_SetFont( "crackdown2_font30" )
     local sizex, sizey = surface_GetTextSize( text )
 
     draw_NoTexture()
@@ -175,9 +99,9 @@ function CD2DrawInputbar( x, y, keyname, text )
     surface_SetDrawColor( grey )
     draw_Circle( x, y, 20, 6 )
 
-    draw_DrawText( keyname, "crackdown2_inputbarkey", x, y - 15, color_white, TEXT_ALIGN_CENTER )
+    draw_DrawText( keyname, "crackdown2_font30", x, y - 15, color_white, TEXT_ALIGN_CENTER )
 
-    draw_DrawText( text, "crackdown2_inputbarkey", x + 20, y - 17, color_white, TEXT_ALIGN_LEFT )
+    draw_DrawText( text, "crackdown2_font30", x + 20, y - 17, color_white, TEXT_ALIGN_LEFT )
     
 end
 
@@ -502,7 +426,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             surface_SetDrawColor( blackish )
             surface_DrawRect( scrw - 400, scrh - 100, 300, 60 )
 
-            draw_DrawText( weapon:Ammo1(), "crackdown2_ammoreserve", scrw - 35, scrh - 140, color_white, TEXT_ALIGN_RIGHT )
+            draw_DrawText( weapon:Ammo1(), "crackdown2_font40", scrw - 35, scrh - 140, color_white, TEXT_ALIGN_RIGHT )
 
 
             for i = 1, weapon:Clip1() do
@@ -605,7 +529,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
                 end
             end
     
-            draw_DrawText( ply:GetEquipmentCount(), "crackdown2_equipmentcount", scrw - 60, scrh - 90, color_white, TEXT_ALIGN_CENTER )
+            draw_DrawText( ply:GetEquipmentCount(), "crackdown2_font45", scrw - 60, scrh - 90, color_white, TEXT_ALIGN_CENTER )
 
         end
 
@@ -691,7 +615,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         
         
         -- Tacticle Locations | Helicopters --
-        local ents_ = ents.GetAll()
+        local ents_ = ents.FindByClass( "cd2_*" )
         for i = 1, #ents_ do
             local ent = ents_[ i ]
     

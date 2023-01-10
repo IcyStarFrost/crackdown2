@@ -208,6 +208,9 @@ function PLAYER:BuildSkills()
     self:SetHealth( 100 * ( strength < 6 and strength or 5 ) )
     self:SetMaxHealth( 100 * ( strength < 6 and strength or 5 ) )
 
+    self:SetNWShields( self:Armor() )
+    self:SetNWHealth( self:Health() )
+
     self:SetSafeFallSpeed( 40 * agility )
     self:SetJumpPower( 400 + ( agility > 1 and 50 * agility or 0 ) )
     self:SetWalkSpeed( 200 + ( agility > 1 and 50 * agility or 0 ) )

@@ -59,25 +59,6 @@ local function DrawCoordsOnMap( pnl, pos, origin, ang, icon, iconsize, color, fo
     surface_DrawTexturedRectRotated( ( pnl:GetWide() / 2 ) + vec[ 1 ], ( pnl:GetTall() / 2 ) - vec[ 2 ], ScreenScale( iconsize ), ScreenScale( iconsize ), angs[ 2 ] )
 end
 
-surface.CreateFont( "crackdown2_intelconsolebuttontext", {
-    font = "Agency FB",
-	extended = false,
-	size = 30,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-
-})
-
 
 function OpenIntelConsole()
 
@@ -110,7 +91,7 @@ function OpenIntelConsole()
     function CD2_AgencyConsole:OnRemove() CD2_PreventMovement = nil end
 
     local toptext = vgui.Create( "DLabel", CD2_AgencyConsole )
-    toptext:SetFont( "crackdown2_dropmenutoptext" )
+    toptext:SetFont( "crackdown2_font60" )
     toptext:SetSize( 100, 100 )
     toptext:SetText( "             AGENCY INTEL" )
     toptext:Dock( TOP )
@@ -138,7 +119,7 @@ function OpenIntelConsole()
 
     local controlview = vgui.Create( "DButton", leftpnl )
     controlview:SetSize( 100, 40 )
-    controlview:SetFont( "crackdown2_intelconsolebuttontext" )
+    controlview:SetFont( "crackdown2_font30" )
     controlview:SetText( "Control Map View" )
     controlview:Dock( TOP )
 
@@ -221,7 +202,7 @@ function OpenIntelConsole()
         local plypos = LocalPlayer():GetPos()
         plypos[ 3 ] = 0
 
-        local entities = ents.GetAll()
+        local entities = ents.FindByClass( "cd2_*" )
 
         -- Cell --
         for i = 1, #entities do
@@ -245,17 +226,6 @@ function OpenIntelConsole()
 
         
         --
-
---[[         -- Beacons --
-        for i = 1, #entities do
-            local location = entities[ i ]
-    
-            if IsValid( location ) and location:GetClass() == "cd2_locationmarker" then 
-                DrawCoordsOnMap( self, location:GetPos() - viewoffset, plypos, Angle(), location:GetLocationType() == "cell" and cell or peacekeeper, 20, location:GetLocationType() == "cell" and celltargetred or color_white, 30 )
-            end
-        end
-        -- ]]
-
         
         -- Players --
         local players = player_GetAll()

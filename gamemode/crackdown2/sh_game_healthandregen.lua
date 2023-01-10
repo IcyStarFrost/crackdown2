@@ -1,4 +1,5 @@
 local player_GetAll = player.GetAll
+local IsValid = IsValid
 
 -- Shield and Health Regeneration
 hook.Add( "Tick", "crackdown2_regeneration", function()
@@ -67,36 +68,31 @@ end )
 ---------
 
 
--- Updating each player's networked health and shields 
+
 if SERVER then
-    hook.Add( "Tick", "crackdown2_updateplayernw", function()
-        local players = player_GetAll() 
-        for i = 1, #players do
-            local ply = players[ i ]
-            if !ply:IsCD2Agent() then continue end
-            ply:SetNWShields( ply:Armor() )
-            ply:SetNWHealth( ply:Health() )
-        end
-    end )
 
+    -- Updating Entity Networked vars when they are created and damaged. Previously this was done every 0.1 seconds. This is more optimized
+    hook.Add("OnEntityCreated", "crackdown2_networkhealth", function( ent )
+        timer.Simple( 0, function()
+            if !IsValid( ent ) then return end
+            ent:SetNWFloat( "cd2_health", ent:Health() )
 
-    -- Network all health so the target health bars are accurate
-    local ents_GetAll = ents.GetAll
-    local nextupdate = 0
-    hook.Add( "Tick", "crackdown2_networkvars", function()
-        if CurTime() < nextupdate then return end
-        for k, v in ipairs( ents_GetAll() ) do
-            v:SetNWFloat( "cd2_health", v:Health() )
-            if IsValid( v:GetPhysicsObject() ) then
-                v:SetNW2Int( "cd2_mass", v:GetPhysicsObject():GetMass() )
+            if IsValid( ent:GetPhysicsObject() ) then
+                ent:SetNW2Int( "cd2_mass", ent:GetPhysicsObject():GetMass() )
             end
-        end
-        nextupdate = CurTime() + 0.1
+        end )
     end )
 
-    -- Set the regen start time
+    hook.Add( "PostEntityTakeDamage", "crackdown2_updatenwhealth", function( ent, info, tookdmg )
+        if !tookdmg or ent:IsCD2Agent() then return end
+        ent:SetNWFloat( "cd2_health", ent:Health() )
+    end )
+
+    -- Set the regen start time and updates the player's networked health. Same as above for networked health, player's networked health was updated every 0.1 seconds. Once again this is more optimized
     hook.Add( "PlayerHurt", "crackdown2_delayregen", function( ply, attacker, remaining, damagetaken )
         ply.cd2_NextRegenTime = CurTime() + 6
+        ply:SetNWShields( ply:Armor() )
+        ply:SetNWHealth( ply:Health() )
     end )
 end
 

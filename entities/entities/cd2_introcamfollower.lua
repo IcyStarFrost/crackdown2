@@ -77,8 +77,8 @@ function ENT:Initialize()
                     end
                 end
 
-                draw.DrawText( toptext, "crackdown2_dropmenutext1", 200, ScrH() / 2, topcolor, TEXT_ALIGN_LEFT )
-                draw.DrawText( bottomtext, "crackdown2_dropmenutext1", 200, ScrH() / 2 + 60, bottomcolor, TEXT_ALIGN_LEFT )
+                draw.DrawText( toptext, "crackdown2_font50", 200, ScrH() / 2, topcolor, TEXT_ALIGN_LEFT )
+                draw.DrawText( bottomtext, "crackdown2_font50", 200, ScrH() / 2 + 60, bottomcolor, TEXT_ALIGN_LEFT )
             end )
 
             return object

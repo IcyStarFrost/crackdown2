@@ -224,12 +224,23 @@ function ENT:BeaconDetonate()
 
             self:PlayClientSound( "crackdown2/ambient/beacon/beaconfinish.mp3", self:GetPos(), 5 )
 
-            coroutine.wait( 5 )
+            coroutine.wait( 20 )
 
             self:Remove()
         
         end )
     elseif CLIENT then
+
+        if IsValid( self.cd2_beaconambient ) then self.cd2_beaconambient:Stop() end
+
+        sound.PlayFile( "sound/crackdown2/ambient/beacon/beaconambient.mp3", "3d mono", function( snd, id, name )
+            if id then return end
+            self.cd2_beaconambient = snd
+            snd:SetPos( self:GetPos() )
+            snd:EnableLooping( true )
+            snd:Set3DFadeDistance( 700, 1000000000  )
+        end )
+
         if LocalPlayer():GetPos():DistToSqr( self:GetPos() ) > ( 2500 * 2500 ) then return end
 
         CD2CreateThread( function()
@@ -252,10 +263,14 @@ function ENT:BeaconDetonate()
             CD2_DrawMinimap = false
             CD2_DrawBlackbars = true
 
+            
+            local lerpup = true
             local pos = self:GetPos() + Vector( math.sin( SysTime() ) * 2000, math.cos( SysTime() ) * 2000, 1000 )
             CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
 
-                self.SunBeamMult = Lerp( 1 * FrameTime(), self.SunBeamMult, 3 )
+                if lerpup then
+                    self.SunBeamMult = Lerp( 1 * FrameTime(), self.SunBeamMult, 3 )
+                end
 
                 viewtbl.origin = pos
                 viewtbl.angles = ( self:GetPos() - pos ):Angle()
@@ -267,24 +282,17 @@ function ENT:BeaconDetonate()
                 return viewtbl
             end
 
+            coroutine.wait( 3 )
             local time = SysTime() + 3
+            lerpup = false
+            
             while true do
                 if SysTime() > time then break end
                 self.SunBeamMult = Lerp( 1 * FrameTime(), self.SunBeamMult, 0.20 )
                 coroutine.yield()
             end
 
-            coroutine.wait( 6 )
-
-            if IsValid( self.cd2_beaconambient ) then self.cd2_beaconambient:Stop() end
-
-            sound.PlayFile( "sound/crackdown2/ambient/beacon/beaconambient.mp3", "3d mono", function( snd, id, name )
-                if id then return end
-                self.cd2_beaconambient = snd
-                snd:SetPos( self:GetPos() )
-                snd:EnableLooping( true )
-                snd:Set3DFadeDistance( 700, 1000000000  )
-            end )
+            coroutine.wait( 3 )
             
             CD2_PreventMovement = nil
             CD2_ViewOverride = nil

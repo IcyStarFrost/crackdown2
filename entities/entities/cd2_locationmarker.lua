@@ -198,8 +198,9 @@ function ENT:VisCheck()
 end
 
 function ENT:Think()
+    if CLIENT then return end
 
-    if SERVER and !self:GetIsActive() and CurTime() > self.cd2_nextpassivespawn and #self.cd2_passivenpcs < self.cd2_maxpassivenpccount and self:VisCheck() then
+    if !CD2_EmptyStreets and !self:GetIsActive() and CurTime() > self.cd2_nextpassivespawn and #self.cd2_passivenpcs < self.cd2_maxpassivenpccount and self:VisCheck() then
         
         if self:GetLocationType() == "cell" then
             local npclist = difficultynpcs[ self:GetDifficulty() ]
@@ -221,7 +222,7 @@ function ENT:Think()
         self.cd2_nextpassivespawn = CurTime() + 2
     end
 
-    if SERVER and !self:GetIsActive() then
+    if !self:GetIsActive() then
 
         local players = player_GetAll()
         for i = 1, #players do

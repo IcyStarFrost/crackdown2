@@ -9,27 +9,6 @@ if CLIENT then
     local surface_DrawOutlinedRect = surface.DrawOutlinedRect
     local foldericon = Material( "crackdown2/ui/folder.png", "smooth" )
 
-    surface.CreateFont( "crackdown2_kttc", {
-        font = "Agency FB",
-        extended = false,
-        size = 30,
-        weight = 500,
-        blursize = 0,
-        scanlines = 0,
-        antialias = true,
-        underline = false,
-        italic = false,
-        strikeout = false,
-        symbol = false,
-        rotary = false,
-        shadow = false,
-        additive = false,
-        outline = false,
-    
-    })
-    
-    
-
 
     function CreateKeysTotheCityMenu()
         if !KeysToTheCity() then return end
@@ -101,7 +80,7 @@ if CLIENT then
             optionpnl.label:SetSize( 250, 100 )
             optionpnl.label:DockMargin( 2, 2, 2, 2 )
             optionpnl.label:Dock( LEFT )
-            optionpnl.label:SetFont( "crackdown2_kttc" )
+            optionpnl.label:SetFont( "crackdown2_font30" )
 
 
             CD2_KeysToTheCityMenu.OptionFolders[ folder ] = CD2_KeysToTheCityMenu.OptionFolders[ folder ] or {}
@@ -160,7 +139,7 @@ if CLIENT then
                 optionpnl.OptionPnl:SetSize( 30, 30 )
                 optionpnl.OptionPnl:DockMargin( 2, 2, 2, 2 )
                 optionpnl.OptionPnl:Dock( RIGHT )
-                optionpnl.OptionPnl:SetFont( "crackdown2_kttc" )
+                optionpnl.OptionPnl:SetFont( "crackdown2_font30" )
                 optionpnl.OptionPnl.Num = options.default
                 optionpnl.OptionPnl.Max = options.max
 
@@ -408,6 +387,13 @@ if CLIENT then
             net.WriteBool( pnl:GetValue() )
             net.SendToServer()
         end )
+        
+        AddOption( "Empty Streets", "global", "Check", { default = false }, function( pnl )
+            pnl:SetValue( !pnl:GetValue() )
+            net.Start( "cd2net_kttc_emptystreets" )
+            net.WriteBool( pnl:GetValue() )
+            net.SendToServer()
+        end )
 
         AddOption( "Skip to Next Dawn/Dusk", "global", "Button", { default = false }, function( pnl )
             net.Start( "cd2net_kttc_nexttime" )
@@ -496,6 +482,7 @@ elseif SERVER then
     util.AddNetworkString( "cd2net_kttc_nexttime" )
     util.AddNetworkString( "cd2net_kttc_freezetime" )
     util.AddNetworkString( "cd2net_kttc_spawnbeacon" )
+    util.AddNetworkString( "cd2net_kttc_emptystreets" )
 
     local Trace = util.TraceLine
     local tracetable = {}
@@ -520,6 +507,16 @@ elseif SERVER then
         beacon:Spawn()
 
         timer.Simple( 0.1, function() beacon:DropBeacon() end )
+    end )
+
+    net.Receive( "cd2net_kttc_emptystreets", function( len, ply )
+        local val = net.ReadBool()
+        CD2_EmptyStreets = val
+
+        if val then
+            CD2ClearNPCS()
+            table.Empty( CD2_SpawnedNSNNpcs )
+        end
     end )
 
     net.Receive( "cd2net_kttc_nexttime", function( len, ply )

@@ -95,6 +95,7 @@ function ENT:DeployPeacekeepers()
     self.cd2_leavepos = result.HitPos - Vector( 0, 0, 100 )
 
     for i = 1, 4 do
+        if CD2_EmptyStreets then return end
         local peacekeeper = ents.Create( "cd2_droppeacekeeper" )
         peacekeeper:SetPos( self:GetPos() + ( self:GetForward() * ( 50 * i ) ) + self:GetRight() * 50 ) 
         peacekeeper:Spawn()

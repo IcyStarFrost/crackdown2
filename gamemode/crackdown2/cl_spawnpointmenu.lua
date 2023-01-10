@@ -23,24 +23,7 @@ CD2_InSpawnPointMenu = false
 local viewtrace = {}
 local viewtbl = {}
 
-surface.CreateFont( "crackdown2_spawnpointmenubottomtext", {
-    font = "Agency FB",
-	extended = false,
-	size = 60,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
 
-})
 
 function CD2OpenSpawnPointMenu()
 
@@ -71,7 +54,7 @@ function CD2OpenSpawnPointMenu()
         CD2_SpawnPointMenu:SetKeyBoardInputEnabled( false )
 
         local toptext = vgui.Create( "DLabel", CD2_SpawnPointMenu )
-        toptext:SetFont( "crackdown2_dropmenutoptext" )
+        toptext:SetFont( "crackdown2_font60" )
         toptext:SetSize( 100, 100 )
         toptext:SetText( "             AGENCY REDEPLOYMENT PROGRAM" )
         toptext:Dock( TOP )
@@ -81,7 +64,7 @@ function CD2OpenSpawnPointMenu()
         line:Dock( TOP )
 
         local selecttext = vgui.Create( "DLabel", CD2_SpawnPointMenu )
-        selecttext:SetFont( "crackdown2_dropmenutext1" )
+        selecttext:SetFont( "crackdown2_font50" )
         selecttext:SetSize( 100, 60 )
         selecttext:SetColor( Color( 218, 103, 10 ) )
         selecttext:SetText( "             CHOOSE A DROP POINT TO DEPLOY YOUR AGENT" )
@@ -187,7 +170,7 @@ function CD2OpenSpawnPointMenu()
             CD2DrawInputbar( 100, 200, upper( buttonname ), " Select previous Drop Point" )
             CD2DrawInputbar( 150, 250, upper( reloadname ), " Select next Drop Point" )
 
-            draw.DrawText( "Press " .. jumpname .. " to confirm your Drop Point", "crackdown2_spawnpointmenubottomtext", w / 2, h - 55, orange, TEXT_ALIGN_CENTER )
+            draw.DrawText( "Press " .. jumpname .. " to confirm your Drop Point", "crackdown2_font60", w / 2, h - 55, orange, TEXT_ALIGN_CENTER )
 
         end
 

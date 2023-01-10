@@ -51,7 +51,7 @@ function CD2BeginIntroVideo( endcallback )
             local code = input_GetKeyCode( usebind )
             local buttonname = input_GetKeyName( code )
 
-            draw_DrawText( "Press " .. upper( buttonname ) .. " to skip first time playing intro", "crackdown2_equipmentcount", 50, h - 70, color_white, TEXT_ALIGN_LEFT )
+            draw_DrawText( "Press " .. upper( buttonname ) .. " to skip first time playing intro", "crackdown2_font45", 50, h - 70, color_white, TEXT_ALIGN_LEFT )
         end
     end
 

@@ -16,6 +16,7 @@ function CD2CreateThread( func )
 end
 
 function CD2DebugMessage( ... )
+    if !GetConVar( "cd2_enableconsolemessages" ):GetBool() then return end
     print( "Crackdown 2 Console: ", ...)
 end
 
@@ -66,11 +67,12 @@ function CD2GetClosestSpawn( ply )
     local spawns = CD2GetPossibleSpawns()
 
     for k, v in ipairs( spawns ) do
-        if !closest then closest = v dist = ply:GetPos():DistToSqr( v:GetPos() ) continue end
+        local range = ply:SqrRangeTo( v )
+        if !closest then closest = v dist = range continue end
 
-        if ply:GetPos():DistToSqr( v:GetPos() ) < dist then
+        if range < dist then
             closest = v 
-            dist = ply:GetPos():DistToSqr( v:GetPos() )
+            dist = range
         end
     end
     return closest
@@ -158,7 +160,9 @@ end
 
 -- Removes all NPCs
 function CD2ClearNPCS()
-    for k, v in ipairs( ents.GetAll() ) do
+    local ents_ = ents.FindByClass( "cd2_*" )
+    for i = 1, #ents_ do
+        local v = ents_[ i ]
         if IsValid( v ) and v:IsCD2NPC() then v:Remove() end
     end
 end
@@ -283,8 +287,10 @@ end
 
 local RandomPairs = RandomPairs
 function CD2GetClosestNavAreas( pos, dist )
+    local navareas = navmesh.GetAllNavAreas()
     local areas = {} 
-    for k, v in ipairs( navmesh.GetAllNavAreas() ) do
+    for i = 1, #navareas do
+        local v = navareas[ i ]
         if IsValid( v ) and v:GetClosestPointOnArea( pos ):DistToSqr( pos ) <= ( dist * dist ) then
             areas[ #areas + 1 ] = v
         end
@@ -294,8 +300,10 @@ end
 
 -- Returns a list of nav areas that are specifically filtered
 function CD2GetNavmeshFiltered()
+    local navareas = navmesh.GetAllNavAreas()
     local areas = {} 
-    for k, v in ipairs( navmesh.GetAllNavAreas() ) do
+    for i = 1, #navareas do
+        local v = navareas[ i ]
         if IsValid( v ) and !v:IsUnderwater() and v:GetSizeX() > 40 and v:GetSizeY() > 40 then
             areas[ #areas + 1 ] = v
         end
@@ -309,9 +317,7 @@ local hulltrace = {}
 -- Returns a random position on the navmesh
 function CD2GetRandomPos( dist, pos ) 
     local areas = dist and CD2GetClosestNavAreas( pos, dist ) or CD2GetNavmeshFiltered()
-
-     
-
+    
     for k, v in RandomPairs( areas ) do
         if IsValid( v ) then
             local spot = v:GetRandomPoint()

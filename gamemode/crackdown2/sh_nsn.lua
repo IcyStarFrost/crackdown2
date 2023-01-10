@@ -31,7 +31,7 @@ if SERVER then
     end
 
     local function GetCellCount()
-        local enttbl = ents.GetAll() 
+        local enttbl = ents.FindByClass( "cd2_*" )
         local count = 0
         for i = 1, #enttbl do
             local ent = enttbl[ i ]
@@ -43,7 +43,7 @@ if SERVER then
     end
 
     local function GetFreaks()
-        local enttbl = ents.GetAll() 
+        local enttbl = ents.FindByClass( "cd2_*" )
         local tbl = {}
         for i = 1, #enttbl do
             local ent = enttbl[ i ]
@@ -55,7 +55,7 @@ if SERVER then
     end
 
     local function GetPeaceKeeperCount()
-        local enttbl = ents.GetAll() 
+        local enttbl = ents.FindByClass( "cd2_*" )
         local count = 0
         for i = 1, #enttbl do
             local ent = enttbl[ i ]
@@ -115,7 +115,7 @@ if SERVER then
     end )
 
     hook.Add( "Tick", "crackdown2_naturalspawningnpcs", function()
-        if !navmesh.IsLoaded() then return end
+        if !navmesh.IsLoaded() or CD2_EmptyStreets then return end
         if ( game.SinglePlayer() or IsValid( Entity( 1 ) ) and Entity( 1 ):IsListenServerHost() ) and ( !IsValid( Entity( 1 ) ) or !Entity( 1 ):IsCD2Agent() or Entity( 1 ).cd2_InTutorial ) then return end
         CD2_MaxCivilians = CD2IsDay() and 15 or !CD2IsDay() and 6
 

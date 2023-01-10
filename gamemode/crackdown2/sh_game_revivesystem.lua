@@ -9,6 +9,7 @@ if !game.SinglePlayer() and CLIENT then
     local IsValid = IsValid
 
     hook.Add( "Tick", "crackdown2_playerreviving", function()
+
         local players = player_GetAll() 
         for i = 1, #players do
             local ply = players[ i ]

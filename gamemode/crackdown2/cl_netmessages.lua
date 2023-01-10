@@ -194,7 +194,7 @@ net.Receive( "cd2net_playerinitialspawn", function()
         pnl:MakePopup()
         
         local lbl = vgui.Create("DLabel", pnl )
-        lbl:SetFont( "crackdown2_dropmenutoptext" )
+        lbl:SetFont( "crackdown2_font60" )
         lbl:SetText( "This map does not have a Navigation Mesh! The CRACKDOWN 2 Gamemode requires you to play on a map with a Navigation Mesh! Press the button below to generate a Navigation Mesh or play a map that has one" )
         lbl:SetWrap( true )
         lbl:SetSize( ScrW() / 2, 500 )

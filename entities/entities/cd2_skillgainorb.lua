@@ -117,6 +117,8 @@ end
 function ENT:Think()
     if CLIENT then return end
 
+    if !IsValid( self:GetPlayer() ) then self:Remove() return end
+
     if self:GetPos()[ 3 ] < self.cd2_TargetZ then
         self.cd2_SeekPlayer = true
     end

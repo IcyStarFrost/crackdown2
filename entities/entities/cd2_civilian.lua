@@ -29,7 +29,6 @@ include( "crackdown2/gamemode/crackdown2/civilianvoicelines.lua" )
 ENT.cd2_PanicEnd = 0 -- The next time we will stop panicking
 
 local RandomPairs = RandomPairs
-local ents_GetAll = ents.GetAll
 local string_find = string.find
 local random = math.random
 local rand = math.Rand

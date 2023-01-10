@@ -75,6 +75,9 @@ function PLAYER:Init()
     self.Player:SetStrengthXP( 0 )
     self.Player:SetExplosiveXP( 0 )
     self.Player:SetDrivingXP( 0 )
+
+    self.Player:SetNWShields( 100 )
+    self.Player:SetNWHealth( 100 )
 end
 
 function PLAYER:Spawn()

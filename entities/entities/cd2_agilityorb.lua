@@ -126,7 +126,7 @@ function ENT:Think()
     local players = player_GetAll()
     for i = 1, #players do
         local ply = players[ i ]
-        if IsValid( ply ) and ply:IsCD2Agent() and self.cd2_missingplayers[ ply:SteamID() ] and ply:GetPos():DistToSqr( self:GetPos() ) < ( 40 * 40 ) then
+        if IsValid( ply ) and ply:IsCD2Agent() and self.cd2_missingplayers[ ply:SteamID() ] and ply:SqrRangeTo( self ) < ( 40 * 40 ) then
             self:OnCollected( ply )
         end
     end

@@ -1,41 +1,4 @@
 
-surface.CreateFont( "crackdown2_typingtext", {
-    font = "Agency FB",
-	extended = false,
-	size = 50,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-
-})
-
-surface.CreateFont( "crackdown2_typingtext2", {
-    font = "Agency FB",
-	extended = false,
-	size = 40,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-
-})
 
 local id = 0
 local white = Color( 255, 255, 255, 255 )
@@ -114,17 +77,17 @@ hook.Add( "HUDPaint", "crackdown2_typingtext", function()
         if CD2_TypingText_FlashColor then
             bluecolor.a = abs( sin( SysTime() * 4 ) * 100 )
             redcolor.a = abs( sin( SysTime() * 4 ) * 100 )
-            surface_SetFont( "crackdown2_typingtext" )
+            surface_SetFont( "crackdown2_font50" )
             local w, h = surface_GetTextSize( CD2_TypingText_Top )
             surface_SetDrawColor( !CD2_TypingText_Red and bluecolor or redcolor )
             surface_SetMaterial( sprite )
             surface_DrawTexturedRect( ( ScrW() / 2 ) - ( w / 2 ) - 50, ( ScrH() / 2.3 ), w + 100, h )
         end
 
-        draw_DrawText( CD2_TypingText_Top, "crackdown2_typingtext", ScrW() / 2, ScrH() / 2.3, topcolor, TEXT_ALIGN_CENTER )
+        draw_DrawText( CD2_TypingText_Top, "crackdown2_font50", ScrW() / 2, ScrH() / 2.3, topcolor, TEXT_ALIGN_CENTER )
     end
 
     if CD2_TypingText_Bottom then
-        draw_DrawText( CD2_TypingText_Bottom, "crackdown2_typingtext2", ScrW() / 2, ScrH() / 2, white, TEXT_ALIGN_CENTER )
+        draw_DrawText( CD2_TypingText_Bottom, "crackdown2_font40", ScrW() / 2, ScrH() / 2, white, TEXT_ALIGN_CENTER )
     end
 end )

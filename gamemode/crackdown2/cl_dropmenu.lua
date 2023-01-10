@@ -21,81 +21,6 @@ local ipairs = ipairs
 CD2_InDropMenu = false
 CD2_DropMenu = CD2_DropMenu or nil
 
-surface.CreateFont( "crackdown2_dropmenutoptext", {
-    font = "Agency FB",
-	extended = false,
-	size = 60,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-
-})
-
-surface.CreateFont( "crackdown2_dropmenutext1", {
-    font = "Agency FB",
-	extended = false,
-	size = 50,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-
-})
-
-surface.CreateFont( "crackdown2_dropmenutext2", {
-    font = "Agency FB",
-	extended = false,
-	size = 45,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-
-})
-
-surface.CreateFont( "crackdown2_weaponstattext", {
-    font = "Agency FB",
-	extended = false,
-	size = ceil( ScreenScale( 6.5 ) ),
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-
-})
 
 CD2_DropPrimary = "cd2_smg"
 CD2_DropSecondary = "cd2_pistol"
@@ -144,7 +69,7 @@ function CD2OpenDropMenu( issupplypoint )
         end
 
         local toptext = vgui.Create( "DLabel", CD2_DropMenu )
-        toptext:SetFont( "crackdown2_dropmenutoptext" )
+        toptext:SetFont( "crackdown2_font60" )
         toptext:SetSize( 100, 100 )
         toptext:SetText( !issupplypoint and "             AGENCY REDEPLOYMENT PROGRAM" or "             AGENCY SUPPORT" )
         toptext:Dock( TOP )
@@ -154,7 +79,7 @@ function CD2OpenDropMenu( issupplypoint )
         line:Dock( TOP )
 
         local selecttext = vgui.Create( "DLabel", CD2_DropMenu )
-        selecttext:SetFont( "crackdown2_dropmenutext1" )
+        selecttext:SetFont( "crackdown2_font50" )
         selecttext:SetSize( 100, 60 )
         selecttext:SetColor( Color( 218, 103, 10 ) )
         selecttext:SetText( "             SELECT YOUR EQUIPMENT" )
@@ -187,7 +112,7 @@ function CD2OpenDropMenu( issupplypoint )
             coroutine.wait( 0 )
     
             local label = vgui.Create( "DLabel", panel )
-            label:SetFont( "crackdown2_dropmenutext2" )
+            label:SetFont( "crackdown2_font45" )
             label:SetSize( 100, 50 )
             label:SetColor( Color( 218, 103, 10 ) )
             label:SetText( "  UNAVAILABLE" )
@@ -349,7 +274,7 @@ function CD2OpenDropMenu( issupplypoint )
             end
 
             local label = vgui.Create( "DLabel", CD2_DropMenu )
-            label:SetFont( "crackdown2_dropmenutext2" )
+            label:SetFont( "crackdown2_font45" )
             label:SetSize( 100, 60 )
             label:SetColor( Color( 218, 103, 10) )
             label:SetText( "             " .. text )

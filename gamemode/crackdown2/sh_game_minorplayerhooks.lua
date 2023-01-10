@@ -11,6 +11,7 @@ if SERVER then
         ply:IsOnGround() then ply:EmitSound( "crackdown2/ply/jump" .. random( 1, 4 ) .. ".wav", 60, 100, 0.2, CHAN_AUTO ) end
     end )
 
+    -- Director commentary over level ups
     hook.Add( "CD2_OnLevelUp", "crackdown2_levelup", function( ply, skill )
         if KeysToTheCity() then return end
 
@@ -74,7 +75,7 @@ if SERVER then
 
     hook.Add( "OnCD2NPCKilled", "crackdown2_firstcellkill", function( npc, info )
         local attacker = info:GetAttacker()
-        if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadFirstCellKill or KeysToTheCity() then return end
+        if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadFirstCellKill or KeysToTheCity() or npc:GetCD2Team() != "cell" then return end
         CD2FILESYSTEM:RequestPlayerData( attacker, "cd2_hadfirstcellkill", function( val )
             if !val then
                 attacker:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firstcellkill.mp3" )
@@ -93,21 +94,28 @@ local actcommands = {
     "act halt"
 }
 
+local delay = 0
+
 -- Randomly playing act animation
 hook.Add( "Tick", "crackdown2_passiveactcommands", function()
-    local players = player_GetAll() 
-    for i = 1, #players do
-        local ply = players[ i ]
-
-        if !ply:Alive() or !ply:IsCD2Agent() then continue end
+    if CurTime() > delay then
         
-        ply.cd2_nextgesture = ply.cd2_nextgesture or CurTime() + random( 5, 60 )
+        local players = player_GetAll() 
+        for i = 1, #players do
+            local ply = players[ i ]
 
-        if CurTime() > ply.cd2_nextgesture then
-            ply:ConCommand( actcommands[ random( 3 ) ])
-            ply.cd2_nextgesture = CurTime() + random( 5, 60 )
+            if !ply:Alive() or !ply:IsCD2Agent() then continue end
+            
+            ply.cd2_nextgesture = ply.cd2_nextgesture or CurTime() + random( 5, 60 )
+
+            if CurTime() > ply.cd2_nextgesture then
+                ply:ConCommand( actcommands[ random( 3 ) ])
+                ply.cd2_nextgesture = CurTime() + random( 5, 60 )
+            end
+
         end
 
+        delay = CurTime() + 2
     end
 end )
 

@@ -42,9 +42,12 @@ end
 if SERVER then
     AddCSLuaFile( "cd2globalfunctions.lua" )
     AddCSLuaFile( "cd2_filesystem.lua" )
+    AddCSLuaFile( "cd2_fonts.lua" )
 end
 include( "cd2globalfunctions.lua" )
 include( "cd2_filesystem.lua" )
+
+if CLIENT then include( "cd2_fonts.lua" ) end
 
 IncludeDirectory( "crackdown2/gamemode/crackdown2" )
 

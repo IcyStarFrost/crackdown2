@@ -295,7 +295,7 @@ function SWEP:DrawWorldModel()
     if self:WaterLevel() != 0 then return false end
 
     self.cd2_effectdelay = self.cd2_effectdelay or SysTime() + 0.5
-    if !IsValid( self:GetOwner() ) and self:GetVelocity():IsZero() then
+    if !IsValid( self:GetOwner() ) and self:GetVelocity():IsZero() and LocalPlayer():SqrRangeTo( self ) < ( 2000 * 2000 ) then
         local wep = LocalPlayer():GetWeapon( self:GetClass() )
         if SysTime() < self.cd2_effectdelay or ( IsValid( wep ) and wep:Ammo1() >= ( wep.Primary.DefaultClip - wep.Primary.ClipSize ) ) then 
             self:SetupBones()

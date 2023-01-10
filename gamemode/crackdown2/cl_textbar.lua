@@ -5,24 +5,7 @@ local surface_DrawTexturedRect = surface.DrawTexturedRect
 local surface_DrawOutlinedRect = surface.DrawOutlinedRect
 local linecol = Color( 61, 61, 61, 100 )
 
-surface.CreateFont( "crackdown2_textbox", {
-    font = "Agency FB",
-	extended = false,
-	size = 30,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
 
-})
 
 function CD2SetTextBoxText( txt )
     CD2_CurrentTextBoxText = txt
@@ -40,7 +23,7 @@ hook.Add( "OnGamemodeLoaded", "crackdown2_textbox", function()
     CD2_TextBox:SetSize( x, y )
 
     CD2_TextBox.lbl = vgui.Create( "DLabel", CD2_TextBox )
-    CD2_TextBox.lbl:SetFont( "crackdown2_textbox" )
+    CD2_TextBox.lbl:SetFont( "crackdown2_font30" )
     CD2_TextBox.lbl:SetText( "" )
     CD2_TextBox.lbl:DockMargin( 5, 5, 5, 5 )
     CD2_TextBox.lbl:Dock( FILL )

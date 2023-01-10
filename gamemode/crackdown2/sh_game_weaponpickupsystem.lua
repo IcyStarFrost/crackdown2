@@ -13,7 +13,9 @@ hook.Add( "PlayerCanPickupWeapon", "crackdown2_npcweapons", function( ply, wep )
     if haswep and ply:GetWeapon( wep:GetClass() ):Ammo1() >= ( wep.Primary.DefaultClip - wep.Primary.ClipSize ) then
         return false
     elseif haswep and ply:GetWeapon( wep:GetClass() ):Ammo1() < ( wep.Primary.DefaultClip - wep.Primary.ClipSize ) then
-        ply:SetAmmo( clamp( ply:GetAmmoCount( wep.Primary.Ammo ) + ( ceil( wep.Primary.DefaultClip / 6 ) ), 0, wep.Primary.DefaultClip ), wep.Primary.Ammo )
+        local count = clamp( ply:GetAmmoCount( wep.Primary.Ammo ) + ( ceil( wep.Primary.DefaultClip / 6 ) ), 0, wep.Primary.DefaultClip )
+        ply:GetWeapon( wep:GetClass() ).cd2_Ammocount = count
+        ply:SetAmmo( count, wep.Primary.Ammo )
         wep:Remove()
         ply:EmitSound( "items/ammo_pickup.wav", 60 )
         return false

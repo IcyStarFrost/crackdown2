@@ -603,6 +603,15 @@ hook.Add( "Think", "crackdown2_regeneratemenu", function()
     if ply:KeyPressed( IN_USE ) then
         if !CD2_InSpawnPointMenu then
             CD2OpenSpawnPointMenu()
+
+            if !KeysToTheCity() then
+                local directorcommented = CD2FILESYSTEM:ReadPlayerData( "cd2_director_dead" )
+
+                if !directorcommented then
+                    sound.PlayFile( "sound/crackdown2/vo/agencydirector/regenerate.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
+                    CD2FILESYSTEM:WritePlayerData( "cd2_director_dead", true )
+                end
+            end
         end
     elseif ply:KeyPressed( IN_RELOAD ) then
         net.Start( "cd2net_spawnatnearestspawn" )

@@ -161,9 +161,11 @@ function OpenIntelConsole()
 
     local viewoffset = Vector()
     local znear
+    local limittime = 0
 
     function midpnl:Think()
         if iscontrollingview then
+            local ismoving = false
 
             if LocalPlayer():KeyDown( IN_JUMP ) then
                 znear = znear - 50
@@ -173,19 +175,24 @@ function OpenIntelConsole()
 
             if LocalPlayer():KeyDown( IN_FORWARD ) then
                 viewoffset.x = viewoffset.x + 50
+                ismoving = true
             end
 
             if LocalPlayer():KeyDown( IN_BACK ) then
                 viewoffset.x = viewoffset.x - 50
+                ismoving = true
             end
             
             if LocalPlayer():KeyDown( IN_MOVERIGHT ) then
                 viewoffset.y = viewoffset.y - 50
+                ismoving = true
             end
 
             if LocalPlayer():KeyDown( IN_MOVELEFT ) then
                 viewoffset.y = viewoffset.y + 50
+                ismoving = true
             end
+            if ismoving then LocalPlayer():EmitSound( "crackdown2/ui/ui_move.mp3", 70, 100, 1, CHAN_WEAPON ) end
         end
     end
 
@@ -215,12 +222,13 @@ function OpenIntelConsole()
         plypos[ 3 ] = 0
 
         local entities = ents.GetAll()
-        local nearbyminimap = CD2FindInSphere( LocalPlayer():GetPos(), 3000, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "cell" end )
 
         -- Cell --
-        for i = 1, #nearbyminimap do
-            local ent = nearbyminimap[ i ]
-            DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, ent:GetAngles(), cellicon, 4, ent:GetEnemy() == LocalPlayer() and celltargetred or cellwhite, 30 )
+        for i = 1, #entities do
+            local ent = entities[ i ]
+            if IsValid( ent ) and ent:IsCD2NPC() and ent:GetCD2Team() == "cell" and ent:SqrRangeTo( LocalPlayer() ) < ( 3000 * 3000 ) then
+                DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, ent:GetAngles(), cellicon, 4, ent:GetEnemy() == LocalPlayer() and celltargetred or cellwhite, 30 )
+            end
         end
         --
 

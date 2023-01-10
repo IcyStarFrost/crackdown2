@@ -106,8 +106,10 @@ end
 local FindInSphere = ents.FindInSphere
 function CD2FindInSphere( pos, radius, filter )
     local entities = {}
+    local find = FindInSphere( pos, radius )
 
-    for k, v in ipairs( FindInSphere( pos, radius ) ) do
+    for i = 1, #find do
+        local v = find[ i ]
         if IsValid( v ) and ( !filter or filter( v ) == true ) then
             entities[ #entities + 1 ] = v
         end
@@ -119,11 +121,14 @@ end
 function CD2GetClosestInTable( tbl, target )
     local closest
     local dist 
-    for k, v in ipairs( tbl ) do 
-        if !closest then closest = v dist = v:GetPos():DistToSqr( target:GetPos() ) continue end
-        if v:GetPos():DistToSqr( target:GetPos() ) < dist then
+    for i = 1, #tbl do
+        local v = tbl[ i ] 
+
+        if !closest then closest = v dist = v:SqrRangeTo( target ) continue end
+        
+        if v:SqrRangeTo( target ) < dist then
             closest = v 
-            dist = v:GetPos():DistToSqr( target:GetPos() )
+            dist = v:SqrRangeTo( target )
         end
     end
     return closest
@@ -298,17 +303,38 @@ function CD2GetNavmeshFiltered()
     return areas
 end
 
+local TraceHull = util.TraceHull
+local hulltrace = {}
+
 -- Returns a random position on the navmesh
 function CD2GetRandomPos( dist, pos ) 
     local areas = dist and CD2GetClosestNavAreas( pos, dist ) or CD2GetNavmeshFiltered()
 
+     
+
     for k, v in RandomPairs( areas ) do
         if IsValid( v ) then
-            return v:GetRandomPoint()
+            local spot = v:GetRandomPoint()
+            hulltrace.start = spot
+            hulltrace.endpos = spot
+            hulltrace.maxs = Vector( 17, 17, 72 )
+            hulltrace.mins = Vector( -17, -17, 0 )
+            local result = TraceHull( hulltrace )
+            if !result.Hit then return spot end
         end
     end
 end
 
+if SERVER then
+    -- Sets the text to type in the middle of the player's screen
+    function CD2SetTypingText( ply, top, bottom, isred )
+        net.Start( "cd2net_sendtypingtext" )
+        net.WriteString( top )
+        net.WriteString( bottom )
+        net.WriteBool( isred or false )
+        if !ply then net.Broadcast() else net.Send( ply ) end
+    end
+end
 
 
 -- Returns if the server is currently running Keys to the city mode

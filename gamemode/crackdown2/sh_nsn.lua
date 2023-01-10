@@ -116,7 +116,7 @@ if SERVER then
 
     hook.Add( "Tick", "crackdown2_naturalspawningnpcs", function()
         if !navmesh.IsLoaded() then return end
-        if game.SinglePlayer() and ( !IsValid( Entity( 1 ) ) or !Entity( 1 ):IsCD2Agent() or Entity( 1 ).cd2_InTutorial ) then return end
+        if ( game.SinglePlayer() or IsValid( Entity( 1 ) ) and Entity( 1 ):IsListenServerHost() ) and ( !IsValid( Entity( 1 ) ) or !Entity( 1 ):IsCD2Agent() or Entity( 1 ).cd2_InTutorial ) then return end
         CD2_MaxCivilians = CD2IsDay() and 15 or !CD2IsDay() and 6
 
 

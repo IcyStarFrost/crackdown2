@@ -29,6 +29,7 @@ include( "crackdown2/gamemode/crackdown2/civilianvoicelines.lua" )
 ENT.cd2_PanicEnd = 0 -- The next time we will stop panicking
 
 local RandomPairs = RandomPairs
+local ents_GetAll = ents.GetAll
 local string_find = string.find
 local random = math.random
 local rand = math.Rand
@@ -58,6 +59,7 @@ function ENT:Initialize2()
         local model = mdls[ random( #mdls ) ]
         self:SetModel( model ) 
         self.cd2_gender = string_find( model, "female" ) != nil and "female" or "male"
+        self.cd2_FreakCheck = CurTime() + 0.5
 
         self:Hook( "EntityFireBullets", "bullethearing", function( ent, bullet ) 
             local pos = bullet.Src 
@@ -146,8 +148,6 @@ function ENT:OnOtherKilled( victim )
     end
 end
 
-
-
 function ENT:Think2()
     self:HandleVoiceLines()
 
@@ -158,14 +158,17 @@ function ENT:Think2()
         self:StopMovement() 
     end
 
-    if SERVER then
+    if SERVER and CurTime() > self.cd2_FreakCheck then
         local nearzombies = CD2FindInSphere( self:GetPos(), self.cd2_SightDistance, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" and self:Visible( ent ) end )
+        
+
         if #nearzombies > 0 and !self:GetIsPanicked() then
             self.cd2_Panickedlocation = self:GetPos()
             self.cd2_PanicEnd = CurTime() + rand( 15, 30 )
             self:SetState( "Panicked" )
             self:StopMovement() 
         end
+        self.cd2_FreakCheck = CurTime() + 1
     end
 end
 
@@ -225,7 +228,7 @@ end
 
 function ENT:Panicked()
 
-    if self.cd2_FirstPanic then coroutine.wait( 1 ) self.cd2_FirstPanic = false self:LookTo() end
+    if self.cd2_FirstPanic then self.cd2_FirstPanic = false self:LookTo() end
 
     self:PlaySequenceAndWait( random( 1, 2 ) == 1 and "lookoutrun" or "startle_behind" )
 
@@ -302,4 +305,5 @@ function ENT:Idle()
         self:SetState( "GuitarState" )
     end
 
+    coroutine.wait( 1 )
 end

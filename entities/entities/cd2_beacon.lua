@@ -87,6 +87,18 @@ function ENT:OnLand()
             snd:EnableLooping( true )
             snd:Set3DFadeDistance( 700, 1000000000  )
         end )
+
+        local emitter = self:GetEmitter()
+
+        if IsValid( emitter ) then
+            sound.PlayFile( "sound/crackdown2/ambient/au/au_ring.mp3", "3d mono", function( snd, id, name )
+                if id then return end
+                self.cd2_ringambient = snd
+                snd:SetPos( self:GetPos() )
+                snd:EnableLooping( true )
+                snd:Set3DFadeDistance( 700, 1000000000  )
+            end )
+        end
     end
 end
 
@@ -189,7 +201,7 @@ function ENT:StartIntroMusic()
     end )
 end
 
-
+local viewtbl = {}
 function ENT:BeaconDetonate()
     if SERVER then
         self:SetIsDetonated( true )
@@ -197,8 +209,19 @@ function ENT:BeaconDetonate()
         self:PlayClientSound( "crackdown2/ambient/beacon/beacondetonate.mp3", self:GetPos(), 5 )
 
         CD2CreateThread( function()
+
+            coroutine.wait( 2 )
+
+            local near = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return !ent:IsPlayer() end )
+
+            for i = 1, #near do
+                local ent = near[ i ]
+                if !IsValid( ent ) then continue end
+                ent:TakeDamage( ent:GetMaxHealth(), Entity( 0 ) )
+            end
         
             coroutine.wait( 4 )
+
             self:PlayClientSound( "crackdown2/ambient/beacon/beaconfinish.mp3", self:GetPos(), 5 )
 
             coroutine.wait( 5 )
@@ -208,6 +231,77 @@ function ENT:BeaconDetonate()
         end )
     elseif CLIENT then
         if LocalPlayer():GetPos():DistToSqr( self:GetPos() ) > ( 2500 * 2500 ) then return end
+
+        CD2CreateThread( function()
+            coroutine.wait( 2 ) 
+            LocalPlayer():ScreenFade( SCREENFADE.IN, color_white, 2, 1 )
+        end )
+        CD2CreateThread( function()
+
+            CD2StartMusic( "sound/crackdown2/music/beacon_victory.mp3", 600 )
+
+            CD2_PreventMovement = true
+            CD2_DrawAgilitySkill = false
+            CD2_DrawFirearmSkill = false
+            CD2_DrawStrengthSkill = false
+            CD2_DrawExplosiveSkill = false
+
+            CD2_DrawTargetting = false
+            CD2_DrawHealthandShields = false
+            CD2_DrawWeaponInfo = false
+            CD2_DrawMinimap = false
+            CD2_DrawBlackbars = true
+
+            local pos = self:GetPos() + Vector( math.sin( SysTime() ) * 2000, math.cos( SysTime() ) * 2000, 1000 )
+            CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+
+                self.SunBeamMult = Lerp( 1 * FrameTime(), self.SunBeamMult, 3 )
+
+                viewtbl.origin = pos
+                viewtbl.angles = ( self:GetPos() - pos ):Angle()
+                viewtbl.fov = 60
+                viewtbl.znear = znear
+                viewtbl.zfar = zfar
+                viewtbl.drawviewer = true
+
+                return viewtbl
+            end
+
+            local time = SysTime() + 3
+            while true do
+                if SysTime() > time then break end
+                self.SunBeamMult = Lerp( 1 * FrameTime(), self.SunBeamMult, 0.20 )
+                coroutine.yield()
+            end
+
+            coroutine.wait( 6 )
+
+            if IsValid( self.cd2_beaconambient ) then self.cd2_beaconambient:Stop() end
+
+            sound.PlayFile( "sound/crackdown2/ambient/beacon/beaconambient.mp3", "3d mono", function( snd, id, name )
+                if id then return end
+                self.cd2_beaconambient = snd
+                snd:SetPos( self:GetPos() )
+                snd:EnableLooping( true )
+                snd:Set3DFadeDistance( 700, 1000000000  )
+            end )
+            
+            CD2_PreventMovement = nil
+            CD2_ViewOverride = nil
+
+            CD2_DrawAgilitySkill = true
+            CD2_DrawFirearmSkill = true
+            CD2_DrawStrengthSkill = true
+            CD2_DrawExplosiveSkill = true
+
+            CD2_DrawTargetting = true
+            CD2_DrawHealthandShields = true
+            CD2_DrawWeaponInfo = true
+            CD2_DrawMinimap = true
+            CD2_DrawBlackbars = false
+
+
+        end )
         
     end
 end
@@ -305,6 +399,7 @@ function ENT:Think()
 
         if self:GetIsCharging() and CurTime() > self.cd2_curtimeduration then
             self:BeaconDetonate()
+            BroadcastLua( "Entity(" .. self:EntIndex() .. "):BeaconDetonate()" )
         end
 
         if self:GetIsDropping() and self:GetPos():DistToSqr( self:GetBeaconPos() ) > ( 20 * 20 ) then
@@ -332,6 +427,10 @@ function ENT:Think()
         end
 
     elseif CLIENT then
+
+        if IsValid( self.cd2_ringambient ) and IsValid( self:GetEmitter() ) then
+            self.cd2_ringambient:SetPos( self:GetEmitter():GetPos() )
+        end
 
         if self:GetIsCharging() then
             local light = DynamicLight( self:EntIndex() )
@@ -424,6 +523,7 @@ function ENT:OnRemove()
         
     elseif CLIENT then
         if IsValid( self.cd2_beaconambient ) then self.cd2_beaconambient:Stop() end
+        if IsValid( self.cd2_ringambient ) then self.cd2_ringambient:Stop() end
     end
 end
 

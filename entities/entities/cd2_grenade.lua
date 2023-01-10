@@ -45,7 +45,7 @@ function ENT:OnDelayEnd()
             sound.Play( highskillsounds[ random( 3 ) ], self:GetPos(), 90, 100, 1 )
         end
 
-        util.BlastDamageInfo( blast, self:GetPos(), 300 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
+        util.BlastDamageInfo( blast, self:GetPos(), 400 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
 
         net.Start( "cd2net_explosion" )
         net.WriteVector( self:GetPos() )

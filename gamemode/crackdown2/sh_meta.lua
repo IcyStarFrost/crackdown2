@@ -12,6 +12,7 @@ function ENT:AlwaysLockon()
     return self.cd2_AlwaysLockon or self:GetNW2Bool( "cd2_alwayslockon", false ) or false
 end
 
+-- NPCs are not agents
 function ENT:IsCD2Agent()
     return false
 end
@@ -19,6 +20,12 @@ end
 -- Returns the entity's Eye Pos. You can't override Nextbot's eyepos function so we are using this function to substitute it for NPCs and players
 function ENT:CD2EyePos()
     return ( self:IsCD2NPC() and self:EyePos2() ) or ( ( self:IsPlayer() or self:IsNPC() ) and self:EyePos() )
+end
+
+-- Returns the squared range to the position
+function ENT:SqrRangeTo( pos )
+    local pos = isentity( pos ) and pos:GetPos() or pos
+    return self:GetPos():DistToSqr( pos )
 end
 
 function PLAYER:IsCD2Agent()
@@ -35,6 +42,11 @@ function PLAYER:Trace( start, endpos, col, mask )
     normaltrace.collisiongroup = col or COLLISION_GROUP_NONE
     local result = Trace( normaltrace )
     return result
+end
+
+function PLAYER:SqrRangeTo( pos )
+    local pos = isentity( pos ) and pos:GetPos() or pos
+    return self:GetPos():DistToSqr( pos )
 end
 
 function PLAYER:HandsPos()

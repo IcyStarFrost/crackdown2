@@ -34,6 +34,7 @@ local LerpVector = LerpVector
 local Lerp = Lerp
 local table_insert = table.insert
 local math_rad = math.rad
+local player_GetAll = player.GetAll
 local surface_DrawPoly = CLIENT and surface.DrawPoly
 local surface_SetDrawColor = CLIENT and surface.SetDrawColor
 local surface_SetMaterial = CLIENT and surface.SetMaterial
@@ -133,9 +134,10 @@ function ENT:Think()
     -- Custom Pickup code for equipment
     if SERVER and !IsValid( self:GetThrower() ) and !self:GetHadThrower() and self:WaterLevel() == 0 then
 
-        local nearpickupents = CD2FindInSphere( self:GetPos(), 50, function( ent ) return ent:IsCD2Agent() end )
-        for i = 1, #nearpickupents do
-            local ply = nearpickupents[ i ]
+        local players = player_GetAll()
+        for i = 1, #players do
+            local ply = players[ i ]
+            if !ply:IsCD2Agent() or ply:GetPos():DistToSqr( self:GetPos() ) > ( 50 * 50 ) then continue end
 
             if IsValid( ply ) and self:IsAmmoToPlayer( ply ) and ply:GetEquipmentCount() < ply:GetMaxEquipmentCount() then
                 ply:SetEquipmentCount( self.cd2_equipmentcount or clamp( ply:GetEquipmentCount() + ( ply:GetMaxEquipmentCount() / 4 ), 0, ply:GetMaxEquipmentCount() ) )

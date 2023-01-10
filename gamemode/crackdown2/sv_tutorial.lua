@@ -28,7 +28,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         
         coroutine.wait( 3 )
 
---[[         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag1.mp3" ) 
+        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag1.mp3" ) 
 
         coroutine.wait( 21 )
 
@@ -132,7 +132,10 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         coroutine.wait( 8 )
 
-        while IsValid( agilityorb ) or IsValid( agilityorb ) and !agilityorb:IsCollectedBy( ply ) do coroutine.yield() end
+        while true do 
+            if !IsValid( agilityorb ) or IsValid( agilityorb ) and agilityorb:IsCollectedBy( ply ) then break end
+            coroutine.yield() 
+        end
 
         if IsValid( agilityorb ) then agilityorb:Remove() end
         if IsValid( guide ) then guide:Remove() end
@@ -372,7 +375,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             coroutine.wait( 0.2 )
         end
 
-        coroutine.wait( 2 ) ]]
+        coroutine.wait( 2 )
 
         ply:Freeze( true )
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag15.mp3" )
@@ -394,7 +397,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         cam:SetPlayer( ply )
         cam:Spawn()
 
-        CD2GenerateMapData()
+        if !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then CD2GenerateMapData() end
 
         coroutine.wait( 3 )
 
@@ -448,6 +451,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/intel3.mp3" )
 
         coroutine.wait( 18 )
+
+        ply:SendLua( "OpenIntelConsole()" )
 
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firsttactical.mp3" )
 

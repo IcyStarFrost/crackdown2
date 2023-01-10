@@ -209,7 +209,7 @@ function ENT:MainThink()
     if CurTime() > self.cd2_sightlinecheck then
         local ent = self:CheckSightLine()
         if IsValid( ent ) then self:SetEnemy( ent ) end
-        self.cd2_sightlinecheck = CurTime() + 0.3
+        self.cd2_sightlinecheck = CurTime() + 0.5
     end
     
     

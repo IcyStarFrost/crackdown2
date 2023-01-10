@@ -7,6 +7,7 @@ local table_HasValue = table.HasValue
 local table_RemoveByValue = table.RemoveByValue
 local tracetable = {}
 local Trace = util.TraceLine
+local player_GetAll = player.GetAll
 
 function ENT:Initialize()
 
@@ -24,7 +25,7 @@ function ENT:Initialize()
 
         hook.Add( "OnCD2NPCKilled", self, function( self, ent, info )
             if !IsValid( self ) then hook.Remove( "OnCD2NPCKilled", self) return end
-            if table_HasValue( self.cd2_activecell, ent ) then table_RemoveByValue( self.cd2_activecell, ent ) self.cd2_killcount = self.cd2_killcount + 1 end
+            if table_HasValue( self.cd2_activecell, ent ) then self.cd2_killcount = self.cd2_killcount + 1 end
         end )
     end
 
@@ -94,20 +95,49 @@ function ENT:OnActivate( ply )
 
     if self:GetLocationType() == "cell" and SERVER then
 
+        CD2SetTypingText( nil, "TACTICAL ASSAULT INITIATED", "" )
+
         local npclist = difficultynpcs[ self:GetDifficulty() ]
 
         self:SetIsActive( true )
         sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
 
+        local aborttime = CurTime() + 10
+        local limitwarning = false
+        CD2CreateThread( function()
+            while IsValid( self ) do 
+                if !IsValid( self ) or !self:GetIsActive() then return end
+                local players = player_GetAll()
+
+                local playernear = false
+                for i = 1, #players do
+                    local player = players[ i ]
+                    if player:IsCD2Agent() and player:SqrRangeTo( self ) < ( 2000 * 2000 ) and player:Alive() then playernear = true break end
+                end
+
+                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2SendTextBoxMessage( nil, "Return to the Tactical Location!" ) limitwarning = true end end
+
+                if CurTime() > aborttime then
+                    self:SetIsActive( false )
+                    CD2SetTypingText( nil, "Tactical Assault Aborted", "", true )
+                    return
+                end
+
+                coroutine.wait( 1 )
+            end
+        end )
+
         CD2CreateThread( function()
 
             while IsValid( self ) and self.cd2_killcount < self.cd2_maxkillcount do
-                if !IsValid( self ) then return end
+                if !IsValid( self ) or !self:GetIsActive() then return end
                 
                 if #self.cd2_activecell < self.cd2_cellcount then
                     local cell = ents.Create( npclist[ random( #npclist ) ] )
                     cell:SetPos( CD2GetRandomPos( 2000, self:GetPos() )  )
                     cell:Spawn()
+                    cell:CallOnRemove( "removefromactive", function() table_RemoveByValue( self.cd2_activecell, cell ) end )
+                    
                     cell:AttackTarget( ply )
                     self.cd2_activecell[ #self.cd2_activecell + 1 ] = cell
                 end
@@ -138,6 +168,15 @@ function ENT:OnActivate( ply )
             net.Start( "cd2net_locationcaptured" )
             net.Broadcast()
 
+            local agencycount = 0 
+            local locations = ents.FindByClass( "cd2_locationmarker" )
+            for i = 1, #locations do
+                local location = locations[ i ]
+                if location:GetLocationType() == "agency" then agencycount = agencycount + 1 end
+            end
+
+            CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Cell Tactical Location\nCaptured " .. agencycount .. " of " .. #locations .. " Tactical Locations" )
+
         end )
     elseif self:GetLocationType() == "agency" then
         net.Start( "cd2net_opendropmenu" )
@@ -147,9 +186,19 @@ function ENT:OnActivate( ply )
 
 end
 
+function ENT:VisCheck()
+    local players = player_GetAll()
+    local withinPVS = false
+    for i = 1, #players do
+        local ply = players[ i ]
+        if ply:IsCD2Agent() and self:GetPos():DistToSqr( ply:GetPos() ) < ( 3000 * 3000 ) then withinPVS = true end
+    end
+    return withinPVS
+end
+
 function ENT:Think()
 
-    if SERVER and !self:GetIsActive() and CurTime() > self.cd2_nextpassivespawn and #self.cd2_passivenpcs < self.cd2_maxpassivenpccount then
+    if SERVER and !self:GetIsActive() and CurTime() > self.cd2_nextpassivespawn and #self.cd2_passivenpcs < self.cd2_maxpassivenpccount and self:VisCheck() then
         
         if self:GetLocationType() == "cell" then
             local npclist = difficultynpcs[ self:GetDifficulty() ]
@@ -172,12 +221,11 @@ function ENT:Think()
     end
 
     if SERVER and !self:GetIsActive() then
-        if game.SinglePlayer() and Entity( 1 ):GetPos():DistToSqr( self:GetPos() ) > ( 150 * 150 ) then return end
 
-        local nearplys = CD2FindInSphere( self:GetPos(), 150, function( ent ) return ent:IsCD2Agent() end )
-        for i = 1, #nearplys do
-            local ply = nearplys[ i ]
-            if !IsValid( ply ) or !ply:IsCD2Agent() then continue end
+        local players = player_GetAll()
+        for i = 1, #players do
+            local ply = players[ i ]
+            if !IsValid( ply ) or !ply:IsCD2Agent() or ply:GetPos():DistToSqr( self:GetPos() ) > ( 150 * 150 ) then continue end
 
             ply:SetNW2Entity( "cd2_targettacticlelocation", self )
             timer.Create( "cd2_unselecttacticlelocation" .. ply:EntIndex(), 0.6, 1, function() ply:SetNW2Entity( "cd2_targettacticlelocation", nil ) end )

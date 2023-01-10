@@ -733,8 +733,8 @@ hook.Add( "PreDrawEffects", "crackdown2_peacekeepericons/cellicons", function()
     -- Peacekeeper --
     local near = CD2FindInSphere( ply:GetPos(), 1500, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "agency" end )
 
-    for k, v in ipairs( near ) do
-
+    for i = 1, #near do
+        local v = near[ i ]
         render_SetMaterial( peacekeeper )
         render_DrawSprite( v:GetPos() + Vector( 0, 0, 100 ), 32, 20, color_white )
     end
@@ -743,8 +743,8 @@ hook.Add( "PreDrawEffects", "crackdown2_peacekeepericons/cellicons", function()
     -- Explosives --
     local near = CD2FindInSphere( ply:GetPos(), 1500, function( ent ) return explosivemodels[ ent:GetModel() ] end )
 
-    for k, v in ipairs( near ) do
-
+    for i = 1, #near do
+        local v = near[ i ]
         render_SetMaterial( fireicon )
         render_DrawSprite( v:GetPos() + Vector( 0, 0, v:GetModelRadius() + 40 ), 16, 16, color_white )
     end
@@ -753,8 +753,8 @@ hook.Add( "PreDrawEffects", "crackdown2_peacekeepericons/cellicons", function()
     -- Cell --
     local near = CD2FindInSphere( ply:GetPos(), 1500, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "cell" end )
 
-    for k, v in ipairs( near ) do
-
+    for i = 1, #near do
+        local v = near[ i ]
         render_SetMaterial( cell )
         render_DrawSprite( v:GetPos() + Vector( 0, 0, 100 ), 16, 16, red )
     end

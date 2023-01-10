@@ -10,17 +10,26 @@ function CD2GenerateMapData()
     local averageZ = 0
     local mapunderOrigin = false
     local highareas = {}
+    local hiddenvectors = {}
 
     local agilityorbdata = {}
     local tacticallocationdata = {}
+    local hiddenorbdata = {}
 
     CD2DebugMessage( "Generating Map Data for " .. game.GetMap() )
 
-    -- Get all Nav area Z positions
+    -- Get all Nav area Z positions | Get Hiding Spots
     for i = 1, #navareas do
         local nav = navareas[ i ]
         if !IsValid( nav ) then continue end
         averagetbl[ #averagetbl + 1 ] = nav:GetCenter().z
+
+        if #nav:GetAdjacentAreas() < 2 then 
+            local hidden = nav:GetHidingSpots( 1 )
+            for i = 1, #hidden do 
+                hiddenvectors[ #hiddenvectors + 1 ] = hidden[ i ] 
+            end
+        end
     end
 
     -- Calculate the average Z position
@@ -81,9 +90,34 @@ function CD2GenerateMapData()
 
     CD2DebugMessage( "Generated " .. #agilityorbdata .. " Agility Orbs")
 
-    CD2DebugMessage( "Looking for suitable areas for Tactical Locations.." )
-    -- Create Tactical Locations
+    -- Create Hidden Orbs
 
+    CD2DebugMessage( "Finding hiding places for Hidden Orbs.." )
+    for i = 1, #hiddenvectors do
+        local pos = hiddenvectors[ i ]
+
+        if !pos then continue end
+
+        local nearorbs = CD2FindInSphere( pos, 3000, function( ent ) return ent:GetClass() == "cd2_hiddenorb" end )
+
+        if #nearorbs > 0 then continue end
+
+        local hiddenorb = ents.Create( "cd2_hiddenorb" )
+        hiddenorb:SetPos( pos + Vector( 0, 0, 10) )
+
+        hiddenorb.cd2_map_isgenerated = true
+        hiddenorb.cd2_map_id = "hiddenorb:" .. hiddenorb:GetCreationID()
+
+        hiddenorb:Spawn()
+        
+        hiddenorbdata[ #hiddenorbdata + 1 ] = { pos = hiddenorb:GetPos(), id = hiddenorb.cd2_map_id }
+    end
+
+    CD2DebugMessage( "Generated " .. #hiddenorbdata .. " Hidden Orbs")
+
+    CD2DebugMessage( "Looking for suitable areas for Tactical Locations.." )
+
+    -- Create Tactical Locations
     local assignfirstlocation = true
     for i = 1, #navareas do
         local nav = navareas[ i ]
@@ -122,9 +156,12 @@ function CD2GenerateMapData()
     CD2_Firstbeacon:SetPos( CD2GetRandomPos( 1000, pos )  )
     CD2_Firstbeacon:Spawn()
     
+
+    SetGlobal2Bool( "cd2_MapDataLoaded", true )
     
     if !KeysToTheCity() then
         CD2FILESYSTEM:WriteMapData( "cd2_map_agilityorbdata", agilityorbdata )
+        CD2FILESYSTEM:WriteMapData( "cd2_map_hiddenorbdata", hiddenorbdata )
         CD2FILESYSTEM:WriteMapData( "cd2_map_tacticallocationdata", tacticallocationdata )
     end
 end
@@ -135,7 +172,9 @@ function CD2LoadMapData()
     local mapdata = CD2FILESYSTEM:ReadMapData( "TABLE" )
     local agilityorbs = mapdata.cd2_map_agilityorbdata
     local tacticallocations = mapdata.cd2_map_tacticallocationdata
+    local hiddenorbs = mapdata.cd2_map_hiddenorbdata
 
+    -- Load agility orbs
     for i = 1, #agilityorbs do
         local orbdata = agilityorbs[ i ]
         local pos = orbdata.pos
@@ -155,6 +194,27 @@ function CD2LoadMapData()
 
     CD2DebugMessage( "Loaded " .. #agilityorbs .. " Agility Orbs" )
 
+    -- Load Hidden Orbs
+    for i = 1, #hiddenorbs do
+        local orbdata = hiddenorbs[ i ]
+        local pos = orbdata.pos
+        local id = orbdata.id
+
+        local hiddenorb = ents.Create( "cd2_hiddenorb" )
+        hiddenorb:SetPos( pos )
+
+        hiddenorb.cd2_map_isgenerated = true
+        hiddenorb.cd2_map_id = id
+
+        hiddenorb:Spawn()
+
+    end
+
+    CD2DebugMessage( "Loaded " .. #hiddenorbs .. " Hidden Orbs" )
+
+
+
+    -- Load tactical locations
     for i = 1, #tacticallocations do
         local locationdata = tacticallocations[ i ]
         local pos = locationdata.pos
@@ -179,6 +239,8 @@ function CD2LoadMapData()
     end
 
     CD2DebugMessage( "Loaded " .. #tacticallocations .. " Tactical Locations" )
+
+    SetGlobal2Bool( "cd2_MapDataLoaded", true )
 end
 
 
@@ -197,6 +259,22 @@ hook.Add( "CD2_OnAgilityOrbCollected", "crackdown2_removeorbfrommapdata", functi
     end
 
     CD2FILESYSTEM:WriteMapData( "cd2_map_agilityorbdata", agilityorbdata )
+end )
+
+hook.Add( "CD2_OnHiddenOrbCollected", "crackdown2_removeorbfrommapdata", function( orb, ply )
+    if !orb.cd2_map_isgenerated or KeysToTheCity() then return end
+    local hiddenorbdata = CD2FILESYSTEM:ReadMapData( "cd2_map_hiddenorbdata" )
+
+    for i = 1, #hiddenorbdata do
+        local data = hiddenorbdata[ i ]
+
+        if data and data.id == orb.cd2_map_id then
+            CD2DebugMessage( "Removing Map Generated Hidden Orb ID " .. orb.cd2_map_id )
+            table_remove( hiddenorbdata, i )
+        end
+    end
+
+    CD2FILESYSTEM:WriteMapData( "cd2_map_hiddenorbdata", hiddenorbdata )
 end )
 
 

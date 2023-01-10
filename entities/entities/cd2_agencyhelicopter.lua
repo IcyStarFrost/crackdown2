@@ -98,6 +98,16 @@ function ENT:DeployPeacekeepers()
         local peacekeeper = ents.Create( "cd2_droppeacekeeper" )
         peacekeeper:SetPos( self:GetPos() + ( self:GetForward() * ( 50 * i ) ) + self:GetRight() * 50 ) 
         peacekeeper:Spawn()
+
+        CD2CreateThread( function()
+
+            peacekeeper:EmitSound( "crackdown2/npc/peacekeeper/drop" .. random( 1, 2 ) .. ".wav", 70 )
+
+            while IsValid( peacekeeper ) and !peacekeeper:IsOnGround() do coroutine.yield() end 
+            if !IsValid( peacekeeper ) then return end
+            
+            peacekeeper:EmitSound( "crackdown2/npc/peacekeeper/hitground" .. random( 1, 2 ) .. ".wav", 70 )
+        end )
     end
 end
 

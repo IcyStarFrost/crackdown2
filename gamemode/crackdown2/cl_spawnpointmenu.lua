@@ -157,7 +157,7 @@ function CD2OpenSpawnPointMenu()
 
                     function button:DoClick()
                         CD2_SpawnPointIndex = index
-                        surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
+                        surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
                     end
 
                     function button:Paint() end
@@ -203,11 +203,11 @@ hook.Add( "Think", "crackdown2_spawnpointmenu", function()
 
 
     if ply:KeyPressed( IN_USE ) then
-        surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
+        surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
         CD2_SpawnPointIndex = CD2_SpawnPointIndex - 1
         if CD2_SpawnPointIndex <= 0 then CD2_SpawnPointIndex = #CD2_SpawnPoints end
     elseif ply:KeyPressed( IN_RELOAD ) then
-        surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
+        surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
         CD2_SpawnPointIndex = CD2_SpawnPointIndex + 1
         if CD2_SpawnPointIndex > #CD2_SpawnPoints then CD2_SpawnPointIndex = 1 end
     elseif ply:KeyPressed( IN_JUMP ) then 

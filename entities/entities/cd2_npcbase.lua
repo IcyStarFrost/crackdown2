@@ -507,6 +507,26 @@ function ENT:OnContact( ent )
     end
 end
 
+--[[ function ENT:Reposition()
+    local nav
+    local dist
+    local navs = navmesh.GetAllNavAreas()
+    for i = 1, #navs do
+        local navarea = navs[ i ]
+        if !IsValid( navarea ) then continue end
+        if !nav then nav = navarea dist = self:GetRangeSquaredTo( navarea:GetCenter() ) continue end
+
+        if self:GetRangeSquaredTo( navarea:GetCenter() ) < dist then
+            nav = navarea
+            dist = self:GetRangeSquaredTo( navarea:GetCenter() )
+        end
+    end
+
+    if IsValid( nav ) then
+        self:SetPos( nav:GetCenter() )
+    end
+end ]]
+
 function ENT:HandleStuck()
     if CurTime() > self.cd2_ClearStuckTimes then self.cd2_StuckTimes = 0 end
 

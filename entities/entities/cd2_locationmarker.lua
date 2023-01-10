@@ -119,6 +119,7 @@ function ENT:OnActivate( ply )
 
                 if CurTime() > aborttime then
                     self:SetIsActive( false )
+                    self.cd2_killcount = 0
                     CD2SetTypingText( nil, "Tactical Assault Aborted", "", true )
                     return
                 end

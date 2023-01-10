@@ -199,7 +199,7 @@ function ENT:MainThink()
             self.cd2_NextLookAround = CurTime() + 5
             if ( !self.cd2_MoveChange or CurTime() > self.cd2_MoveChange ) then -- Randomly move around when we are attacking
                 self.cd2_Goal = self:GetPos() + Vector( random( -500, 500 ), random( -500, 500 ) )
-                self.cd2_MoveChange = CurTime() + 3
+                self.cd2_MoveChange = CurTime() + 5
             end
         end
 

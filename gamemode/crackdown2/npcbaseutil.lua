@@ -46,6 +46,7 @@ function ENT:MoveToPos( pos, options )
 	path:SetGoalTolerance( options.tolerance or 20 )
 	path:Compute( self, ( isentity( self.cd2_MoveGoal ) and self.cd2_MoveGoal:GetPos() or self.cd2_MoveGoal ) )
 
+
 	if !path:IsValid() then
         coroutine.wait( 1 )
         return "failed" 

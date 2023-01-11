@@ -15,7 +15,7 @@ if SERVER then
     hook.Add( "CD2_OnLevelUp", "crackdown2_levelup", function( ply, skill )
         if KeysToTheCity() then return end
 
-        if !ply.cd2_firstagilityimprove then
+        if skill == "Agility" and !ply.cd2_firstagilityimprove then
             CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstagilityimprove", function( val )
                 if !val then
                     timer.Simple( 2, function()
@@ -29,7 +29,7 @@ if SERVER then
             end )
         end
 
-        if !ply.cd2_firstfirearmimprove then
+        if skill == "Weapon" and !ply.cd2_firstfirearmimprove then
             CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstfirearmimprove", function( val )
                 if !val then
                     timer.Simple( 2, function()
@@ -43,7 +43,7 @@ if SERVER then
             end )
         end
 
-        if !ply.cd2_firststrengthimprove then
+        if skill == "Strength" and !ply.cd2_firststrengthimprove then
             CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firststrengthimprove", function( val )
                 if !val then
                     timer.Simple( 2, function()
@@ -57,7 +57,7 @@ if SERVER then
             end )
         end
 
-        if !ply.cd2_firstexplosiveimprove then
+        if skill == "Explosive" and !ply.cd2_firstexplosiveimprove then
             CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstexplosiveimprove", function( val )
                 if !val then
                     timer.Simple( 2, function()

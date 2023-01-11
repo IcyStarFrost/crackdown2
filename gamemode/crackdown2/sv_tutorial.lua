@@ -36,18 +36,21 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         coroutine.wait( 4.5 )
 
+        ply:SendLua( "surface.PlaySound( 'crackdown2/ui/hudactivate.mp3' )")
         net.Start( "cd2net_tutorial_activatehud" )
         net.WriteString( "CD2_DrawHealthandShields" )
         net.Send( ply )
 
         coroutine.wait( 4.8 )
 
+        ply:SendLua( "surface.PlaySound( 'crackdown2/ui/hudactivate.mp3' )")
         net.Start( "cd2net_tutorial_activatehud" )
         net.WriteString( "CD2_DrawMinimap" )
         net.Send( ply )
 
         coroutine.wait( 2.3 )
 
+        ply:SendLua( "surface.PlaySound( 'crackdown2/ui/hudactivate.mp3' )")
         net.Start( "cd2net_tutorial_activatehud" )
         net.WriteString( "CD2_DrawTargetting" )
         net.Send( ply )
@@ -114,7 +117,6 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         CD2SendTextBoxMessage( ply, "Run to the Agility Orb and collect it" )
 
         ply:Freeze( false )
-
         net.Start( "cd2net_tutorial_activatehud" )
         net.WriteString( "CD2_DrawAgilitySkill" )
         net.Send( ply )

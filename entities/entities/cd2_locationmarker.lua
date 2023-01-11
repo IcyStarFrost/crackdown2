@@ -97,6 +97,10 @@ function ENT:OnActivate( ply )
 
         CD2SetTypingText( nil, "TACTICAL ASSAULT INITIATED", "" )
 
+        if !KeysToTheCity() and random( 1, 2 ) == 1 then
+            ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/celldefend.mp3" )
+        end
+
         local npclist = difficultynpcs[ self:GetDifficulty() ]
 
         self:SetIsActive( true )

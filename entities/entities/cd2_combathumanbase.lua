@@ -116,6 +116,7 @@ function ENT:ControlMovement( pos, update )
         shouldupdatepath = false
         self.cd2_RecomputeMove = false
 
+
         self.cd2_Path:Compute( self, pos )
 
     else
@@ -190,7 +191,7 @@ function ENT:MainThink()
                 CD2CreateThread( function()
                     self:AddGesture( ACT_GMOD_GESTURE_ITEM_THROW, true )
                     coroutine.wait( 1 )
-                    if !IsValid( self ) or !IsValid(  self:GetEnemy() ) then return end
+                    if !IsValid( self ) or !IsValid( self:GetEnemy() ) then return end
                     CD2ThrowEquipment( self.cd2_Equipment, self, self:GetEnemy():GetPos() )
                 end )
                 self.cd2_grenadecooldown = CurTime() + rand( 5, 15 )

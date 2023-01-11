@@ -368,7 +368,7 @@ function ENT:Think()
             phys:SetAngles( self:GetAngles() )
         end
 
-        self.cd2_PhysicsUpdate = CurTime() + 0.05
+        self.cd2_PhysicsUpdate = CurTime() + 0.1
     end
 
     if !self:GetIsDisabled() and IsValid( self:GetActiveWeapon() ) and self:GetActiveWeapon():Clip1() == 0 then

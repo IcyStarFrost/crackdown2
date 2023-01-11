@@ -195,6 +195,19 @@ function PLAYER:Stun( force )
     self:SetIsStunned( true )
 end
 
+local oldsethealth = ENT.SetHealth
+function ENT:SetHealth( newhealth )
+    if self:IsCD2Agent() then self:SetNWHealth( newhealth ) end
+    
+    oldsethealth( self, newhealth )
+end
+
+local oldsetarmor = PLAYER.SetArmor
+function PLAYER:SetArmor( newarmor )
+    if self:IsCD2Agent() then self:SetNWShields( newarmor ) end
+    oldsetarmor( self, newarmor )
+end
+
 
 function PLAYER:BuildSkills()
     local strength = self:GetStrengthSkill()

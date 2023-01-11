@@ -127,7 +127,7 @@ function ENT:OnBeamStart()
             beamlerp = beamlerp or emitter:GetPos()
 
             render.SetMaterial( beam )
-            render.DrawBeam( emitter:GetPos(), beamlerp, 50, 1, 50, beaconblue )
+            render.DrawBeam( emitter:GetPos(), beamlerp, 50, 1, random( 1, 1000000 ), beaconblue )
 
             beamlerp = LerpVector( clamp( ( SysTime() - starttime ) / ( endtime - starttime ), 0, 1 ), beamlerp, core:GetPos() )
 

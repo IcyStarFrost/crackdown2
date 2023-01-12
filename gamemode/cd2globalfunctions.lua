@@ -329,6 +329,7 @@ function CD2GetRandomPos( dist, pos )
             if !result.Hit then return spot end
         end
     end
+    return Vector()
 end
 
 if SERVER then

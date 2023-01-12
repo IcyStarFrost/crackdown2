@@ -10,6 +10,7 @@ ENT.TrailColor = Color( 255 ,174, 0)
 ENT.DelayTime = 3 -- The time before the grenade blows up. 0 for no timed explosive
 ENT.TickSound = "weapons/grenade/tick1.wav"
 
+ENT.DropMenu_RequiresCollect = true
 ENT.DropMenu_SkillLevel = 0
 ENT.DropMenu_Damage = 8
 ENT.DropMenu_Range = 7

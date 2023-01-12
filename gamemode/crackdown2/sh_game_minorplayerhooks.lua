@@ -15,6 +15,10 @@ if SERVER then
     hook.Add( "CD2_OnLevelUp", "crackdown2_levelup", function( ply, skill )
         if KeysToTheCity() then return end
 
+        if skill == "Strength" and ply:GetStrengthSkill() == 4 then
+            CD2SendTextBoxMessage( ply, "While in the air, hold USE key and press your attack/fire button to initiate a devastating Ground Pound" )
+        end
+
         if skill == "Agility" and !ply.cd2_firstagilityimprove then
             CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstagilityimprove", function( val )
                 if !val then

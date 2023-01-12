@@ -73,6 +73,22 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             ply:SetPos( pos )
 
+            CD2CreateThread( function()
+                if !IsValid( ply ) then return end
+        
+                for i = 1, 100 do
+                    if !IsValid( ply ) then return end
+        
+                    local trailer = ents.Create( "cd2_respawntrail" )
+                    trailer:SetPos( ply:WorldSpaceCenter() + VectorRand( -150, 150 ) )
+                    trailer:SetPlayer( ply )
+                    trailer:Spawn()
+        
+                    coroutine.wait( 0.01 )
+                end
+            
+            end )
+
             net.Start( "cd2net_playerspawnlight" )
             net.WriteEntity( ply )
             net.Broadcast()
@@ -286,6 +302,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         CD2SendTextBoxMessage( ply, "Hold USE key and press your attack/fire button to melee" )
 
         pos = CD2GetRandomPos( 500, ply:GetPos() )
+
         local ent = ents.Create( "cd2_freak" )
         ent:SetPos( pos )
         ent:AttackTarget( ply )
@@ -424,6 +441,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         ply:SetCanUseMelee( true )
         CD2_FreezeTime = false
     
+        ply:StripAmmo()
+        ply:StripWeapons()
         ply:Spawn()
         ply:SetPos( playerspawnpos )
         ply:SetAngles( ang )
@@ -460,7 +479,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         coroutine.wait( 5 )
 
-        
+        CD2FILESYSTEM:WritePlayerData( ply, "c_completedtutorial", true )
 
         ply:Freeze( false )
         ply.cd2_godmode = false

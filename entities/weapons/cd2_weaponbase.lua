@@ -30,8 +30,8 @@ SWEP.ReloadSounds = {} -- A table of tables with the first key being the time to
 SWEP.DropMenu_Damage = 0
 SWEP.DropMenu_Range = 0
 SWEP.DropMenu_FireRate = 0
+SWEP.DropMenu_RequiresCollect = false -- If the player must bring this weapon to a Agency Landing Zone to pick it in the Drop Menu
 SWEP.DropMenu_SkillLevel = 0 -- The skill level the player's Weapon skill needs to be in order to use this weapon
-SWEP.DropMenu_Feature = nil -- What makes this weapon unique. I.E UV 
 --
 
 SWEP.IsExplosive = false -- If the weapon is explosive. used to render the dropped weapon color to yellow

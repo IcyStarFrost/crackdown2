@@ -35,6 +35,7 @@ util.AddNetworkString( "cd2net_generatenavmesh" )
 util.AddNetworkString( "cd2net_locationcaptured" )
 util.AddNetworkString( "cd2net_enablehud" )
 util.AddNetworkString( "cd2net_sendtypingtext" )
+util.AddNetworkString( "cd2net_checkweapons" )
 
 util.AddNetworkString( "cd2filesystem_requestplayerdata" )
 util.AddNetworkString( "cd2filesystem_dispatchplayerdata" )

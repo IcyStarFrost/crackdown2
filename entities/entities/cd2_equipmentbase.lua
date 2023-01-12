@@ -14,9 +14,14 @@ ENT.TickSound = nil -- The sound that will play as the grenade ticks
 ENT.RemoveOnInvalid = false -- If true, the equipment will remove itself if its thrower is invalid
 --
 
-ENT.DropMenu_SkillLevel = 0
+-- Drop menu shown stats. 
+ENT.DropMenu_RequiresCollect = false -- If the player must bring this weapon to a Agency Landing Zone to pick it in the Drop Menu
+ENT.DropMenu_SkillLevel = 0 -- The skill level the player's Weapon skill needs to be in order to use this weapon
+
+-- These values must be clamped to 0 to 10!
 ENT.DropMenu_Damage = 0
 ENT.DropMenu_Range = 0
+--
 
 
 -- Util vars

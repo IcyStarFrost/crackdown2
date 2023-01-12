@@ -208,6 +208,14 @@ function PLAYER:SetArmor( newarmor )
     oldsetarmor( self, newarmor )
 end
 
+local oldstripammo = PLAYER.StripAmmo
+function PLAYER:StripAmmo()
+    for k, v in ipairs( self:GetWeapons() ) do
+        if IsValid( v ) then v.cd2_Ammocount = 0 end
+    end
+    oldstripammo( self )
+end
+
 
 function PLAYER:BuildSkills()
     local strength = self:GetStrengthSkill()

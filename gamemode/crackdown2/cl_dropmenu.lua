@@ -26,6 +26,11 @@ CD2_DropPrimary = "cd2_smg"
 CD2_DropSecondary = "cd2_pistol"
 CD2_DropEquipment = "cd2_grenade"
 
+local function PlayerHasWeapon( class )
+    local hasweapon = CD2FILESYSTEM:ReadPlayerData( "cd2_weaponcollect_" .. class )
+    return hasweapon
+end
+
 function CD2OpenDropMenu( issupplypoint )
 
     surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
@@ -133,14 +138,16 @@ function CD2OpenDropMenu( issupplypoint )
             modelpanel:SetLookAt( ent:OBBCenter() + Vector( 0, 0, 5 ) )
 
             local dmg 
+            local class
             local range 
             local firerate
             local skilllevel
             local isexplosive
+            local requirescollect
 
             -- Returns if the player can use this weapon
             function panel:PassesWeaponSkillTest()
-                return !KeysToTheCity() and ( !isequipment and !isexplosive ) and skilllevel and skilllevel <= plyweaponskill or ( isequipment or isexplosive ) and skilllevel and skilllevel <= plyexplosiveskill or KeysToTheCity()
+                return !KeysToTheCity() and ( requirescollect and PlayerHasWeapon( class ) ) or !KeysToTheCity() and !requirescollect and ( !isequipment and !isexplosive ) and skilllevel and skilllevel <= plyweaponskill or !KeysToTheCity() and !requirescollect and ( isequipment or isexplosive ) and skilllevel and skilllevel <= plyexplosiveskill or KeysToTheCity()
             end
 
             function statsholder:Paint( w, h )
@@ -200,10 +207,12 @@ function CD2OpenDropMenu( issupplypoint )
             function modelpanel:Paint( w, h )
                 oldpaint( self, w, h )
 
-                if !KeysToTheCity() and ( !isequipment and !isexplosive ) and skilllevel and skilllevel > plyweaponskill then
+                if !KeysToTheCity() and !requirescollect and ( !isequipment and !isexplosive ) and skilllevel and skilllevel > plyweaponskill then
                     draw_DrawText( "UNLOCKED AT FIREARMS LEVEL " .. skilllevel, "crackdown2_weaponstattext", 10, h - 20, lightgrey, TEXT_ALIGN_LEFT )
-                elseif !KeysToTheCity() and ( isequipment or isexplosive ) and skilllevel and skilllevel > plyexplosiveskill then
+                elseif !KeysToTheCity() and !requirescollect and ( isequipment or isexplosive ) and skilllevel and skilllevel > plyexplosiveskill then
                     draw_DrawText( "UNLOCKED AT EXPLOSIVES LEVEL " .. skilllevel, "crackdown2_weaponstattext", 10, h - 20, lightgrey, TEXT_ALIGN_LEFT )
+                elseif !KeysToTheCity() and requirescollect and !PlayerHasWeapon( class ) then
+                    draw_DrawText( "EQUIPMENT YET TO BE STORED", "crackdown2_weaponstattext", 10, h - 20, lightgrey, TEXT_ALIGN_LEFT )
                 end
             end
 
@@ -212,11 +221,13 @@ function CD2OpenDropMenu( issupplypoint )
             function panel:SetWeaponData( data )
                 label:SetText( "  " .. data.PrintName )
                 modelpanel:SetModel( data.WorldModel )
+                class = data.ClassName
                 dmg = data.DropMenu_Damage
                 range = data.DropMenu_Range
                 firerate = data.DropMenu_FireRate
                 skilllevel = data.DropMenu_SkillLevel
                 isexplosive = data.IsExplosive
+                requirescollect = data.DropMenu_RequiresCollect
             end
 
             return panel
@@ -337,9 +348,9 @@ function CD2OpenDropMenu( issupplypoint )
                         if IsValid( ent ) then
                             
                             
-                            if !KeysToTheCity() and v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyexplosiveskill then
+                            if !KeysToTheCity() and ( v.DropMenu_RequiresCollect and !PlayerHasWeapon( v.ClassName ) ) or !KeysToTheCity() and ( v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyexplosiveskill ) then
                                 lockicon:Show()
-                            elseif !KeysToTheCity() and !v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyweaponskill then
+                            elseif !KeysToTheCity() and ( v.DropMenu_RequiresCollect and !PlayerHasWeapon( v.ClassName ) )  or !KeysToTheCity() and !v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyweaponskill then
                                 lockicon:Show()
                             else
                                 lockicon:Hide()
@@ -378,9 +389,9 @@ function CD2OpenDropMenu( issupplypoint )
 
                         if IsValid( ent ) then
 
-                            if !KeysToTheCity() and wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyexplosiveskill then
+                            if !KeysToTheCity() and ( wepdata.DropMenu_RequiresCollect and !PlayerHasWeapon( wepdata.ClassName ) ) or !KeysToTheCity() and wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyexplosiveskill then
                                 lockicon:Show()
-                            elseif !KeysToTheCity() and !wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyweaponskill then
+                            elseif !KeysToTheCity() and ( wepdata.DropMenu_RequiresCollect and !PlayerHasWeapon( wepdata.ClassName ) ) or !KeysToTheCity() and !wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyweaponskill then
                                 lockicon:Show()
                             else
                                 lockicon:Hide()

@@ -555,3 +555,37 @@ net.Receive( "cd2net_sendtypingtext", function()
     local isred = net.ReadBool()
     CD2SetTypingText( top, bottom, isred )
 end )
+
+
+local function PlayerHasWeapon( class )
+    local hasweapon = CD2FILESYSTEM:ReadPlayerData( "cd2_weaponcollect_" .. class )
+    return hasweapon
+end
+
+net.Receive( "cd2net_checkweapons", function()
+    local weps = LocalPlayer():GetWeapons()
+    local equipment = LocalPlayer():GetEquipment()
+    local texttbl = {}
+    local newweps = false 
+
+    for k , v in ipairs( weps ) do 
+        if IsValid( v ) and v.DropMenu_RequiresCollect and !PlayerHasWeapon( v:GetClass() ) then 
+            texttbl[ #texttbl + 1 ] = v:GetPrintName()
+            CD2FILESYSTEM:WritePlayerData( "cd2_weaponcollect_" .. v:GetClass(), true )
+            newweps = true 
+        end
+    end
+
+    local enttbl = scripted_ents.Get( equipment )
+
+    if enttbl.DropMenu_RequiresCollect and !PlayerHasWeapon( equipment ) then
+        texttbl[ #texttbl + 1 ] = enttbl.PrintName
+        CD2FILESYSTEM:WritePlayerData( "cd2_weaponcollect_" .. equipment, true )
+        newweps = true 
+    end
+
+    if newweps then
+        CD2SetTypingText( "Equipment Stored", table.concat( texttbl, ", " ) )
+    end
+
+end )

@@ -22,7 +22,7 @@ CD2_InDropMenu = false
 CD2_DropMenu = CD2_DropMenu or nil
 
 
-CD2_DropPrimary = "cd2_smg"
+CD2_DropPrimary = "cd2_assaultrifle"
 CD2_DropSecondary = "cd2_pistol"
 CD2_DropEquipment = "cd2_grenade"
 
@@ -35,9 +35,9 @@ function CD2OpenDropMenu( issupplypoint )
 
     surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
 
-    CD2_DropPrimary = CD2FILESYSTEM:ReadPlayerData( "cd2_dropprimary" ) or CD2_DropPrimary
-    CD2_DropSecondary = CD2FILESYSTEM:ReadPlayerData( "cd2_dropsecondary" ) or CD2_DropSecondary
-    CD2_DropEquipment = CD2FILESYSTEM:ReadPlayerData( "cd2_dropequipment" ) or CD2_DropEquipment
+    CD2_DropPrimary = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "cd2_dropprimary" ) or CD2_DropPrimary
+    CD2_DropSecondary = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "cd2_dropsecondary" ) or CD2_DropSecondary
+    CD2_DropEquipment = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "cd2_dropequipment" ) or CD2_DropEquipment
 
 
 
@@ -506,7 +506,7 @@ function CD2OpenDropMenu( issupplypoint )
                 net.WriteAngle( CD2_SelectedSpawnAngle )
                 net.SendToServer()
 
-                LocalPlayer():SetEquipment( CD2_DropEquipment )
+                LocalPlayer().cd2_equipment = CD2_Equipment
                 LocalPlayer().cd2_lastspawnprimary = CD2_DropPrimary
                 LocalPlayer().cd2_lastspawnsecondary = CD2_DropSecondary
             else
@@ -516,7 +516,7 @@ function CD2OpenDropMenu( issupplypoint )
                 net.WriteString( CD2_DropEquipment )
                 net.SendToServer()
 
-                LocalPlayer():SetEquipment( CD2_DropEquipment )
+                LocalPlayer().cd2_equipment = CD2_Equipment
                 LocalPlayer().cd2_lastspawnprimary = CD2_DropPrimary
                 LocalPlayer().cd2_lastspawnsecondary = CD2_DropSecondary
             end

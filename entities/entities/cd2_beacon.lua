@@ -9,6 +9,14 @@ local LerpVector = LerpVector
 local FrameTime = FrameTime
 local Vector = Vector
 local Trace = util.TraceLine
+local blackish = Color( 39, 39, 39 )
+local linecol = Color( 61, 61, 61, 100 )
+local orangeish = Color( 202, 79, 22 )
+local chargecol = Color( 0, 110, 255 )
+local beaconiconcol = Color( 0, 110, 255 )
+
+local glow = Material( "crackdown2/ui/skillglow2.png" )
+local beaconicon = Material( "crackdown2/ui/beaconicon.png" )
 local beacontrace = {}
 
 function ENT:Initialize()
@@ -31,6 +39,7 @@ function ENT:Initialize()
         self.RingMid:SetParent( self.Ring )
 
         self:SetEmitter( self.RingMid )
+        self:SetBeaconHealth( 100 )
         self:SetCore( self.Core )
 
         self.cd2_currentlerp = 0
@@ -50,6 +59,11 @@ function ENT:Initialize()
             net.Broadcast()
         end )
         
+        hook.Add( "EntityTakeDamage", self, function( self, ent, info )
+            if !self:GetIsCharging() or ent:GetOwner() != self then return end
+            self:SetBeaconHealth( self:GetBeaconHealth() - ( info:GetDamage() / 10 ) )
+        end )
+
     end
 end
 
@@ -64,6 +78,7 @@ function ENT:SetupDataTables()
     self:NetworkVar( "Bool", 5, "BeamActive" )
 
     self:NetworkVar( "Float", 0, "ChargeDuration" )
+    self:NetworkVar( "Float", 1, "BeaconHealth" )
 
     self:NetworkVar( "Vector", 0, "RingPos" )
     self:NetworkVar( "Vector", 1, "BeaconPos" )
@@ -73,6 +88,7 @@ function ENT:SetupDataTables()
 end
 
 
+-- Once the beacon touches ground, play some effects
 function ENT:OnLand()
     if SERVER then
         net.Start( "cd2net_playerlandingdecal" )
@@ -105,6 +121,8 @@ end
 local beaconblue = Color( 0, 217, 255 )
 local beam = Material( "crackdown2/effects/beam.png", "smooth" )
 
+
+-- The energy beam from the Ring has been initialized and the beacon will soon begin charging
 ENT.SunBeamMult = 0.20
 ENT.SunBeamDark = 0
 ENT.SunSize = 0.05
@@ -119,6 +137,67 @@ function ENT:OnBeamStart()
         local beamlerp
         local starttime = SysTime()
         local endtime = SysTime() + 10
+
+        local truedur
+        local curtimed
+        local lasthealth = 100
+
+        hook.Add( "HUDPaint", self, function() 
+            if self:GetIsDetonated() then hook.Remove( "HUDPaint", self ) return end
+            if !LocalPlayer():IsCD2Agent() or LocalPlayer():SqrRangeTo( self ) > ( 2000 * 2000 ) or !truedur or !self:GetIsCharging() then return end
+            curtimed = curtimed or CurTime()
+
+
+            -- Base
+            surface.SetDrawColor( blackish )
+            draw.NoTexture()
+            surface.DrawRect( ScrW() - 350,  40, 300, 64 )
+        
+            surface.SetDrawColor( linecol )
+            surface.DrawOutlinedRect( ScrW() - 350,  40, 300, 64, 1 )
+            --
+
+            -- Icon
+            surface.SetDrawColor( color_white )
+            surface.SetMaterial( beaconicon )
+            surface.DrawTexturedRect( ScrW() - 420,  40, 64, 64 )
+
+            beaconiconcol.r = Lerp( 1 * FrameTime(), beaconiconcol.r, 0 )
+            beaconiconcol.g = Lerp( 1 * FrameTime(), beaconiconcol.g, 110 )
+            beaconiconcol.b = Lerp( 1 * FrameTime(), beaconiconcol.b, 255 )
+
+            surface.SetDrawColor( beaconiconcol )
+            surface.SetMaterial( glow )
+            surface.DrawTexturedRect( ScrW() - 452,  5, 128, 128 )
+            --
+        
+            local progressW = ( ( CurTime() - curtimed ) / truedur ) * 280
+        
+            -- Beacon Progress bar
+            surface.SetDrawColor( chargecol )
+            surface.DrawRect( ScrW() - 340, 55, progressW, 10 )
+        
+            surface.SetDrawColor( linecol )
+            surface.DrawOutlinedRect( ScrW() - 345,  50, 290, 20, 1 )
+
+            local healthW = ( self:GetBeaconHealth() / 100 ) * 280
+        
+            -- Beacon Health Bar
+            surface.SetDrawColor( orangeish )
+            surface.DrawRect( ScrW() - 340, 80, healthW, 10 )
+        
+            surface.SetDrawColor( linecol )
+            surface.DrawOutlinedRect( ScrW() - 345,  75, 290, 20, 1 )
+            
+            if self:GetBeaconHealth() != lasthealth then
+                beaconiconcol.r = 255 
+                beaconiconcol.g = 0
+                beaconiconcol.b = 0
+            end
+
+            lasthealth = self:GetBeaconHealth()
+
+        end )
         
         hook.Add( "PreDrawEffects", self, function()
             local emitter = self:GetEmitter()
@@ -156,10 +235,11 @@ function ENT:OnBeamStart()
 
             if IsValid( self.cd2_intromusic ) then self.cd2_intromusic:Kill() end
             local first = true
-            CD2StartMusic( self:GetSoundTrack(), 600, false, false, nil, nil, nil, nil, nil, function( chan )
+            self.cd2_beaconmusic = CD2StartMusic( self:GetSoundTrack(), 600, false, false, nil, nil, nil, nil, nil, function( chan )
                 if !IsValid( self ) then chan:FadeOut() end
 
                 if first then
+                    truedur = chan:GetChannel():GetLength() - 10
                     net.Start( "cd2net_beaconduration" )
                     net.WriteEntity( self )
                     net.WriteFloat( chan:GetChannel():GetLength() )
@@ -172,6 +252,7 @@ function ENT:OnBeamStart()
     end
 end
 
+-- Drops the beacon to the ground and begins the Beacon defense event
 function ENT:DropBeacon()
     beacontrace.start = self:GetPos()
     beacontrace.endpos = self:GetPos() - Vector( 0, 0, 1000000 )
@@ -185,6 +266,37 @@ function ENT:DropBeacon()
     self:SetRingPos( self.Ring:GetPos() )
     self:SetBeaconPos( result.HitPos )
     self:SetActive( true )
+end
+
+-- Called when the beacon's health reaches 0 or below
+function ENT:OnBeaconDestroyed() 
+    if SERVER then
+        self:SetIsCharging( false )
+
+        net.Start( "cd2net_explosion" )
+        net.WriteVector( self.Core:GetPos() )
+        net.WriteFloat( 3 )
+        net.Broadcast()
+
+        self.Core:Remove()
+
+        CD2SetTypingText( nil, "OBJECTIVE INCOMPLETE", "Beacon Destroyed", true )
+        
+        local players = player.GetAll()
+        for i = 1, #players do 
+            local ply = players[ i ]
+            if IsValid( ply ) and ply:SqrRangeTo( self ) < ( 2000 * 2000 ) then ply:Kill() end
+        end
+
+        timer.Simple( 7, function() if IsValid( self ) then self:Remove() end end )
+    else 
+        hook.Remove( "PreDrawEffects", self )
+        hook.Remove( "HUDPaint", self )
+
+
+        if IsValid( self.cd2_beaconmusic ) then self.cd2_beaconmusic:FadeOut() end
+        self.cd2_beaconmusic = CD2StartMusic( "sound/crackdown2/music/beacon/beacondestroyed.mp3", 600 )
+    end
 end
 
 function ENT:PlayClientSound( path, pos, volume )
@@ -201,6 +313,7 @@ function ENT:StartIntroMusic()
     end )
 end
 
+-- The beacon has fully charged and is now detonating
 local viewtbl = {}
 function ENT:BeaconDetonate()
     if SERVER then
@@ -220,7 +333,7 @@ function ENT:BeaconDetonate()
                 ent:TakeDamage( ent:GetMaxHealth(), Entity( 0 ) )
             end
         
-            coroutine.wait( 4 )
+            coroutine.wait( 2 )
 
             self:PlayClientSound( "crackdown2/ambient/beacon/beaconfinish.mp3", self:GetPos(), 5 )
 
@@ -282,7 +395,7 @@ function ENT:BeaconDetonate()
                 return viewtbl
             end
 
-            coroutine.wait( 3 )
+            coroutine.wait( 2 )
             local time = SysTime() + 3
             lerpup = false
             
@@ -292,7 +405,7 @@ function ENT:BeaconDetonate()
                 coroutine.yield()
             end
 
-            coroutine.wait( 3 )
+            coroutine.wait( 2 )
             
             CD2_PreventMovement = nil
             CD2_ViewOverride = nil
@@ -314,6 +427,7 @@ function ENT:BeaconDetonate()
     end
 end
 
+-- The begin now begins charging 10 seconds after being supplied by the energy beam 
 local energy = Material( "crackdown2/effects/energy.png" )
 function ENT:BeginBeaconCharge()
     if SERVER then
@@ -384,18 +498,31 @@ end
 function ENT:Think()
     if !self:GetActive() then return end
 
+    -- Beacon Sequence --
+    -- The Sequence of Operation will be labeled from first to last step
     if SERVER then
 
-        if self:GetBeamActive() then
-            self.Ring:SetAngles( Angle( 0, CurTime() * 800, 0 ) )
+        -- The Beacon's health reached 0. The Agents failed to defend the Beacon
+        if self:GetBeaconHealth() <= 0 and !self.cd2_isdestroyed then
+            self:OnBeaconDestroyed()
+            BroadcastLua( "Entity(" .. self:EntIndex() .. "):OnBeaconDestroyed()" )
+            self.cd2_isdestroyed = true
         end
 
+        -- When the beam is active, begin spinning the Ring
+        if self:GetBeamActive() then
+            self.Ring:SetAngles( Angle( 0, CurTime() * 800, 0 ) )
+            self.Ring:SetPos( self:GetRingPos() )
+        end
+
+        -- 4th Step: After 10 seconds is up, begin the beacon charging
         if self.cd2_BeaconChargeStart and CurTime() > self.cd2_BeaconChargeStart then
             self:BeginBeaconCharge()
             BroadcastLua( "Entity(" .. self:EntIndex() .. "):BeginBeaconCharge()" )
             self.cd2_BeaconChargeStart = nil
         end
 
+        -- Slowly raise the Beacon Core when the Beacon is being charged
         if self:GetIsCharging() then
             local time = self:GetChargeDuration()
             self.cd2_currentlerp = 0
@@ -405,15 +532,18 @@ function ENT:Think()
             self.Core:SetAngles( Angle( CurTime() * 200, CurTime() * 200, CurTime() * 200 ) / ( self.cd2_curtimeduration - CurTime() )  )
         end
 
+        -- Final Step: The Beacon finished charging and will now detonate
         if self:GetIsCharging() and CurTime() > self.cd2_curtimeduration then
             self:BeaconDetonate()
             BroadcastLua( "Entity(" .. self:EntIndex() .. "):BeaconDetonate()" )
         end
 
+        -- 1st Step: The Beacon is dropping to the ground
         if self:GetIsDropping() and self:GetPos():DistToSqr( self:GetBeaconPos() ) > ( 20 * 20 ) then
 
             self:SetPos( self:GetPos() + ( self:GetBeaconPos() - self:GetPos() ):GetNormalized() * 10 )
 
+            -- 2nd Step: Once the Beacon has reached the ground, return the Ring back to the sky 
         elseif self:GetIsDropping() and self:GetPos():DistToSqr( self:GetBeaconPos() ) <= ( 20 * 20 ) then
 
             self:SetIsDropping( false )
@@ -423,10 +553,12 @@ function ENT:Think()
             BroadcastLua( "Entity(" .. self:EntIndex() .. "):OnLand()" )
             self:OnLand()
 
+            -- 2nd Step: Ring is returning..
         elseif self:GetRingReturning() and self.Ring:GetPos():DistToSqr( self:GetRingPos() ) > ( 20 * 20 ) then
 
             self.Ring:SetPos( self.Ring:GetPos() + ( self:GetRingPos() - self.Ring:GetPos() ):GetNormalized() * 4 )
 
+            -- 3rd Step: The Ring has reached its position and will now fire its energy beam
         elseif self:GetRingReturning() and self.Ring:GetPos():DistToSqr( self:GetRingPos() ) <= ( 20 * 20 ) then
             BroadcastLua( "Entity(" .. self:EntIndex() .. "):OnBeamStart()" )
             self:OnBeamStart()
@@ -436,10 +568,12 @@ function ENT:Think()
 
     elseif CLIENT then
 
+        -- Setting the ring ambient sound position
         if IsValid( self.cd2_ringambient ) and IsValid( self:GetEmitter() ) then
             self.cd2_ringambient:SetPos( self:GetEmitter():GetPos() )
         end
 
+        -- Emitting the energy particles during charge
         if self:GetIsCharging() then
             local light = DynamicLight( self:EntIndex() )
             if ( light ) then
@@ -520,7 +654,36 @@ function ENT:Think()
             end
         end
 
+        -- Smaller energy particles after the Beacon has detonated
+        if self:GetIsDetonated() and LocalPlayer():SqrRangeTo( self ) < ( 1500 * 1500 ) then
+            if !self.cd2_nextenergycoreparticle or SysTime() > self.cd2_nextenergycoreparticle then
+                local particle = ParticleEmitter( self:GetCore():GetPos() )
+                local part = particle:Add( energy, self:GetCore():GetPos() )
+
+                if part then
+                    part:SetStartSize( 10 )
+                    part:SetEndSize( 10 ) 
+                    part:SetStartAlpha( 255 )
+                    part:SetEndAlpha( 0 )
+        
+                    part:SetColor( 255, 255, 255 )
+                    part:SetLighting( false )
+                    part:SetCollide( false )
+        
+                    part:SetDieTime( 3 )
+                    part:SetGravity( Vector() )
+                    part:SetAirResistance( 100 )
+                    part:SetVelocity( VectorRand( -100, 100 ) )
+                    part:SetAngleVelocity( AngleRand( -1, 1 ) )
+                end
+
+                particle:Finish()
+                self.cd2_nextenergycoreparticle = SysTime() + 0.08
+            end
+        end
+
     end
+
 
     self:NextThink( CurTime() + 0.01 )
     return true
@@ -535,6 +698,7 @@ function ENT:OnRemove()
     end
 end
 
+-- Helper function
 function ENT:CreatePart( pos, ang, mdl, mat, scale )
     local part = ents.Create( "base_anim" )
     part:SetPos( pos )

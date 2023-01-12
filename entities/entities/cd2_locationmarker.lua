@@ -15,8 +15,8 @@ function ENT:Initialize()
 
     if SERVER then
         self.cd2_cellcount = 2 + ( 2 * self:GetDifficulty() )
-        self.cd2_maxkillcount = 9 + ( 3 * self:GetDifficulty() )
-        self.cd2_killcount = 0
+        self:SetMaxKillCount( 9 + ( 3 * self:GetDifficulty() ) )
+        self:SetKillCount( 0 )
         self.cd2_activecell = {}
 
         self.cd2_maxpassivenpccount = 3
@@ -25,7 +25,7 @@ function ENT:Initialize()
 
         hook.Add( "OnCD2NPCKilled", self, function( self, ent, info )
             if !IsValid( self ) then hook.Remove( "OnCD2NPCKilled", self) return end
-            if table_HasValue( self.cd2_activecell, ent ) then self.cd2_killcount = self.cd2_killcount + 1 end
+            if table_HasValue( self.cd2_activecell, ent ) then self:SetKillCount( self:GetKillCount() + 1 ) end
         end )
     end
 
@@ -51,21 +51,58 @@ function ENT:Initialize()
         end )
 
         local upper = string.upper
-        local input_LookupBinding = CLIENT and input.LookupBinding
-        local input_GetKeyCode = CLIENT and input.GetKeyCode
-        local input_GetKeyName = CLIENT and input.GetKeyName
+        local input_LookupBinding = input.LookupBinding
+        local input_GetKeyCode = input.GetKeyCode
+        local input_GetKeyName = input.GetKeyName
+        local surface_SetDrawColor = surface.SetDrawColor
+        local draw_NoTexture = draw.NoTexture
+        local surface_DrawRect = surface.DrawRect
+        local surface_DrawOutlinedRect = surface.DrawOutlinedRect
+        local surface_SetMaterial = surface.SetMaterial
+        local surface_DrawTexturedRect = surface.DrawTexturedRect
+        local ceil = math.ceil
+        local celltargetred = Color( 255, 51, 0 )
+        local blackish = Color( 39, 39, 39)
+        local linecol = Color( 61, 61, 61, 100 )
+
+        local cell = Material( "crackdown2/ui/cell.png", "smooth" )
+
         hook.Add( "HUDPaint", self, function()
             local ply = LocalPlayer()
             local currentlocation = ply:GetNW2Entity( "cd2_targettacticlelocation", nil )
 
-            if !IsValid( currentlocation ) or currentlocation != self then return end
-
-            local usebind = input_LookupBinding( "+use" ) or "e"
-            local code = input_GetKeyCode( usebind )
-            local buttonname = input_GetKeyName( code )
+            if IsValid( currentlocation ) and currentlocation == self then
+                local usebind = input_LookupBinding( "+use" ) or "e"
+                local code = input_GetKeyCode( usebind )
+                local buttonname = input_GetKeyName( code )
+                local screen = ( currentlocation:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
+                CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), self:GetLocationType() == "agency" and "Call Helicopter" or self:GetLocationType() == "cell" and "Begin Assault on this Tactical Location" )
+            end
+        
+            if self:GetLocationType() == "cell" and self:GetIsActive() and LocalPlayer():SqrRangeTo( self ) <= ( 2000 * 2000 ) then
+                surface_SetDrawColor( blackish )
+                draw_NoTexture()
+                surface_DrawRect( ScrW() - 350,  50, 300, 20 )
             
-            local screen = ( currentlocation:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
-            CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), self:GetLocationType() == "agency" and "Call Helicopter" or self:GetLocationType() == "cell" and "Begin Assault on this Tactical Location" )
+                surface_SetDrawColor( linecol )
+                surface_DrawOutlinedRect( ScrW() - 350,  50, 300, 20, 1 )
+            
+                surface_SetDrawColor( celltargetred )
+                surface_SetMaterial( cell )
+                surface_DrawTexturedRect( ScrW() - 420,  28, 64, 64 )
+            
+                local max = self:GetMaxKillCount()
+                local count = self:GetKillCount()
+
+                for i = 1, ( max - count ) do
+                    local wscale = 300 / max
+                    local x = ( ScrW() - 345 ) + ( wscale * ( i - 1 ) )
+                    if x >= ScrW() - 395 and x + wscale / 2 <= ScrW() - 50 then
+                        surface_SetDrawColor( celltargetred )
+                        surface_DrawRect( x, 55, ceil( wscale / 2 ), 10 )
+                    end
+                end
+            end
         end )
 
     end
@@ -81,6 +118,8 @@ function ENT:SetupDataTables()
     self:NetworkVar( "String", 1, "Text" )
 
     self:NetworkVar( "Int", 0, "Difficulty" )
+    self:NetworkVar( "Int", 1, "MaxKillCount" )
+    self:NetworkVar( "Int", 2, "KillCount" )
 end
 
 function ENT:OnRemove()
@@ -123,7 +162,7 @@ function ENT:OnActivate( ply )
 
                 if CurTime() > aborttime then
                     self:SetIsActive( false )
-                    self.cd2_killcount = 0
+                    self:SetKillCount( 0 )
                     CD2SetTypingText( nil, "Tactical Assault Aborted", "", true )
                     return
                 end
@@ -134,7 +173,7 @@ function ENT:OnActivate( ply )
 
         CD2CreateThread( function()
 
-            while IsValid( self ) and self.cd2_killcount < self.cd2_maxkillcount do
+            while IsValid( self ) and self:GetKillCount() < self:GetMaxKillCount() do
                 if !IsValid( self ) or !self:GetIsActive() then return end
                 
                 if #self.cd2_activecell < self.cd2_cellcount then

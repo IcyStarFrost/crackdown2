@@ -502,7 +502,7 @@ elseif SERVER then
         local result = Trace( tracetable )
 
         local beacon = ents.Create( "cd2_beacon" )
-        beacon:SetPos( result.HitPos - Vector( 0, 0, 50 ) )
+        beacon:SetPos( result.HitPos - Vector( 0, 0, 130 ) )
         beacon:SetSoundTrack( sndtracks[ random( #sndtracks ) ] )
         beacon:Spawn()
 

@@ -77,17 +77,21 @@ if SERVER then
 end
 
 if SERVER then
-hook.Add( "OnEntityCreated", "crackdown2_explosivepropeffects", function( ent )
-    timer.Simple( 0, function()
-        if !IsValid( ent ) or explosivemodels[ ent:GetModel() ] == nil then return end
-        ent:SetNW2Bool( "cd2_alwayslockon", true )
-        ent:CallOnRemove( "explosiveeffect", function()
-            net.Start( "cd2net_explosion" )
-            net.WriteVector( ent:GetPos() )
-            net.WriteFloat( explosivemodels[ ent:GetModel() ] )
-            net.Broadcast()
+    hook.Add( "OnEntityCreated", "crackdown2_explosivepropeffects", function( ent )
+        timer.Simple( 0, function()
+            if !IsValid( ent ) or explosivemodels[ ent:GetModel() ] == nil then return end
+            ent:SetNW2Bool( "cd2_alwayslockon", true )
+            ent:CallOnRemove( "explosiveeffect", function()
+                net.Start( "cd2net_explosion" )
+                net.WriteVector( ent:GetPos() )
+                net.WriteFloat( explosivemodels[ ent:GetModel() ] )
+                net.Broadcast()
+            end )
         end )
     end )
-end )
+
+    hook.Add( "PostCleanupMap", "crackdown2_regenmap", function()
+        CD2GenerateMapData()
+    end )
 
 end

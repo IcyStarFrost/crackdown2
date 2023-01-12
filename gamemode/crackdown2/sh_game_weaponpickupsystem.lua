@@ -90,5 +90,5 @@ hook.Add( "HUDPaint", "crackdown2_pickupequipmentpaint", function()
     local buttonname = input_GetKeyName( code )
     
     local screen = ( equipment:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
-    CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), "Hold to Equip " .. equipment:GetPrintName() .. " / Drop " .. scripted_ents.Get( ply.cd2_Equipment ).PrintName )
+    CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), "Hold to Equip " .. equipment:GetPrintName() .. " / Drop " .. scripted_ents.Get( ply:GetEquipment() ).PrintName )
 end )

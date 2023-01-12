@@ -168,8 +168,10 @@ end
 
 -- Loads a Map Data File
 function CD2LoadMapData()
-    CD2DebugMessage( "Loading map data for " .. game.GetMap() )
+    CD2DebugMessage( "Attempting to load map data for " .. game.GetMap() )
     local mapdata = CD2FILESYSTEM:ReadMapData( "TABLE" )
+    if !mapdata then return false end
+    
     local agilityorbs = mapdata.cd2_map_agilityorbdata
     local tacticallocations = mapdata.cd2_map_tacticallocationdata
     local hiddenorbs = mapdata.cd2_map_hiddenorbdata
@@ -241,6 +243,8 @@ function CD2LoadMapData()
     CD2DebugMessage( "Loaded " .. #tacticallocations .. " Tactical Locations" )
 
     SetGlobal2Bool( "cd2_MapDataLoaded", true )
+
+    return true
 end
 
 

@@ -218,12 +218,16 @@ if CLIENT then
 
 
         -- Agency --
-        AddOption( "Spawn PeaceKeeper", "Agency", "Button", { default = false }, function( pnl )
-            net.Start( "cd2net_kttc_spawnnpc" )
-            net.WriteString( "cd2_peacekeeper" )
-            net.WriteAngle( CD2_viewangles )
-            net.SendToServer()
-        end )
+
+        for ClassName, basetable in pairs( scripted_ents.GetList() ) do
+            if basetable.Base != "cd2_combathumanbase" or basetable.t.cd2_Team != "agency" then continue end
+            AddOption( "Spawn " .. basetable.t.PrintName, "Agency", "Button", { default = false }, function( pnl )
+                net.Start( "cd2net_kttc_spawnnpc" )
+                net.WriteString( ClassName )
+                net.WriteAngle( CD2_viewangles )
+                net.SendToServer()
+            end )
+        end
 
         AddOption( "Spawn Beacon", "Agency", "Button", { default = false }, function( pnl )
             net.Start( "cd2net_kttc_spawnbeacon" )

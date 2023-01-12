@@ -7,7 +7,7 @@ ENT.PrintName = "Frag Grenade"
 ENT.Cooldown = 1
 ENT.MaxGrenadeCount = 8
 ENT.TrailColor = Color( 255 ,174, 0)
-ENT.DelayTime = 3 -- The time before the grenade blows up. 0 for no timed explosive
+ENT.DelayTime = 1 -- The time before the grenade blows up. 0 for no timed explosive
 ENT.TickSound = "crackdown2/weapons/fragtick.mp3"
 
 ENT.DropMenu_SkillLevel = 0

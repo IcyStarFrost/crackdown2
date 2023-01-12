@@ -194,6 +194,10 @@ function ENT:Think()
 
     if IsValid( self:GetThrower() ) or self:GetHadThrower() then
 
+        if !self:Trace( nil, self:GetPos() - Vector( 0, 0, 10 ) ).Hit then
+            self.DelayCurTime = CurTime() + self.DelayTime
+        end
+
         -- If time is up, booom
         if CurTime() > self.DelayCurTime and !self.Exploded then
             self:OnDelayEnd()
@@ -212,6 +216,18 @@ function ENT:Think()
     if CLIENT then self:SetNextClientThink( CurTime() ) end
     self:NextThink( CurTime() )
     return true  
+end
+
+local Trace = util.TraceLine
+local normaltrace = {}
+function ENT:Trace( start, endpos, col, mask )
+    normaltrace.start = start or self:GetPos()
+    normaltrace.endpos = ( isentity( endpos ) and endpos:WorldSpaceCenter() or endpos )
+    normaltrace.filter = self
+    normaltrace.mask = mask or MASK_SOLID
+    normaltrace.collisiongroup = col or COLLISION_GROUP_NONE
+    local result = Trace( normaltrace )
+    return result
 end
 
 

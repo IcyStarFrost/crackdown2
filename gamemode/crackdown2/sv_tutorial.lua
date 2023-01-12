@@ -178,6 +178,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         rifle.cd2_reservedplayer = ply
         rifle:Spawn()
 
+        CD2SendTextBoxMessage( ply, "Follow the trail to the weapon provided" )
+
         while !IsValid( rifle:GetOwner() ) do coroutine.yield() end
 
         if IsValid( guide ) then guide:Remove() end
@@ -246,7 +248,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag10.mp3" ) 
 
-        coroutine.wait( 10 )
+        coroutine.wait( 8 )
         local freaks = {}
         for i = 1, 4 do
             pos = CD2GetRandomPos( 500, ply:GetPos() )
@@ -256,6 +258,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             freaks[ #freaks + 1 ] = ent
             ent:Spawn()
         end
+
+        CD2SendTextBoxMessage( ply, "Kill all Freaks" )
 
         while true do
             local shouldbreak = true

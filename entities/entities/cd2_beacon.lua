@@ -14,6 +14,9 @@ local linecol = Color( 61, 61, 61, 100 )
 local orangeish = Color( 202, 79, 22 )
 local chargecol = Color( 0, 110, 255 )
 local beaconiconcol = Color( 0, 110, 255 )
+local beaconblue = Color( 0, 217, 255 )
+local beam = Material( "crackdown2/effects/beam.png", "smooth" )
+
 
 local glow = Material( "crackdown2/ui/skillglow2.png" )
 local beaconicon = Material( "crackdown2/ui/beaconicon.png" )
@@ -64,6 +67,46 @@ function ENT:Initialize()
             self:SetBeaconHealth( self:GetBeaconHealth() - ( info:GetDamage() / 10 ) )
         end )
 
+    elseif CLIENT then 
+
+        local beamlerp
+        local starttime
+        local endtime
+
+        hook.Add( "PreDrawEffects", self, function()
+            if !self:GetRenderBeam() then return end
+
+            starttime = starttime or SysTime()
+            endtime = endtime or SysTime() + 10
+
+            local emitter = self:GetEmitter()
+            local core = self:GetCore()
+            if !IsValid( emitter ) or !IsValid( core ) then return end
+            beamlerp = beamlerp or emitter:GetPos()
+
+            render.SetMaterial( beam )
+            render.DrawBeam( emitter:GetPos(), beamlerp, 50, 1, random( 1, 1000000 ), beaconblue )
+
+            beamlerp = LerpVector( clamp( ( SysTime() - starttime ) / ( endtime - starttime ), 0, 1 ), beamlerp, core:GetPos() )
+
+            cam.Start2D()
+                local pos = core:GetPos()
+                local screen = pos:ToScreen()
+
+                if self:GetIsCharging() then
+                    local time = self:GetChargeDuration()
+                    self.cd2_currentbeamlerp = 0
+                    self.cd2_currentbeamlerp = self.cd2_currentlerp + FrameTime()
+                    
+                    self.SunDistance = Lerp( self.cd2_currentbeamlerp / time, self.SunDistance, 1500 )
+                end
+
+                local dist_mult = -clamp( CD2_vieworigin:Distance( pos ) / self.SunDistance, 0, 1 ) + 1
+            
+                DrawSunbeams( self.SunBeamDark, dist_mult * self.SunBeamMult * ( math.Clamp( CD2_viewangles:Forward():Dot( ( pos - CD2_vieworigin ):GetNormalized() ) - 0.5, 0, 1 ) * 2 ) ^ 5, self.SunSize, screen.x / ScrW(), screen.y / ScrH() )
+            cam.End2D()
+        end )
+
     end
 end
 
@@ -76,6 +119,7 @@ function ENT:SetupDataTables()
     self:NetworkVar( "Bool", 3, "Active" )
     self:NetworkVar( "Bool", 4, "RingReturning" )
     self:NetworkVar( "Bool", 5, "BeamActive" )
+    self:NetworkVar( "Bool", 6, "RenderBeam" )
 
     self:NetworkVar( "Float", 0, "ChargeDuration" )
     self:NetworkVar( "Float", 1, "BeaconHealth" )
@@ -118,8 +162,6 @@ function ENT:OnLand()
     end
 end
 
-local beaconblue = Color( 0, 217, 255 )
-local beam = Material( "crackdown2/effects/beam.png", "smooth" )
 
 
 -- The energy beam from the Ring has been initialized and the beacon will soon begin charging
@@ -131,13 +173,10 @@ function ENT:OnBeamStart()
     if SERVER then
         self:SetBeamActive( true )
         self:SetChargeDuration( 200 )
+        self:SetRenderBeam( true )
         self.cd2_curtimeduration = CurTime() + 200
         self.cd2_BeaconChargeStart = CurTime() + 10
     elseif CLIENT then
-        local beamlerp
-        local starttime = SysTime()
-        local endtime = SysTime() + 10
-
         local truedur
         local curtimed
         local lasthealth = 100
@@ -198,35 +237,7 @@ function ENT:OnBeamStart()
             lasthealth = self:GetBeaconHealth()
 
         end )
-        
-        hook.Add( "PreDrawEffects", self, function()
-            local emitter = self:GetEmitter()
-            local core = self:GetCore()
-            if !IsValid( emitter ) or !IsValid( core ) then return end
-            beamlerp = beamlerp or emitter:GetPos()
-
-            render.SetMaterial( beam )
-            render.DrawBeam( emitter:GetPos(), beamlerp, 50, 1, random( 1, 1000000 ), beaconblue )
-
-            beamlerp = LerpVector( clamp( ( SysTime() - starttime ) / ( endtime - starttime ), 0, 1 ), beamlerp, core:GetPos() )
-
-            cam.Start2D()
-                local pos = core:GetPos()
-                local screen = pos:ToScreen()
-
-                if self:GetIsCharging() then
-                    local time = self:GetChargeDuration()
-                    self.cd2_currentbeamlerp = 0
-                    self.cd2_currentbeamlerp = self.cd2_currentlerp + FrameTime()
-                    
-                    self.SunDistance = Lerp( self.cd2_currentbeamlerp / time, self.SunDistance, 1500 )
-                end
-
-                local dist_mult = -clamp( CD2_vieworigin:Distance( pos ) / self.SunDistance, 0, 1 ) + 1
-            
-                DrawSunbeams( self.SunBeamDark, dist_mult * self.SunBeamMult * ( math.Clamp( CD2_viewangles:Forward():Dot( ( pos - CD2_vieworigin ):GetNormalized() ) - 0.5, 0, 1 ) * 2 ) ^ 5, self.SunSize, screen.x / ScrW(), screen.y / ScrH() )
-            cam.End2D()
-        end )
+    
 
         CD2CreateThread( function() 
 
@@ -335,7 +346,7 @@ function ENT:BeaconDetonate()
         
             coroutine.wait( 2 )
 
-            self:PlayClientSound( "crackdown2/ambient/beacon/beaconfinish.mp3", self:GetPos(), 5 )
+            self:PlayClientSound( "crackdown2/ambient/beacon/beaconfinish.mp3", self:GetPos(), 10 )
 
             coroutine.wait( 20 )
 
@@ -424,6 +435,57 @@ function ENT:BeaconDetonate()
 
         end )
         
+    end
+end
+
+-- Sets the Beacon to the ground and sets it active as if it detonated
+function ENT:StartBeaconasActive()
+
+    if SERVER then
+        beacontrace.start = self:GetPos()
+        beacontrace.endpos = self:GetPos() - Vector( 0, 0, 1000000 )
+        beacontrace.collisiongroup = COLLISION_GROUP_WORLD
+        beacontrace.mask = MASK_SOLID_BRUSHONLY
+        local result = Trace( beacontrace )
+
+        self:PlayClientSound( "crackdown2/ambient/beacon/beaconfinish.mp3", self:GetPos(), 10 )
+        
+        self.Ring:SetParent()
+
+        self:SetIsDetonated( true )
+        self:SetRenderBeam( true )
+        self:SetBeamActive( true )
+        self:SetRingPos( self.Ring:GetPos() )
+        self:SetBeaconPos( result.HitPos )
+        self:SetActive( true )
+
+        self.Shell1:Remove()
+        self.Shell2:Remove()
+        self.Shell3:Remove()
+        self.Shell4:Remove()
+
+        self:SetPos( result.HitPos )
+        self.Core:SetPos( ( self:GetPos() + Vector( 0, 0, 70 ) ) + Vector( 0, 0, 70 ) )
+
+        BroadcastLua( "Entity(" .. self:EntIndex() .. "):StartBeaconasActive()" )
+
+    elseif CLIENT then
+
+        sound.PlayFile( "sound/crackdown2/ambient/au/au_ring.mp3", "3d mono", function( snd, id, name )
+            if id then return end
+            self.cd2_ringambient = snd
+            snd:SetPos( self:GetPos() )
+            snd:EnableLooping( true )
+            snd:Set3DFadeDistance( 700, 1000000000  )
+        end )
+
+        sound.PlayFile( "sound/crackdown2/ambient/beacon/beaconambient.mp3", "3d mono", function( snd, id, name )
+            if id then return end
+            self.cd2_beaconambient = snd
+            snd:SetPos( self:GetPos() )
+            snd:EnableLooping( true )
+            snd:Set3DFadeDistance( 700, 1000000000  )
+        end )
     end
 end
 
@@ -573,6 +635,10 @@ function ENT:Think()
             self.cd2_ringambient:SetPos( self:GetEmitter():GetPos() )
         end
 
+        if IsValid( self.cd2_beaconambient ) then
+            self.cd2_beaconambient:SetPos( self:GetPos() )
+        end
+
         -- Emitting the energy particles during charge
         if self:GetIsCharging() then
             local light = DynamicLight( self:EntIndex() )
@@ -710,6 +776,8 @@ function ENT:CreatePart( pos, ang, mdl, mat, scale )
     part:SetMaterial( mat or "" )
     part:Spawn()
 
+    part.cd2_IsBeaconPart = true
+    part:AddFlags( FL_OBJECT )
     self:DeleteOnRemove( part )
 
     part:PhysicsInit( SOLID_VPHYSICS )

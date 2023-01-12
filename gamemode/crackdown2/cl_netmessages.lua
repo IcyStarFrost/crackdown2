@@ -231,10 +231,13 @@ net.Receive( "cd2net_playerinitialspawn", function()
     -- If the player is new to the gamemode, then play the intro video
     if !isreturningplayer then
         CD2CreateThread( function()
-            CD2BeginIntroVideo()
 
-            while IsValid( CD2_videopanel ) do
-                coroutine.yield()
+            if BRANCH == "x86-64" or BRANCH == "chromium" then
+                CD2BeginIntroVideo()
+
+                while IsValid( CD2_videopanel ) do
+                    coroutine.yield()
+                end
             end
 
             CD2_DrawAgilitySkill = false

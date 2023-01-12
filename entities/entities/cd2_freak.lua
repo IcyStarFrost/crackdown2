@@ -190,6 +190,10 @@ function ENT:ControlMovement( pos, update )
 
 end
 
+function ENT:CanAttack( ent )
+    return ( ( ent:IsCD2NPC() or ent:IsCD2Agent() ) and ent:GetCD2Team() != self:GetCD2Team() or ent.cd2_IsBeaconPart ) and self:CanSee( ent )
+end
+
 function ENT:Swipe()
     if CurTime() < self.cd2_nextattack then return end
 

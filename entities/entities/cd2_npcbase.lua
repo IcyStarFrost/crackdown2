@@ -381,6 +381,7 @@ function ENT:Think()
 
         if !self.cd2_NextRegen or CurTime() > self.cd2_NextRegen then
             self:SetHealth( self:Health() + 1 )
+            self:SetNWFloat( "cd2_health", self:Health() )
             self.cd2_NextRegen = CurTime() + 0.03
         end
     end

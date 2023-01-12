@@ -11,6 +11,12 @@ if SERVER then
         ply:IsOnGround() then ply:EmitSound( "crackdown2/ply/jump" .. random( 1, 4 ) .. ".wav", 60, 100, 0.2, CHAN_AUTO ) end
     end )
 
+    hook.Add( "CD2_SwitchWeapon", "crackdown2_changeholstermodel", function( ply, old, new )
+        ply.cd2_holsteredweapon:SetModel( old:GetModel() )
+        local mins, maxs = ply.cd2_holsteredweapon:GetModelBounds()
+        ply.cd2_holsteredweapon:SetLocalPos( Vector( -10, -9, 0 ) - mins / 2 )
+    end )
+
     -- Director commentary over level ups
     hook.Add( "CD2_OnLevelUp", "crackdown2_levelup", function( ply, skill )
         if KeysToTheCity() then return end

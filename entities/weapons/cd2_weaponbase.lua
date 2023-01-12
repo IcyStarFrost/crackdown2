@@ -256,6 +256,7 @@ function SWEP:Holster( wep )
         if SERVER then
             self:GetOwner():SetActiveWeapon( wep )
             wep:Deploy()
+            hook.Run( "CD2_SwitchWeapon", self:GetOwner(), self, wep )
         end
         self:SetHoldType( self.HoldType )
     end )

@@ -64,7 +64,7 @@ function ENT:Initialize()
         
         hook.Add( "EntityTakeDamage", self, function( self, ent, info )
             if !self:GetIsCharging() or ent:GetOwner() != self then return end
-            self:SetBeaconHealth( self:GetBeaconHealth() - ( info:GetDamage() / 10 ) )
+            self:SetBeaconHealth( self:GetBeaconHealth() - ( info:GetDamage() / 20 ) )
         end )
 
     elseif CLIENT then 

@@ -67,6 +67,13 @@ function ENT:OnKilled2( info, ragdoll )
             if !IsValid( ragdoll ) or !ragdoll:IsOnFire() then return end
             ragdoll:EmitSound( "crackdown2/vo/cell/male2/fire" .. random( 1, 9 ) .. ".mp3", 70, 100, 1, CHAN_VOICE )
         end )
+    elseif self:GetCD2Team() == "agency" then
+        self:EmitSound( "crackdown2/vo/peacekeeper/die" .. random( 1, 10 ) .. ".mp3", 70, 100, 1, CHAN_VOICE )
+
+        timer.Simple( 3, function()
+            if !IsValid( ragdoll ) or !ragdoll:IsOnFire() then return end
+            ragdoll:EmitSound( "crackdown2/vo/peacekeeper/fire" .. random( 1, 15 ) .. ".mp3", 70, 100, 1, CHAN_VOICE )
+        end )
     end
 
 
@@ -81,6 +88,8 @@ function ENT:OnInjured2( info )
 
     if self:GetCD2Team() == "cell" then
         self:PlayPainSound( "crackdown2/vo/cell/male2/hurt" .. random( 1, 10 ) .. ".mp3" )
+    elseif self:GetCD2Team() == "agency" then
+        self:PlayPainSound( "crackdown2/vo/peacekeeper/hurt" .. random( 1, 10 ) .. ".mp3" )
     end
 end
 

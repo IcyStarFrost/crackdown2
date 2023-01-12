@@ -148,7 +148,7 @@ function CD2FindInLockableTragets( ply )
     local wep = ply:GetActiveWeapon()
     if !IsValid( wep ) then return {} end
     local entities = {}
-    local cone = ents_FindInCone( CLIENT and CD2_vieworigin or ply:EyePos(), CLIENT and CD2_viewangles:Forward() or ply:EyeAngles():Forward(), wep.LockOnRange, 0.99 )
+    local cone = ents_FindInCone( CLIENT and CD2_vieworigin or ply:EyePos(), CLIENT and CD2_viewangles:Forward() or ply:EyeAngles():Forward(), ( wep.LockOnRange or 2000 ), 0.99 )
 
     for i = 1, #cone do
         local ent = cone[ i ]

@@ -254,7 +254,7 @@ function ENT:Draw()
     if !IsValid( self:GetThrower() ) and !self:GetHadThrower() and self:GetVelocity():IsZero() and LocalPlayer():SqrRangeTo( self ) < ( 2000 * 2000 ) then
         local wep = LocalPlayer():GetWeapon( self:GetClass() )
 
-        if !LocalPlayer():IsCD2Agent() or SysTime() < self.cd2_effectdelay or ( LocalPlayer():GetEquipmentCount() == LocalPlayer():GetMaxEquipmentCount() and LocalPlayer().cd2_Equipment == self:GetClass() ) then 
+        if !LocalPlayer():IsCD2Agent() or SysTime() < self.cd2_effectdelay or ( LocalPlayer():GetEquipmentCount() == LocalPlayer():GetMaxEquipmentCount() and LocalPlayer():GetEquipment() == self:GetClass() ) then 
             self:SetupBones()
             self:SetPos( self:GetNetworkOrigin() )
             self:SetAngles( self:GetNetworkAngles() )

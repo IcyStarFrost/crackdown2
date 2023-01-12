@@ -33,7 +33,7 @@ function PLAYER:Death()
     -- Save all weapons and equipment for if we decide to regenerate and drop them from then
     if !game.SinglePlayer() then
         self.Player.cd2_deathweapons = {}
-        self.Player.cd2_deathequipment = self.Player.cd2_Equipment
+        self.Player.cd2_deathequipment = self.Player:GetEquipment()
         local weps = self.Player:GetWeapons()
         for i = 1, #weps do 
             local wep = weps[ i ]

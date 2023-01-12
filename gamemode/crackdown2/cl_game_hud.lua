@@ -426,7 +426,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             surface_SetDrawColor( blackish )
             surface_DrawRect( scrw - 400, scrh - 100, 300, 60 )
 
-            draw_DrawText( weapon:Ammo1(), "crackdown2_font40", scrw - 35, scrh - 140, color_white, TEXT_ALIGN_RIGHT )
+            draw_DrawText( weapon.Ammo1 and weapon:Ammo1() or "NONE", "crackdown2_font40", scrw - 35, scrh - 140, color_white, TEXT_ALIGN_RIGHT )
 
 
             for i = 1, weapon:Clip1() do

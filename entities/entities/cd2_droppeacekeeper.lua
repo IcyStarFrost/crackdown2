@@ -19,3 +19,11 @@ ENT.cd2_damagedivider = 3
 function ENT:ModelGet()
     return "models/player/combine_soldier.mdl"
 end
+
+local random = math.random
+local rand = math.Rand
+function ENT:MainThink2()
+    if self:CanSpeak() and IsValid( self:GetEnemy() ) then
+        self:PlayVoiceSound( "crackdown2/vo/peacekeeper/idle" .. random( 1, 49 ) .. ".mp3", rand( 5, 15 ) )
+    end
+end

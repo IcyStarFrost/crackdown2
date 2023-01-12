@@ -82,6 +82,7 @@ if SERVER then
             if !IsValid( ent ) or explosivemodels[ ent:GetModel() ] == nil then return end
             ent:SetNW2Bool( "cd2_alwayslockon", true )
             ent:CallOnRemove( "explosiveeffect", function()
+                sound.Play( "crackdown2/ambient/explosivebarrel.mp3", ent:GetPos(), 80, 100, 1 )
                 net.Start( "cd2net_explosion" )
                 net.WriteVector( ent:GetPos() )
                 net.WriteFloat( explosivemodels[ ent:GetModel() ] )

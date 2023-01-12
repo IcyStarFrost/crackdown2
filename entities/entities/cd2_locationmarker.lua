@@ -236,7 +236,7 @@ function ENT:Think()
             ply:SetNW2Entity( "cd2_targettacticlelocation", self )
             timer.Create( "cd2_unselecttacticlelocation" .. ply:EntIndex(), 0.6, 1, function() ply.cd2_checkweapons = true ply:SetNW2Entity( "cd2_targettacticlelocation", nil ) end )
             
-            if self:GetLocationType() == "agency" and ply.cd2_checkweapons then
+            if !KeysToTheCity() and self:GetLocationType() == "agency" and ply.cd2_checkweapons then
                 net.Start( "cd2net_checkweapons" )
                 net.Send( ply )
                 ply.cd2_checkweapons = false

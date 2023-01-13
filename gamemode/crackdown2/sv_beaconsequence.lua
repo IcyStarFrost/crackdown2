@@ -32,15 +32,19 @@ function CD2CreateBeaconSet( beacondata )
 
     hook.Add( "CD2_PowerNetworkComplete", "crackdown2_networkwatcher" .. id, function( group )
         if group != beacondata.AUID then return end
+        CD2DebugMessage( "AU Group " .. group .. " power network has been completed!" )
         hook.Remove( "CD2_PowerNetworkComplete", "crackdown2_networkwatcher" .. id )
 
         local marker = ents.Create( "cd2_locationmarker" )
         marker:SetPos( beacondata.pos ) 
         marker:SetLocationType( "beacon" )
+        marker.cd2_AUgroup = beacondata.AUID
     
         function marker:OnActivate( ply ) 
             local sndtracks = { "sound/crackdown2/music/beacon/ptb.mp3", "sound/crackdown2/music/beacon/industrialfreaks.mp3" }
             sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
+
+            CD2DebugMessage( self, "A Beacon for AUGroup " .. beacondata.AUID .. " has been called by " .. ply:Name() )
     
             marker.cd2_beacon = ents.Create( "cd2_beacon" )
             marker.cd2_beacon:SetPos( beacondata.beaconspawnpos )
@@ -57,10 +61,12 @@ function CD2CreateBeaconSet( beacondata )
         end
     
         marker:Spawn()
+
+        CD2DebugMessage( marker, "Created Beacon Marker for AU Group " .. group )
     
         CD2CreateThread( function()
             while true do 
-                if !IsValid( marker ) then return end
+                if !IsValid( marker ) then break end
     
                 marker:SetIsActive( IsValid( marker.cd2_beacon ) )
                 marker:SetNoDraw( IsValid( marker.cd2_beacon ) )
@@ -83,7 +89,7 @@ function CD2CreateBeaconSet( beacondata )
                         coroutine.wait( 7 )
     
                         CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )
-                        return
+                        break
                     end
     
                 end

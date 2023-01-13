@@ -157,10 +157,11 @@ function ENT:Think()
             self:EmitSound( "crackdown2/ambient/au/chargenew" .. math.random( 1, 4 ) .. ".mp3", 80 )
             self.cd2_first = true
         end
-        self:SetCharge( self:GetCharge() + 1 )
+        self:SetCharge( self:GetCharge() + 4 )
 
         if self:GetCharge() >= 100 then
             self:EnableBeam() 
+            CD2DebugMessage( self, "AU unit of Group " .. self:GetAUGroupID() .. " has been activated" )
             self:TypingText() 
         end
 

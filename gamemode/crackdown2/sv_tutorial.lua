@@ -420,7 +420,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
         cam:SetPlayer( ply )
         cam:Spawn()
 
-        if !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then CD2GenerateMapData() end
+        if !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then CD2GenerateMapData( true ) end
 
         coroutine.wait( 3 )
 

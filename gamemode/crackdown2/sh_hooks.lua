@@ -89,6 +89,16 @@ if SERVER then
     end )
 
     hook.Add( "PostCleanupMap", "crackdown2_regenmap", function()
+
+        local hooktbl = hook.GetTable()
+        local powernetworkhooks = hooktbl.CD2_PowerNetworkComplete
+
+        if powernetworkhooks then
+            for k, v in pairs( powernetworkhooks ) do
+                hook.Remove( "CD2_PowerNetworkComplete", k )
+            end
+        end
+
         CD2GenerateMapData( true )
 
         for k, ply in ipairs( player.GetAll() ) do

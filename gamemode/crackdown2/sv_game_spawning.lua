@@ -24,7 +24,7 @@ hook.Add( "PlayerInitialSpawn", "crackdown2_setplayerclass", function( ply )
             local loaded = CD2LoadMapData()
             
             if !loaded then
-                CD2GenerateMapData()
+                CD2GenerateMapData( true )
             end
         end
     end )

@@ -6,7 +6,7 @@ local tracetable = {}
 -- Generates Map data by using the Navigation Mesh
 function CD2GenerateMapData( randomize )
 
-    --CD2CreateThread( function()
+    CD2CreateThread( function()
 
         local navareas = navmesh.GetAllNavAreas()
         local averagetbl = {}
@@ -90,6 +90,7 @@ function CD2GenerateMapData( randomize )
             agilityorb:Spawn()
             
             agilityorbdata[ #agilityorbdata + 1 ] = { pos = agilityorb:GetPos(), level = agilityorb:GetLevel(), id = agilityorb.cd2_map_id }
+            coroutine.wait( 0.01 )
         end
 
         CD2DebugMessage( "Generated " .. #agilityorbdata .. " Agility Orbs")
@@ -112,6 +113,7 @@ function CD2GenerateMapData( randomize )
             onlineorb:Spawn()
             
             onlineorbdata[ #onlineorbdata + 1 ] = { pos = onlineorb:GetPos(), id = onlineorb.cd2_map_id }
+            coroutine.wait( 0.01 )
         end
 
         CD2DebugMessage( "Generated " .. #onlineorbdata .. " Online Orbs")
@@ -157,6 +159,7 @@ function CD2GenerateMapData( randomize )
             end
 
             beacondata[ #beacondata + 1 ] = tbl
+            coroutine.wait( 0.01 )
         end
 
         CD2DebugMessage( "Generated " .. ( #beacondata * 3 ) .. " AU positions and " .. #beacondata .. " Beacon Positions" )
@@ -180,6 +183,7 @@ function CD2GenerateMapData( randomize )
             hiddenorb:Spawn()
             
             hiddenorbdata[ #hiddenorbdata + 1 ] = { pos = hiddenorb:GetPos(), id = hiddenorb.cd2_map_id }
+            coroutine.wait( 0.01 )
         end
 
         CD2DebugMessage( "Generated " .. #hiddenorbdata .. " Hidden Orbs")
@@ -212,6 +216,7 @@ function CD2GenerateMapData( randomize )
 
                 assignfirstlocation = false
                 tacticallocationdata[ #tacticallocationdata + 1 ] = { pos = location:GetPos(), id = location.cd2_map_id, difficulty = location:GetDifficulty(), type = location:GetLocationType(), isbeginninglocation = location:GetIsBeginningLocation() }
+                coroutine.wait( 0.01 )
             end
         end
 
@@ -231,6 +236,8 @@ function CD2GenerateMapData( randomize )
         CD2_CurrentBeacon = 1
 
         CD2CreateBeaconSet( beacondata[ 1 ] )
+
+        CD2DebugMessage( "Completed Map Data Generation for " .. game.GetMap() )
         
         if !KeysToTheCity() then
             CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", 1 )
@@ -240,7 +247,7 @@ function CD2GenerateMapData( randomize )
             CD2FILESYSTEM:WriteMapData( "cd2_map_tacticallocationdata", tacticallocationdata )
             CD2FILESYSTEM:WriteMapData( "cd2_map_onlineorbdata", onlineorbdata )
         end
-    --end )
+    end )
 end
 
 -- Loads a Map Data File

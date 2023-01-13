@@ -19,10 +19,19 @@ function ENT:Initialize()
     self:DrawShadow( false )
 
     self.cd2_missingplayers = {}
+    self.cd2_collectedby = {}
 
     for k, v in ipairs( player.GetAll() ) do
         self.cd2_missingplayers[ v:SteamID() ] = true
     end
+
+    if SERVER then
+        hook.Add( "PlayerInitialSpawn", self, function( self, ply ) 
+            if self.cd2_collectedby[ ply:SteamID() ] then return end
+            self.cd2_missingplayers[ ply:SteamID() ] = true
+        end )
+    end
+
 
 end
 
@@ -30,15 +39,18 @@ function ENT:Draw()
     if !self.cd2_missingplayers[ LocalPlayer():SteamID() ] then return end
 
     local isfar = LocalPlayer():GetPos():DistToSqr( self:GetPos() ) >= ( 2000 * 2000 )
+    local istoofar = LocalPlayer():GetPos():DistToSqr( self:GetPos() ) >= ( 7000 * 7000 )
 
     self.cd2_color.a = max( abs( math_sin( SysTime() * 2 ) ) * 255, abs( math_cos( SysTime() * 2 ) ) * 255 )
 
     render.SetColorMaterial()
-    render.DrawSphere( self:GetPos(), 15, isfar and 5 or 50, isfar and 5 or 50, self.cd2_color )
+    render.DrawSphere( self:GetPos(), 15, isfar and 5 or 10, isfar and 5 or 10, self.cd2_color )
+
+    if istoofar then return end
 
     for i = 1, self:GetLevel() do
         render.SetColorMaterial()
-        render.DrawSphere( ( self:GetPos() + Vector( 0, 0, 20 ) ) + Vector( 0, 0, 20 * i ) , 5, isfar and 5 or 30, isfar and 5 or 30, self.cd2_color )
+        render.DrawSphere( ( self:GetPos() + Vector( 0, 0, 20 ) ) + Vector( 0, 0, 20 * i ) , 5, isfar and 5 or 10, isfar and 5 or 10, self.cd2_color )
     end
 
     cam.Start3D2D( self:GetPos(), Angle( 0, CD2_viewangles[ 2 ] + -90, 90 ), 2 )
@@ -85,6 +97,7 @@ end
 function ENT:OnCollected( ply )
     CD2DebugMessage( ply:Name() .. " collected a agility orb " .. self:EntIndex() )
     self.cd2_missingplayers[ ply:SteamID() ] = false
+    self.cd2_collectedby[ ply:SteamID() ] = true
 
     if CLIENT then
         sound.Play( "crackdown2/ambient/agilityorbcollect.mp3", self:GetPos(), 80, 100, 1 )    
@@ -146,11 +159,12 @@ function ENT:Think()
                 if id then print( id, name ) end
                 self.cd2_agilitysound = snd
                 snd:EnableLooping( true )
-                snd:Set3DFadeDistance( 400, 1000000000 )
+                snd:Set3DFadeDistance( 200, 1000000000 )
             end )
         end
 
         if IsValid( self.cd2_agilitysound ) then
+            self.cd2_agilitysound:SetVolume( self:SqrRangeTo( LocalPlayer() ) < ( 2000 * 2000 ) and 1 or 0 )
             self.cd2_agilitysound:SetPos( self:GetPos() )
         end
 

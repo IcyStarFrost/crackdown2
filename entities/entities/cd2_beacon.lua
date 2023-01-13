@@ -63,7 +63,7 @@ function ENT:Initialize()
         end )
         
         hook.Add( "EntityTakeDamage", self, function( self, ent, info )
-            if !self:GetIsCharging() or ent:GetOwner() != self then return end
+            if !self:GetIsCharging() or ent:GetOwner() != self or ( info:GetAttacker():IsCD2Agent() or info:GetAttacker():IsCD2NPC() ) and info:GetAttacker():GetCD2Team() != "freak" then return end
             self:SetBeaconHealth( self:GetBeaconHealth() - ( info:GetDamage() / 20 ) )
         end )
 
@@ -332,6 +332,8 @@ function ENT:BeaconDetonate()
         self:SetIsCharging( false )
         self:PlayClientSound( "crackdown2/ambient/beacon/beacondetonate.mp3", self:GetPos(), 5 )
 
+        hook.Run( "CD2_BeaconDetonate", self )
+
         CD2CreateThread( function()
 
             coroutine.wait( 2 )
@@ -344,13 +346,9 @@ function ENT:BeaconDetonate()
                 ent:TakeDamage( ent:GetMaxHealth(), Entity( 0 ) )
             end
         
-            coroutine.wait( 2 )
+            coroutine.wait( 5 )
 
             self:PlayClientSound( "crackdown2/ambient/beacon/beaconfinish.mp3", self:GetPos(), 10 )
-
-            coroutine.wait( 20 )
-
-            self:Remove()
         
         end )
     elseif CLIENT then

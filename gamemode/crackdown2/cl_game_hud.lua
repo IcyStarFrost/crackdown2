@@ -114,6 +114,8 @@ local hlerp1
 local hlerp2
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local cell = Material( "crackdown2/ui/cell.png", "smooth" )
+local beaconicon = Material( "crackdown2/ui/beacon.png" )
+local Auicon = Material( "crackdown2/ui/auicon.png" )
 local upicon = Material( "crackdown2/ui/up.png", "smooth" )
 local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
 local downicon = Material( "crackdown2/ui/down.png", "smooth" )
@@ -356,7 +358,6 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     
     
 
-    
     
     
     
@@ -614,15 +615,17 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         --
         
         
-        -- Tacticle Locations | Helicopters --
+        -- Tacticle Locations | Helicopters | AUs --
         local ents_ = ents.FindByClass( "cd2_*" )
         for i = 1, #ents_ do
             local ent = ents_[ i ]
     
             if IsValid( ent ) and ent:GetClass() == "cd2_locationmarker" then 
-                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), ent:GetLocationType() == "cell" and cell or peacekeeper, 10, ent:GetLocationType() == "cell" and celltargetred or color_white, fov )
+                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), ent:GetLocationType() == "beacon" and beaconicon or ent:GetLocationType() == "cell" and cell or peacekeeper, ent:GetLocationType() == "beacon" and 20 or 10, ent:GetLocationType() == "cell" and celltargetred or color_white, fov )
             elseif IsValid( ent ) and ent:GetClass() == "cd2_agencyhelicopter" then
                 DrawCoordsOnMiniMap( ent:GetPos(), ent:GetAngles(), heloicon, 15, color_white, fov )
+            elseif IsValid( ent ) and ent:GetClass() == "cd2_au" and !ent:GetActive() then
+                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), Auicon, 10, color_white, fov )
             end
         end
         --

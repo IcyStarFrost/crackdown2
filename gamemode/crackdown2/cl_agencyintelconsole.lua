@@ -21,8 +21,10 @@ local surface_DrawTexturedRectRotated = surface.DrawTexturedRectRotated
 local curfov = 90
 local clamp = math.Clamp
 local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
+local beaconicon = Material( "crackdown2/ui/beacon.png" )
 local cellicon = Material( "crackdown2/ui/celltrackericon.png" )
 local cellwhite = Color( 255, 255, 255 )
+local Auicon = Material( "crackdown2/ui/auicon.png" )
 local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
 local celltargetred = Color( 255, 51, 0 )
 
@@ -213,17 +215,19 @@ function OpenIntelConsole()
         end
         --
 
-        -- Tacticle Locations --
+        -- Tacticle Locations | Helicopters | AUs --
         for i = 1, #entities do
             local ent = entities[ i ]
 
             if IsValid( ent ) and ent:GetClass() == "cd2_locationmarker" then 
-                DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, Angle(), ent:GetLocationType() == "cell" and cell or peacekeeper, 20, ent:GetLocationType() == "cell" and celltargetred or color_white, 30 )
+                DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, Angle(), ent:GetLocationType() == "beacon" and beaconicon or ent:GetLocationType() == "cell" and cell or peacekeeper, 20, ent:GetLocationType() == "cell" and celltargetred or color_white, 30 )
             elseif IsValid( ent ) and ent:GetClass() == "cd2_agencyhelicopter" then
                 DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, ent:GetAngles(), heloicon, 20, color_white, 30 )
+            elseif IsValid( ent ) and ent:GetClass() == "cd2_au" and !ent:GetActive() then
+                DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, ent:GetAngles(), Auicon, 15, color_white, 30 )
             end
         end
-
+        
         
         --
         

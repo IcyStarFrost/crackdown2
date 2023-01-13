@@ -133,6 +133,29 @@ end )
 if CLIENT then
     local limit = false
 
+    hook.Add( "Think", "crackdown2_light", function()
+        local ply = LocalPlayer()
+        if !IsValid( ply ) or !ply:IsCD2Agent() then return end
+
+        if !ply:GetNoDraw() and !IsValid( ply.cd2_light ) and ( !CD2IsDay() ) then
+            ply.cd2_light = ProjectedTexture()
+            ply.cd2_light:SetPos( ply:EyePos() + ply:GetAimVector() * 100 )
+            ply.cd2_light:SetAngles( ply:EyeAngles() )
+            ply.cd2_light:SetFarZ( 2000 )
+            ply.cd2_light:SetEnableShadows( false )
+            ply.cd2_light:SetBrightness( 15 )
+            ply.cd2_light:SetFOV( 60 )
+            ply.cd2_light:SetTexture( "effects/flashlight001" )
+            ply.cd2_light:Update()
+        elseif !ply:GetNoDraw() and IsValid( ply.cd2_light ) and ( !CD2IsDay() ) then
+            ply.cd2_light:SetPos( ply:EyePos() )
+            ply.cd2_light:SetAngles( ply:EyeAngles() )
+            ply.cd2_light:Update()
+        elseif IsValid( ply.cd2_light ) and ( CD2IsDay() ) then
+            ply.cd2_light:Remove()
+        end
+    end )
+
     -- Wind sounds for falling 
     hook.Add( "Tick", "crackdown2_fallsounds", function()
         local ply = LocalPlayer()

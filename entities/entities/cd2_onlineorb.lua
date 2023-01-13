@@ -4,7 +4,6 @@ ENT.Base = "base_anim"
 
 local IsValid = IsValid
 local random = math.random
-local beam = Material( "crackdown2/effects/lightbeam.png", "smooth" )
 local abs = math.abs
 local math_sin = math.sin
 local max = math.max
@@ -13,8 +12,10 @@ local math_cos = math.cos
 local pairs = pairs
 local ipairs = ipairs
 
+local sprite = Material( "crackdown2/ui/skillglow.png" )
+
 function ENT:Initialize()
-    if CLIENT then self.cd2_color = Color( 43, 109, 207) end
+    if CLIENT then self.cd2_color = Color( 68, 68, 68 ) end
     self:SetModel( "models/error.mdl" )
     self:DrawShadow( false )
 
@@ -25,11 +26,22 @@ function ENT:Initialize()
         self.cd2_missingplayers[ v:SteamID() ] = true
     end
 
-    
     if SERVER then
         hook.Add( "PlayerInitialSpawn", self, function( self, ply ) 
             if self.cd2_collectedby[ ply:SteamID() ] then return end
             self.cd2_missingplayers[ ply:SteamID() ] = true
+        end )
+    end
+
+    if CLIENT then
+        hook.Add("HUDPaint", self, function() 
+            if LocalPlayer():SqrRangeTo( self ) > ( 40 * 40 ) then return end 
+            local renderinput = self:GetNW2Bool( "cd2_drawinput", false )
+
+            if renderinput then
+                local screen = ( self:GetPos() + Vector( 0, 0, 5 ) ):ToScreen()
+                CD2DrawInputbar( screen.x, screen.y, "", !game.SinglePlayer() and "Not enough players in range!" or "Play with other Agents to collect this orb!" )
+            end
         end )
     end
 
@@ -39,38 +51,15 @@ function ENT:Draw()
     if !self.cd2_missingplayers[ LocalPlayer():SteamID() ] then return end
 
     local isfar = LocalPlayer():GetPos():DistToSqr( self:GetPos() ) >= ( 2000 * 2000 )
-    local istoofar = LocalPlayer():GetPos():DistToSqr( self:GetPos() ) >= ( 5000 * 5000 )
 
     self.cd2_color.a = max( abs( math_sin( SysTime() * 2 ) ) * 255, abs( math_cos( SysTime() * 2 ) ) * 255 )
 
     render.SetColorMaterial()
     render.DrawSphere( self:GetPos(), 15, isfar and 5 or 10, isfar and 5 or 10, self.cd2_color )
 
-    if istoofar then return end
 
-    cam.Start3D2D( self:GetPos(), Angle( 0, CD2_viewangles[ 2 ] + -90, 90 ), 2 )
-        surface.SetMaterial( beam )
-        surface.SetDrawColor( self.cd2_color )
-        surface.DrawTexturedRect( -25, -80, 50, 90 )
-    cam.End3D2D()
-
---[[     render.SetMaterial( beam )
-    render.DrawSprite( self:GetPos(), 100, 500, self.cd2_color ) ]]
-
-    if isfar then return end
-
-    local dlight = DynamicLight( self:EntIndex() )
-
-    if dlight then
-        dlight.pos = self:GetPos()
-		dlight.r = self.cd2_color.r
-		dlight.g = self.cd2_color.g
-		dlight.b = self.cd2_color.b
-		dlight.brightness = 5
-		dlight.Decay = 1000
-		dlight.Size = 100
-		dlight.DieTime = CurTime() + 1
-    end
+    render.SetMaterial( sprite )
+    render.DrawSprite( self:GetPos(), 100, 100, self.cd2_color )
 
 end
 
@@ -82,8 +71,8 @@ end
 
 function ENT:OnRemove()
 
-    if CLIENT and IsValid( self.cd2_hiddensound ) then
-        self.cd2_hiddensound:Stop()
+    if CLIENT and IsValid( self.cd2_onlineorbsound ) then
+        self.cd2_onlineorbsound:Stop()
     end
 
 end
@@ -92,18 +81,18 @@ local weaponskillcolor = Color( 0, 225, 255)
 local agilityskillcolor = Color( 0, 255, 0 )
 local strengthskillcolor = Color( 255, 251, 0)
 local explosiveskillcolor = Color( 0, 110, 255 )
+
 function ENT:OnCollected( ply )
-    CD2DebugMessage( ply:Name() .. " collected a Hidden orb " .. self:EntIndex() )
+    CD2DebugMessage( ply:Name() .. " collected a agility orb " .. self:EntIndex() )
     self.cd2_missingplayers[ ply:SteamID() ] = false
     self.cd2_collectedby[ ply:SteamID() ] = true
 
     if CLIENT then
         sound.Play( "crackdown2/ambient/hiddenorb_collect.mp3", self:GetPos(), 80, 100, 1 )    
-        if ply == LocalPlayer() then CD2SetTextBoxText( "Well done. You found a Hidden Orb!" ) end
+        if ply == LocalPlayer() then CD2SetTextBoxText( "Well done. You found a Online Orb!" ) end
     end
 
     if SERVER then
-
         for i = 1, 6 do
             CD2CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, agilityskillcolor )
             CD2CreateSkillGainOrb( self:GetPos(), ply, "Weapon", 0.2, weaponskillcolor )
@@ -112,7 +101,7 @@ function ENT:OnCollected( ply )
         end
     end
 
-    hook.Run( "CD2_OnHiddenOrbCollected", self, ply )
+    hook.Run( "CD2_OnOnlineOrbCollected", self, ply )
 end
 
 -- Returns if this orb was collected by the player
@@ -129,43 +118,48 @@ function ENT:CheckPlayers()
     for k, v in pairs( self.cd2_missingplayers ) do
         if v then shouldremove = false end
     end
-    if shouldremove then CD2DebugMessage( "Hidden Orb " .. self:EntIndex() .. " has been collected by all players. Removing." ) self:Remove() end
+    if shouldremove then CD2DebugMessage( "Online Orb " .. self:EntIndex() .. " has been collected by all players. Removing." ) self:Remove() end
 end
 
 function ENT:Think()
 
     self:CheckPlayers()
 
-    local players = player_GetAll()
+    local players = CD2FindInSphere( self:GetPos(), 40, function( ent ) return ent:IsCD2Agent() end )
     for i = 1, #players do
         local ply = players[ i ]
-        if IsValid( ply ) and ply:IsCD2Agent() and self.cd2_missingplayers[ ply:SteamID() ] and ply:GetPos():DistToSqr( self:GetPos() ) < ( 40 * 40 ) then
+        if !ply.cd2_onlineorb_notified and SERVER then if !KeysToTheCity() then ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/onlineorb.mp3" ) end  CD2SendTextBoxMessage( ply, "Team up with another Agent to collect this Orb!" ) ply.cd2_onlineorb_notified = true end
+        if #players > 1 and self.cd2_missingplayers[ ply:SteamID() ] then
             self:OnCollected( ply )
+        elseif #players < 2 then
+            self:SetNW2Bool( "cd2_drawinput", true )
+            timer.Create( "removeinput" .. self:EntIndex(), 0.5, 1, function() if !IsValid( self ) then return end self:SetNW2Bool( "cd2_drawinput", false ) end )
         end
     end
-
+    
     if CLIENT then
         if !self.cd2_missingplayers[ LocalPlayer():SteamID() ] then
 
-            if IsValid( self.cd2_hiddensound ) then
-                self.cd2_hiddensound:Stop()
+            if IsValid( self.cd2_onlineorbsound ) then
+                self.cd2_onlineorbsound:Stop()
             end
             
             return
         end
+
         
-        if !self.cd2_hiddensound then
-            sound.PlayFile( "sound/crackdown2/ambient/hiddenorb.mp3", "3d mono", function( snd, id, name )
+        if !self.cd2_onlineorbsound then
+            sound.PlayFile( "sound/crackdown2/ambient/orb1.mp3", "3d mono", function( snd, id, name )
                 if id then print( id, name ) end
-                self.cd2_hiddensound = snd
+                self.cd2_onlineorbsound = snd
                 snd:EnableLooping( true )
-                snd:Set3DFadeDistance( 200, 1000000000 )
+                snd:Set3DFadeDistance( 400, 1000000000 )
             end )
         end
 
-        if IsValid( self.cd2_hiddensound ) then
-            self.cd2_hiddensound:SetVolume( self:SqrRangeTo( LocalPlayer() ) < ( 2000 * 2000 ) and 1 or 0 )
-            self.cd2_hiddensound:SetPos( self:GetPos() )
+        if IsValid( self.cd2_onlineorbsound ) then
+            self.cd2_onlineorbsound:SetVolume( self:SqrRangeTo( LocalPlayer() ) < ( 2000 * 2000 ) and 1 or 0 )
+            self.cd2_onlineorbsound:SetPos( self:GetPos() )
         end
 
     end

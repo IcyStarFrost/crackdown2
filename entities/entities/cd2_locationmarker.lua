@@ -42,11 +42,6 @@ function ENT:Initialize()
             snd:EnableLooping( true )
 
             snd:Play()
-
-            hook.Add( "Think", self, function()
-                if !IsValid( snd ) then hook.Remove( "Think", self ) return end
-                snd:SetPos( self:GetPos() )
-            end )
         
         end )
 
@@ -76,7 +71,7 @@ function ENT:Initialize()
                 local code = input_GetKeyCode( usebind )
                 local buttonname = input_GetKeyName( code )
                 local screen = ( currentlocation:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
-                CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), self:GetLocationType() == "agency" and "Call Helicopter" or self:GetLocationType() == "cell" and "Begin Assault on this Tactical Location" )
+                CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), self:GetLocationType() == "beacon" and "Drop Beacon" or self:GetLocationType() == "agency" and "Call Helicopter" or self:GetLocationType() == "cell" and "Begin Assault on this Tactical Location" )
             end
         
             if self:GetLocationType() == "cell" and self:GetIsActive() and LocalPlayer():SqrRangeTo( self ) <= ( 2000 * 2000 ) then
@@ -290,6 +285,11 @@ function ENT:Think()
         end
     end
 
+    if CLIENT and IsValid( self.cd2_ambient ) then
+        self.cd2_ambient:SetPos( self:GetPos() )
+        self.cd2_ambient:SetVolume( self:SqrRangeTo( LocalPlayer() ) < ( 2000 * 2000 ) and 1 or 0 )
+    end
+
     self:NextThink( CurTime() )
     return true
 end
@@ -364,7 +364,7 @@ if CLIENT then
                     surface_SetMaterial( cell )
                     local size = 200
                     surface_DrawTexturedRect( -size / 2, -size / 2, size, size)
-                elseif self:GetLocationType() == "agency" then
+                elseif self:GetLocationType() == "agency" or self:GetLocationType() == "beacon" then
                     surface_SetDrawColor( default )
                     surface_SetMaterial( peacekeeper )
                     local size = 200

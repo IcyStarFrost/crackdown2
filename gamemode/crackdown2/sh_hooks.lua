@@ -72,9 +72,6 @@ local explosivemodels = {
     [ "models/props_junk/gascan001a.mdl" ] = 0.6
 }
 
-if SERVER then
-    hook.Add( "InitPostEntity", "crackdown2_generatemapKTTC", function() timer.Simple( 1, function() if KeysToTheCity() and navmesh.IsLoaded() then CD2GenerateMapData() end end ) end )
-end
 
 if SERVER then
     hook.Add( "OnEntityCreated", "crackdown2_explosivepropeffects", function( ent )
@@ -92,7 +89,36 @@ if SERVER then
     end )
 
     hook.Add( "PostCleanupMap", "crackdown2_regenmap", function()
-        CD2GenerateMapData()
+        CD2GenerateMapData( true )
+
+        for k, ply in ipairs( player.GetAll() ) do
+            timer.Simple( 0.01, function()
+                if !IsValid( ply.cd2_holsteredweapon ) then 
+        
+                    local mdl
+        
+                    for k, v in ipairs( ply:GetWeapons() ) do
+                        if v != ply:GetActiveWeapon() then mdl = v:GetModel() break end
+                    end
+        
+                    ply.cd2_holsteredweapon = ents.Create( "base_anim" )
+                    ply.cd2_holsteredweapon:SetNoDraw( true )
+                    ply.cd2_holsteredweapon:SetModel( mdl or "" )
+                    ply.cd2_holsteredweapon:SetPos( ply:GetPos() )
+                    ply.cd2_holsteredweapon:SetAngles( ply:GetAngles() )
+                    ply.cd2_holsteredweapon:Spawn()
+        
+                    local mins, maxs = ply.cd2_holsteredweapon:GetModelBounds()
+                    ply.cd2_holsteredweapon:FollowBone( ply, ply:LookupBone( "ValveBiped.Bip01_Spine2" ) )
+                    ply.cd2_holsteredweapon:SetLocalPos( Vector( -10, -9, 0 ) - mins / 2 ) 
+                    ply.cd2_holsteredweapon:SetLocalAngles( Angle( 40, 0, 0 ) )
+        
+                    ply.cd2_holsteredweapon.Think = function( entself ) if entself:GetModel() != "models/error.mdl" then entself:SetNoDraw( !ply:Alive() and true or ply:GetNoDraw() ) end end
+        
+                    if mdl then ply.cd2_holsteredweapon:SetNoDraw( false ) end
+                end
+            end )
+        end 
     end )
 
 end

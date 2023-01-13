@@ -46,7 +46,7 @@ end
 function ENT:Draw()
 
     render.SetColorMaterial()
-    render.DrawSphere( self:GetPos(), 2, 50, 50, self:GetTrailColor():ToColor() )
+    render.DrawSphere( self:GetPos(), 2, 10, 10, self:GetTrailColor():ToColor() )
 
     local dlight = DynamicLight( self:EntIndex() )
 

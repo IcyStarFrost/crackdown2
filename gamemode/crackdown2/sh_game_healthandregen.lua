@@ -75,7 +75,7 @@ if SERVER then
     hook.Add("OnEntityCreated", "crackdown2_networkhealth", function( ent )
         timer.Simple( 0, function()
             if !IsValid( ent ) then return end
-            ent:SetNWFloat( "cd2_health", ent:Health() )
+            ent:SetNW2Float( "cd2_health", ent:Health() )
 
             if IsValid( ent:GetPhysicsObject() ) then
                 ent:SetNW2Int( "cd2_mass", ent:GetPhysicsObject():GetMass() )
@@ -85,7 +85,7 @@ if SERVER then
 
     hook.Add( "PostEntityTakeDamage", "crackdown2_updatenwhealth", function( ent, info, tookdmg )
         if !tookdmg or ent:IsCD2Agent() then return end
-        ent:SetNWFloat( "cd2_health", ent:Health() )
+        ent:SetNW2Float( "cd2_health", ent:Health() )
     end )
 
     -- Set the regen start time and updates the player's networked health. Same as above for networked health, player's networked health was updated every 0.1 seconds. Once again this is more optimized

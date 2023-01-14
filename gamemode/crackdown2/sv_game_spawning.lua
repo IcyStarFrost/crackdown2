@@ -19,15 +19,20 @@ hook.Add( "PlayerInitialSpawn", "crackdown2_setplayerclass", function( ply )
     net.WriteString( util.TableToJSON( vecs ) )
     net.Send( ply )
 
-    CD2FILESYSTEM:RequestPlayerData( ply, "c_completedtutorial", function( val )
-        if val and !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then 
-            local loaded = CD2LoadMapData()
-            
-            if !loaded then
-                CD2GenerateMapData( true )
+    if !KeysToTheCity() and !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then
+        CD2FILESYSTEM:RequestPlayerData( ply, "c_completedtutorial", function( val )
+            if val then 
+                local loaded = CD2LoadMapData()
+                
+                if !loaded then
+                    CD2GenerateMapData( true )
+                end
             end
-        end
-    end )
+        end )
+    elseif KeysToTheCity() and !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then
+        CD2GenerateMapData( true )
+    end
+    
 end )
 --
 

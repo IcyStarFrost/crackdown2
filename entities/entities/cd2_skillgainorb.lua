@@ -48,7 +48,7 @@ function ENT:Draw()
     render.SetColorMaterial()
     render.DrawSphere( self:GetPos(), 2, 10, 10, self:GetTrailColor():ToColor() )
 
-    local dlight = DynamicLight( self:EntIndex() )
+--[[     local dlight = DynamicLight( self:EntIndex() )
 
     if dlight then
         dlight.pos = self:GetPos()
@@ -59,7 +59,7 @@ function ENT:Draw()
 		dlight.Decay = 1000
 		dlight.Size = 256
 		dlight.DieTime = CurTime() + 1
-    end
+    end ]]
 
 end
 

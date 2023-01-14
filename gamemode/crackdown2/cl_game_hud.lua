@@ -551,7 +551,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             surface_DrawRect( toscreen.x - 30, toscreen.y, 60, 12 )
 
             surface_SetDrawColor( orangeish )
-            surface_DrawRect( toscreen.x - 28, toscreen.y + 2, ( target:GetNWFloat( "cd2_health", 0 ) / target:GetMaxHealth() ) * 56, 8 )
+            surface_DrawRect( toscreen.x - 28, toscreen.y + 2, ( target:GetNW2Float( "cd2_health", 0 ) / target:GetMaxHealth() ) * 56, 8 )
         
         end
     end

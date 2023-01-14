@@ -350,11 +350,11 @@ end
 
 function ENT:Think()
 
-    if SERVER and self.cd2_ShouldcheckPVS then
-        if game.SinglePlayer() and !Entity( 1 ):TestPVS( self ) and Entity( 1 ):SqrRangeTo( self ) > ( 1500 * 1500 )  or CD2_DisableAllAI then
+    if SERVER and game.SinglePlayer() and self.cd2_ShouldcheckPVS then
+        if !Entity( 1 ):TestPVS( self ) and Entity( 1 ):SqrRangeTo( self ) > ( 1500 * 1500 )  or CD2_DisableAllAI then
             self:SetIsDisabled( true )
             if !Entity( 1 ):TestPVS( self ) and CurTime() > self.cd2_pvsremovetime then self:Remove() end
-        elseif game.SinglePlayer() and Entity( 1 ):TestPVS( self ) and !CD2_DisableAllAI then 
+        elseif Entity( 1 ):TestPVS( self ) and !CD2_DisableAllAI then 
             self:SetIsDisabled( false )
         end
         if Entity( 1 ):TestPVS( self ) or Entity( 1 ):SqrRangeTo( self ) < ( 1500 * 1500 ) then self.cd2_pvsremovetime = CurTime() + 10 end
@@ -381,7 +381,7 @@ function ENT:Think()
 
         if !self.cd2_NextRegen or CurTime() > self.cd2_NextRegen then
             self:SetHealth( self:Health() + 1 )
-            self:SetNWFloat( "cd2_health", self:Health() )
+            self:SetNW2Float( "cd2_health", self:Health() )
             self.cd2_NextRegen = CurTime() + 0.03
         end
     end
@@ -462,6 +462,18 @@ function ENT:Think()
     if self.Think2 then self:Think2() end
 
 end
+
+function ENT:BodyUpdate()
+    if game.SinglePlayer() and self:GetRangeSquaredTo( Entity( 1 ) ) > ( 2500 * 2500 ) then return end
+
+    if !self.loco:GetVelocity():IsZero() and self:IsOnGround() then
+        self:BodyMoveXY()
+        return
+    end
+
+    self:FrameAdvance()
+end
+
 
 function ENT:OnLandOnGround()
     
@@ -614,16 +626,6 @@ function ENT:OnKilled( info )
     if self.OnKilled2 then self:OnKilled2( info, ragdoll ) end
 end
 
-function ENT:BodyUpdate()
-    if game.SinglePlayer() and self:GetRangeSquaredTo( Entity( 1 ) ) > ( 2500 * 2500 ) then return end
-
-    if !self.loco:GetVelocity():IsZero() and self:IsOnGround() then
-        self:BodyMoveXY()
-        return
-    end
-
-    self:FrameAdvance()
-end
 
 
 

@@ -143,7 +143,7 @@ if CLIENT then
             ply.cd2_light:SetAngles( ply:EyeAngles() )
             ply.cd2_light:SetFarZ( 2000 )
             ply.cd2_light:SetEnableShadows( false )
-            ply.cd2_light:SetBrightness( 15 )
+            ply.cd2_light:SetBrightness( 3 )
             ply.cd2_light:SetFOV( 60 )
             ply.cd2_light:SetTexture( "effects/flashlight001" )
             ply.cd2_light:Update()

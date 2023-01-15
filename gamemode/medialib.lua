@@ -1,3 +1,4 @@
+AddCSLuaFile()
 local medialib
 
 do

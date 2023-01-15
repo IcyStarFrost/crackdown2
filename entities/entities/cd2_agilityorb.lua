@@ -114,8 +114,8 @@ function ENT:OnCollected( ply )
         if !KeysToTheCity() and !ply.cd2_InTutorial and !ply.cd2_hadfirstagilityorb then
             CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstagilityorb", function( val ) 
                 if !val then
-                    ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firstau_achieve.mp3" )
-                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstau", true )
+                    ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firstagilityorb_achieve.mp3" )
+                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstagilityorb", true )
                 end
                 ply.cd2_hadfirstagilityorb = true
             end )

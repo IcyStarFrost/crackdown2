@@ -18,9 +18,7 @@ function ENT:Initialize()
         self:ResetSequence( 0 )
     end )
 
-    if SERVER then
-        self:EmitSound( "^npc/attack_helicopter/aheli_rotor_loop1.wav", 120, 100, 1, CHAN_AUTO )
-    end
+    self:EmitSound( "^npc/attack_helicopter/aheli_rotor_loop1.wav", 120, 100, 1, CHAN_AUTO )
 
     self.cd2_angles = self:GetAngles()
 

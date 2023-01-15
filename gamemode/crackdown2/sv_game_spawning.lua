@@ -64,6 +64,8 @@ net.Receive( "cd2net_playerdropmenuconfirm", function( len, ply )
         if !KeysToTheCity() then ply:LoadProgress() end -- Load their progress
     end
 
+    CD2DebugMessage( ply:Name(), " Has chosen their spawn location and will now spawn at " .. tostring( spawnposition ) )
+
     --ply.cd2_spawnatposition = spawnposition
     ply.cd2_WeaponSpawnDelay = CurTime() + 0.5 -- Disables the custom weapon pickup for a bit so we can force give these weapons
     ply:Spawn()
@@ -128,6 +130,8 @@ net.Receive( "cd2net_spawnatnearestspawn", function( len, ply )
             if !KeysToTheCity() then ply:LoadProgress() end
         end
 
+        CD2DebugMessage( ply:Name() .. " Is respawning at the nearest spawn point" )
+
         ply.cd2_WeaponSpawnDelay = CurTime() + 0.5
         ply.cd2_spawnatnearestspawn = true
         ply:Spawn()
@@ -149,6 +153,8 @@ end )
 net.Receive( "cd2net_reviveplayer", function( len, ply ) 
     local agent = net.ReadEntity()
     if agent:Alive() or !agent:GetCanRevive() then return end
+
+    CD2DebugMessage( agent:Name() .. " Was revived by " .. ply:Name() )
 
     agent.cd2_revived = true
     agent.cd2_WeaponSpawnDelay = CurTime() + 0.5

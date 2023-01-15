@@ -75,8 +75,6 @@ function ENT:OnKilled2( info, ragdoll )
             ragdoll:EmitSound( "crackdown2/vo/peacekeeper/fire" .. random( 1, 15 ) .. ".mp3", 70, 100, 1, CHAN_VOICE )
         end )
     end
-
-
 end
 
 function ENT:OnInjured2( info ) 

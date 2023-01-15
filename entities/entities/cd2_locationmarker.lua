@@ -137,6 +137,8 @@ function ENT:OnActivate( ply )
 
         local npclist = difficultynpcs[ self:GetDifficulty() ]
 
+        CD2DebugMessage( ply:Name() .. " Initiated a Tactical Assault on Location Marker ", self )
+
         self:SetIsActive( true )
         sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
 
@@ -209,18 +211,23 @@ function ENT:OnActivate( ply )
 
             local agencycount = 0 
             local locations = ents.FindByClass( "cd2_locationmarker" )
+            local locationcount = 0
             for i = 1, #locations do
                 local location = locations[ i ]
+                if location:GetLocationType() != "beacon" then locationcount = locationcount + 1 end
                 if location:GetLocationType() == "agency" then agencycount = agencycount + 1 end
             end
 
-            CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Cell Tactical Location\nCaptured " .. agencycount .. " of " .. #locations .. " Tactical Locations" )
+            CD2DebugMessage( self, " Tactical Location was converted to Agency" )
+
+            CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Cell Tactical Location\nCaptured " .. agencycount .. " of " .. locationcount .. " Tactical Locations" )
 
         end )
     elseif self:GetLocationType() == "agency" then
         net.Start( "cd2net_opendropmenu" )
         net.WriteBool( true )
         net.Send( ply )
+        CD2DebugMessage( ply:Name() .. " Entered resupply from ", self, " Agency Tactical location" )
     end
 
 end

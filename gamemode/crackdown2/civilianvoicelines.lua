@@ -1,3 +1,4 @@
+AddCSLuaFile()
 
 ENT.cd2_VoiceLines = {
     [ "male" ] = {

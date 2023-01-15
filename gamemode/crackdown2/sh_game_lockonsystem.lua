@@ -99,9 +99,10 @@ if SERVER then
 
     net.Receive( "cd2net_changelockonpos", function( len, ply )
         ply.cd2_LockOnPos = net.ReadString()
+        local targ = ply:GetNW2Entity( "cd2_lockontarget", nil )
         
-        if ply.cd2_LockOnPos == "head" then 
-            local dist = ply:GetPos():Distance( ply:GetNW2Entity( "cd2_lockontarget", nil ):GetPos() ) / 150
+        if IsValid( targ ) and ply.cd2_LockOnPos == "head" then 
+            local dist = ply:GetPos():Distance( targ:GetPos() ) / 150
 
             ply:SetLockonSpreadDecay( dist * 0.08 ) 
         end

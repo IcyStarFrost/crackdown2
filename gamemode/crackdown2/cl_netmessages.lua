@@ -279,6 +279,12 @@ net.Receive( "cd2net_playerinitialspawn", function()
             return
         end
 
+        timer.Simple( 1, function()
+            if !KeysToTheCity() then
+                sound.PlayFile( "sound/crackdown2/vo/agencydirector/droppoint.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
+            end
+        end
+
         CD2OpenSpawnPointMenu()
         CD2StartMusic( "sound/crackdown2/music/mainmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
             if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end

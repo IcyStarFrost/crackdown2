@@ -206,15 +206,6 @@ function OpenIntelConsole()
 
         local entities = ents.FindByClass( "cd2_*" )
 
-        -- Cell --
-        for i = 1, #entities do
-            local ent = entities[ i ]
-            if IsValid( ent ) and ent:IsCD2NPC() and ent:GetCD2Team() == "cell" and ent:SqrRangeTo( LocalPlayer() ) < ( 3000 * 3000 ) then
-                DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, ent:GetAngles(), cellicon, 4, ent:GetEnemy() == LocalPlayer() and celltargetred or cellwhite, 30 )
-            end
-        end
-        --
-
         -- Tacticle Locations | Helicopters | AUs --
         for i = 1, #entities do
             local ent = entities[ i ]

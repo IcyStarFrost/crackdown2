@@ -218,6 +218,12 @@ function ENT:OnActivate( ply )
                 if location:GetLocationType() == "agency" then agencycount = agencycount + 1 end
             end
 
+            if !KeysToTheCity() and agencycount == locationcount then
+                for k, v in ipairs( player.GetAll() ) do
+                    v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/alltactical_achieve.mp3" )
+                end
+            end
+
             CD2DebugMessage( self, " Tactical Location was converted to Agency" )
 
             CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Cell Tactical Location\nCaptured " .. agencycount .. " of " .. locationcount .. " Tactical Locations" )
@@ -275,13 +281,14 @@ function ENT:Think()
             if !IsValid( ply ) or !ply:IsCD2Agent() or ply:GetPos():DistToSqr( self:GetPos() ) > ( 150 * 150 ) then continue end
 
             ply:SetNW2Entity( "cd2_targettacticlelocation", self )
-            timer.Create( "cd2_unselecttacticlelocation" .. ply:EntIndex(), 0.6, 1, function() ply.cd2_checkweapons = true ply:SetNW2Entity( "cd2_targettacticlelocation", nil ) end )
+            timer.Create( "cd2_unselecttacticlelocation" .. ply:EntIndex(), 0.6, 1, function() if !IsValid( ply ) then return end ply.cd2_checkweapons = true ply:SetNW2Entity( "cd2_targettacticlelocation", nil ) end )
             
             if !KeysToTheCity() and self:GetLocationType() == "agency" and ply.cd2_checkweapons then
                 net.Start( "cd2net_checkweapons" )
                 net.Send( ply )
                 ply.cd2_checkweapons = false
             end
+
 
             if ply:KeyPressed( IN_USE ) then
                 self:OnActivate( ply )

@@ -73,6 +73,10 @@ function ENT:CreateCluster()
             elseif skilllevel >= 4 then
                 sound.Play( highskillsounds[ random( 3 ) ], cluster:GetPos(), 90, 100, 1 )
             end
+
+            if skilllevel > 1 then
+                sound.Play( "crackdown2/weapons/exp" .. random( 1, 4 ) .. ".wav", self:GetPos(), 90 + ( 10 * skilllevel ), 100, 1 )
+            end
     
             util.BlastDamageInfo( blast, cluster:GetPos(), 400 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
     
@@ -116,6 +120,10 @@ function ENT:OnDelayEnd()
             sound.Play( skillsounds[ skilllevel ], self:GetPos(), 80, 100, 1 )
         elseif skilllevel >= 4 then
             sound.Play( highskillsounds[ random( 3 ) ], self:GetPos(), 90, 100, 1 )
+        end
+
+        if skilllevel > 1 then
+            sound.Play( "crackdown2/weapons/exp" .. random( 1, 4 ) .. ".wav", self:GetPos(), 90 + ( 10 * skilllevel ), 100, 1 )
         end
 
         util.BlastDamageInfo( blast, self:GetPos(), 400 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )

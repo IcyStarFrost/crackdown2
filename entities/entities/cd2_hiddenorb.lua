@@ -110,6 +110,16 @@ function ENT:OnCollected( ply )
             CD2CreateSkillGainOrb( self:GetPos(), ply, "Strength", 1, strengthskillcolor )
             CD2CreateSkillGainOrb( self:GetPos(), ply, "Explosive", 0.4, explosiveskillcolor )
         end
+
+        if !KeysToTheCity() and !ply.cd2_hadfirsthiddenorb then
+            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firsthiddenorb", function( val ) 
+                if !val then
+                    ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firsthiddenorb_achieve.mp3" )
+                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firsthiddenorb", true )
+                end
+                ply.cd2_hadfirsthiddenorb = true
+            end )
+        end
     end
 
     hook.Run( "CD2_OnHiddenOrbCollected", self, ply )

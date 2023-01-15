@@ -98,6 +98,18 @@ function ENT:TypingText()
         end
     end
 
+    local activecount = 0 
+    for i = 1, #AUs do 
+        local au = AUs[ i ]
+        if IsValid( au ) and au:GetActive() then activecount = activecount + 1 end
+    end
+
+    if !KeysToTheCity() and ( CD2_BeaconCount * 3 ) == activecount then
+        for k, v in ipairs( player.GetAll() ) do
+            v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allau_achieve.mp3" )
+        end
+    end
+
     if othercount == 3 then
         hook.Run( "CD2_PowerNetworkComplete", self:GetAUGroupID() )
         CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\nA Beacon can now be deployed" )
@@ -163,6 +175,20 @@ function ENT:Think()
             self:EnableBeam() 
             CD2DebugMessage( self, "AU unit of Group " .. self:GetAUGroupID() .. " has been activated" )
             self:TypingText() 
+
+            if !KeysToTheCity() then
+                for i = 1, #nearplayers do
+                    local ply = nearplayers[ i ]
+                    if ply.cd2_hadfirstau then continue end
+                    CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstau", function( val ) 
+                        if !val then
+                            ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firstau_achieve.mp3" )
+                            CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstau", true )
+                        end
+                        ply.cd2_hadfirstau = true
+                    end )
+                end
+            end
         end
 
         if !self.cd2_nextsound or CurTime() > self.cd2_nextsound then

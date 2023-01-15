@@ -243,7 +243,7 @@ end
 
 -- Play a small third person animation before switching
 function SWEP:Holster( wep )
-    if self:GetPickupMode() then return end
+    if self:GetPickupMode() or self:GetIsHolstering() then return end
     self:SetIsHolstering( true )
     self:SetIsReloading( false )
     self:SetHoldType( "passive" )

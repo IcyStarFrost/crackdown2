@@ -39,7 +39,7 @@ function CD2OpenDropMenu( issupplypoint )
     CD2_DropSecondary = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "cd2_dropsecondary" ) or CD2_DropSecondary
     CD2_DropEquipment = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "cd2_dropequipment" ) or CD2_DropEquipment
 
-
+    if IsValid( CD2_DropMenu ) then CD2_DropMenu:Remove() end
 
     CD2CreateThread( function()
 

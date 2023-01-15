@@ -430,6 +430,11 @@ function ENT:BeaconDetonate()
             CD2_DrawMinimap = true
             CD2_DrawBlackbars = false
 
+            if !KeysToTheCity() and !CD2FILESYSTEM:ReadPlayerData( "cd2_firstbeacon" ) then
+                sound.PlayFile( "sound/crackdown2/vo/agencydirector/firstbeacon_achieve.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
+                CD2FILESYSTEM:WritePlayerData( "cd2_firstbeacon", true )
+            end
+
 
         end )
         

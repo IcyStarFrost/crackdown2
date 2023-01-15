@@ -212,7 +212,7 @@ function CD2GenerateMapData( randomize )
                 location:SetLocationType( "cell" )
                 location:Spawn()
 
-                if assignfirstlocation then CD2DebugMessage( "Assigned beginning location to " .. location.cd2_map_id ) end
+                if assignfirstlocation then CD2_BeginnerLocation = location CD2DebugMessage( "Assigned beginning location to " .. location.cd2_map_id ) end
 
                 assignfirstlocation = false
                 tacticallocationdata[ #tacticallocationdata + 1 ] = { pos = location:GetPos(), id = location.cd2_map_id, difficulty = location:GetDifficulty(), type = location:GetLocationType(), isbeginninglocation = location:GetIsBeginningLocation() }
@@ -232,6 +232,10 @@ function CD2GenerateMapData( randomize )
 
         SetGlobal2Bool( "cd2_MapDataLoaded", true )
         CD2_BeaconCount = #beacondata
+        CD2_AgilityOrbCount = #agilityorbdata
+        CD2_HiddenOrbCount = #hiddenorbdata
+        CD2_OnlineOrbCount = #onlineorbdata
+
         CD2_BeaconData = beacondata
         CD2_CurrentBeacon = 1
 
@@ -315,6 +319,10 @@ function CD2LoadMapData()
     end
 
     CD2DebugMessage( "Loaded " .. #hiddenorbs .. " Hidden Orbs" )
+
+    CD2_AgilityOrbCount = #agilityorbs
+    CD2_HiddenOrbCount = #hiddenorbs
+    CD2_OnlineOrbCount = #onlineorbs
 
 
     local currentbeaconindex = mapdata.cd2_map_currentbeacon
@@ -449,7 +457,7 @@ function CD2LoadMapData()
         location:SetDifficulty( difficulty )
         location:SetIsBeginningLocation( isbeginninglocation )
         
-        if isbeginninglocation then  SetGlobal2Vector( "cd2_beginnerlocation", location:GetPos() ) end
+        if isbeginninglocation then CD2_BeginnerLocation = location SetGlobal2Vector( "cd2_beginnerlocation", location:GetPos() ) end
 
         location.cd2_map_isgenerated = true
         location.cd2_map_id = id

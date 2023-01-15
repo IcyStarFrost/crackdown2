@@ -87,6 +87,12 @@ function CD2CreateBeaconSet( beacondata )
                         if !KeysToTheCity() then CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", group + 1 ) end
     
                         coroutine.wait( 7 )
+
+                        if !KeysToTheCity() and count == CD2_BeaconCount then
+                            for k, v in ipairs( player.GetAll() ) do
+                                v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allbeacons_achieve.mp3" )
+                            end
+                        end
     
                         CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )
                         break

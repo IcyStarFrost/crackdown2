@@ -201,6 +201,16 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
             if IsValid( trail1 ) then trail1:Remove() end
             if IsValid( trail2 ) then trail2:Remove() end
 
+            if !KeysToTheCity() and !ply.cd2_hadfirstgroundpound then
+                CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstgroundpound", function( val ) 
+                    if !val then
+                        ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/groundstrike_achieve.mp3" )
+                        CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstgroundpound", true )
+                    end
+                    ply.cd2_hadfirstgroundpound = true
+                end )
+            end
+
         end )
 
     end

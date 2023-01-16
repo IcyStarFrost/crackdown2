@@ -324,119 +324,130 @@ function CD2LoadMapData()
     CD2_HiddenOrbCount = #hiddenorbs
     CD2_OnlineOrbCount = #onlineorbs
 
-
-    local currentbeaconindex = mapdata.cd2_map_currentbeacon
-    CD2_BeaconCount = #beacondata
-    CD2_BeaconData = beacondata
-    CD2_CurrentBeacon = currentbeaconindex
+    local beaconindex = beacondata.cd2_map_currentbeacon
 
     for i = 1, #beacondata do
-        local bdata = beacondata[ i ]
-        local beaconspawnpos = bdata.beaconspawnpos
-        local isdetonated = bdata.isdetonated 
-        local id = bdata.id
-        local auID = bdata.AUID
-        local AUs = bdata.AUs
+        if i > beaconindex then break end
 
+        local beacongroup = beacondata[ i ]
+        local landingpos = beacongroup.pos -- Beacon's Position on ground
+        local spawnpos = beacongroup.beaconspawnpos -- Beacon's position when it drops from the air
+        local beaconID = beacongroup.id -- Beacon's ID
+        local GroupID = beacongroup.AUID -- Beacon's Absorption Unit group ID
+        local isdetonated = beacongroup.isdetonated -- If the beacon is detonated
+
+
+        -- Beacons
         if isdetonated then
             local beacon = ents.Create( "cd2_beacon" )
-            beacon:SetPos( beaconspawnpos )
+            beacon:SetPos( spawnpos )
             
             beacon.cd2_map_isgenerated = true
             beacon.cd2_map_id = id
 
             beacon:Spawn()
 
-            timer.Simple( 0.1, function() beacon:StartBeaconasActive() end )
-        else
-            local activeAUs = 0
-            --if id == currentbeaconindex then
-                for v = 1, #AUs do
-                    if v > currentbeaconindex then continue end
-                    local audata = AUs[ v ]
-                    local aupos = audata.aupos
-                    local active = audata.isactive
-                    local aumapID = audata.id
-    
-                    local au = ents.Create( "cd2_au" )
-                    au:SetPos( aupos ) 
+            timer.Simple( 0.1, function() beacon:StartBeaconasActive() end ) 
+        end
+        --
+
+        local activeAUs = 0
+
+        -- Absoption Units
+        local AUs = beacongroup.AUs
+        for n = 1, #AUs do
+            local audata = AUs[ n ]
+            local AUpos = audata.aupos -- AU's position
+            local isactive = audata.isactive -- If the AU is active
+            local AUID = audata.id -- The AU's individual ID
+
+            
+            local au = ents.Create( "cd2_au" )
+            au:SetPos( aupos ) 
 
 
-                    au.cd2_map_isgenerated = true
-                    au.cd2_map_id = aumapID
+            au.cd2_map_isgenerated = true
+            au.cd2_map_id = AUID
 
-                    au:SetAUGroupID( auID )
-                    au:SetBeamPos( beaconspawnpos + Vector( 0, 0, 120 ) )
-                    au:Spawn()
+            au:SetAUGroupID( auID )
+            au:SetBeamPos( spawnpos + Vector( 0, 0, 120 ) )
+            au:Spawn()
 
-                    if active then
-                        activeAUs = activeAUs + 1
-                        timer.Simple( 0.1, function() au:EnableBeam() end )
-                    end
-    
-                end
-            --end
-
-            if activeAUs == 3 then
-                local bdata = CD2_BeaconData[ auID ]
-                local pos = bdata.pos
-
-                local marker = ents.Create( "cd2_locationmarker" )
-                marker:SetPos( pos ) 
-                marker:SetLocationType( "beacon" )
-
-                function marker:OnActivate( ply ) 
-                    local sndtracks = { "sound/crackdown2/music/beacon/ptb.mp3", "sound/crackdown2/music/beacon/industrialfreaks.mp3" }
-                    sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
-
-                    marker.cd2_beacon = ents.Create( "cd2_beacon" )
-                    marker.cd2_beacon:SetPos( bdata.beaconspawnpos )
-                    
-                    marker.cd2_beacon.cd2_map_isgenerated = true
-                    marker.cd2_beacon.cd2_map_id = bdata.id
-                    marker.cd2_beacon.cd2_AUgroup = bdata.AUID
-
-                    marker.cd2_beacon:SetSoundTrack( sndtracks[ math.random( #sndtracks ) ] )
-
-                    marker.cd2_beacon:Spawn()
-
-                    timer.Simple( 0.1, function() marker.cd2_beacon:DropBeacon() end )
-                end
-
-                marker:Spawn()
-
-                CD2CreateThread( function()
-                    while true do 
-                        if !IsValid( marker ) then return end
-
-                        marker:SetIsActive( IsValid( marker.cd2_beacon ) )
-                        marker:SetNoDraw( IsValid( marker.cd2_beacon ) )
-
-                        if IsValid( marker.cd2_beacon ) then
-
-                            if marker.cd2_beacon:GetIsDetonated() then
-                                marker:Remove()
-
-                                local activecount = ents.FindByClass( "cd2_beacon" )
-                                local count = 0 
-                                for i = 1, #activecount do
-                                    local beacon = activecount[ i ]
-                                    if IsValid( beacon ) and beacon:GetIsDetonated() then count = count + 1 end
-                                end
-
-                                CD2_CurrentBeacon = group + 1
-                                if !KeysToTheCity() then CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", group + 1 ) end
-
-                                CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )
-                                return
-                            end
-
-                        end
-
-                        coroutine.yield()
-                    end
-                end )
+            if isactive then
+                activeAUs = activeAUs + 1
+                timer.Simple( 0.1, function() au:EnableBeam() end )
             end
+        end
+
+        if activeAUs == 3 then
+            local marker = ents.Create( "cd2_locationmarker" )
+            marker:SetPos( landingpos ) 
+            marker:SetLocationType( "beacon" )
+            marker.cd2_AUgroup = GroupID
+        
+            function marker:OnActivate( ply ) 
+                local sndtracks = { "sound/crackdown2/music/beacon/ptb.mp3", "sound/crackdown2/music/beacon/industrialfreaks.mp3" }
+                sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
+
+                CD2DebugMessage( self, "A Beacon for AUGroup " .. GroupID .. " has been called by " .. ply:Name() )
+        
+                marker.cd2_beacon = ents.Create( "cd2_beacon" )
+                marker.cd2_beacon:SetPos( spawnpos )
+                
+                marker.cd2_beacon.cd2_map_isgenerated = true
+                marker.cd2_beacon.cd2_map_id = beaconIDn
+                marker.cd2_beacon.cd2_AUgroup = GroupID
+        
+                marker.cd2_beacon:SetSoundTrack( sndtracks[ math.random( #sndtracks ) ] )
+        
+                marker.cd2_beacon:Spawn()
+        
+                timer.Simple( 0.1, function() marker.cd2_beacon:DropBeacon() end )
+            end
+        
+            marker:Spawn()
+
+            CD2DebugMessage( marker, "Created Beacon Marker for AU Group " .. GroupID )
+        
+            CD2CreateThread( function()
+                while true do 
+                    if !IsValid( marker ) then break end
+        
+                    marker:SetIsActive( IsValid( marker.cd2_beacon ) )
+                    marker:SetNoDraw( IsValid( marker.cd2_beacon ) )
+        
+                    if IsValid( marker.cd2_beacon ) then
+        
+                        if marker.cd2_beacon:GetIsDetonated() then
+                            marker:Remove()
+        
+                            local activecount = ents.FindByClass( "cd2_beacon" )
+                            local count = 0 
+                            for i = 1, #activecount do
+                                local beacon = activecount[ i ]
+                                if IsValid( beacon ) and beacon:GetIsDetonated() then count = count + 1 end
+                            end
+        
+                            CD2_CurrentBeacon = GroupID + 1
+                            if !KeysToTheCity() then CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", GroupID + 1 ) end
+        
+                            coroutine.wait( 7 )
+
+                            if !KeysToTheCity() and count == CD2_BeaconCount then
+                                for k, v in ipairs( player.GetAll() ) do
+                                    v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allbeacons_achieve.mp3" )
+                                end
+                            end
+        
+                            CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )
+                            break
+                        end
+        
+                    end
+        
+                    coroutine.yield()
+                end
+            end )
         end
 
 
@@ -493,6 +504,26 @@ hook.Add( "CD2_OnAgilityOrbCollected", "crackdown2_removeorbfrommapdata", functi
     CD2FILESYSTEM:WriteMapData( "cd2_map_agilityorbdata", agilityorbdata )
 end )
 
+
+hook.Add( "CD2_AUActivated", "crackdown2_updateAUs", function( au ) 
+    if !au.cd2_map_isgenerated or KeysToTheCity() then return end
+    local Beacondata = CD2FILESYSTEM:ReadMapData( "cd2_map_beacondata" )
+
+    for i = 1, #Beacondata do
+        local beacongroupdata = Beacondata[ i ]
+        local AUs = beacongroupdata.AUs
+
+        for n = 1, #AUs do
+            local AUdata = AUs[ n ]
+            if AUdata.id == au.cd2_map_id then  
+                AUdata.isactive = true
+                break 
+            end
+        end
+    end
+
+    CD2FILESYSTEM:WriteMapData( "cd2_map_beacondata", Beacondata )
+end )
 
 
 hook.Add( "CD2_OnOnlineOrbCollected", "crackdown2_removeorbfrommapdata", function( orb, ply )

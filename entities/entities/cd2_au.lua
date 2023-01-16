@@ -174,6 +174,7 @@ function ENT:Think()
         if self:GetCharge() >= 100 then
             self:EnableBeam() 
             CD2DebugMessage( self, "AU unit of Group " .. self:GetAUGroupID() .. " has been activated" )
+            hook.Run( "CD2_AUActivated", self )
             self:TypingText() 
 
             if !KeysToTheCity() then

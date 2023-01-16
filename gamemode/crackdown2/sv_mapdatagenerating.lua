@@ -324,7 +324,7 @@ function CD2LoadMapData()
     CD2_HiddenOrbCount = #hiddenorbs
     CD2_OnlineOrbCount = #onlineorbs
 
-    local beaconindex = beacondata.cd2_map_currentbeacon
+    local beaconindex = CD2FILESYSTEM:ReadMapData( "cd2_map_currentbeacon" )
 
     for i = 1, #beacondata do
         if i > beaconindex then break end
@@ -347,6 +347,8 @@ function CD2LoadMapData()
 
             beacon:Spawn()
 
+            CD2DebugMessage( "Loading Detonated Beacon " .. id )
+
             timer.Simple( 0.1, function() beacon:StartBeaconasActive() end ) 
         end
         --
@@ -363,15 +365,17 @@ function CD2LoadMapData()
 
             
             local au = ents.Create( "cd2_au" )
-            au:SetPos( aupos ) 
+            au:SetPos( AUpos ) 
 
 
             au.cd2_map_isgenerated = true
             au.cd2_map_id = AUID
 
-            au:SetAUGroupID( auID )
+            au:SetAUGroupID( GroupID )
             au:SetBeamPos( spawnpos + Vector( 0, 0, 120 ) )
             au:Spawn()
+
+            CD2DebugMessage( "Loading " .. ( isactive and "Active Absorption Unit" or "Inactive Absorption Unit" ) .. " " .. AUID )
 
             if isactive then
                 activeAUs = activeAUs + 1
@@ -384,6 +388,8 @@ function CD2LoadMapData()
             marker:SetPos( landingpos ) 
             marker:SetLocationType( "beacon" )
             marker.cd2_AUgroup = GroupID
+
+            CD2DebugMessage( "Creating Location marker for beacon group " .. GroupID )
         
             function marker:OnActivate( ply ) 
                 local sndtracks = { "sound/crackdown2/music/beacon/ptb.mp3", "sound/crackdown2/music/beacon/industrialfreaks.mp3" }
@@ -452,6 +458,12 @@ function CD2LoadMapData()
 
 
     end
+
+    CD2_BeaconCount = #beacondata
+    CD2_BeaconData = beacondata
+    CD2_CurrentBeacon = beaconindex
+
+    CD2DebugMessage( "Loaded " .. #beacondata .. " Beacons and " .. ( #beacondata * 3 ) .. " Absorption Units. Current beacon group is " .. beaconindex )
 
 
     -- Load tactical locations

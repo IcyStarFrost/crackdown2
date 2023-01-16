@@ -36,7 +36,7 @@ CD2FILESYSTEM = {}
 
 -- File writing with the ability to easily pack tables into jsons or compressed jsons
 function CD2FILESYSTEM:Write( filename, contents, type )
-    CD2DebugMessage( "Wrote to file " .. filename )
+    CD2DebugMessage( "Writing to file " .. filename .. " with " .. tostring( contents ) )
 	local f = file.Open( filename, type == "compressed" and "wb" or "w", "DATA" )
 	if ( !f ) then return end
 
@@ -68,6 +68,8 @@ function CD2FILESYSTEM:Read( filename, type )
         contents = decompress( contents )
         contents = JSONToTable( contents )
     end
+
+    CD2DebugMessage( "Read " .. tostring( contents ) .. " from " .. filename )
 
 	return contents
 end

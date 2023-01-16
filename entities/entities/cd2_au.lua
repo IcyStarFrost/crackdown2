@@ -17,6 +17,8 @@ function ENT:Initialize()
     self.cd2_nextchargepoint = 0
 
     if CLIENT then
+        self.cd2_hasfiredbeam = false
+        
         hook.Add( "HUDPaint", self, function()
             if self:GetActive() or self:SqrRangeTo( LocalPlayer() ) > ( 300 * 300 ) then return end
         
@@ -119,10 +121,22 @@ function ENT:TypingText()
 end
 
 function ENT:EnableBeam() 
-    if SERVER then
-        self:SetActive( true )
-        BroadcastLua( "Entity(" .. self:EntIndex() .. "):EnableBeam()")
-    elseif CLIENT then
+    self:SetActive( true )
+end
+
+function ENT:OnRemove()
+    if CLIENT then
+        if IsValid( self.cd2_ambientsnd ) then self.cd2_ambientsnd:Stop() end
+    end
+end
+
+function ENT:Think()
+
+    if CLIENT and IsValid( self.cd2_ambientsnd ) then
+        self.cd2_ambientsnd:SetVolume( self:SqrRangeTo( LocalPlayer() ) > ( 1000 * 1000 ) and 0 or 1 )
+    end
+
+    if CLIENT and !self.cd2_hasfiredbeam and self:GetActive() then
         sound.PlayFile( "sound/crackdown2/ambient/au/charged.mp3", " 3d mono noplay", function( snd, id, name )
             if id then return end
             snd:SetVolume( 2 )
@@ -146,19 +160,7 @@ function ENT:EnableBeam()
             snd:SetPos( self:GetPos() )
             snd:Play()
         end )
-    end
-end
-
-function ENT:OnRemove()
-    if CLIENT then
-        if IsValid( self.cd2_ambientsnd ) then self.cd2_ambientsnd:Stop() end
-    end
-end
-
-function ENT:Think()
-
-    if CLIENT and IsValid( self.cd2_ambientsnd ) then
-        self.cd2_ambientsnd:SetVolume( self:SqrRangeTo( LocalPlayer() ) > ( 1000 * 1000 ) and 0 or 1 )
+        self.cd2_hasfiredbeam= true
     end
 
     if CLIENT or self:GetActive() then return end

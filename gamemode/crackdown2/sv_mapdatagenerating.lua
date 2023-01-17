@@ -325,6 +325,8 @@ function CD2LoadMapData()
     CD2_OnlineOrbCount = #onlineorbs
 
     local beaconindex = CD2FILESYSTEM:ReadMapData( "cd2_map_currentbeacon" )
+    local detonatecount = 0
+    local activeaucount = 0
 
     for i = 1, #beacondata do
         if i > beaconindex then break end
@@ -347,7 +349,9 @@ function CD2LoadMapData()
 
             beacon:Spawn()
 
-            CD2DebugMessage( "Loading Detonated Beacon " .. beaconID )
+            CD2DebugMessage( "Loading Detonated Beacon " .. GroupID )
+
+            detonatecount = detonatecount + 1
 
             timer.Simple( 0.1, function() beacon:StartBeaconasActive() end ) 
         end
@@ -378,6 +382,7 @@ function CD2LoadMapData()
             CD2DebugMessage( "Loading " .. ( isactive and "Active Absorption Unit" or "Inactive Absorption Unit" ) .. " " .. AUID )
 
             if isactive then
+                activeaucount = activeaucount + 1
                 activeAUs = activeAUs + 1
                 timer.Simple( 0.1, function() au:EnableBeam() end )
             end
@@ -463,6 +468,7 @@ function CD2LoadMapData()
     CD2_BeaconData = beacondata
     CD2_CurrentBeacon = beaconindex
 
+    CD2DebugMessage( "Loaded " .. detonatecount .. " active beacons. Loaded " .. activeaucount .. " active Absorption Units" )
     CD2DebugMessage( "Loaded " .. #beacondata .. " Beacons and " .. ( #beacondata * 3 ) .. " Absorption Units. Current beacon group is " .. beaconindex )
 
 

@@ -104,6 +104,10 @@ function ENT:EndMovementControl()
     self.cd2_Path:Invalidate()
 end
 
+function ENT:UpdateTransmitState()
+    return TRANSMIT_ALWAYS
+end 
+
 function ENT:ControlMovement( pos, update )
     local shouldupdatepath = false
 

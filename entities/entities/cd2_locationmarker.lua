@@ -238,6 +238,10 @@ function ENT:OnActivate( ply )
 
 end
 
+function ENT:UpdateTransmitState()
+    return TRANSMIT_ALWAYS
+end
+
 function ENT:VisCheck()
     local players = player_GetAll()
     local withinPVS = false

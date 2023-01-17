@@ -21,11 +21,10 @@ local highskillsounds = { "crackdown2/weapons/explosiveskill4.wav", "crackdown2/
 
 function ENT:OnDelayEnd()
 
-    if CLIENT then
-        local effect = EffectData()
-        effect:SetOrigin( self:GetPos() )
-        util.Effect( "Explosion", effect, true, true )
-    end
+    local effect = EffectData()
+    effect:SetOrigin( self:GetPos() )
+    util.Effect( "Explosion", effect, true, true )
+
 
     util.Decal( "Scorch", self:GetPos(), self:GetPos() - Vector( 0, 0, 50 ), self )
 

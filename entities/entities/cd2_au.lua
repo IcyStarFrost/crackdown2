@@ -130,6 +130,10 @@ function ENT:OnRemove()
     end
 end
 
+function ENT:UpdateTransmitState()
+    return TRANSMIT_ALWAYS
+end
+
 function ENT:Think()
 
     if CLIENT and IsValid( self.cd2_ambientsnd ) then

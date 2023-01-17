@@ -246,15 +246,16 @@ function ENT:OnBeamStart()
 
         end )
     
+        if LocalPlayer():SqrRangeTo( self ) > ( 2000 * 2000 ) then return end
 
         CD2CreateThread( function() 
 
             coroutine.wait( 0.5 )
             if !IsValid( self ) then return end
 
-            if IsValid( self.cd2_intromusic ) then self.cd2_intromusic:Kill() end
+            if IsValid( self.cd2_music ) then self.cd2_music:Kill() end
             local first = true
-            self.cd2_beaconmusic = CD2StartMusic( self:GetSoundTrack(), 600, false, false, nil, nil, nil, nil, nil, function( chan )
+            self.cd2_music = CD2StartMusic( self:GetSoundTrack(), 600, false, false, nil, nil, nil, nil, nil, function( chan )
                 if !IsValid( self ) then chan:FadeOut() end
 
                 if first then
@@ -279,7 +280,10 @@ function ENT:DropBeacon()
     beacontrace.mask = MASK_SOLID_BRUSHONLY
     local result = Trace( beacontrace )
 
-    BroadcastLua( "Entity(" .. self:EntIndex() .. "):StartIntroMusic()" )
+    net.Start( "cd2net_beacon_startmusic" )
+    net.WriteString( string.StripExtension( self:GetSoundTrack() ) .. "_intro.mp3" )
+    net.WriteEntity( self )
+    net.WriteUInt( 590, 32 )
 
     self:SetIsDropping( true )
     self:SetRingPos( self.Ring:GetPos() )
@@ -326,11 +330,6 @@ function ENT:PlayClientSound( path, pos, volume )
     net.Broadcast()
 end
 
-function ENT:StartIntroMusic()
-    self.cd2_intromusic = CD2StartMusic( string.StripExtension( self:GetSoundTrack() ) .. "_intro.mp3", 590, true, false, nil, nil, nil, nil, nil, function( chan )
-        if !IsValid( self ) then chan:FadeOut() end
-    end )
-end
 
 -- The beacon has fully charged and is now detonating
 local viewtbl = {}
@@ -447,6 +446,10 @@ function ENT:BeaconDetonate()
         end )
         
     end
+end
+
+function ENT:UpdateTransmitState()
+    return TRANSMIT_ALWAYS
 end
 
 -- Sets the Beacon to the ground and sets it active as if it detonated
@@ -803,6 +806,7 @@ if SERVER then
     util.AddNetworkString( "cd2net_beaconscale" )
     util.AddNetworkString( "cd2net_beaconduration" )
     util.AddNetworkString( "cd2net_beaconplaysound" )
+    util.AddNetworkString( "cd2net_beacon_startmusic" )
 
     net.Receive( "cd2net_beaconduration", function( len, ply )
         local beacon = net.ReadEntity()
@@ -813,6 +817,19 @@ if SERVER then
     end )
     
 elseif CLIENT then
+
+    net.Receive( "cd2net_beacon_startmusic", function() 
+        local path = net.ReadString()
+        local beacon = net.ReadEntity()
+        local priority = net.ReadUInt( 32 )
+
+        if !IsValid( beacon ) then return end
+
+        beacon.cd2_music = CD2StartMusic( path, priority, true, false, nil, nil, nil, nil, nil, function( chan )
+            if !IsValid( beacon ) then chan:FadeOut() end
+        end )
+    end )
+
     net.Receive( "cd2net_beaconscale", function()
         local ent = net.ReadEntity()
         local scale = net.ReadVector()
@@ -826,6 +843,8 @@ elseif CLIENT then
         local path = net.ReadString()
         local volume = net.ReadFloat()
         local pos = net.ReadVector()
+
+        if LocalPlayer():SqrRangeTo( pos ) > ( 2000 * 2000 ) then return end
 
         sound.PlayFile( "sound/" .. path, "3d mono noplay", function( snd, id, name )
             if id then return end

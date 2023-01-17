@@ -335,7 +335,7 @@ function ENT:OnBeaconDestroyed()
 
         if ply:SqrRangeTo( self ) > ( 2000 * 2000 ) then return end
 
-        self.cd2_beaconmusic = CD2StartMusic( "sound/crackdown2/music/beacon/beacondestroyed.mp3", 600 )
+        self.cd2_beaconmusic = CD2StartMusic( "sound/crackdown2/music/beacondestroyed.mp3", 600 )
     end
 end
 
@@ -792,6 +792,15 @@ function ENT:OnRemove()
     elseif CLIENT then
         if IsValid( self.cd2_beaconambient ) then self.cd2_beaconambient:Stop() end
         if IsValid( self.cd2_ringambient ) then self.cd2_ringambient:Stop() end
+    end
+end
+
+function ENT:SetRandomSoundTrack()
+    local files, dirs, file.Find( "sound/crackdown2/music/beacon/*", "GAME" )
+    for k, v in RandomPairs( files ) do
+        if string.EndsWith( v, "_intro.mp3" ) then
+            self:SetSoundTrack( string.Replace( v, "_intro", "" ) )
+        end
     end
 end
 

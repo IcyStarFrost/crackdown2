@@ -56,7 +56,7 @@ elseif CLIENT then
         sound.PlayFile( "sound/crackdown2/ply/low_armor_beep.mp3", "noplay", function( snd, id, name ) 
             if id then print( id, name ) return end
 
-            snd:SetVolume( 0.1 )
+            snd:SetVolume( 1 )
             snd:Play()
             snd:EnableLooping( true )
 

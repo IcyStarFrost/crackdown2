@@ -507,7 +507,7 @@ elseif SERVER then
 
         local beacon = ents.Create( "cd2_beacon" )
         beacon:SetPos( result.HitPos - Vector( 0, 0, 130 ) )
-        beacon:SetSoundTrack( sndtracks[ random( #sndtracks ) ] )
+        beacon:SetRandomSoundTrack()
         beacon:Spawn()
 
         timer.Simple( 0.1, function() beacon:DropBeacon() end )

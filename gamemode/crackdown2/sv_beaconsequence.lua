@@ -65,7 +65,7 @@ function CD2CreateBeaconSet( beacondata )
             marker.cd2_beacon.cd2_map_id = beacondata.id
             marker.cd2_beacon.cd2_AUgroup = beacondata.AUID
     
-            marker.cd2_beacon:SetSoundTrack( sndtracks[ math.random( #sndtracks ) ] )
+            marker.cd2_beacon:SetRandomSoundTrack()
     
             marker.cd2_beacon:Spawn()
     

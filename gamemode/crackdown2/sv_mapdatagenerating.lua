@@ -343,11 +343,11 @@ function CD2LoadMapData()
             beacon:SetPos( spawnpos )
             
             beacon.cd2_map_isgenerated = true
-            beacon.cd2_map_id = id
+            beacon.cd2_map_id = beaconID
 
             beacon:Spawn()
 
-            CD2DebugMessage( "Loading Detonated Beacon " .. id )
+            CD2DebugMessage( "Loading Detonated Beacon " .. beaconID )
 
             timer.Simple( 0.1, function() beacon:StartBeaconasActive() end ) 
         end
@@ -383,7 +383,7 @@ function CD2LoadMapData()
             end
         end
 
-        if activeAUs == 3 then
+        if activeAUs == 3 and !isdetonated then
             local marker = ents.Create( "cd2_locationmarker" )
             marker:SetPos( landingpos ) 
             marker:SetLocationType( "beacon" )

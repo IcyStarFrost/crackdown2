@@ -291,7 +291,7 @@ function CD2GetClosestNavAreas( pos, dist )
     local areas = {} 
     for i = 1, #navareas do
         local v = navareas[ i ]
-        if IsValid( v ) and v:GetClosestPointOnArea( pos ):DistToSqr( pos ) <= ( dist * dist ) then
+        if IsValid( v ) and v:GetClosestPointOnArea( pos ):DistToSqr( pos ) <= ( dist * dist ) and !v:IsUnderwater() and v:GetSizeX() > 40 and v:GetSizeY() > 40 then
             areas[ #areas + 1 ] = v
         end
     end

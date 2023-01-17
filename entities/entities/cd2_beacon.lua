@@ -139,6 +139,14 @@ function ENT:OnLand()
         net.WriteVector( self.Core:GetPos() )
         net.WriteBool( true )
         net.Broadcast()
+
+        local nearbyplayers = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2Agent() end )
+
+        for k, v in ipairs( nearbyplayers ) do 
+            if IsValid( v ) then
+                v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/beaconcharge.mp3" )
+            end 
+        end
     elseif CLIENT then
         sound.PlayFile( "sound/crackdown2/ambient/beacon/beaconambient.mp3", "3d mono", function( snd, id, name )
             if id then return end

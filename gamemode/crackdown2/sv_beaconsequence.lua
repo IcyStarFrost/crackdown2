@@ -3,13 +3,15 @@ hook.Add( "CD2_BeaconDetonate", "crackdown2_beaconsequence", function( beacon )
     local beaconid = beacon.cd2_AUgroup
     local tbl = CD2_BeaconData[ beaconid + 1 ]
 
+    CD2DebugMessage( "Beacon of AU Group " .. beaconid .. " has been detonated")
+
     if !KeysToTheCity() then
         for i = 1, #CD2_BeaconData do
             local beacondata = CD2_BeaconData[ i ]
             if beacondata.id == beacon.cd2_map_id then beacondata.isdetonated = true CD2FILESYSTEM:WriteMapData( "cd2_map_beacondata", CD2_BeaconData ) break end
         end
     end
-
+    
     CD2CreateBeaconSet( tbl )
 end )
 

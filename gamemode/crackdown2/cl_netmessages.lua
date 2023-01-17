@@ -216,7 +216,7 @@ net.Receive( "cd2net_playerinitialspawn", function()
             surface_DrawRect( 0, 0, w, h )
         end
 
-        CD2StartMusic( "sound/crackdown2/music/mainmenu.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
+        CD2StartMusic( "sound/crackdown2/music/droppointmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
             if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
         end )
 
@@ -286,7 +286,7 @@ net.Receive( "cd2net_playerinitialspawn", function()
         end )
 
         CD2OpenSpawnPointMenu()
-        CD2StartMusic( "sound/crackdown2/music/mainmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
+        CD2StartMusic( "sound/crackdown2/music/droppointmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
             if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
         end )
 

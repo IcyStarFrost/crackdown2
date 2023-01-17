@@ -184,6 +184,18 @@ function ENT:OnBeamStart()
         self:SetRenderBeam( true )
         self.cd2_curtimeduration = CurTime() + 200
         self.cd2_BeaconChargeStart = CurTime() + 10
+
+        timer.Simple( 2, function()
+            if !IsValid( self ) then return end
+            local nearbyplayers = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2Agent() end )
+
+            for k, v in ipairs( nearbyplayers ) do 
+                if IsValid( v ) then
+                    v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/freaksactive.mp3" )
+                end 
+            end
+        end )
+
     elseif CLIENT then
         local truedur
         local curtimed
@@ -284,6 +296,7 @@ function ENT:DropBeacon()
     net.WriteString( string.StripExtension( self:GetSoundTrack() ) .. "_intro.mp3" )
     net.WriteEntity( self )
     net.WriteUInt( 590, 32 )
+    net.Broadcast()
 
     self:SetIsDropping( true )
     self:SetRingPos( self.Ring:GetPos() )

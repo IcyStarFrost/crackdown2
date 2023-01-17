@@ -65,6 +65,7 @@ function ENT:Initialize()
         hook.Add( "EntityTakeDamage", self, function( self, ent, info )
             if !self:GetIsCharging() or ent:GetOwner() != self or ( info:GetAttacker():IsCD2Agent() or info:GetAttacker():IsCD2NPC() ) and info:GetAttacker():GetCD2Team() != "freak" then return end
             self:SetBeaconHealth( self:GetBeaconHealth() - ( info:GetDamage() / 20 ) )
+            self:EmitSound( "physics/metal/metal_box_impact_bullet" .. random( 1, 3 ) .. ".wav", 80, 100, 1 )
         end )
 
     elseif CLIENT then 
@@ -316,12 +317,12 @@ function ENT:OnBeaconDestroyed()
 
         self.Core:Remove()
 
-        CD2SetTypingText( nil, "OBJECTIVE INCOMPLETE", "Beacon Destroyed", true )
+        
         
         local players = player.GetAll()
         for i = 1, #players do 
             local ply = players[ i ]
-            if IsValid( ply ) and ply:SqrRangeTo( self ) < ( 2000 * 2000 ) then ply:Kill() end
+            if IsValid( ply ) and ply:SqrRangeTo( self ) < ( 2000 * 2000 ) then CD2SetTypingText( ply, "OBJECTIVE INCOMPLETE", "Beacon Destroyed", true ) ply:Kill() end
         end
 
         timer.Simple( 7, function() if IsValid( self ) then self:Remove() end end )
@@ -331,6 +332,9 @@ function ENT:OnBeaconDestroyed()
 
 
         if IsValid( self.cd2_beaconmusic ) then self.cd2_beaconmusic:FadeOut() end
+
+        if ply:SqrRangeTo( self ) > ( 2000 * 2000 ) then return end
+
         self.cd2_beaconmusic = CD2StartMusic( "sound/crackdown2/music/beacon/beacondestroyed.mp3", 600 )
     end
 end
@@ -350,7 +354,7 @@ function ENT:BeaconDetonate()
     if SERVER then
         self:SetIsDetonated( true )
         self:SetIsCharging( false )
-        self:PlayClientSound( "crackdown2/ambient/beacon/beacondetonate.mp3", self:GetPos(), 5 )
+        self:PlayClientSound( "crackdown2/ambient/beacon/beacondetonate.mp3", self:GetPos(), 10 )
 
         hook.Run( "CD2_BeaconDetonate", self )
 
@@ -825,8 +829,8 @@ if SERVER then
         local beacon = net.ReadEntity()
         local duration = net.ReadFloat()
         if !IsValid( beacon ) then return end
-        beacon.cd2_curtimeduration = CurTime() + duration
-        beacon:SetChargeDuration( duration )
+        beacon.cd2_curtimeduration = CurTime() + ( duration - 5 )
+        beacon:SetChargeDuration( duration - 5 )
     end )
     
 elseif CLIENT then

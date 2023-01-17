@@ -293,6 +293,37 @@ net.Receive( "cd2net_playerinitialspawn", function()
     end
 end )
 
+net.Receive( "cd2net_playergroundpound", function() 
+    local pos = net.ReadVector()
+
+    local particle = ParticleEmitter( pos )
+        for i = 1, 30 do
+            
+            local part = particle:Add( "particle/SmokeStack", pos )
+    
+            if part then
+                part:SetStartSize( 70 )
+                part:SetEndSize( 70 ) 
+                part:SetStartAlpha( 255 )
+                part:SetEndAlpha( 0 )
+    
+                part:SetColor( 100, 100, 100 )
+                part:SetLighting( false )
+                part:SetCollide( false )
+    
+                part:SetDieTime( 2 )
+                part:SetGravity( Vector() )
+                part:SetAirResistance( 400 )
+                part:SetVelocity( Vector( math.sin( i ) * 2000, math.cos( i ) * 2000, 0 ) )
+                part:SetAngleVelocity( AngleRand( -1, 1 ) )
+            end
+    
+        end
+    
+        particle:Finish()
+
+end )
+
 net.Receive( "cd2net_enablehud", function()
     CD2_DrawAgilitySkill = true
     CD2_DrawFirearmSkill = true

@@ -268,7 +268,7 @@ CD2_CheapMinimap = true
 
 CD2_DrawTargetting = true -- Draws crosshair and target healthbars
 CD2_DrawHealthandShields = true -- Draws health and shields bars
-CD2_DrawWeaponInfo = true -- Draws weapon info and equipment
+CD2_DrawWeaponInfo = false -- Draws weapon info and equipment
 CD2_DrawMinimap = true -- Draws the tracker
 CD2_DrawBlackbars = false -- Draws the top and bottom black bars
 
@@ -413,7 +413,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
 
     -- Weapon Info --
-    if CD2_DrawWeaponInfo then
+   --[[  if CD2_DrawWeaponInfo then
         local weapon = ply:GetActiveWeapon()
 
         if IsValid( weapon ) then
@@ -456,7 +456,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         end
 
         
-    end
+    end ]]
     ------
 
 

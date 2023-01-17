@@ -53,7 +53,7 @@ elseif CLIENT then
     local function PlayShieldsOfflineSound() 
         local ply = LocalPlayer()
 
-        sound.PlayFile( "sound/crackdown2/ply/shielddown.mp3", "noplay", function( snd, id, name ) 
+        sound.PlayFile( "sound/crackdown2/ply/low_armor_beep.mp3", "noplay", function( snd, id, name ) 
             if id then print( id, name ) return end
 
             snd:SetVolume( 0.1 )

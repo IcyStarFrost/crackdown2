@@ -129,7 +129,11 @@ function ENT:OnActivate( ply )
 
     if self:GetLocationType() == "cell" and SERVER then
 
-        CD2SetTypingText( nil, "TACTICAL ASSAULT INITIATED", "" )
+        for k, v in ipairs( player.GetAll() ) do
+            if v:SqrRangeTo( self ) > ( 2000 * 2000 ) then continue end
+            CD2SetTypingText( v, "TACTICAL ASSAULT INITIATED", "" )
+        end
+
 
         if !KeysToTheCity() and random( 1, 2 ) == 1 then
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/celldefend.mp3" )
@@ -226,7 +230,10 @@ function ENT:OnActivate( ply )
 
             CD2DebugMessage( self, " Tactical Location was converted to Agency" )
 
-            CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Cell Tactical Location\nCaptured " .. agencycount .. " of " .. locationcount .. " Tactical Locations" )
+            for k, v in ipairs( player.GetAll() ) do
+                if v:SqrRangeTo( self ) > ( 2000 * 2000 ) then continue end
+                CD2SetTypingText( v, "OBJECTIVE COMPLETE!", "Cell Tactical Location\nCaptured " .. agencycount .. " of " .. locationcount .. " Tactical Locations" )
+            end
 
         end )
     elseif self:GetLocationType() == "agency" then

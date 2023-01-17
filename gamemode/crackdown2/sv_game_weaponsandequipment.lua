@@ -175,6 +175,10 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
             net.WriteBool( true  )
             net.Broadcast()
 
+            net.Start( "cd2net_playergroundpound" )
+            net.WriteVector( ply:GetPos() )
+            net.Broadcast()
+
             wep:SetPickupMode( false )
             wep:SetHoldType( wep.HoldType )
 

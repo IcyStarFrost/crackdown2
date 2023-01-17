@@ -18,9 +18,9 @@ CD2_lockonoffset = Vector()
 
 local viewtrace = {}
 
-CD2_vieworigin = nil -- Our view origin
+CD2_vieworigin = Vector() -- Our view origin
 CD2_viewangles = Angle() -- Our view angles
-CD2_fieldofview = nil -- Our field of view
+CD2_fieldofview = 60 -- Our field of view
 
 function GM:CalcView( ply, origin, angles, fov, znear, zfar )
 

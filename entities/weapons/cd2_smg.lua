@@ -16,7 +16,7 @@ SWEP.Primary.Tracer = 1
 SWEP.Primary.Spread = 0.06
 SWEP.Primary.LockOnSpread = 0
 SWEP.Primary.Bulletcount = 1
-SWEP.ReloadTime = 2
+SWEP.ReloadTime = 1.2
 SWEP.ReloadSounds = { { 0, "weapons/smg1/smg1_reload.wav" } }
 
 SWEP.DropMenu_RequiresCollect = true

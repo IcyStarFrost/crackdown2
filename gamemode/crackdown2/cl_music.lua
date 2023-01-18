@@ -79,13 +79,13 @@ function CD2MusicChannelMeta:IsFading()
     return self.cd2_shouldfade
 end
 
-local volume = 1 -- The volume of all music
+local volume = GetConVar( "cd2_musicvolume" ) -- The volume of all music
 local incrementalvalue = 0 -- A value that will never re-use old values
 
 -- Starts playing music and returns the music as a CD2Musicchannel object
 -- Higher numbers in priority will silence or kill music depending on killonpriorityfade that are lower priority
 function CD2StartMusic( path, priority, looped, killonpriorityfade, overridevolume, is3d, fademin, fademax, entity, func )
-    local musicvolume = overridevolume or volume
+    local musicvolume = overridevolume or volume:GetFloat()
     local CD2Musicchannel = {}
     setmetatable( CD2Musicchannel, CD2MusicChannelMeta )
 
@@ -129,7 +129,7 @@ function CD2StartMusic( path, priority, looped, killonpriorityfade, overridevolu
 
             if !CD2Musicchannel:IsFading() and CD2Musicchannel:IsHighestPriority() then -- We are currently playing as top priority
                 if snd:GetState() == GMOD_CHANNEL_PAUSED then snd:Play() end
-                musicvolume = overridevolume or volume
+                musicvolume = overridevolume or volume:GetFloat()
                 snd:SetVolume( Lerp( 2 * FrameTime(), snd:GetVolume(), musicvolume ) )
             elseif CD2Musicchannel:IsFading() then -- Fading out
                 snd:SetVolume( Lerp( 2 * FrameTime(), snd:GetVolume(), 0 ) )

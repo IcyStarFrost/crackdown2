@@ -1,6 +1,7 @@
 local grey = Color( 100, 100, 100 )
 local random = math.random
 local backgrounds = { Material( "crackdown2/mainmenu/menubg1.jpg" ), Material( "crackdown2/mainmenu/menubg2.jpg" ), Material( "crackdown2/mainmenu/menubg3.jpg" ) }
+local startbg = Material( "crackdown2/mainmenu/start.png" )
 local surface_SetDrawColor = surface.SetDrawColor
 local surface_SetMaterial = surface.SetMaterial
 local surface_DrawTexturedRect = surface.DrawTexturedRect
@@ -32,9 +33,15 @@ function CD2OpenMainMenu()
     
 
     local bg = backgrounds[ random( 3 ) ]
+    function MenuPanelHolder:Paint( w, h ) 
+        surface_SetDrawColor( color_white )
+        surface_SetMaterial( bg )
+        surface_DrawTexturedRect( 0, 0, w, h )
+    end
+
     function CD2_MainMenu:Paint( w, h ) 
         surface_SetDrawColor( grey )
-        surface_SetMaterial( bg )
+        surface_SetMaterial( startbg )
         surface_DrawTexturedRect( 0, 0, w, h )
     end
 

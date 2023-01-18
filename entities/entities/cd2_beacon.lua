@@ -266,9 +266,9 @@ function ENT:OnBeamStart()
             coroutine.wait( 0.5 )
             if !IsValid( self ) then return end
 
-            if IsValid( self.cd2_music ) then self.cd2_music:Kill() end
+            if IsValid( self.cd2_beaconmusic ) then self.cd2_beaconmusic:Kill() end
             local first = true
-            self.cd2_music = CD2StartMusic( self:GetSoundTrack(), 600, false, false, nil, nil, nil, nil, nil, function( chan )
+            self.cd2_beaconmusic = CD2StartMusic( self:GetSoundTrack(), 600, false, false, nil, nil, nil, nil, nil, function( chan )
                 if !IsValid( self ) then chan:FadeOut() end
 
                 if first then
@@ -333,7 +333,7 @@ function ENT:OnBeaconDestroyed()
 
         if IsValid( self.cd2_beaconmusic ) then self.cd2_beaconmusic:FadeOut() end
 
-        if ply:SqrRangeTo( self ) > ( 2000 * 2000 ) then return end
+        if LocalPlayer():SqrRangeTo( self ) > ( 2000 * 2000 ) then return end
 
         self.cd2_beaconmusic = CD2StartMusic( "sound/crackdown2/music/beacondestroyed.mp3", 600 )
     end
@@ -851,7 +851,7 @@ elseif CLIENT then
 
         if !IsValid( beacon ) then return end
 
-        beacon.cd2_music = CD2StartMusic( path, priority, true, false, nil, nil, nil, nil, nil, function( chan )
+        beacon.cd2_beaconmusic = CD2StartMusic( path, priority, true, false, nil, nil, nil, nil, nil, function( chan )
             if !IsValid( beacon ) then chan:FadeOut() end
         end )
     end )

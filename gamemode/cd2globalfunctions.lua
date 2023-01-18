@@ -341,6 +341,14 @@ if SERVER then
         net.WriteBool( isred or false )
         if !ply then net.Broadcast() else net.Send( ply ) end
     end
+
+    -- Pings a location on a Player's minimap or intel console
+    function CD2PingLocation( ply, pos, pingintelconsole )
+        net.Start( "cd2net_pinglocation" )
+        net.WriteVector( pos )
+        net.WriteBool( pingintelconsole or false )
+        if !ply then net.Broadcast() else net.Send( ply ) end
+    end
 end
 
 

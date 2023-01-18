@@ -473,6 +473,8 @@ function CD2LoadMapData()
                 marker:SetLocationType( "beacon" )
                 marker.cd2_AUgroup = beacondata.AUID
             
+                CD2PingLocation( nil, beacondata.pos )
+
                 function marker:OnActivate( ply ) 
                     local sndtracks = { "sound/crackdown2/music/beacon/ptb.mp3", "sound/crackdown2/music/beacon/industrialfreaks.mp3" }
                     sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )

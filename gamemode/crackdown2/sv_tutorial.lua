@@ -478,7 +478,11 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/intel3.mp3" )
 
-            coroutine.wait( 18 )
+            coroutine.wait( 9 )
+
+            CD2PingLocation( ply, GetGlobal2Vector( "cd2_beginnerlocation" ), true )
+
+            coroutine.wait( 9 )
 
             ply:SendLua( "OpenIntelConsole()" )
 
@@ -516,11 +520,15 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             while wait do coroutine.yield() end 
 
             coroutine.wait( 10 )
+
+            local aupos
             
             while true do 
                 local near = CD2FindInSphere( ply:GetPos(), 3000, function( ent ) return ent:GetClass() == "cd2_au" end )
 
                 if #near > 0 then
+                    local au = CD2GetClosestInTable( near, ply )
+                    aupos = au:GetPos()
                     break
                 end
                 coroutine.wait( 1 )
@@ -537,7 +545,11 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/au2.mp3" )
 
-            coroutine.wait( 15 )
+            coroutine.wait( 8 )
+
+            CD2PingLocation( ply, aupos, true )
+
+            coroutine.wait( 7 )
 
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/au3.mp3" )
 

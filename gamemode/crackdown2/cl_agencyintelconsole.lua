@@ -29,7 +29,20 @@ local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
 local celltargetred = Color( 255, 51, 0 )
 
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
+local pingmat = Material( "crackdown2/ui/pingcircle.png" )
 local cell = Material( "crackdown2/ui/cell.png", "smooth" )
+local pingtimes
+local pingscale = 0
+local pinglocation
+local canping = true
+
+function CD2PingLocationOnConsole( pos )
+    pingtimes = 0
+    pingscale = 0
+    pinglocation = pos
+    canping = true
+end
+
 
 local function WorldVectorToScreen2( pnl, pos, origin, rotation, scale, radius )
     local relativePosition = pos - origin
@@ -203,6 +216,29 @@ function OpenIntelConsole()
 
         local plypos = LocalPlayer():GetPos()
         plypos[ 3 ] = 0
+
+        if pingtimes then
+            
+            if pingtimes == 3 then
+                pingtimes = nil
+            else
+                pingscale = Lerp( 3.5 * FrameTime(), pingscale, 40 )
+                DrawCoordsOnMap( self, pinglocation, plypos, CD2_viewangles, pingmat, pingscale, cellwhite, 30 )
+
+                if canping then
+                    surface.PlaySound( "crackdown2/ui/ping.mp3" )
+                    canping = false
+                end
+            end
+
+
+
+            if pingscale > 35 then
+                canping = true
+                pingscale = 0
+                pingtimes = pingtimes + 1
+            end
+        end
 
         local entities = ents.FindByClass( "cd2_*" )
 

@@ -51,6 +51,8 @@ function CD2CreateBeaconSet( beacondata )
         marker:SetPos( beacondata.pos ) 
         marker:SetLocationType( "beacon" )
         marker.cd2_AUgroup = beacondata.AUID
+
+        CD2PingLocation( nil, beacondata.pos )
     
         function marker:OnActivate( ply ) 
             local sndtracks = { "sound/crackdown2/music/beacon/ptb.mp3", "sound/crackdown2/music/beacon/industrialfreaks.mp3" }

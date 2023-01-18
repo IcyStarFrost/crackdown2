@@ -128,7 +128,7 @@ local strengthicon = Material( "crackdown2/ui/strengthicon.png", "smooth" )
 local explosiveicon = Material( "crackdown2/ui/explosiveicon.png", "smooth" )
 --local drivingicon = Material( "crackdown2/ui/drivingicon.png", "smooth" )
 
-local pingmat = Material( "crackdown2/other/pingcircle.png" )
+local pingmat = Material( "crackdown2/ui/pingcircle.png" )
 -- Minimap vars
 local minimapRT = GetRenderTarget( "crackdown2_minimaprt", 1024, 1024 )
 local mmTrace = {}
@@ -572,7 +572,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             if pingtimes == 3 then
                 pingtimes = nil
             else
-                pingscale = Lerp( 5 * FrameTime(), pingscale, 30 )
+                pingscale = Lerp( 3 * FrameTime(), pingscale, 30 )
                 DrawCoordsOnMiniMap( pinglocation, CD2_viewangles, pingmat, pingscale, cellwhite, fov )
 
                 if canping then

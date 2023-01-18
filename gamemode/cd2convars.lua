@@ -1,0 +1,1 @@
+CreateClientConVar( "cd2_musicvolume", 1, true, false, "The Volume of the Music played in Crackdown 2", 0, 1 )

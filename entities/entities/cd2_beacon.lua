@@ -799,7 +799,7 @@ function ENT:SetRandomSoundTrack()
     local files, dirs = file.Find( "sound/crackdown2/music/beacon/*", "GAME" )
     for k, v in RandomPairs( files ) do
         if string.EndsWith( v, "_intro.mp3" ) then
-            self:SetSoundTrack( string.Replace( v, "_intro", "" ) )
+            self:SetSoundTrack( "sound/crackdown2/music/beacon/" .. string.Replace( v, "_intro", "" ) )
         end
     end
 end

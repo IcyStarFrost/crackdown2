@@ -98,40 +98,37 @@ if SERVER then
 
 end
 
-local actcommands = {
-    "act group",
-    "act forward",
-    "act halt"
-}
 
-local delay = 0
 
--- Randomly playing act animation
-hook.Add( "Tick", "crackdown2_passiveactcommands", function()
-    if CurTime() > delay then
-        
-        local players = player_GetAll() 
-        for i = 1, #players do
-            local ply = players[ i ]
 
-            if !ply:Alive() or !ply:IsCD2Agent() then continue end
+if CLIENT then
+    local limit = false
+
+    local actcommands = {
+        "act group",
+        "act forward",
+        "act halt"
+    }
+    
+    local delay = 0
+    
+    -- Randomly playing act animation
+    hook.Add( "Tick", "crackdown2_passiveactcommands", function()
+        if CurTime() > delay then
+            local ply = LocalPlayer()
+    
+            if !ply:Alive() or !ply:IsCD2Agent() then return end
             
             ply.cd2_nextgesture = ply.cd2_nextgesture or CurTime() + random( 5, 60 )
-
+    
             if CurTime() > ply.cd2_nextgesture then
                 ply:ConCommand( actcommands[ random( 3 ) ])
                 ply.cd2_nextgesture = CurTime() + random( 5, 60 )
             end
 
+            delay = CurTime() + 2
         end
-
-        delay = CurTime() + 2
-    end
-end )
-
-
-if CLIENT then
-    local limit = false
+    end )
 
     hook.Add( "Think", "crackdown2_light", function()
         local ply = LocalPlayer()

@@ -179,8 +179,10 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
             net.WriteVector( ply:GetPos() )
             net.Broadcast()
 
-            wep:SetPickupMode( false )
-            wep:SetHoldType( wep.HoldType )
+            if IsValid( wep ) then
+                wep:SetPickupMode( false )
+                wep:SetHoldType( wep.HoldType )
+            end
 
             local near = CD2FindInSphere( ply:GetPos(), 200, function( ent ) return ent != ply end )
 

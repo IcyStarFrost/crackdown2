@@ -31,7 +31,11 @@ local function PlayerHasWeapon( class )
     return hasweapon
 end
 
+local cooldown = 0
 function CD2OpenDropMenu( issupplypoint )
+
+    if SysTime() < cooldown then return end
+    cooldown = SysTime() + 1
 
     surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
 

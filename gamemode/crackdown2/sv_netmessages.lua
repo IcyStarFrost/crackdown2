@@ -14,6 +14,10 @@ net.Receive( "cd2net_resupply", function( len, ply )
     ply:Give( secondary )
 end )
 
+net.Receive( "cd2net_setplayercolor", function( len, ply )
+    ply.cd2_playercolor = net.ReadVector()
+end )
+
 
 -- Received when a dead player calls for help. Multiplayer only
 net.Receive( "cd2net_playercallforhelp", function( len, ply ) 

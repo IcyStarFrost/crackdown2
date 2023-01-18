@@ -185,9 +185,6 @@ local grey = Color( 100, 100, 100 )
 net.Receive( "cd2net_playerinitialspawn", function()
     CD2_HasNavMesh = net.ReadBool()
 
-    local isreturningplayer = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_isreturningplayer" ) or KeysToTheCity() and true
-    local completedtutorial = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_completedtutorial" ) or KeysToTheCity() and true
-
     if !CD2_HasNavMesh then
         local pnl = vgui.Create( "DPanel", GetHUDPanel() )
         pnl:Dock( FILL ) 
@@ -216,7 +213,7 @@ net.Receive( "cd2net_playerinitialspawn", function()
             surface_DrawRect( 0, 0, w, h )
         end
 
-        CD2StartMusic( "sound/crackdown2/music/droppointmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
+        CD2StartMusic( "sound/crackdown2/music/startmenu.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
             if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
         end )
 
@@ -228,69 +225,7 @@ net.Receive( "cd2net_playerinitialspawn", function()
         return
     end
 
-    -- If the player is new to the gamemode, then play the intro video
-    if !isreturningplayer then
-        CD2CreateThread( function()
-
-            if BRANCH == "x86-64" or BRANCH == "chromium" then
-                CD2BeginIntroVideo()
-
-                while IsValid( CD2_videopanel ) do
-                    coroutine.yield()
-                end
-            end
-
-            CD2_DrawAgilitySkill = false
-            CD2_DrawFirearmSkill = false
-            CD2_DrawStrengthSkill = false
-            CD2_DrawExplosiveSkill = false
-            CD2_CanOpenAgencyConsole = false
-
-            CD2_DrawTargetting = false
-            CD2_DrawHealthandShields = false
-            CD2_DrawWeaponInfo = false
-            CD2_DrawMinimap = false
-            CD2_DrawBlackbars = false
-
-            net.Start( "cd2net_starttutorial" )
-            net.SendToServer()
-
-        end )
-
-        CD2FILESYSTEM:WritePlayerData( "c_isreturningplayer", true )
-    else -- If not then let them get in game already. If they haven't completed the tutorial then run it
-
-        if !completedtutorial then
-
-            CD2_DrawAgilitySkill = false
-            CD2_DrawFirearmSkill = false
-            CD2_DrawStrengthSkill = false
-            CD2_DrawExplosiveSkill = false
-            CD2_CanOpenAgencyConsole = false
-
-            CD2_DrawTargetting = false
-            CD2_DrawHealthandShields = false
-            CD2_DrawWeaponInfo = false
-            CD2_DrawMinimap = false
-            CD2_DrawBlackbars = false
-
-            net.Start( "cd2net_starttutorial" )
-            net.SendToServer()
-            return
-        end
-
-        timer.Simple( 5, function()
-            if !KeysToTheCity() then
-                sound.PlayFile( "sound/crackdown2/vo/agencydirector/droppoint.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
-            end
-        end )
-
-        CD2OpenSpawnPointMenu()
-        CD2StartMusic( "sound/crackdown2/music/droppointmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
-            if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
-        end )
-
-    end
+    CD2OpenMainMenu()
 end )
 
 net.Receive( "cd2net_playergroundpound", function() 

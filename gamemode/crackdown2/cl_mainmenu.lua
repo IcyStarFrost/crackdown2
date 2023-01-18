@@ -19,6 +19,7 @@ end
 function CD2OpenMainMenu()
 
     local mapname = GetMapName()
+    local channel = CD2StartMusic( "sound/crackdown2/music/startmenu.mp3", 490, true )
     local optionspnl
 
     CD2_MainMenu = vgui.Create( "DPanel", GetHUDPanel() )
@@ -72,7 +73,154 @@ function CD2OpenMainMenu()
         surface_DrawRect( 0, 0, w, h )
     end
 
+    function playbutton:DoClick()
+        if IsValid( optionspnl ) then optionspnl:Remove() end
+        surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
+        MenuPanelHolder:Clear()
+
+        timer.Simple( 0, function()
+            local toptextpnl = vgui.Create( "DPanel", MenuPanelHolder )
+            toptextpnl:SetSize( 100, 100 )
+            toptextpnl:Dock( TOP )
+
+            function toptextpnl:Paint( w, h ) 
+                surface_SetDrawColor( blackish )
+                surface_DrawRect( 0, 0, w, h )
+            end
+        
+            local toptext = vgui.Create( "DLabel", toptextpnl )
+            toptext:SetFont( "crackdown2_font60" )
+            toptext:SetSize( 100, 100 )
+            toptext:SetText( "             AGENT SETUP" )
+            toptext:Dock( TOP )
+        
+            local line = vgui.Create( "DPanel", MenuPanelHolder )
+            line:SetSize( 100, 3 )
+            line:Dock( TOP )
+
+            local selecttext = vgui.Create( "DLabel", MenuPanelHolder )
+            selecttext:SetFont( "crackdown2_font50" )
+            selecttext:SetSize( 100, 60 )
+            selecttext:SetColor( Color( 218, 103, 10 ) )
+            selecttext:SetText( "             SELECT YOUR AGENT COLOR" )
+            selecttext:Dock( TOP )
+
+            local confirmbutton = vgui.Create( "DButton", MenuPanelHolder )
+            confirmbutton:SetSize( 100, 50 )
+            confirmbutton:SetFont( "crackdown2_font40" )
+            confirmbutton:SetText( "CONFIRM" )
+            confirmbutton:Dock( BOTTOM )
+
+            local colorvector = CD2FILESYSTEM:ReadPlayerData( "cd2_agentcolorvector" )
+            if !colorvector then colorvector = Vector( 1, 1, 1 ) CD2FILESYSTEM:WritePlayerData( "cd2_agentcolorvector", colorvector ) end
+
+            local agentpreview = vgui.Create( "DModelPanel", MenuPanelHolder )
+            agentpreview:SetSize( ScrW() / 2, ScrH() / 3 )
+            agentpreview:Dock( RIGHT )
+            agentpreview:SetModel( "models/player/combine_super_soldier.mdl" )
+            agentpreview:GetEntity().GetPlayerColor = function( self ) return colorvector end
+            function agentpreview:LayoutEntity() end
+
+            local color = vgui.Create( "DColorMixer", MenuPanelHolder )
+            color:SetSize( ScrW() / 2, ScrH() / 3 )
+            color:DockMargin( 10, 10, 10, 10 )
+            color:Dock( LEFT )
+            color:SetColor( colorvector:ToColor() )
+
+            function color:ValueChanged( col ) 
+                colorvector = Vector( col.r / 255, col.g / 255, col.b / 255 )
+                CD2FILESYSTEM:WritePlayerData( "cd2_agentcolorvector", colorvector )
+            end
+
+            function confirmbutton:Paint( w, h ) 
+                surface_SetDrawColor( blackish )
+                surface_DrawRect( 0, 0, w, h )
+            end
+
+            function confirmbutton:DoClick() 
+                CD2_MainMenu:Remove()
+                channel:Kill()
+
+                net.Start( "cd2net_setplayercolor" )
+                net.WriteVector( CD2FILESYSTEM:ReadPlayerData( "cd2_agentcolorvector" ) )
+                net.SendToServer()
+
+                local isreturningplayer = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_isreturningplayer" ) or KeysToTheCity() and true
+                local completedtutorial = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_completedtutorial" ) or KeysToTheCity() and true
+                
+                -- If the player is new to the gamemode, then play the intro video
+                if !isreturningplayer then
+                    CD2CreateThread( function()
+
+                        if BRANCH == "x86-64" or BRANCH == "chromium" then
+                            CD2BeginIntroVideo()
+
+                            while IsValid( CD2_videopanel ) do
+                                coroutine.yield()
+                            end
+                        end
+
+                        CD2_DrawAgilitySkill = false
+                        CD2_DrawFirearmSkill = false
+                        CD2_DrawStrengthSkill = false
+                        CD2_DrawExplosiveSkill = false
+                        CD2_CanOpenAgencyConsole = false
+
+                        CD2_DrawTargetting = false
+                        CD2_DrawHealthandShields = false
+                        CD2_DrawWeaponInfo = false
+                        CD2_DrawMinimap = false
+                        CD2_DrawBlackbars = false
+
+                        net.Start( "cd2net_starttutorial" )
+                        net.SendToServer()
+
+                    end )
+
+                    CD2FILESYSTEM:WritePlayerData( "c_isreturningplayer", true )
+                else -- If not then let them get in game already. If they haven't completed the tutorial then run it
+
+                    if !completedtutorial then
+
+                        CD2_DrawAgilitySkill = false
+                        CD2_DrawFirearmSkill = false
+                        CD2_DrawStrengthSkill = false
+                        CD2_DrawExplosiveSkill = false
+                        CD2_CanOpenAgencyConsole = false
+
+                        CD2_DrawTargetting = false
+                        CD2_DrawHealthandShields = false
+                        CD2_DrawWeaponInfo = false
+                        CD2_DrawMinimap = false
+                        CD2_DrawBlackbars = false
+
+                        net.Start( "cd2net_starttutorial" )
+                        net.SendToServer()
+                        return
+                    end
+
+                    timer.Simple( 1, function()
+                        if !KeysToTheCity() then
+                            sound.PlayFile( "sound/crackdown2/vo/agencydirector/droppoint.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
+                        end
+                    end )
+            
+                    CD2OpenSpawnPointMenu()
+                    CD2StartMusic( "sound/crackdown2/music/droppointmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
+                        if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
+                    end )
+
+                end
+
+            end
+
+        end )
+
+
+    end
+
     function optionsbutton:DoClick()
+        surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
         optionspnl = vgui.Create( "DFrame", MenuPanelHolder )
         optionspnl:SetSize( 500, 300 )
         optionspnl:Center()
@@ -81,14 +229,21 @@ function CD2OpenMainMenu()
         local scroll = vgui.Create( "DScrollPanel", optionspnl )
         scroll:Dock( FILL )
 
+        local musicvolume = vgui.Create( "DNumSlider", scroll )
+        musicvolume:SetSize( 200, 30 )
+        musicvolume:SetConVar( "cd2_musicvolume" )
+        musicvolume:SetText( "Music Volume" )
+        musicvolume:SetDecimals( 2 )
+        musicvolume:SetMin( 0 )
+        musicvolume:SetMax( 1 )
+        musicvolume:SetValue( GetConVar( "cd2_musicvolume" ):GetFloat() )
+
 
         function optionspnl:Paint( w, h ) 
             surface_SetDrawColor( blackish )
             surface_DrawRect( 0, 0, w, h )
         end
     end
-
-    local channel = CD2StartMusic( "sound/crackdown2/music/startmenu.mp3", 490, true )
 
 
     function MenuPanelHolder:Paint() end
@@ -99,6 +254,9 @@ function CD2OpenMainMenu()
     end
 
     function CD2_MainMenu:OnKeyCodePressed( key ) 
+        local jumpbind = input.LookupBinding( "+jump" ) or "SPACE"
+        local jumpcode = input.GetKeyCode( jumpbind )
+
         if key and !MenuPanelHolder:IsVisible() then
             surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
             MenuPanelHolder:Show()
@@ -130,6 +288,8 @@ function CD2OpenMainMenu()
         surface_SetDrawColor( grey )
         surface_SetMaterial( startbg )
         surface_DrawTexturedRect( 0, 0, w, h )
+
+        draw.DrawText( "Press any Key to Start", "crackdown2_font50", ScrW() / 2, ScrH() / 1.5, color_white, TEXT_ALIGN_CENTER )
     end
 
 end

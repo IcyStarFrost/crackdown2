@@ -12,7 +12,6 @@ local upper = string.upper
 local Trace = util.TraceLine
 local surface_SetMaterial = surface.SetMaterial
 local surface_DrawRect = surface.DrawRect
-local player_GetAll = player.GetAll
 local draw_NoTexture = draw.NoTexture
 local surface_SetFont = surface.SetFont
 local surface_GetTextSize = surface.GetTextSize
@@ -23,13 +22,8 @@ local blackish = Color( 39, 39, 39)
 local black = Color( 0, 0, 0 )
 local grey = Color( 61, 61, 61)
 local linecol = Color( 61, 61, 61, 100 )
-local math_cos = math.cos
-local math_sin = math.sin
 local surface_DrawCircle = surface.DrawCircle
 local abs = math.abs
-local surface_DrawTexturedRect = surface.DrawTexturedRect
-local surface_DrawOutlinedRect = surface.DrawOutlinedRect
-local surface_DrawTexturedRectRotated = surface.DrawTexturedRectRotated
 local input_LookupBinding = input.LookupBinding
 local input_GetKeyCode = input.GetKeyCode
 local math_max = math.max
@@ -108,6 +102,10 @@ end
 local explosives = {}
 local fireicon = Material( "crackdown2/ui/explosive.png" )
 
+local pingtimes
+local pinglocation
+local canping = true
+local pingscale = 0
 local hplerp = -1
 local shieldlerp = -1
 local hlerp1
@@ -130,6 +128,7 @@ local strengthicon = Material( "crackdown2/ui/strengthicon.png", "smooth" )
 local explosiveicon = Material( "crackdown2/ui/explosiveicon.png", "smooth" )
 --local drivingicon = Material( "crackdown2/ui/drivingicon.png", "smooth" )
 
+local pingmat = Material( "crackdown2/other/pingcircle.png" )
 -- Minimap vars
 local minimapRT = GetRenderTarget( "crackdown2_minimaprt", 1024, 1024 )
 local mmTrace = {}
@@ -166,6 +165,12 @@ local function WorldVectorToScreen2( pos, origin, rotation, scale, radius )
     return Vector( x, y )
 end
 
+function CD2PingLocationTracker( pos )
+    canping = true
+    pinglocation = pos
+    pingtimes = 0
+    pingscale = 0
+end
 
 local function DrawCoordsOnMiniMap( pos, ang, icon, iconsize, color, fov )
     local radius = ScreenScale( 45 )
@@ -178,7 +183,7 @@ local function DrawCoordsOnMiniMap( pos, ang, icon, iconsize, color, fov )
     surface_SetMaterial( icon or playerarrow )
 
     local vec = WorldVectorToScreen2( pos, plypos, CD2_viewangles[ 2 ] - 90, radius / ( fov * 170 ), radius ) --WorldVectorToScreen( pos, plypos, 0.2, CD2_viewangles[ 2 ] - 90, radius, fov )
-    surface_DrawTexturedRectRotated( 200 + vec[ 1 ], ( ScrH() - 200 ) - vec[ 2 ], ScreenScale( iconsize ), ScreenScale( iconsize ), ( angs[ 2 ] ) )
+    surface.DrawTexturedRectRotated( 200 + vec[ 1 ], ( ScrH() - 200 ) - vec[ 2 ], ScreenScale( iconsize ), ScreenScale( iconsize ), ( angs[ 2 ] ) )
 end
 
 local skillvars = {}
@@ -283,7 +288,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     if !CD2_DrawWeaponInfo then RemoveHUDpanels() end
 
     if !game.SinglePlayer() then
-        for k, v in ipairs( player_GetAll() ) do
+        for k, v in ipairs( player.GetAll() ) do
             if v == LocalPlayer() or !v:IsCD2Agent() then continue end
             local ent = IsValid( v:GetRagdollEntity() ) and v:GetRagdollEntity() or v
             local screen = ( ent:GetPos() + Vector( 0, 0, 100 ) ):ToScreen()
@@ -322,7 +327,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         CD2DrawInputbar( scrw / 2.1, 200, upper( buttonname ), "Regenerate" )
         CD2DrawInputbar( scrw / 2, 250, upper( reloadname ), "Regenerate at nearest spawn" )
 
-        if #player_GetAll() > 1 then
+        if #player.GetAll() > 1 then
             local fbind = input_LookupBinding( "+forward" ) or "w"
             local fcode = input_GetKeyCode( fbind )
             local forwardname = input_GetKeyName( fcode )
@@ -351,7 +356,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
                 local spread = ply:GetLockonSpreadDecay() * 500
                 surface_SetDrawColor( shadedwhite )
                 surface_SetMaterial( hex )
-                surface_DrawTexturedRectRotated( ( scrw / 2 ), ( scrh / 2 ), spread, spread, ( SysTime() * 300 ) )
+                surface.DrawTexturedRectRotated( ( scrw / 2 ), ( scrh / 2 ), spread, spread, ( SysTime() * 300 ) )
             end
         end
     end
@@ -446,10 +451,10 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     
     
             surface_SetDrawColor( linecol )
-            surface_DrawOutlinedRect( scrw - 120, scrh - 100, 90, 60, 2 )
-            surface_DrawOutlinedRect( scrw - 100, scrh - 140, 70, 40, 2 )
-            surface_DrawOutlinedRect( scrw - 400, scrh - 130, 300, 30, 2 )
-            surface_DrawOutlinedRect( scrw - 400, scrh - 100, 280, 60, 2 )
+            surface.DrawOutlinedRect( scrw - 120, scrh - 100, 90, 60, 2 )
+            surface.DrawOutlinedRect( scrw - 100, scrh - 140, 70, 40, 2 )
+            surface.DrawOutlinedRect( scrw - 400, scrh - 130, 300, 30, 2 )
+            surface.DrawOutlinedRect( scrw - 400, scrh - 100, 280, 60, 2 )
     
             draw_DrawText( ply:GetEquipmentCount(), "crackdown2_font45", scrw - 60, scrh - 90, color_white, TEXT_ALIGN_CENTER )
 
@@ -519,10 +524,10 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             draw_Circle( 200, scrh - 200, ScreenScale( 50 ) - 10, 30 )
         end
 
-        surface_SetDrawColor( color_white )
+        surface_SetDrawColor( ply:GetPlayerColor():ToColor() )
         surface_SetMaterial( playerarrow )
         local _, angle = WorldToLocal( Vector(), ply:GetAngles(), ply:GetPos(), CD2_viewangles )
-        surface_DrawTexturedRectRotated( 200, scrh - 200, ScreenScale( 10 ), ScreenScale( 10 ), angle[ 2 ] )
+        surface.DrawTexturedRectRotated( 200, scrh - 200, ScreenScale( 10 ), ScreenScale( 10 ), angle[ 2 ] )
 
         local nearbyminimap = CD2FindInSphere( LocalPlayer():GetPos(), 3500, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "cell" end )
 
@@ -552,7 +557,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         --
         
         -- Players --
-        local players = player_GetAll()
+        local players = player.GetAll()
 
         for i = 1, #players do
             local otherplayer = players[ i ]
@@ -561,6 +566,31 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             end
         end
         --
+
+        if CD2_DrawMinimap and pingtimes then
+            
+            if pingtimes == 3 then
+                pingtimes = nil
+            else
+                pingscale = Lerp( 5 * FrameTime(), pingscale, 30 )
+                DrawCoordsOnMiniMap( pinglocation, CD2_viewangles, pingmat, pingscale, cellwhite, fov )
+
+                if canping then
+                    surface.PlaySound( "crackdown2/ui/ping.mp3" )
+                    canping = false
+                end
+            end
+
+
+
+            if pingscale > 25 then
+                canping = true
+                pingscale = 0
+                pingtimes = pingtimes + 1
+            end
+        end
+        
+        
 
     end
     ------

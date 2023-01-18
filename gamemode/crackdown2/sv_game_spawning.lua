@@ -5,12 +5,12 @@ local random = math.random
 hook.Add( "PlayerSpawn", "crackdown2_setplayerclass", function( ply )
     if !ply.cd2_firsttimespawn then ply.cd2_firsttimespawn = true return end
     player_manager.SetPlayerClass( ply, "cd2_player" )
-    ply:SetPlayerColor( plycolor )
+    ply:SetPlayerColor( ply.cd2_playercolor or plycolor )
 end )
 
 hook.Add( "PlayerInitialSpawn", "crackdown2_setplayerclass", function( ply )
     player_manager.SetPlayerClass( ply, "cd2_spectator" )
-    ply:SetPlayerColor( plycolor )
+    ply:SetPlayerColor( ply.cd2_playercolor or plycolor )
 
     local vecs = {}
     for k, v in ipairs( CD2GetPossibleSpawns() ) do vecs[ #vecs + 1 ] = { v:GetPos(), v:GetAngles() } end

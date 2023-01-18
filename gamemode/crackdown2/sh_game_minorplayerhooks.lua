@@ -117,7 +117,7 @@ if CLIENT then
         if CurTime() > delay then
             local ply = LocalPlayer()
     
-            if !ply:Alive() or !ply:IsCD2Agent() then return end
+            if !IsValid( ply ) or !ply:Alive() or !ply:IsCD2Agent() then return end
             
             ply.cd2_nextgesture = ply.cd2_nextgesture or CurTime() + random( 5, 60 )
     

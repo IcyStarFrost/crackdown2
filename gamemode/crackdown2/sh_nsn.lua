@@ -114,6 +114,13 @@ if SERVER then
         end
     end )
 
+    local difficultynpcs = {
+        [ 1 ] = { "cd2_smgcellsoldier", "cd2_shotguncellsoldier" },
+        [ 2 ] = { "cd2_smgcellsoldier", "cd2_shotguncellsoldier", "cd2_107cellsoldier", "cd2_xgscellsoldier" },
+        [ 3 ] = { "cd2_smgcellsoldier", "cd2_shotguncellsoldier", "cd2_107cellsoldier", "cd2_xgscellsoldier", "cd2_machineguncellsoldier" },
+        [ 4 ] = { "cd2_smgcellsoldier", "cd2_shotguncellsoldier", "cd2_107cellsoldier", "cd2_xgscellsoldier", "cd2_machineguncellsoldier" }
+    }
+
     hook.Add( "Tick", "crackdown2_naturalspawningnpcs", function()
         if !navmesh.IsLoaded() or CD2_EmptyStreets or !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then return end
         if ( game.SinglePlayer() or IsValid( Entity( 1 ) ) and Entity( 1 ):IsListenServerHost() ) and ( !IsValid( Entity( 1 ) ) or !Entity( 1 ):IsCD2Agent() or Entity( 1 ).cd2_InTutorial ) then return end
@@ -129,10 +136,11 @@ if SERVER then
 
         -- Cell --
             if GetCellCount() < CD2_MaxCell and CurTime() > CD2_NextCellSpawn then
-                local lead = SpawnNPC( nil, "cd2_smgcellsoldier", GetRandomPlayer() )
+                local npcs = difficultynpcs[ CD2GetTacticalLocationDifficulty() ]
+                local lead = SpawnNPC( nil, npcs[ random( #npcs ) ], GetRandomPlayer() )
 
                 if IsValid( lead ) and GetCellCount() < CD2_MaxCell then
-                    local other = SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), "cd2_shotguncellsoldier", GetRandomPlayer() )
+                    local other = SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), npcs[ random( #npcs ) ], GetRandomPlayer() )
                 end
 
                 CD2_NextCellSpawn = CurTime() + rand( 1, 25 )

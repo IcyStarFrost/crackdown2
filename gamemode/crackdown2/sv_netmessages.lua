@@ -6,6 +6,8 @@ net.Receive( "cd2net_resupply", function( len, ply )
     local equipment = net.ReadString()
 
     ply.cd2_WeaponSpawnDelay = CurTime() + 0.5
+    ply.cd2_lastspawnprimary = primary
+    ply.cd2_lastspawnsecondary = secondary
     ply:StripWeapons()
     ply:SetEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )
     ply:SetMaxEquipmentCount( scripted_ents.Get( equipment ).MaxGrenadeCount )

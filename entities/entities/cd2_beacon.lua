@@ -107,6 +107,67 @@ function ENT:Initialize()
                 DrawSunbeams( self.SunBeamDark, dist_mult * self.SunBeamMult * ( math.Clamp( CD2_viewangles:Forward():Dot( ( pos - CD2_vieworigin ):GetNormalized() ) - 0.5, 0, 1 ) * 2 ) ^ 5, self.SunSize, screen.x / ScrW(), screen.y / ScrH() )
             cam.End2D()
         end )
+        
+
+        local curtimed
+        local lasthealth = 100
+
+        hook.Add( "HUDPaint", self, function() 
+            if self:GetIsDetonated() then hook.Remove( "HUDPaint", self ) return end
+            if !LocalPlayer():IsCD2Agent() or LocalPlayer():SqrRangeTo( self ) > ( 2000 * 2000 ) or !self.truedur or !self:GetIsCharging() then return end
+            curtimed = curtimed or CurTime()
+
+
+            -- Base
+            surface.SetDrawColor( blackish )
+            draw.NoTexture()
+            surface.DrawRect( ScrW() - 350,  40, 300, 64 )
+        
+            surface.SetDrawColor( linecol )
+            surface.DrawOutlinedRect( ScrW() - 350,  40, 300, 64, 1 )
+            --
+
+            -- Icon
+            surface.SetDrawColor( color_white )
+            surface.SetMaterial( beaconicon )
+            surface.DrawTexturedRect( ScrW() - 420,  40, 64, 64 )
+
+            beaconiconcol.r = Lerp( 1 * FrameTime(), beaconiconcol.r, 0 )
+            beaconiconcol.g = Lerp( 1 * FrameTime(), beaconiconcol.g, 110 )
+            beaconiconcol.b = Lerp( 1 * FrameTime(), beaconiconcol.b, 255 )
+
+            surface.SetDrawColor( beaconiconcol )
+            surface.SetMaterial( glow )
+            surface.DrawTexturedRect( ScrW() - 452,  5, 128, 128 )
+            --
+        
+            local progressW = ( ( CurTime() - curtimed ) / self.truedur ) * 280
+        
+            -- Beacon Progress bar
+            surface.SetDrawColor( chargecol )
+            surface.DrawRect( ScrW() - 340, 55, progressW, 10 )
+        
+            surface.SetDrawColor( linecol )
+            surface.DrawOutlinedRect( ScrW() - 345,  50, 290, 20, 1 )
+
+            local healthW = ( self:GetBeaconHealth() / 100 ) * 280
+        
+            -- Beacon Health Bar
+            surface.SetDrawColor( orangeish )
+            surface.DrawRect( ScrW() - 340, 80, healthW, 10 )
+        
+            surface.SetDrawColor( linecol )
+            surface.DrawOutlinedRect( ScrW() - 345,  75, 290, 20, 1 )
+            
+            if self:GetBeaconHealth() != lasthealth then
+                beaconiconcol.r = 255 
+                beaconiconcol.g = 0
+                beaconiconcol.b = 0
+            end
+
+            lasthealth = self:GetBeaconHealth()
+
+        end )
 
     end
 end
@@ -141,12 +202,15 @@ function ENT:OnLand()
         net.WriteBool( true )
         net.Broadcast()
 
-        local nearbyplayers = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2Agent() end )
+        if !KeysToTheCity() then
+            local nearbyplayers = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2Agent() end )
 
-        for k, v in ipairs( nearbyplayers ) do 
-            if IsValid( v ) then
-                v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/beaconcharge.mp3" )
-            end 
+            
+            for k, v in ipairs( nearbyplayers ) do 
+                if IsValid( v ) then
+                    v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/beaconcharge.mp3" )
+                end 
+            end
         end
     elseif CLIENT then
         sound.PlayFile( "sound/crackdown2/ambient/beacon/beaconambient.mp3", "3d mono", function( snd, id, name )
@@ -186,80 +250,22 @@ function ENT:OnBeamStart()
         self.cd2_curtimeduration = CurTime() + 200
         self.cd2_BeaconChargeStart = CurTime() + 10
 
-        timer.Simple( 2, function()
-            if !IsValid( self ) then return end
-            local nearbyplayers = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2Agent() end )
+        if !KeysToTheCity() then
+            timer.Simple( 2, function()
+                if !IsValid( self ) then return end
+                local nearbyplayers = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2Agent() end )
 
-            for k, v in ipairs( nearbyplayers ) do 
-                if IsValid( v ) then
-                    v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/freaksactive.mp3" )
-                end 
-            end
-        end )
+                for k, v in ipairs( nearbyplayers ) do 
+                    if IsValid( v ) then
+                        v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/freaksactive.mp3" )
+                    end 
+                end
+            end )
+        end
 
     elseif CLIENT then
-        local truedur
-        local curtimed
-        local lasthealth = 100
-
-        hook.Add( "HUDPaint", self, function() 
-            if self:GetIsDetonated() then hook.Remove( "HUDPaint", self ) return end
-            if !LocalPlayer():IsCD2Agent() or LocalPlayer():SqrRangeTo( self ) > ( 2000 * 2000 ) or !truedur or !self:GetIsCharging() then return end
-            curtimed = curtimed or CurTime()
-
-
-            -- Base
-            surface.SetDrawColor( blackish )
-            draw.NoTexture()
-            surface.DrawRect( ScrW() - 350,  40, 300, 64 )
         
-            surface.SetDrawColor( linecol )
-            surface.DrawOutlinedRect( ScrW() - 350,  40, 300, 64, 1 )
-            --
-
-            -- Icon
-            surface.SetDrawColor( color_white )
-            surface.SetMaterial( beaconicon )
-            surface.DrawTexturedRect( ScrW() - 420,  40, 64, 64 )
-
-            beaconiconcol.r = Lerp( 1 * FrameTime(), beaconiconcol.r, 0 )
-            beaconiconcol.g = Lerp( 1 * FrameTime(), beaconiconcol.g, 110 )
-            beaconiconcol.b = Lerp( 1 * FrameTime(), beaconiconcol.b, 255 )
-
-            surface.SetDrawColor( beaconiconcol )
-            surface.SetMaterial( glow )
-            surface.DrawTexturedRect( ScrW() - 452,  5, 128, 128 )
-            --
         
-            local progressW = ( ( CurTime() - curtimed ) / truedur ) * 280
-        
-            -- Beacon Progress bar
-            surface.SetDrawColor( chargecol )
-            surface.DrawRect( ScrW() - 340, 55, progressW, 10 )
-        
-            surface.SetDrawColor( linecol )
-            surface.DrawOutlinedRect( ScrW() - 345,  50, 290, 20, 1 )
-
-            local healthW = ( self:GetBeaconHealth() / 100 ) * 280
-        
-            -- Beacon Health Bar
-            surface.SetDrawColor( orangeish )
-            surface.DrawRect( ScrW() - 340, 80, healthW, 10 )
-        
-            surface.SetDrawColor( linecol )
-            surface.DrawOutlinedRect( ScrW() - 345,  75, 290, 20, 1 )
-            
-            if self:GetBeaconHealth() != lasthealth then
-                beaconiconcol.r = 255 
-                beaconiconcol.g = 0
-                beaconiconcol.b = 0
-            end
-
-            lasthealth = self:GetBeaconHealth()
-
-        end )
-    
-        if LocalPlayer():SqrRangeTo( self ) > ( 2000 * 2000 ) then return end
 
         CD2CreateThread( function() 
 
@@ -269,10 +275,16 @@ function ENT:OnBeamStart()
             if IsValid( self.cd2_beaconmusic ) then self.cd2_beaconmusic:Kill() end
             local first = true
             self.cd2_beaconmusic = CD2StartMusic( self:GetSoundTrack(), 600, false, false, nil, nil, nil, nil, nil, function( chan )
-                if !IsValid( self ) then chan:FadeOut() end
+                if !IsValid( self ) then chan:FadeOut() return end
+
+                if LocalPlayer():SqrRangeTo( self:GetBeaconPos() ) > ( 2000 * 2000 ) then
+                    chan:GetChannel():SetVolume( 0 )
+                else 
+                    chan:GetChannel():SetVolume( 1 )
+                end
 
                 if first then
-                    truedur = chan:GetChannel():GetLength() - 10
+                    self.truedur = chan:GetChannel():GetLength() - 10
                     net.Start( "cd2net_beaconduration" )
                     net.WriteEntity( self )
                     net.WriteFloat( chan:GetChannel():GetLength() )
@@ -322,7 +334,7 @@ function ENT:OnBeaconDestroyed()
         local players = player.GetAll()
         for i = 1, #players do 
             local ply = players[ i ]
-            if IsValid( ply ) and ply:SqrRangeTo( self ) < ( 2000 * 2000 ) then CD2SetTypingText( ply, "OBJECTIVE INCOMPLETE", "Beacon Destroyed", true ) ply:Kill() end
+            if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2SetTypingText( ply, "OBJECTIVE INCOMPLETE", "Beacon Destroyed", true ) ply:Kill() end
         end
 
         timer.Simple( 7, function() if IsValid( self ) then self:Remove() end end )
@@ -333,7 +345,7 @@ function ENT:OnBeaconDestroyed()
 
         if IsValid( self.cd2_beaconmusic ) then self.cd2_beaconmusic:FadeOut() end
 
-        if LocalPlayer():SqrRangeTo( self ) > ( 2000 * 2000 ) then return end
+        if LocalPlayer():SqrRangeTo( self:GetBeaconPos() ) > ( 2000 * 2000 ) then return end
 
         self.cd2_beaconmusic = CD2StartMusic( "sound/crackdown2/music/beacondestroyed.mp3", 600 )
     end
@@ -394,6 +406,8 @@ function ENT:BeaconDetonate()
             LocalPlayer():ScreenFade( SCREENFADE.IN, color_white, 2, 1 )
         end )
         CD2CreateThread( function()
+
+            if IsValid( self.cd2_beaconmusic ) then self.cd2_beaconmusic:FadeOut() end
 
             CD2StartMusic( "sound/crackdown2/music/beacon_victory.mp3", 600 )
 
@@ -852,7 +866,13 @@ elseif CLIENT then
         if !IsValid( beacon ) then return end
 
         beacon.cd2_beaconmusic = CD2StartMusic( path, priority, true, false, nil, nil, nil, nil, nil, function( chan )
-            if !IsValid( beacon ) then chan:FadeOut() end
+            if !IsValid( beacon ) then chan:FadeOut() return end
+
+            if LocalPlayer():SqrRangeTo( beacon:GetBeaconPos() ) > ( 2000 * 2000 ) then
+                chan:GetChannel():SetVolume( 0 )
+            else 
+                chan:GetChannel():SetVolume( 1 )
+            end
         end )
     end )
 

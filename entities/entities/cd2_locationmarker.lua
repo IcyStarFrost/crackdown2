@@ -14,8 +14,8 @@ function ENT:Initialize()
     self:DrawShadow( false )
 
     if SERVER then
-        self.cd2_cellcount = 2 + ( 2 * self:GetDifficulty() )
-        self:SetMaxKillCount( 9 + ( 3 * self:GetDifficulty() ) )
+        self.cd2_cellcount = 2 + ( 2 * CD2GetTacticalLocationDifficulty() )
+        self:SetMaxKillCount( random( 7, 13 ) + ( 2 * CD2GetTacticalLocationDifficulty() ) )
         self:SetKillCount( 0 )
         self.cd2_activecell = {}
 
@@ -112,7 +112,6 @@ function ENT:SetupDataTables()
     self:NetworkVar( "String", 0, "LocationType" )
     self:NetworkVar( "String", 1, "Text" )
 
-    self:NetworkVar( "Int", 0, "Difficulty" )
     self:NetworkVar( "Int", 1, "MaxKillCount" )
     self:NetworkVar( "Int", 2, "KillCount" )
 end
@@ -122,7 +121,10 @@ function ENT:OnRemove()
 end
 
 local difficultynpcs = {
-    [ 1 ] = { "cd2_smgcellsoldier", "cd2_shotguncellsoldier" }
+    [ 1 ] = { "cd2_smgcellsoldier", "cd2_shotguncellsoldier" },
+    [ 2 ] = { "cd2_smgcellsoldier", "cd2_shotguncellsoldier", "cd2_107cellsoldier", "cd2_xgscellsoldier" },
+    [ 3 ] = { "cd2_smgcellsoldier", "cd2_shotguncellsoldier", "cd2_107cellsoldier", "cd2_xgscellsoldier", "cd2_machineguncellsoldier", "cd2_rpgcellsoldier", "cd2_snipercellsoldier" },
+    [ 4 ] = { "cd2_smgcellsoldier", "cd2_shotguncellsoldier", "cd2_107cellsoldier", "cd2_xgscellsoldier", "cd2_machineguncellsoldier", "cd2_rpgcellsoldier", "cd2_snipercellsoldier", "cd2_homingcellsoldier" }
 }
 
 function ENT:OnActivate( ply )
@@ -136,10 +138,13 @@ function ENT:OnActivate( ply )
 
 
         if !KeysToTheCity() and random( 1, 2 ) == 1 then
-            ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/celldefend.mp3" )
+            for k, v in ipairs( player.GetAll() ) do
+                if v:SqrRangeTo( self ) > ( 2000 * 2000 ) then continue end
+                v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/celldefend.mp3" )
+            end
         end
 
-        local npclist = difficultynpcs[ self:GetDifficulty() ]
+        local npclist = difficultynpcs[ CD2GetTacticalLocationDifficulty() ]
 
         CD2DebugMessage( ply:Name() .. " Initiated a Tactical Assault on Location Marker ", self )
 
@@ -211,6 +216,7 @@ function ENT:OnActivate( ply )
             end
 
             net.Start( "cd2net_locationcaptured" )
+            net.WriteVector( self:GetPos() )
             net.Broadcast()
 
             local agencycount = 0 
@@ -265,7 +271,7 @@ function ENT:Think()
     if !CD2_EmptyStreets and !self:GetIsActive() and CurTime() > self.cd2_nextpassivespawn and #self.cd2_passivenpcs < self.cd2_maxpassivenpccount and self:VisCheck() then
         
         if self:GetLocationType() == "cell" then
-            local npclist = difficultynpcs[ self:GetDifficulty() ]
+            local npclist = difficultynpcs[ CD2GetTacticalLocationDifficulty() ]
 
             local cell = ents.Create( npclist[ random( #npclist ) ] )
             cell:SetPos( CD2GetRandomPos( 2000, self:GetPos() )  )
@@ -404,3 +410,11 @@ if CLIENT then
 
 end
 
+
+if CLIENT then
+    net.Receive( "cd2net_locationcaptured", function()
+        local pos = net.ReadVector()
+        if LocalPlayer():SqrRangeTo( pos ) > ( 2000 * 2000 ) then return end
+        CD2StartMusic( "sound/crackdown2/music/locationcaptured.mp3", 100 )
+    end )
+end

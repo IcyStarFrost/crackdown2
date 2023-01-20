@@ -112,11 +112,16 @@ function ENT:TypingText()
         end
     end
 
-    if othercount == 3 then
-        hook.Run( "CD2_PowerNetworkComplete", self:GetAUGroupID() )
-        CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\nA Beacon can now be deployed" )
-    elseif othercount > 0 then
-        CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\n" .. othercount .. " of 3 units active" )
+    if othercount == 3 then hook.Run( "CD2_PowerNetworkComplete", self:GetAUGroupID() ) end
+
+    for k, ply in ipairs( player.GetAll() ) do
+        if ply:SqrRangeTo( self ) > ( 1000 * 1000 ) then continue end
+        if othercount == 3 then
+            CD2SetTypingText( ply, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\nA Beacon can now be deployed" )
+        elseif othercount > 0 then
+            CD2SetTypingText( ply, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\n" .. othercount .. " of 3 units active" )
+        end
+
     end
 end
 
@@ -175,7 +180,7 @@ function ENT:Think()
             self:EmitSound( "crackdown2/ambient/au/chargenew" .. math.random( 1, 4 ) .. ".mp3", 80 )
             self.cd2_first = true
         end
-        self:SetCharge( self:GetCharge() + 4 )
+        self:SetCharge( self:GetCharge() + ( 2 * #nearplayers ) )
 
         if self:GetCharge() >= 100 then
             self:EnableBeam() 

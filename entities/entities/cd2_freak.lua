@@ -60,6 +60,10 @@ function ENT:Initialize2()
         net.WriteBool( false  )
         net.Broadcast()
 
+        self:SetModelScale( math.Rand( 0.7, 1.4 ), 0 )
+
+        self:SetHealth( 75 + ( 5 * self:GetModelScale() ) )
+
         self:Hook( "EntityEmitSound", "hearing", function( snddata )
             if IsValid( self:GetEnemy() ) then return end
             local chan = snddata.Channel 
@@ -132,12 +136,13 @@ function ENT:OnKilled2( info, ragdoll )
 
     ragdoll:Ignite( 10 )
 
-    net.Start( "cd2net_freakkill" )
-    net.WriteEntity( ragdoll )
-    net.Broadcast()
+    ragdoll:SetModelScale( self:GetModelScale(), 0 )
 
     timer.Simple( 2, function()
         if !IsValid( ragdoll ) then return end
+        net.Start( "cd2net_freakkill", true )
+        net.WriteVector( ragdoll:GetPos() )
+        net.Broadcast()
         ragdoll:Remove()
     end )
 end
@@ -205,7 +210,7 @@ function ENT:Swipe()
         self:GetEnemy():EmitSound( "npc/zombie/claw_strike" .. random( 1, 3 ) .. ".wav", 70, 100, 1, CHAN_WEAPON )
         local info = DamageInfo()
         info:SetAttacker( self ) 
-        info:SetDamage( 15 ) 
+        info:SetDamage( 10 + ( 5 * self:GetModelScale() ) ) 
         info:SetDamageType( DMG_DIRECT )
         self:GetEnemy():TakeDamageInfo( info )
     end )

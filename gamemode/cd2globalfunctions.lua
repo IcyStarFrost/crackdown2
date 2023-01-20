@@ -158,6 +158,34 @@ function CD2FindInLockableTragets( ply )
     return entities
 end
 
+-- Returns a difficulty number depending on the captured location count
+function CD2GetTacticalLocationDifficulty()
+    local locations = ents.FindByClass( "cd2_locationmarker" )
+    local agencylocations = 0
+    local totalcount = 0
+    local difficulty = 1
+    for i = 1, #locations do
+        local location = locations[ i ]
+        if !IsValid( location ) then continue end
+        if location:GetLocationType() == "cell" then 
+            totalcount = totalcount + 1
+        elseif location:GetLocationType() == "agency" then
+            agencylocations = agencylocations + 1
+            totalcount = totalcount + 1
+        end
+    end
+
+    if agencylocations >= totalcount * 0.7 then
+        difficulty = 4
+    elseif agencylocations >= totalcount * 0.5 then
+        difficulty = 3
+    elseif agencylocations >= totalcount * 0.3 then
+        difficulty = 2
+    end
+    
+    return difficulty
+end
+
 -- Removes all NPCs
 function CD2ClearNPCS()
     local ents_ = ents.FindByClass( "cd2_*" )

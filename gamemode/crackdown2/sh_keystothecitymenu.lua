@@ -199,6 +199,15 @@ if CLIENT then
         end
         --
 
+        -- Game Objects --
+        AddOption( "Spawn Hidden Orb", "Objects", "Button", { default = false }, function( pnl )
+            net.Start( "cd2net_kttc_spawnnpc" )
+            net.WriteString( "cd2_hiddenorb")
+            net.WriteAngle( CD2_viewangles )
+            net.SendToServer()
+        end )
+        --
+
         
         -- Objects --
         AddOption( "Spawn Explosive Barrel", "Objects", "Button", { default = false }, function( pnl )

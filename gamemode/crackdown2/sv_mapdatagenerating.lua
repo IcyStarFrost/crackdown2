@@ -100,7 +100,7 @@ function CD2GenerateMapData( randomize )
             if !IsValid( nav ) or nav:IsUnderwater() then continue end
             local pos = nav:GetRandomPoint()
             
-            local nearorbs = CD2FindInSphere( pos, 3500, function( ent ) return ent:GetClass() == "cd2_onlineorb" end )
+            local nearorbs = CD2FindInSphere( pos, 6500, function( ent ) return ent:GetClass() == "cd2_onlineorb" end )
 
             if #nearorbs > 0 then continue end
 
@@ -144,6 +144,8 @@ function CD2GenerateMapData( randomize )
             tracetable.collisiongroup = COLLISION_GROUP_WORLD
         
             local result = Trace( tracetable )
+
+            if result.HitPos:DistToSqr( pos ) < 500 then continue end
 
             tbl.beaconspawnpos = result.HitPos - Vector( 0, 0, 130 )
             tbl.pos = pos 
@@ -202,20 +204,19 @@ function CD2GenerateMapData( randomize )
 
                 local location = ents.Create( "cd2_locationmarker" )
                 location:SetPos( pos ) 
-                location:SetDifficulty( 1 )
 
                 location.cd2_map_isgenerated = true
                 location.cd2_map_id = "tacticallocation:" .. location:GetCreationID()
                 location:SetIsBeginningLocation( assignfirstlocation )
                 if assignfirstlocation then SetGlobal2Vector( "cd2_beginnerlocation", location:GetPos() ) end
 
-                location:SetLocationType( "cell" )
+                location:SetLocationType( KeysToTheCity() and assignfirstlocation and "agency" or "cell" )
                 location:Spawn()
 
                 if assignfirstlocation then CD2_BeginnerLocation = location CD2DebugMessage( "Assigned beginning location to " .. location.cd2_map_id ) end
 
                 assignfirstlocation = false
-                tacticallocationdata[ #tacticallocationdata + 1 ] = { pos = location:GetPos(), id = location.cd2_map_id, difficulty = location:GetDifficulty(), type = location:GetLocationType(), isbeginninglocation = location:GetIsBeginningLocation() }
+                tacticallocationdata[ #tacticallocationdata + 1 ] = { pos = location:GetPos(), id = location.cd2_map_id, type = location:GetLocationType(), isbeginninglocation = location:GetIsBeginningLocation() }
                 coroutine.wait( 0.01 )
             end
         end
@@ -225,9 +226,11 @@ function CD2GenerateMapData( randomize )
         -- First Beacon --
         local pos = GetGlobal2Vector( "cd2_beginnerlocation" )
 
-        CD2_Firstbeacon = ents.Create( "cd2_beacon" )
-        CD2_Firstbeacon:SetPos( CD2GetRandomPos( 1000, pos )  )
-        CD2_Firstbeacon:Spawn()
+        if !KeysToTheCity() then
+            CD2_Firstbeacon = ents.Create( "cd2_beacon" )
+            CD2_Firstbeacon:SetPos( CD2GetRandomPos( 1000, pos )  )
+            CD2_Firstbeacon:Spawn()
+        end
 
 
         SetGlobal2Bool( "cd2_MapDataLoaded", true )
@@ -559,13 +562,11 @@ function CD2LoadMapData()
         local locationdata = tacticallocations[ i ]
         local pos = locationdata.pos
         local id = locationdata.id
-        local difficulty = locationdata.difficulty
         local type = locationdata.type
         local isbeginninglocation = locationdata.isbeginninglocation
 
         local location = ents.Create( "cd2_locationmarker" )
         location:SetPos( pos ) 
-        location:SetDifficulty( difficulty )
         location:SetIsBeginningLocation( isbeginninglocation )
         
         if isbeginninglocation then CD2_BeginnerLocation = location SetGlobal2Vector( "cd2_beginnerlocation", location:GetPos() ) end
@@ -677,7 +678,7 @@ hook.Add( "CD2_OnTacticalLocationCaptured", "crackdown2_locationcaptured", funct
         CD2FILESYSTEM:WriteMapData( "cd2_map_tacticallocationdata", locationdata )
     end
     
-    if location:GetIsBeginningLocation() then
+    if location:GetIsBeginningLocation() and !KeysToTheCity() then
         tracetable.start = location:GetPos()
         tracetable.endpos = location:GetPos() + Vector( 0, 0, 6000 )
         tracetable.mask = MASK_SOLID_BRUSHONLY

@@ -35,7 +35,7 @@ function ENT:Initialize()
 
     if CLIENT then
         hook.Add("HUDPaint", self, function() 
-            if LocalPlayer():SqrRangeTo( self ) > ( 40 * 40 ) then return end 
+            if LocalPlayer():SqrRangeTo( self ) > ( 70 * 70 ) then return end 
             local renderinput = self:GetNW2Bool( "cd2_drawinput", false )
 
             if renderinput then
@@ -125,7 +125,7 @@ function ENT:Think()
 
     self:CheckPlayers()
 
-    local players = CD2FindInSphere( self:GetPos(), 40, function( ent ) return ent:IsCD2Agent() end )
+    local players = CD2FindInSphere( self:GetPos(), 70, function( ent ) return ent:IsCD2Agent() end )
     for i = 1, #players do
         local ply = players[ i ]
         if !ply.cd2_onlineorb_notified and SERVER then if !KeysToTheCity() then ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/onlineorb.mp3" ) end  CD2SendTextBoxMessage( ply, "Team up with another Agent to collect this Orb!" ) ply.cd2_onlineorb_notified = true end

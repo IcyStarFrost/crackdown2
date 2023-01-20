@@ -84,7 +84,7 @@ net.Receive( "cd2net_playerlandingdecal", function()
     local result = Trace( landingtbl )
 
     if !result then return end
-    
+
     local particle = ParticleEmitter( result.HitPos + Vector( 0, 0, 3) )
     local num = bigfall and 400 or 200
     for i = 1, 30 do
@@ -411,38 +411,35 @@ end )
 
 local flame = Material( "crackdown2/effects/flamelet1.png" )
 net.Receive( "cd2net_freakkill", function()
-    local ragdoll = net.ReadEntity()
-    if !IsValid( ragdoll ) then return end
-    
-    ragdoll:CallOnRemove( "effect", function() 
-        sound.Play( "ambient/fire/gascan_ignite1.wav", ragdoll:GetPos(), 60, 100, 1 )
-        local particle = ParticleEmitter( ragdoll:GetPos() )
-        for i = 1, 60 do
-            if !IsValid( ragdoll ) then return end
+    local pos = net.ReadVector()
 
-            local part = particle:Add( "particle/SmokeStack", ragdoll:GetPos() )
-    
-            if part then
-                part:SetStartSize( 10 )
-                part:SetEndSize( 10 ) 
-                part:SetStartAlpha( 255 )
-                part:SetEndAlpha( 0 )
-    
-                part:SetColor( 255, 255, 50 )
-                part:SetLighting( false )
-                part:SetCollide( true )
-    
-                part:SetDieTime( 2 )
-                part:SetGravity( Vector( 0, 0, -80 ) )
-                part:SetAirResistance( 200 )
-                part:SetVelocity( Vector( random( -200, 200 ), random( -200, 200 ), random( -200, 200 ) ) )
-                part:SetAngleVelocity( AngleRand( -1, 1 ) )
-            end
-    
+    sound.Play( "ambient/fire/gascan_ignite1.wav", pos, 60, 100, 1 )
+    local particle = ParticleEmitter( pos )
+    for i = 1, 60 do
+
+        local part = particle:Add( "particle/SmokeStack", pos )
+
+        if part then
+            part:SetStartSize( 10 )
+            part:SetEndSize( 10 ) 
+            part:SetStartAlpha( 255 )
+            part:SetEndAlpha( 0 )
+
+            part:SetColor( 255, 255, 50 )
+            part:SetLighting( false )
+            part:SetCollide( true )
+
+            part:SetDieTime( 2 )
+            part:SetGravity( Vector( 0, 0, -80 ) )
+            part:SetAirResistance( 200 )
+            part:SetVelocity( Vector( random( -200, 200 ), random( -200, 200 ), random( -200, 200 ) ) )
+            part:SetAngleVelocity( AngleRand( -1, 1 ) )
         end
-    
-        particle:Finish()
-    end )
+
+    end
+
+    particle:Finish()
+
 end )
 
 net.Receive( "cd2net_explosion", function()

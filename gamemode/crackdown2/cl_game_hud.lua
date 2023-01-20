@@ -4,15 +4,12 @@ local math_sin = math.sin
 local math_cos = math.cos
 local clamp = math.Clamp
 local ceil = math.ceil
-local surface_DrawPoly = surface.DrawPoly
 local surface_SetDrawColor = surface.SetDrawColor
 local surface_DrawLine = surface.DrawLine
 local draw_DrawText = draw.DrawText
-local upper = string.upper
 local Trace = util.TraceLine
 local surface_SetMaterial = surface.SetMaterial
 local surface_DrawRect = surface.DrawRect
-local draw_NoTexture = draw.NoTexture
 local surface_SetFont = surface.SetFont
 local surface_GetTextSize = surface.GetTextSize
 local shadedwhite = Color( 177, 177, 177 )
@@ -23,10 +20,6 @@ local black = Color( 0, 0, 0 )
 local grey = Color( 61, 61, 61)
 local linecol = Color( 61, 61, 61, 100 )
 local surface_DrawCircle = surface.DrawCircle
-local abs = math.abs
-local input_LookupBinding = input.LookupBinding
-local input_GetKeyCode = input.GetKeyCode
-local math_max = math.max
 local input_GetKeyName = input.GetKeyName
 local render_SetMaterial = render.SetMaterial
 local render_DrawSprite = render.DrawSprite
@@ -56,10 +49,10 @@ local function draw_Circle( x, y, radius, seg, rotate )
 		table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
 	end
 
-	local a = math_rad( rotate ) -- This is needed for non absolute segment counts
+	local a = math_rad( rotate ) -- This is needed for non math.absolute segment counts
 	table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
 
-	surface_DrawPoly( cir )
+	surface.DrawPoly( cir )
 end
 
 
@@ -73,10 +66,10 @@ local function DrawSkillCircle( x, y, radius, arc, rotate )
 		table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
 	end
 
-	local a = math_rad( rotate ) -- This is needed for non absolute segment counts
+	local a = math_rad( rotate ) -- This is needed for non math.absolute segment counts
 	table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
 
-	surface_DrawPoly( cir )
+	surface.DrawPoly( cir )
 end
 
 
@@ -86,7 +79,7 @@ function CD2DrawInputbar( x, y, keyname, text )
     surface_SetFont( "crackdown2_font30" )
     local sizex, sizey = surface_GetTextSize( text )
 
-    draw_NoTexture()
+    draw.NoTexture()
     surface_SetDrawColor( blackish )
     surface_DrawRect( x, y - 15, sizex + 30, 30 )
     
@@ -192,7 +185,7 @@ local function DrawSkillHex( x, y, icon, level, xp, col, skillname )
     skillvars[ skillname ] = skillvars[ skillname ] or {}
     skillvars[ skillname ].col = skillvars[ skillname ].col or col
 
-    draw_NoTexture()
+    draw.NoTexture()
 
     -- Outlined circle pathing behind each skill dot
     surface_DrawCircle( x, y, 30, 0, 0, 0 )
@@ -203,7 +196,7 @@ local function DrawSkillHex( x, y, icon, level, xp, col, skillname )
     -- White circle pathing behind each skill dot
     DrawSkillCircle( x, y, 33, Lerp( xp / 100, ( 55 * level ), ( 55 * ( level + 1 ) ) ) , -160 )
 
-    draw_NoTexture()
+    draw.NoTexture()
 
     surface_SetDrawColor( blackish )
     draw_Circle( x, y, 25, 6, 30 ) -- Base hex
@@ -214,7 +207,7 @@ local function DrawSkillHex( x, y, icon, level, xp, col, skillname )
         draw_Circle( x, y, 30, 6, 30 )
     end
 
-    draw_NoTexture()
+    draw.NoTexture()
 
     local dotsize = 6
     
@@ -273,7 +266,7 @@ CD2_CheapMinimap = true
 
 CD2_DrawTargetting = true -- Draws crosshair and target healthbars
 CD2_DrawHealthandShields = true -- Draws health and shields bars
-CD2_DrawWeaponInfo = false -- Draws weapon info and equipment
+CD2_DrawWeaponInfo = true -- Draws weapon info and equipment
 CD2_DrawMinimap = true -- Draws the tracker
 CD2_DrawBlackbars = false -- Draws the top and bottom black bars
 
@@ -315,24 +308,24 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     end
 
     if !ply:Alive() then 
-        local usebind = input_LookupBinding( "+use" ) or "e"
-        local code = input_GetKeyCode( usebind )
+        local usebind = input.LookupBinding( "+use" ) or "e"
+        local code = input.GetKeyCode( usebind )
         local buttonname = input_GetKeyName( code )
 
-        local reloadbind = input_LookupBinding( "+reload" ) or "r"
-        local rcode = input_GetKeyCode( reloadbind )
+        local reloadbind = input.LookupBinding( "+reload" ) or "r"
+        local rcode = input.GetKeyCode( reloadbind )
         local reloadname = input_GetKeyName( rcode )
         
 
-        CD2DrawInputbar( scrw / 2.1, 200, upper( buttonname ), "Regenerate" )
-        CD2DrawInputbar( scrw / 2, 250, upper( reloadname ), "Regenerate at nearest spawn" )
+        CD2DrawInputbar( scrw / 2.1, 200, string.upper( buttonname ), "Regenerate" )
+        CD2DrawInputbar( scrw / 2, 250, string.upper( reloadname ), "Regenerate at nearest spawn" )
 
         if #player.GetAll() > 1 then
-            local fbind = input_LookupBinding( "+forward" ) or "w"
-            local fcode = input_GetKeyCode( fbind )
+            local fbind = input.LookupBinding( "+forward" ) or "w"
+            local fcode = input.GetKeyCode( fbind )
             local forwardname = input_GetKeyName( fcode )
 
-            CD2DrawInputbar( scrw / 1.9, 300, upper( forwardname ), "Hold to call for help" )
+            CD2DrawInputbar( scrw / 1.9, 300, string.upper( forwardname ), "Hold to call for help" )
         end
 
         RemoveHUDpanels()
@@ -341,7 +334,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
     -- Crosshair --
     if CD2_DrawTargetting then
-        draw_NoTexture()
+        draw.NoTexture()
         surface_SetDrawColor( !CD2_lockon and shadedwhite or red )
         draw_Circle( scrw / 2, scrh / 2, 2, 30 )
 
@@ -395,7 +388,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
             for i = 1, hpbars do
                 if i == 1 then continue end
-                draw_NoTexture()
+                draw.NoTexture()
                 surface_SetDrawColor( orangeish )
                 draw_Circle( 60 + ( 20 * ( i - 1 ) ), 90, ceil( ScreenScale( 2.5 ) ), 6, 30 )
             end
@@ -406,9 +399,9 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         surface_DrawRect( 75, 55, shieldlerp, 10 )
 
         if hpbars == 1 then
-            hpred.r = math_max( 30, ( abs( math_sin( SysTime() * 1.5 ) * 163 ) ), ( abs( math_cos( SysTime() * 1.5 ) * 163 ) ) )
-            hpred.g = ( abs( math_sin( SysTime() * 1.5 ) * 12 ) )
-            hpred.b = ( abs( math_sin( SysTime() * 1.5 ) * 12 ) )
+            hpred.r = math.max( 30, ( math.abs( math_sin( SysTime() * 1.5 ) * 163 ) ), ( math.abs( math_cos( SysTime() * 1.5 ) * 163 ) ) )
+            hpred.g = ( math.abs( math_sin( SysTime() * 1.5 ) * 12 ) )
+            hpred.b = ( math.abs( math_sin( SysTime() * 1.5 ) * 12 ) )
         end
 
         surface_SetDrawColor( hpbars > 1 and orangeish or hpred  )
@@ -418,7 +411,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
 
     -- Weapon Info --
-   --[[  if CD2_DrawWeaponInfo then
+    if CD2_DrawWeaponInfo then
         local weapon = ply:GetActiveWeapon()
 
         if IsValid( weapon ) then
@@ -445,6 +438,41 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
                 end
             end
 
+            if !IsValid( CD2_weaponpnl ) then
+                CD2_weaponpnl = vgui.Create( "DModelPanel", GetHUDPanel() )
+                CD2_weaponpnl:SetModel( mdl )
+                CD2_weaponpnl:SetPos( scrw - 400 , scrh - 100 )
+                CD2_weaponpnl:SetSize( 300, 60 )
+                CD2_weaponpnl:SetFOV( 50 )
+        
+                local ent = CD2_weaponpnl:GetEntity()
+                ent:SetMaterial( "models/debug/debugwhite" )
+                CD2_weaponpnl:SetCamPos( Vector( 0, 80, 0 ) )
+                CD2_weaponpnl:SetLookAt( ent:OBBCenter() )
+                
+        
+                local thinkpanel = vgui.Create( "DPanel", CD2_weaponpnl )
+        
+                function CD2_weaponpnl:PostDrawModel( ent ) 
+                    render.SuppressEngineLighting( false )
+                end
+        
+                function CD2_weaponpnl:PreDrawModel( ent ) 
+                    render.SuppressEngineLighting( true )
+                end
+                function CD2_weaponpnl:LayoutEntity() end
+                function thinkpanel:Paint( w, h ) end
+                function thinkpanel:Think()
+                    if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
+                    local wep = ply:GetActiveWeapon()
+                    if IsValid( CD2_weaponpnl ) and IsValid( wep ) then local ent = CD2_weaponpnl:GetEntity() ent:SetModel( wep:GetWeaponWorldModel() ) CD2_weaponpnl:SetLookAt( ent:OBBCenter() ) end
+                    
+                    if CD2_weaponpnl != self:GetParent() then
+                        self:GetParent():Remove()
+                    end
+                end
+            end
+
 
             surface_SetDrawColor( blackish )
             surface_DrawRect( scrw - 120, scrh - 100, 90, 60 )
@@ -455,13 +483,56 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             surface.DrawOutlinedRect( scrw - 100, scrh - 140, 70, 40, 2 )
             surface.DrawOutlinedRect( scrw - 400, scrh - 130, 300, 30, 2 )
             surface.DrawOutlinedRect( scrw - 400, scrh - 100, 280, 60, 2 )
+
+            if !IsValid( CD2_equipmentpnl ) then
+                local mdl = scripted_ents.Get( ply:GetEquipment() ).WorldModel
+    
+                CD2_equipmentpnl = vgui.Create( "DModelPanel", GetHUDPanel() )
+                CD2_equipmentpnl:SetModel( mdl )
+                CD2_equipmentpnl:SetPos( scrw - 135 , scrh - 85 )
+                CD2_equipmentpnl:SetSize( 64, 64 )
+                CD2_equipmentpnl:SetFOV( 60 )
+    
+                local ent = CD2_equipmentpnl:GetEntity()
+                ent:SetMaterial( "models/debug/debugwhite" )
+                CD2_equipmentpnl:SetCamPos( Vector( 0, 15, 0 ) )
+                CD2_equipmentpnl:SetLookAt( ent:OBBCenter() )
+                
+    
+                local thinkpanel = vgui.Create( "DPanel", CD2_equipmentpnl )
+    
+                function CD2_equipmentpnl:PostDrawModel( ent ) 
+                    render.SuppressEngineLighting( false )
+                end
+    
+                function CD2_equipmentpnl:PreDrawModel( ent ) 
+                    render.SuppressEngineLighting( true )
+                end
+                function CD2_equipmentpnl:LayoutEntity() end
+                function thinkpanel:Paint( w, h ) end
+                function thinkpanel:Think()
+                    if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
+    
+                    if IsValid( CD2_equipmentpnl ) then
+                        local mdl = scripted_ents.Get( ply:GetEquipment() ).WorldModel
+                        local ent = CD2_equipmentpnl:GetEntity()
+    
+                        if IsValid( ent ) and ent:GetModel() != mdl then ent:SetModel( mdl ) end
+                    end
+                    
+    
+                    if CD2_equipmentpnl != self:GetParent() then
+                        self:GetParent():Remove()
+                    end
+                end
+            end
     
             draw_DrawText( ply:GetEquipmentCount(), "crackdown2_font45", scrw - 60, scrh - 90, color_white, TEXT_ALIGN_CENTER )
 
         end
 
         
-    end ]]
+    end
     ------
 
 
@@ -514,7 +585,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             render.PopRenderTarget()
         end
 
-        draw_NoTexture()
+        draw.NoTexture()
         surface_SetDrawColor( blackish )
         draw_Circle( 200, scrh - 200, ScreenScale( 50 ), 30 )
 

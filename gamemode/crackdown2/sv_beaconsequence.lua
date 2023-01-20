@@ -1,5 +1,7 @@
 
 hook.Add( "CD2_BeaconDetonate", "crackdown2_beaconsequence", function( beacon )
+    if !beacon.cd2_map_isgenerated then return end
+    
     local Beacondata = CD2FILESYSTEM:ReadMapData( "cd2_map_beacondata" )
 
     local beaconid = beacon.cd2_AUgroup

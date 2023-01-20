@@ -82,6 +82,9 @@ net.Receive( "cd2net_playerlandingdecal", function()
     landingtbl.collisiongroup = COLLISION_GROUP_WORLD
 
     local result = Trace( landingtbl )
+
+    if !result then return end
+    
     local particle = ParticleEmitter( result.HitPos + Vector( 0, 0, 3) )
     local num = bigfall and 400 or 200
     for i = 1, 30 do
@@ -531,9 +534,7 @@ net.Receive( "cd2net_introduction_music", function()
     end )
 end )
 
-net.Receive( "cd2net_locationcaptured", function()
-    CD2StartMusic( "sound/crackdown2/music/locationcaptured.mp3", 100 )
-end )
+
 
 net.Receive( "cd2net_sendtypingtext", function()
     local top = net.ReadString()

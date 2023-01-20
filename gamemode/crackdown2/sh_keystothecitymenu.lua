@@ -266,12 +266,16 @@ if CLIENT then
         --
 
         -- Freaks -- 
-        AddOption( "Spawn Freak", "Freaks", "Button", { default = false }, function( pnl )
-            net.Start( "cd2net_kttc_spawnnpc" )
-            net.WriteString( "cd2_freak" )
-            net.WriteAngle( CD2_viewangles )
-            net.SendToServer()
-        end )
+
+        for ClassName, basetable in pairs( scripted_ents.GetList() ) do
+            if basetable.t.cd2_Team != "freak" then continue end
+            AddOption( "Spawn " .. basetable.t.PrintName, "Freaks", "Button", { default = false }, function( pnl )
+                net.Start( "cd2net_kttc_spawnnpc" )
+                net.WriteString( ClassName )
+                net.WriteAngle( CD2_viewangles )
+                net.SendToServer()
+            end )
+        end
         --
 
 

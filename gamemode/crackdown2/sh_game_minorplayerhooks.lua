@@ -154,7 +154,7 @@ if CLIENT then
     end )
 
     -- Wind sounds for falling 
-    hook.Add( "Tick", "crackdown2_fallsounds", function()
+--[[     hook.Add( "Tick", "crackdown2_fallsounds", function()
         local ply = LocalPlayer()
         if !IsValid( ply ) or !ply:IsCD2Agent() then return end
         local vel = ply:GetVelocity()[ 3 ]
@@ -172,7 +172,7 @@ if CLIENT then
         end
         
     end )
-
+ ]]
     -- Ambient music --
     local nexttrack = CurTime() + random( 90, 250 )
     

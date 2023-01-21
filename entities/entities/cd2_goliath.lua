@@ -1,29 +1,30 @@
 AddCSLuaFile()
 
 ENT.Base = "cd2_npcbase"
-ENT.PrintName = "Slinger"
+ENT.PrintName = "Goliath"
 
-if CLIENT then language.Add( "cd2_freakslinger", "Slinger" ) end
+if CLIENT then language.Add( "cd2_goliath", "Goliath" ) end
 
 -- NPC Stats
-ENT.cd2_Health = 100 -- The health the NPC has
+ENT.cd2_Health = 1000 -- The health the NPC has
 ENT.cd2_Team = "freak" -- The Team the NPC will be in. It will attack anything that isn't on its team
 ENT.cd2_SightDistance = 2000 -- How far this NPC can see
 ENT.cd2_Weapon = "none" -- The weapon this NPC will have
 ENT.cd2_IsCD2NPC = true -- Crackdown 2 NPC
-ENT.cd2_RunSpeed = 200 -- Run speed
+ENT.cd2_RunSpeed = 400 -- Run speed
 ENT.cd2_WalkSpeed = 100 -- Walk speed
 ENT.cd2_CrouchSpeed = 60 -- Crouch speed
 ENT.cd2_damagedivider = 1 -- The amount we should divide damage caused by this npc
-ENT.cd2_maxskillorbs = 4 -- The max amount of skill orbs the player can get out of this NPC when they kill it
+ENT.cd2_maxskillorbs = 20 -- The max amount of skill orbs the player can get out of this NPC when they kill it
+ENT.cd2_IsRanged = false -- If this freak is ranged
 --
 
 ENT.cd2_holdtypetranslations = {
 
     [ "normal" ] = {
         idle = ACT_HL2MP_IDLE_ZOMBIE,
-        walk = ACT_HL2MP_RUN,
-        run = ACT_HL2MP_RUN,
+        walk = ACT_HL2MP_RUN_ZOMBIE,
+        run = ACT_HL2MP_RUN_ZOMBIE,
         jump = ACT_HL2MP_JUMP_ZOMBIE,
         crouch = ACT_HL2MP_IDLE_CROUCH_ZOMBIE,
         crouchwalk = ACT_HL2MP_WALK_CROUCH_ZOMBIE,
@@ -43,7 +44,7 @@ ENT.cd2_NextIdleWalk = 0
 local math_max = math.max
 
 function ENT:ModelGet()
-    return "models/player/zombie_fast.mdl"
+    return "models/player/zombie_soldier.mdl"
 end
 
 local random = math.random
@@ -59,7 +60,7 @@ function ENT:Initialize2()
         net.WriteBool( false  )
         net.Broadcast()
 
-        self:SetDangerLevel( math.Clamp( CD2GetBeaconDifficulty(), 1, 3 ) )
+        self:SetModelScale( 5, 0 )
 
         self:Hook( "EntityEmitSound", "hearing", function( snddata )
             if IsValid( self:GetEnemy() ) then return end
@@ -79,8 +80,8 @@ function ENT:Initialize2()
     if SERVER then self.cd2_Path = Path( "Follow" ) self.loco:SetAcceleration( 2000 ) end
 end
 
-function ENT:SetupDataTables2()
-    self:NetworkVar( "Int", 1, "DangerLevel" )
+function ENT:HandleAnimEvent( event, time, cycle, type, options ) 
+
 end
 
 function ENT:PlayGesture( act )
@@ -90,7 +91,8 @@ end
 function ENT:BehaveUpdate( fInterval )
 
     if self.cd2_Gesture then
-        self:AddGesture( self.cd2_Gesture, true )
+        local id = self:AddGesture( self.cd2_Gesture, true )
+        self:SetLayerPlaybackRate( id, 0.7 )
         self.cd2_Gesture = nil
     end
 
@@ -119,6 +121,8 @@ end
 function ENT:OnInjured2( info ) 
     local attacker = info:GetAttacker()
 
+    if self:GetEnemy().cd2_IsBeaconPart then return end
+
     if ( ( attacker:IsCD2NPC() or attacker:IsCD2Agent() ) and attacker:GetCD2Team() != self:GetCD2Team() ) then
         self:AttackTarget( attacker )
     end
@@ -131,10 +135,11 @@ function ENT:AttackTarget( ent )
 end
 
 function ENT:OnKilled2( info, ragdoll )
-    ragdoll:EmitSound( "crackdown2/npc/freak/freakkill.mp3", 65 )
-    ragdoll:EmitSound( "crackdown2/npc/freak/die" .. random( 1, 7 ) .. ".mp3", 70, 100, 1, CHAN_VOICE )
 
     ragdoll:Ignite( 10 )
+    ragdoll:EmitSound2( "crackdown2/npc/goliath/goliath_die.mp3", 500, 5 )
+
+    ragdoll:SetModelScale( self:GetModelScale(), 0 )
 
     timer.Simple( 2, function()
         if !IsValid( ragdoll ) then return end
@@ -197,45 +202,30 @@ function ENT:CanAttack( ent )
     return ( ( ent:IsCD2NPC() or ent:IsCD2Agent() ) and ent:GetCD2Team() != self:GetCD2Team() or ( ent.cd2_IsBeaconPart and ent:GetOwner():GetIsCharging() ) ) and self:CanSee( ent )
 end
 
-function ENT:Sling()
+function ENT:Swipe()
     if CurTime() < self.cd2_nextattack then return end
 
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_hit.mp3", 500, 5 )
     CD2CreateThread( function()
+        self:PlayGesture( ACT_GMOD_GESTURE_RANGE_ZOMBIE )
 
-        self:PlayGesture( ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE )
-
-        coroutine.wait( 0.3 )
-        if !IsValid( self ) then return end
-
-        self:EmitSound( "crackdown2/npc/freak/freakslingthrow.wav", 70, 100, 1, CHAN_WEAPON )
-
-        for i = 1, 4 do
-            if !IsValid( self ) or !IsValid( self:GetEnemy() ) then return end
-
-            local sling = ents.Create( "cd2_sling" )
-            sling:SetPos( self:GetShootPos() )
-            sling:SetOwner( self )
-            sling:SetDangerLevel( self:GetDangerLevel() )
-            sling:Spawn()
-            sling:ThrowAt( self:GetEnemy():WorldSpaceCenter() + Vector( 0, 0, random( -15, 15 ) * i) + self:GetEnemy():GetVelocity() / 4 )
-
-            if self:GetEnemy().cd2_IsBeaconPart then self:GetEnemy():TakeDamage( 10 * self:GetDangerLevel(), self, self ) end
-            
-            coroutine.wait( 0.1 )
-        end
-
-        
-
+        coroutine.wait( 1 )
+        if !IsValid( self ) or !IsValid( self:GetEnemy() ) or self:GetRangeSquaredTo( self:GetEnemy() ) > ( 60 * 60 ) then return end
+        self:GetEnemy():EmitSound2( "crackdown2/npc/goliath/goliath_beaconhit.mp3", 500, 5 )
+        local info = DamageInfo()
+        info:SetAttacker( self ) 
+        info:SetDamage( 60 ) 
+        info:SetDamageType( DMG_DIRECT )
+        self:GetEnemy():TakeDamageInfo( info )
     end )
-
-    
-
-    self.cd2_nextattack = CurTime() + 3
+    self.cd2_nextattack = CurTime() + 2
 end
 
 local anims = { "zombie_slump_rise_02_fast", "zombie_slump_rise_02_slow", "zombie_slump_rise_01" }
 function ENT:SpawnAnim()
-    self:PlaySequenceAndWait( anims[ random( #anims ) ], speed )
+    self:PlaySequenceAndWait( anims[ random( #anims ) ] )
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 700, 5 )
+    self:PlaySequenceAndWait( "taunt_zombie", 0.5 )
     self:SetState( "MainThink" )
 end
 
@@ -245,9 +235,9 @@ function ENT:MainThink()
 
     --self:PlayVoiceSound( "npc/zombie/zombie_voice_idle" .. random( 1, 14 ) .. ".wav", rand( 3, 10 ) )
 
-    if IsValid( self:GetEnemy() ) and self:GetRangeSquaredTo( self:GetEnemy() ) < ( 700 * 700 ) then
+    if IsValid( self:GetEnemy() ) and self:GetRangeSquaredTo( self:GetEnemy() ) <= ( 60 * 60 ) then
         self:LookTo( self:GetEnemy(), 3 )
-        self:Sling()
+        self:Swipe()
     end
 
     if self.MainThink2 then self:MainThink2() end
@@ -262,11 +252,11 @@ function ENT:MainThink()
         self.cd2_NextIdleWalk = CurTime() + 5
     elseif IsValid( self:GetEnemy() ) then 
        
-        if !self:CanSee( self:GetEnemy() ) or self:GetRangeSquaredTo( self:GetEnemy() ) > ( 700 * 700 ) then
+        if !self:CanSee( self:GetEnemy() ) then
             self.cd2_Goal = self.cd2_EnemyLastKnownPosition
         else
             self:LookTo( self:GetEnemy(), 3 )
-            self.cd2_Goal = nil
+            self.cd2_Goal = self:GetEnemy():GetPos()
             self.cd2_EnemyLastKnownPosition = self:GetEnemy():GetPos()
             self.cd2_CombatTimeout = CurTime() + 10
         end

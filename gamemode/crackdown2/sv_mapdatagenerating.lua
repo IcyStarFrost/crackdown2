@@ -409,7 +409,7 @@ function CD2LoadMapData()
                 marker.cd2_beacon:SetPos( spawnpos )
                 
                 marker.cd2_beacon.cd2_map_isgenerated = true
-                marker.cd2_beacon.cd2_map_id = beaconIDn
+                marker.cd2_beacon.cd2_map_id = beaconID
                 marker.cd2_beacon.cd2_AUgroup = GroupID
         
                 marker.cd2_beacon:SetRandomSoundTrack()
@@ -467,13 +467,15 @@ function CD2LoadMapData()
             local id = tostring( beacondata )
 
             hook.Add( "CD2_PowerNetworkComplete", "crackdown2_networkwatcher" .. id, function( group )
-                if GroupID != beacondata.AUID then return end
-                CD2DebugMessage( "AU Group " .. GroupID .. " power network has been completed!" )
+                if group != beacondata.AUID then return end
+                CD2DebugMessage( "AU Group " .. group .. " power network has been completed!" )
                 hook.Remove( "CD2_PowerNetworkComplete", "crackdown2_networkwatcher" .. id )
 
                 local marker = ents.Create( "cd2_locationmarker" )
                 marker:SetPos( beacondata.pos ) 
                 marker:SetLocationType( "beacon" )
+                au.cd2_map_isgenerated = true
+                au.cd2_map_id = AUID
                 marker.cd2_AUgroup = beacondata.AUID
             
                 CD2PingLocation( nil, beacondata.pos )
@@ -500,7 +502,7 @@ function CD2LoadMapData()
             
                 marker:Spawn()
 
-                CD2DebugMessage( marker, "Created Beacon Marker for AU Group " .. GroupID )
+                CD2DebugMessage( marker, "Created Beacon Marker for AU Group " .. group )
             
                 CD2CreateThread( function()
                     while true do 
@@ -521,8 +523,8 @@ function CD2LoadMapData()
                                     if IsValid( beacon ) and beacon:GetIsDetonated() then count = count + 1 end
                                 end
             
-                                CD2_CurrentBeacon = GroupID + 1
-                                if !KeysToTheCity() then CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", GroupID + 1 ) end
+                                CD2_CurrentBeacon = group + 1
+                                if !KeysToTheCity() then CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", group + 1 ) end
             
                                 coroutine.wait( 7 )
 

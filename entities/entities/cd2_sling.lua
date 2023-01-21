@@ -61,12 +61,12 @@ function ENT:PhysicsCollide( data, collider )
             
     sound.Play( "crackdown2/npc/freak/freakslinghit.wav", self:GetPos(), 70, 100, 1 )
     if IsValid( ent ) then
-        
+
         local info = DamageInfo()
         info:SetAttacker( self )
         info:SetInflictor( self )
-        info:SetDamageType( DMG_ACID )
-        info:SetDamage( 10 * self:GetDangerLevel() )
+        info:SetDamageType( DMG_ACID + DMG_DIRECT )
+        info:SetDamage( 5 * self:GetDangerLevel() )
 
         ent:TakeDamageInfo( info )
         local tbl = {

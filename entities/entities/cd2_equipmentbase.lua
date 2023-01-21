@@ -194,7 +194,7 @@ function ENT:Think()
 
     if IsValid( self:GetThrower() ) or self:GetHadThrower() then
 
-        if !self:Trace( nil, self:GetPos() - Vector( 0, 0, 10 ) ).Hit then
+        if !self:Trace( nil, self:GetPos() - Vector( 0, 0, 40 ) ).Hit then
             self.DelayCurTime = CurTime() + self.DelayTime
         end
 

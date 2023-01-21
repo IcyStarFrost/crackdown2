@@ -251,6 +251,12 @@ function ENT:OnBeamStart()
         self.cd2_curtimeduration = CurTime() + 200
         self.cd2_BeaconChargeStart = CurTime() + 10
 
+        local players = player.GetAll()
+        for i = 1, #players do 
+            local ply = players[ i ]
+            if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2SendTextBoxMessage( ply, "Protect the Beacon" ) end
+        end
+
         if !KeysToTheCity() then
             timer.Simple( 2, function()
                 if !IsValid( self ) then return end
@@ -273,7 +279,7 @@ function ENT:OnBeamStart()
             coroutine.wait( 0.5 )
             if !IsValid( self ) then return end
 
-            if IsValid( self.cd2_beaconmusic ) then self.cd2_beaconmusic:Kill() end
+            if self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:Kill() end
             local first = true
             self.cd2_beaconmusic = CD2StartMusic( self:GetSoundTrack(), 600, false, false, nil, nil, nil, nil, nil, function( chan )
                 if !IsValid( self ) then chan:FadeOut() return end
@@ -344,11 +350,11 @@ function ENT:OnBeaconDestroyed()
         hook.Remove( "HUDPaint", self )
 
 
-        if IsValid( self.cd2_beaconmusic ) then self.cd2_beaconmusic:FadeOut() end
+        if self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:Kill() end
 
         if LocalPlayer():SqrRangeTo( self:GetBeaconPos() ) > ( 2000 * 2000 ) then return end
 
-        self.cd2_beaconmusic = CD2StartMusic( "sound/crackdown2/music/beacondestroyed.mp3", 600 )
+        CD2StartMusic( "sound/crackdown2/music/beacondestroyed.mp3", 605 )
     end
 end
 
@@ -408,7 +414,7 @@ function ENT:BeaconDetonate()
         end )
         CD2CreateThread( function()
 
-            if IsValid( self.cd2_beaconmusic ) then self.cd2_beaconmusic:FadeOut() end
+            if self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:FadeOut() end
 
             CD2StartMusic( "sound/crackdown2/music/beacon_victory.mp3", 605 )
 

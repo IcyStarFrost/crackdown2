@@ -1,9 +1,9 @@
 
 local difficultynpcs = {
     [ 1 ] = { "cd2_freak" },
-    [ 2 ] = { "cd2_freak", "cd2_freakslinger" },
-    [ 3 ] = { "cd2_freak", "cd2_freakslinger" },
-    [ 4 ] = { "cd2_freak", "cd2_freakslinger" },
+    [ 2 ] = { "cd2_freak", "cd2_freak", "cd2_freak", "cd2_freakslinger" },
+    [ 3 ] = { "cd2_freak", "cd2_freak", "cd2_freakslinger" },
+    [ 4 ] = { "cd2_freak", "cd2_freak", "cd2_freakslinger" },
 }
 
 hook.Add( "Tick", "crackdown2_antibeaconfreaks", function()

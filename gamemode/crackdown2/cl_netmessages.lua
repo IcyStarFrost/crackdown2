@@ -442,6 +442,25 @@ net.Receive( "cd2net_freakkill", function()
 
 end )
 
+net.Receive( "cd2net_emitsound2", function()
+    local ent = net.ReadEntity()
+    if !IsValid( ent ) then return end 
+    local path = net.ReadString()
+    local snddist = net.ReadUInt( 32 )
+    local volume = net.ReadFloat()
+    sound.PlayFile( path, "3d mono noplay", function( chan, id, name )
+        if id then return end
+        chan:SetVolume( volume )
+        chan:SetPos( ent:GetPos() )
+        chan:Play()
+
+        hook.Add( "Think", ent, function()  
+            if !IsValid( chan ) or chan:GetState() == GMOD_CHANNEL_STOPPED then hook.Remove( "Think", ent ) return end
+            chan:SetPos( ent:GetPos() )
+        end )
+    end )
+end )
+
 net.Receive( "cd2net_explosion", function()
     local pos = net.ReadVector()
     local scale = net.ReadFloat()

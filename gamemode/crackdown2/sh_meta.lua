@@ -28,6 +28,17 @@ function ENT:SqrRangeTo( pos )
     return self:GetPos():DistToSqr( pos )
 end
 
+if SERVER then
+    function ENT:EmitSound2( path, snddist, volume )
+        net.Start( "cd2net_emitsound2" )
+        net.WriteEntity( self )
+        net.WriteString( "sound/" .. path )
+        net.WriteUInt( snddist or 400, 32 )
+        net.WriteFloat( volume or 1 )
+        net.Broadcast()
+    end
+end
+
 function PLAYER:IsCD2Agent()
     return player_manager.GetPlayerClass( self ) == "cd2_player"
 end

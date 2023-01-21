@@ -428,7 +428,8 @@ function CD2QuickSpawnPeaceKeeperNPC()
 end
 
 function CD2QuickSpawnFreakNPC()
-    local ent = ents.Create( "cd2_freak" )
+    local ent = ents.Create( "cd2_freakslinger" )
+    ent:SetDangerLevel( 1 )
     ent:SetPos( Entity( 1 ):GetEyeTrace().HitPos )
     ent:Spawn()
 end

@@ -32,7 +32,8 @@ if !CD2_Precachedplayermodels then
         "models/player/police.mdl",
         "models/player/combine_soldier.mdl",
         "models/player/combine_super_soldier.mdl",
-        "models/player/zombie_classic.mdl"
+        "models/player/zombie_classic.mdl",
+        "models/player/zombie_fast.mdl"
     }
 
     for i = 1, #precachetable do

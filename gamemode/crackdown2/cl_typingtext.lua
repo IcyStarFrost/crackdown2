@@ -4,6 +4,7 @@ local id = 0
 local white = Color( 255, 255, 255, 255 )
 local topcolor = Color( 255, 255, 255, 255 )
 function CD2SetTypingText( toptext, bottomtext, red )
+    if !GetConVar( "cd2_drawhud" ):GetBool() then return end
     local toptexttbl = string.ToTable( toptext )
     local bottomtexttbl = string.ToTable( bottomtext )
 
@@ -71,7 +72,7 @@ local surface_DrawTexturedRect = surface.DrawTexturedRect
 local draw_DrawText = draw.DrawText
 
 hook.Add( "HUDPaint", "crackdown2_typingtext", function()
-    
+    if !GetConVar( "cd2_drawhud" ):GetBool() then return end
     if CD2_TypingText_Top then
 
         if CD2_TypingText_FlashColor then

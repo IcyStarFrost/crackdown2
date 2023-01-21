@@ -260,7 +260,7 @@ function CD2OpenMainMenu()
         if key and !MenuPanelHolder:IsVisible() then
             surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
             MenuPanelHolder:Show()
-            channel:Kill()
+            channel:FadeOut()
             channel = CD2StartMusic( "sound/crackdown2/music/mainmusic.mp3", 490, true )
 
             local fadepanel = vgui.Create( "DPanel" )

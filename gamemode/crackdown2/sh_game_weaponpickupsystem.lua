@@ -75,6 +75,7 @@ local input_LookupBinding = CLIENT and input.LookupBinding
 local input_GetKeyCode = CLIENT and input.GetKeyCode
 local input_GetKeyName = CLIENT and input.GetKeyName
 hook.Add( "HUDPaint", "crackdown2_pickupweaponpaint", function()
+    if !GetConVar( "cd2_drawhud" ):GetBool() then return end
     local ply = LocalPlayer()
     local wep = ply:GetNW2Entity( "cd2_targetweapon", nil )
     local render = ply:GetNW2Float( "cd2_weapondrawcur", 0 )
@@ -93,6 +94,7 @@ end )
 -- For cd2_equipmentbase.lua
 
 hook.Add( "HUDPaint", "crackdown2_pickupequipmentpaint", function()
+    if !GetConVar( "cd2_drawhud" ):GetBool() then return end
     local ply = LocalPlayer()
     local equipment = ply:GetNW2Entity( "cd2_targetequipment", nil )
     local render = ply:GetNW2Float( "cd2_equipmentdrawcur", 0 )

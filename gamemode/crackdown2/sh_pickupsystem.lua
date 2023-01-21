@@ -124,6 +124,7 @@ if CLIENT then
     local input_GetKeyName = input.GetKeyName
 
     hook.Add( "HUDPaint", "crackdown2_pickupprompt", function()
+        if !GetConVar( "cd2_drawhud" ):GetBool() then return end
         local ply = LocalPlayer()
 
         local targ = ply:GetNW2Entity( "cd2_pickuptarget", nil )

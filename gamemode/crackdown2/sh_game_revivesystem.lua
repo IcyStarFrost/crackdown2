@@ -46,6 +46,7 @@ if !game.SinglePlayer() and CLIENT then
     end )
 
     hook.Add( "HUDPaint", "crackdown2_revivepaint", function()
+        if !GetConVar( "cd2_drawhud" ):GetBool() then return end
         local targ = LocalPlayer().cd2_revivetarget
         if !IsValid( targ ) or !targ:GetRagdollOwner():GetCanRevive() then return end
 

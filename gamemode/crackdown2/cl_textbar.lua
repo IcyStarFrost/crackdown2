@@ -8,6 +8,7 @@ local linecol = Color( 61, 61, 61, 100 )
 
 
 function CD2SetTextBoxText( txt )
+    if !GetConVar( "cd2_drawhud" ):GetBool() then return end
     CD2_CurrentTextBoxText = txt
 end
 

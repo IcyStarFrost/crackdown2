@@ -22,9 +22,9 @@ ENT.cd2_holdtypetranslations = {
 
     [ "normal" ] = {
         idle = ACT_HL2MP_IDLE_ZOMBIE,
-        walk = ACT_HL2MP_RUN_MELEE,
-        run = ACT_HL2MP_RUN_MELEE,
-        jump = ACT_HL2MP_JUMP_MELEE,
+        walk = ACT_HL2MP_RUN,
+        run = ACT_HL2MP_RUN,
+        jump = ACT_HL2MP_JUMP_ZOMBIE,
         crouch = ACT_HL2MP_IDLE_CROUCH_ZOMBIE,
         crouchwalk = ACT_HL2MP_WALK_CROUCH_ZOMBIE,
         reload = ACT_HL2MP_GESTURE_RELOAD_ZOMBIE,
@@ -43,7 +43,7 @@ ENT.cd2_NextIdleWalk = 0
 local math_max = math.max
 
 function ENT:ModelGet()
-    return "models/player/zombie_classic.mdl"
+    return "models/player/zombie_fast.mdl"
 end
 
 local random = math.random
@@ -58,6 +58,8 @@ function ENT:Initialize2()
         net.WriteVector( self:WorldSpaceCenter() )
         net.WriteBool( false  )
         net.Broadcast()
+
+        self:SetDangerLevel( math.Clamp( CD2GetBeaconDifficulty(), 1, 3 ) )
 
         self:Hook( "EntityEmitSound", "hearing", function( snddata )
             if IsValid( self:GetEnemy() ) then return end
@@ -77,6 +79,9 @@ function ENT:Initialize2()
     if SERVER then self.cd2_Path = Path( "Follow" ) self.loco:SetAcceleration( 2000 ) end
 end
 
+function ENT:SetupDataTables2()
+    self:NetworkVar( "Int", 1, "DangerLevel" )
+end
 
 function ENT:PlayGesture( act )
     self.cd2_Gesture = act
@@ -199,19 +204,20 @@ function ENT:Sling()
 
         self:PlayGesture( ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE )
 
-        coroutine.wait( 0.5 )
+        coroutine.wait( 0.3 )
         if !IsValid( self ) then return end
 
         self:EmitSound( "crackdown2/npc/freak/freakslingthrow.wav", 70, 100, 1, CHAN_WEAPON )
 
         for i = 1, 4 do
-            if !IsValid( self ) then return end
+            if !IsValid( self ) or !IsValid( self:GetEnemy() ) then return end
 
             local sling = ents.Create( "cd2_sling" )
             sling:SetPos( self:GetShootPos() )
             sling:SetOwner( self )
+            sling:SetDangerLevel( self:GetDangerLevel() )
             sling:Spawn()
-            sling:ThrowAt( self:GetEnemy() )
+            sling:ThrowAt( self:GetEnemy():WorldSpaceCenter() + Vector( 0, 0, random( -15, 15 ) * i) + self:GetEnemy():GetVelocity() / 4 )
             
             coroutine.wait( 0.1 )
         end
@@ -233,7 +239,7 @@ function ENT:MainThink()
 
     --self:PlayVoiceSound( "npc/zombie/zombie_voice_idle" .. random( 1, 14 ) .. ".wav", rand( 3, 10 ) )
 
-    if IsValid( self:GetEnemy() ) and self:CanAttack( self:GetEnemy() ) then
+    if IsValid( self:GetEnemy() ) and self:GetRangeSquaredTo( self:GetEnemy() ) < ( 700 * 700 ) then
         self:LookTo( self:GetEnemy(), 3 )
         self:Sling()
     end
@@ -250,7 +256,7 @@ function ENT:MainThink()
         self.cd2_NextIdleWalk = CurTime() + 5
     elseif IsValid( self:GetEnemy() ) then 
        
-        if !self:CanSee( self:GetEnemy() ) then
+        if !self:CanSee( self:GetEnemy() ) or self:GetRangeSquaredTo( self:GetEnemy() ) > ( 700 * 700 ) then
             self.cd2_Goal = self.cd2_EnemyLastKnownPosition
         else
             self:LookTo( self:GetEnemy(), 3 )

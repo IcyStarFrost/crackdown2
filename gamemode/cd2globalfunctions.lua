@@ -186,6 +186,23 @@ function CD2GetTacticalLocationDifficulty()
     return difficulty
 end
 
+-- Returns a difficulty number depending on the active beacon count
+function CD2GetBeaconDifficulty()
+    local count = CD2_BeaconCount
+    local beacons = ents.FindByClass( "cd2_beacon" )
+    local difficulty = 1
+
+    if #beacons >= count * 0.6 then
+        difficulty = 4
+    elseif #beacons >= count * 0.4 then
+        difficulty = 3
+    elseif #beacons >= count * 0.2 then
+        difficulty = 2
+    end
+    
+    return difficulty
+end
+
 -- Removes all NPCs
 function CD2ClearNPCS()
     local ents_ = ents.FindByClass( "cd2_*" )

@@ -332,6 +332,8 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         return 
     end
 
+    if !GetConVar( "cd2_drawhud" ):GetBool() then RemoveHUDpanels() return end 
+
     -- Crosshair --
     if CD2_DrawTargetting then
         draw.NoTexture()

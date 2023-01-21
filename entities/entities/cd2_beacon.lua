@@ -113,6 +113,7 @@ function ENT:Initialize()
         local lasthealth = 100
 
         hook.Add( "HUDPaint", self, function() 
+            if !GetConVar( "cd2_drawhud" ):GetBool() then return end
             if self:GetIsDetonated() then hook.Remove( "HUDPaint", self ) return end
             if !LocalPlayer():IsCD2Agent() or LocalPlayer():SqrRangeTo( self ) > ( 2000 * 2000 ) or !self.truedur or !self:GetIsCharging() then return end
             curtimed = curtimed or CurTime()
@@ -409,7 +410,7 @@ function ENT:BeaconDetonate()
 
             if IsValid( self.cd2_beaconmusic ) then self.cd2_beaconmusic:FadeOut() end
 
-            CD2StartMusic( "sound/crackdown2/music/beacon_victory.mp3", 600 )
+            CD2StartMusic( "sound/crackdown2/music/beacon_victory.mp3", 605 )
 
             CD2_PreventMovement = true
             CD2_DrawAgilitySkill = false

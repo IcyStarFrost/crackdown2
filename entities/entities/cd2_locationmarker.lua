@@ -63,6 +63,7 @@ function ENT:Initialize()
         local cell = Material( "crackdown2/ui/cell.png", "smooth" )
 
         hook.Add( "HUDPaint", self, function()
+            if !GetConVar( "cd2_drawhud" ):GetBool() then return end
             local ply = LocalPlayer()
             local currentlocation = ply:GetNW2Entity( "cd2_targettacticlelocation", nil )
 

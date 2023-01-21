@@ -20,6 +20,7 @@ function ENT:Initialize()
         self.cd2_hasfiredbeam = false
         
         hook.Add( "HUDPaint", self, function()
+            if !GetConVar( "cd2_drawhud" ):GetBool() then return end
             if self:GetActive() or self:SqrRangeTo( LocalPlayer() ) > ( 300 * 300 ) then return end
         
             -- Base

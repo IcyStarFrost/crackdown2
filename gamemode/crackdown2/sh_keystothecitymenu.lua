@@ -397,12 +397,30 @@ if CLIENT then
             net.WriteBool( pnl:GetValue() )
             net.SendToServer()
         end )
-
+        
         AddOption( "Freeze Time", "global", "Check", { default = false }, function( pnl )
             pnl:SetValue( !pnl:GetValue() )
             net.Start( "cd2net_kttc_freezetime" )
             net.WriteBool( pnl:GetValue() )
             net.SendToServer()
+        end )
+
+        AddOption( "Free Cam", "global", "Check", { default = false }, function( pnl )
+            pnl:SetValue( !pnl:GetValue() )
+            CD2_FreeCamMode = pnl:GetValue()
+        end )
+
+        AddOption( "Hide HUD", "global", "Check", { default = false }, function( pnl )
+            pnl:SetValue( !pnl:GetValue() )
+            CD2_HideKTTCMenu = !pnl:GetValue()
+
+            if pnl:GetValue() then
+                CD2_KeysToTheCityMenu:SetPos( -10000, -100000 )
+            else
+                CD2_KeysToTheCityMenu:SetPos( ScrW() - 400, ScrH() - 450 )
+            end
+
+            GetConVar( "cd2_drawhud" ):SetBool( !pnl:GetValue() )
         end )
         
         AddOption( "Empty Streets", "global", "Check", { default = false }, function( pnl )

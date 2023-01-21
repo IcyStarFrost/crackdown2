@@ -145,7 +145,7 @@ function CD2GenerateMapData( randomize )
         
             local result = Trace( tracetable )
 
-            if result.HitPos:DistToSqr( pos ) < 500 then continue end
+            if result.HitPos:DistToSqr( pos ) < ( 500 * 500 ) then continue end
 
             tbl.beaconspawnpos = result.HitPos - Vector( 0, 0, 130 )
             tbl.pos = pos 

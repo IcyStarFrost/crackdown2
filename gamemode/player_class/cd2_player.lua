@@ -78,6 +78,46 @@ function PLAYER:Init()
 
     self.Player:SetNWShields( 100 )
     self.Player:SetNWHealth( 100 )
+
+    if CLIENT then
+
+        -- XP --
+
+        self.Player:NetworkVarNotify( "AgilityXP", function( ply, name, old, new )
+            CD2FILESYSTEM:WritePlayerData( "cd2_skillxp_Agility", new )
+        end )
+
+        self.Player:NetworkVarNotify( "WeaponXP", function( ply, name, old, new )
+            CD2FILESYSTEM:WritePlayerData( "cd2_skillxp_Weapon", new )
+        end )
+
+        self.Player:NetworkVarNotify( "StrengthXP", function( ply, name, old, new )
+            CD2FILESYSTEM:WritePlayerData( "cd2_skillxp_Strength", new )
+        end )
+
+        self.Player:NetworkVarNotify( "ExplosiveXP", function( ply, name, old, new )
+            CD2FILESYSTEM:WritePlayerData( "cd2_skillxp_Explosive", new )
+        end )
+
+
+        -- Levels --
+
+        self.Player:NetworkVarNotify( "AgilitySkill", function( ply, name, old, new )
+            CD2FILESYSTEM:WritePlayerData( "cd2_skill_Agility", new )
+        end )
+
+        self.Player:NetworkVarNotify( "WeaponSkill", function( ply, name, old, new )
+            CD2FILESYSTEM:WritePlayerData( "cd2_skill_Weapon", new )
+        end )
+
+        self.Player:NetworkVarNotify( "StrengthSkill", function( ply, name, old, new )
+            CD2FILESYSTEM:WritePlayerData( "cd2_skill_Strength", new )
+        end )
+
+        self.Player:NetworkVarNotify( "ExplosiveSkill", function( ply, name, old, new )
+            CD2FILESYSTEM:WritePlayerData( "cd2_skill_Explosive", new )
+        end )
+    end
 end
 
 function PLAYER:Spawn()

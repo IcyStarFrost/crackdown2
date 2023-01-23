@@ -43,7 +43,7 @@ function ENT:Initialize()
         self.RingMid:SetParent( self.Ring )
 
         self:SetEmitter( self.RingMid )
-        self:SetBeaconHealth( 200 )
+        self:SetBeaconHealth( 100 )
         self:SetCore( self.Core )
 
         self.cd2_currentlerp = 0
@@ -63,10 +63,10 @@ function ENT:Initialize()
             net.Broadcast()
         end )
         
-        hook.Add( "EntityTakeDamage", self, function( self, ent, info )
-            if !self:GetIsCharging() or ent:GetOwner() != self or ( info:GetAttacker():IsCD2Agent() or info:GetAttacker():IsCD2NPC() ) and info:GetAttacker():GetCD2Team() != "freak" then return end
-            self:SetBeaconHealth( self:GetBeaconHealth() - ( info:GetDamage() / 20 ) )
-            self:EmitSound( "physics/metal/metal_box_impact_bullet" .. random( 1, 3 ) .. ".wav", 80, 100, 1 )
+        hook.Add( "EntityTakeDamage", self, function( selfent, ent, info )
+            if self:GetIsCharging() and ( ent.cd2_IsBeaconPart and ent:GetOwner() == self or ent == self ) and info:GetAttacker():IsCD2NPC() and info:GetAttacker():GetCD2Team() == "freak" then
+                self:OnBeaconTakeDamage( info )
+            end
         end )
 
     elseif CLIENT then 
@@ -169,7 +169,7 @@ function ENT:Initialize()
             surface.SetDrawColor( linecol )
             surface.DrawOutlinedRect( ScrW() - 345,  50, 290, 20, 1 )
 
-            local healthW = ( self:GetBeaconHealth() / 200 ) * 280
+            local healthW = ( self:GetBeaconHealth() / 100 ) * 280
         
             -- Beacon Health Bar
             surface.SetDrawColor( orangeish )
@@ -189,6 +189,20 @@ function ENT:Initialize()
         end )
 
     end
+end
+
+local difficultydividers = {
+    [ 1 ] = 20,
+    [ 2 ] = 20,
+    [ 3 ] = 30,
+    [ 4 ] = 30,
+}
+
+
+function ENT:OnBeaconTakeDamage( info )
+    self:EmitSound( "physics/metal/metal_box_impact_bullet" .. random( 1, 3 ) .. ".wav", 80, 100, 1 ) 
+    local divide = difficultydividers[ CD2GetBeaconDifficulty() ]
+    self:SetBeaconHealth( self:GetBeaconHealth() - ( info:GetDamage() / divide ) )
 end
 
 function ENT:SetupDataTables()

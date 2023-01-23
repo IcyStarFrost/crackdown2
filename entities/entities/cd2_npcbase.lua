@@ -505,6 +505,7 @@ function ENT:PlaySequenceAndWait( name, speed )
 	coroutine.wait( len / speed )
 
     self.cd2_dontupdateanims = false
+    self:StartActivity( self:GetActivity() )
 
 end
 

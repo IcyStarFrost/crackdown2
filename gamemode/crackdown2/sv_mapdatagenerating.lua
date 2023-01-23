@@ -4,7 +4,7 @@ local Trace = util.TraceLine
 local tracetable = {}
 
 -- Generates Map data by using the Navigation Mesh
-function CD2GenerateMapData( randomize )
+function CD2GenerateMapData( randomize, agencystart )
 
     CD2CreateThread( function()
 
@@ -210,7 +210,7 @@ function CD2GenerateMapData( randomize )
                 location:SetIsBeginningLocation( assignfirstlocation )
                 if assignfirstlocation then SetGlobal2Vector( "cd2_beginnerlocation", location:GetPos() ) end
 
-                location:SetLocationType( KeysToTheCity() and assignfirstlocation and "agency" or "cell" )
+                location:SetLocationType( ( KeysToTheCity() or agencystart ) and assignfirstlocation and "agency" or "cell" )
                 location:Spawn()
 
                 if assignfirstlocation then CD2_BeginnerLocation = location CD2DebugMessage( "Assigned beginning location to " .. location.cd2_map_id ) end
@@ -226,7 +226,7 @@ function CD2GenerateMapData( randomize )
         -- First Beacon --
         local pos = GetGlobal2Vector( "cd2_beginnerlocation" )
 
-        if !KeysToTheCity() then
+        if !KeysToTheCity() or !agencystart then
             CD2_Firstbeacon = ents.Create( "cd2_beacon" )
             CD2_Firstbeacon:SetPos( CD2GetRandomPos( 1000, pos )  )
             CD2_Firstbeacon:Spawn()

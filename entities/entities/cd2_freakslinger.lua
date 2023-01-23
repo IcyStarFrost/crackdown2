@@ -219,7 +219,7 @@ function ENT:Sling()
             sling:Spawn()
             sling:ThrowAt( self:GetEnemy():WorldSpaceCenter() + Vector( 0, 0, random( -15, 15 ) * i) + self:GetEnemy():GetVelocity() / 4 )
 
-            if self:GetEnemy().cd2_IsBeaconPart then self:GetEnemy():TakeDamage( 10 * self:GetDangerLevel(), self, self ) end
+            if self:GetEnemy().cd2_IsBeaconPart then self:GetEnemy():TakeDamage( 5 * self:GetDangerLevel(), self, self ) end
             
             coroutine.wait( 0.1 )
         end

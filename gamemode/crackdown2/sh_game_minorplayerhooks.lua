@@ -102,6 +102,9 @@ end
 
 
 if CLIENT then
+
+
+
     local limit = false
 
     local actcommands = {
@@ -215,6 +218,28 @@ if SERVER then
             net.WriteVector( ply:WorldSpaceCenter() )
             net.WriteBool( vel >= 1000  )
             net.Broadcast()
+
+            if vel >= 1000 then
+                local near = CD2FindInSphere( ply:GetPos(), 200, function( ent ) return ent != ply end )
+
+                for i = 1, #near do
+                    local ent = near[ i ]
+                    if !IsValid( ent ) then return end
+                    local force = ent:IsCD2NPC() and 20000 or IsValid( hitphys ) and hitphys:GetMass() * 50 or 20000
+                    local info = DamageInfo()
+                    info:SetAttacker( ply )
+                    info:SetInflictor( ply )
+                    info:SetDamage( 100 + vel / 10 )
+                    info:SetDamageType( DMG_FALL )
+                    info:SetDamageForce( ( ent:WorldSpaceCenter() - ply:GetPos() ):GetNormalized() * force )
+                    info:SetDamagePosition( ply:GetPos() )
+                    ent:TakeDamageInfo( info )
+                end
+
+                net.Start( "cd2net_playergroundpound" )
+                net.WriteVector( ply:GetPos() )
+                net.Broadcast()
+            end
 
             sound_Play( "crackdown2/ply/hardland" .. random( 1, 2 ) .. ".wav", ply:GetPos(), 65, 100, 1 )
         else

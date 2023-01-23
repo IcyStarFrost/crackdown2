@@ -4,9 +4,10 @@ ENT.Base = "cd2_npcbase"
 ENT.PrintName = "Goliath"
 
 if CLIENT then language.Add( "cd2_goliath", "Goliath" ) end
+if SERVER then util.AddNetworkString( "cd2net_goliathkill" ) end
 
 -- NPC Stats
-ENT.cd2_Health = 1000 -- The health the NPC has
+ENT.cd2_Health = 3000 -- The health the NPC has
 ENT.cd2_Team = "freak" -- The Team the NPC will be in. It will attack anything that isn't on its team
 ENT.cd2_SightDistance = 2000 -- How far this NPC can see
 ENT.cd2_Weapon = "none" -- The weapon this NPC will have
@@ -15,8 +16,9 @@ ENT.cd2_RunSpeed = 400 -- Run speed
 ENT.cd2_WalkSpeed = 100 -- Walk speed
 ENT.cd2_CrouchSpeed = 60 -- Crouch speed
 ENT.cd2_damagedivider = 1 -- The amount we should divide damage caused by this npc
-ENT.cd2_maxskillorbs = 20 -- The max amount of skill orbs the player can get out of this NPC when they kill it
+ENT.cd2_maxskillorbs = 30 -- The max amount of skill orbs the player can get out of this NPC when they kill it
 ENT.cd2_IsRanged = false -- If this freak is ranged
+ENT.cd2_NoHeadShot = true -- This NPC can not be targetted in the head
 --
 
 ENT.cd2_holdtypetranslations = {
@@ -57,10 +59,11 @@ function ENT:Initialize2()
     if SERVER then
         net.Start( "cd2net_playerlandingdecal" )
         net.WriteVector( self:WorldSpaceCenter() )
-        net.WriteBool( false  )
+        net.WriteBool( true )
         net.Broadcast()
 
-        self:SetModelScale( 5, 0 )
+        self:SetModelScale( 3, 0 )
+        self:SetPos( self:GetPos() + Vector( 0, 0, 50 ))
 
         self:Hook( "EntityEmitSound", "hearing", function( snddata )
             if IsValid( self:GetEnemy() ) then return end
@@ -73,8 +76,10 @@ function ENT:Initialize2()
             self.cd2_Goal = isentity( pos ) and pos:GetPos() or pos
             if pos and chan == CHAN_WEAPON then self:LookTo( pos, 3 ) end
         end )
-
+        
         sound_Play( "crackdown2/ply/hardland" .. random( 1, 2 ) .. ".wav", self:GetPos(), 65, 100, 1 )
+
+        self.loco:SetStepHeight( 100 )
     end
 
     if SERVER then self.cd2_Path = Path( "Follow" ) self.loco:SetAcceleration( 2000 ) end
@@ -92,7 +97,7 @@ function ENT:BehaveUpdate( fInterval )
 
     if self.cd2_Gesture then
         local id = self:AddGesture( self.cd2_Gesture, true )
-        self:SetLayerPlaybackRate( id, 0.7 )
+        self:SetLayerPlaybackRate( id, 1 )
         self.cd2_Gesture = nil
     end
 
@@ -121,7 +126,7 @@ end
 function ENT:OnInjured2( info ) 
     local attacker = info:GetAttacker()
 
-    if self:GetEnemy().cd2_IsBeaconPart then return end
+    if self:GetEnemy().cd2_IsBeaconPart or self:GetEnemy():GetClass() == "cd2_beacon" then return end
 
     if ( ( attacker:IsCD2NPC() or attacker:IsCD2Agent() ) and attacker:GetCD2Team() != self:GetCD2Team() ) then
         self:AttackTarget( attacker )
@@ -134,20 +139,18 @@ function ENT:AttackTarget( ent )
     self.cd2_CombatTimeout = CurTime() + 10
 end
 
-function ENT:OnKilled2( info, ragdoll )
+function ENT:OnKilled( info )
 
-    ragdoll:Ignite( 10 )
-    ragdoll:EmitSound2( "crackdown2/npc/goliath/goliath_die.mp3", 500, 5 )
+    self:Ignite( 10000 )
 
-    ragdoll:SetModelScale( self:GetModelScale(), 0 )
+    self:RemoveAllHooks()
 
-    timer.Simple( 2, function()
-        if !IsValid( ragdoll ) then return end
-        net.Start( "cd2net_freakkill", true )
-        net.WriteVector( ragdoll:GetPos() )
-        net.Broadcast()
-        ragdoll:Remove()
-    end )
+    CD2AssessSkillGainOrbs( self, self.cd2_loggeddamage )
+
+    hook.Run( "OnCD2NPCKilled", self, info )
+
+    self:SetState( "DieSequence" )
+
 end
 
 
@@ -205,28 +208,41 @@ end
 function ENT:Swipe()
     if CurTime() < self.cd2_nextattack then return end
 
-    self:EmitSound2( "crackdown2/npc/goliath/goliath_hit.mp3", 500, 5 )
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_hit.mp3", 10000, 5 )
     CD2CreateThread( function()
         self:PlayGesture( ACT_GMOD_GESTURE_RANGE_ZOMBIE )
 
         coroutine.wait( 1 )
-        if !IsValid( self ) or !IsValid( self:GetEnemy() ) or self:GetRangeSquaredTo( self:GetEnemy() ) > ( 60 * 60 ) then return end
-        self:GetEnemy():EmitSound2( "crackdown2/npc/goliath/goliath_beaconhit.mp3", 500, 5 )
+        if !IsValid( self ) or !IsValid( self:GetEnemy() ) or self:GetRangeSquaredTo( self:GetEnemy() ) > ( 200 * 200 ) then return end
+        self:GetEnemy():EmitSound2( "crackdown2/npc/goliath/goliath_beaconhit.mp3", 10000, 10 )
         local info = DamageInfo()
         info:SetAttacker( self ) 
-        info:SetDamage( 60 ) 
+        info:SetDamage( 40 ) 
         info:SetDamageType( DMG_DIRECT )
         self:GetEnemy():TakeDamageInfo( info )
     end )
-    self.cd2_nextattack = CurTime() + 2
+    self.cd2_nextattack = CurTime() + 1.5
 end
 
 local anims = { "zombie_slump_rise_02_fast", "zombie_slump_rise_02_slow", "zombie_slump_rise_01" }
 function ENT:SpawnAnim()
-    self:PlaySequenceAndWait( anims[ random( #anims ) ] )
-    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 700, 5 )
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 10000, 10 )
+    self:PlaySequenceAndWait( anims[ random( #anims ) ], 0.7 )
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 10000, 10 )
     self:PlaySequenceAndWait( "taunt_zombie", 0.5 )
+    if self:GetState() == "DieSequence" then return end
     self:SetState( "MainThink" )
+end
+
+function ENT:DieSequence()
+    self:LookTo()
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_die.mp3", 10000, 10 )
+    --sound.Play( "crackdown2/npc/goliath/goliath_die.mp3", self:GetPos(), 100, 1 )
+    self:PlaySequenceAndWait( "death_04", 0.5 )
+    net.Start( "cd2net_goliathkill", true )
+    net.WriteVector( self:GetPos() )
+    net.Broadcast()
+    self:Remove()
 end
 
 function ENT:MainThink()
@@ -241,6 +257,15 @@ function ENT:MainThink()
     end
 
     if self.MainThink2 then self:MainThink2() end
+
+    if !self.loco:GetVelocity():IsZero() and ( !self.cd2_stepcooldown or CurTime() > self.cd2_stepcooldown ) then
+        sound.Play( "crackdown2/npc/goliath/goliath_step" .. random( 1, 3 ) .. ".mp3", self:GetPos(), 90, 100, 1 )
+        net.Start( "cd2net_explosion" )
+        net.WriteVector( self:GetPos() )
+        net.WriteFloat( 0.8 )
+        net.Broadcast()
+        self.cd2_stepcooldown = CurTime() + 0.4
+    end
 
     if IsValid( self:GetEnemy() ) and CurTime() > self.cd2_CombatTimeout then self:SetEnemy( NULL ) end
     
@@ -273,4 +298,40 @@ function ENT:MainThink()
     if self.cd2_Goal then
         self:ControlMovement( self.cd2_Goal, IsValid( self:GetEnemy() ) and math_max( 0.3, 0.3 * ( self.cd2_Path:GetLength() / 400 ) ) or 4 )
     end
+end
+
+
+if CLIENT then
+    local flame = Material( "crackdown2/effects/flamelet1.png", "smooth" )
+    net.Receive( "cd2net_goliathkill", function()
+        local pos = net.ReadVector()
+
+        sound.Play( "ambient/fire/gascan_ignite1.wav", pos, 90, 100, 1 )
+        local particle = ParticleEmitter( pos )
+        for i = 1, 80 do
+
+            local part = particle:Add( "particle/SmokeStack", pos )
+
+            if part then
+                part:SetStartSize( 70 )
+                part:SetEndSize( 70 ) 
+                part:SetStartAlpha( 255 )
+                part:SetEndAlpha( 0 )
+
+                part:SetColor( 255, 255, 50 )
+                part:SetLighting( false )
+                part:SetCollide( false )
+
+                part:SetDieTime( 2 )
+                part:SetGravity( Vector( 0, 0, -80 ) )
+                part:SetAirResistance( 200 )
+                part:SetVelocity( Vector( random( -1000, 1000 ), random( -1000, 1000 ), random( -1000, 1000 ) ) )
+                part:SetAngleVelocity( AngleRand( -1, 1 ) )
+            end
+
+        end
+
+        particle:Finish()
+
+    end )
 end

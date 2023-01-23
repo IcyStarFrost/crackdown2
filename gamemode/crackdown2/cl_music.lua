@@ -115,7 +115,7 @@ function CD2StartMusic( path, priority, looped, killonpriorityfade, overridevolu
         hook.Add( "Think", "crackdown2_musicsystem" .. id, function()
             if !CD2Musicchannel:IsValid() then hook.Remove( "Think", "crackdown2_musicsystem" .. id ) return end
 
-            if func then func( CD2Musicchannel ) end
+            if func and !CD2Musicchannel.cd2_shouldfade then func( CD2Musicchannel ) end
 
             if CD2MusicChannelMeta:IsPaused() then if snd:GetState() != GMOD_CHANNEL_PLAYING then snd:Pause() end return end
 

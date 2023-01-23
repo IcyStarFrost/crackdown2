@@ -66,7 +66,7 @@ function ENT:PhysicsCollide( data, collider )
         info:SetAttacker( self )
         info:SetInflictor( self )
         info:SetDamageType( DMG_ACID + DMG_DIRECT )
-        info:SetDamage( 5 * self:GetDangerLevel() )
+        info:SetDamage( 3 * self:GetDangerLevel() )
 
         ent:TakeDamageInfo( info )
         local tbl = {

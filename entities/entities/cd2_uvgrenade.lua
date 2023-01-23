@@ -8,7 +8,7 @@ ENT.Cooldown = 1
 ENT.MaxGrenadeCount = 8
 ENT.TrailColor = Color( 0 ,153, 255 )
 ENT.DelayTime = 1 -- The time before the grenade blows up. 0 for no timed explosive
-ENT.TickSound = "crackdown2/weapons/fragtick.mp3"
+ENT.TickSound = "buttons/button18.wav"
 
 ENT.DropMenu_SkillLevel = 2
 ENT.DropMenu_Damage = 2
@@ -40,10 +40,14 @@ function ENT:OnDelayEnd()
             blast:SetDamageType( DMG_BLAST + DMG_SHOCK )
             blast:SetDamagePosition( self:GetPos() )
 
+            if v:GetClass() == "cd2_goliath" then
+                blast:SetDamage( 300 )
+            end
+
             v:TakeDamageInfo( blast )
         end
-        sound.Play( "ambient/levels/labs/electric_explosion" .. random( 1, 5 ) .. ".wav", self:GetPos(), 80, 100, 1 )
-        sound.Play( "ambient/explosions/explode_7.wav", self:GetPos(), 80, 100, 1 )
+        sound.Play( "ambient/levels/labs/electric_explosion" .. random( 1, 5 ) .. ".wav", self:GetPos(), 90, 100, 1 )
+        sound.Play( "ambient/explosions/explode_7.wav", self:GetPos(), 90, 100, 1 )
 
         net.Start( "cd2net_uvgrenadeexplode" )
         net.WriteVector( self:GetPos() )
@@ -77,7 +81,7 @@ function ENT:OnDelayEnd()
 end
 
 if CLIENT then
-    local energy = Material( "crackdown2/effects/energy.png" )
+    local energy = Material( "crackdown2/effects/energy.png", "smooth" )
 
     net.Receive( "cd2net_uvgrenadeexplode", function()
         local pos = net.ReadVector()

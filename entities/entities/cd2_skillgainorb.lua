@@ -29,6 +29,7 @@ function ENT:Initialize()
 
     self.cd2_first = true
     self.cd2_SeekPlayer = false
+    self.cd2_seekspeed = 3
 
     ztrace.start = self:GetPos()
     ztrace.endpos = self:GetPos() - Vector( 0, 0, 100000 )
@@ -36,7 +37,7 @@ function ENT:Initialize()
     ztrace.collisiongroup = COLLISION_GROUP_WORLD
     local result = Trace( ztrace )
 
-    self.cd2_TargetZ = result.HitPos[ 3 ]
+    self.cd2_TargetZ = result.HitPos[ 3 ] + 10
 
     self:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
 
@@ -136,7 +137,8 @@ function ENT:Think()
     end
 
     if self.cd2_SeekPlayer and IsValid( self:GetPlayer() ) then
-        self:SetPos( self:GetPos() + ( self:GetPlayer():WorldSpaceCenter() - self:GetPos() ):GetNormalized() * 10 )
+        self.cd2_seekspeed = Lerp( 0.2 * FrameTime(), self.cd2_seekspeed, 30 )
+        self:SetPos( self:GetPos() + ( self:GetPlayer():WorldSpaceCenter() - self:GetPos() ):GetNormalized() * self.cd2_seekspeed )
 
         if self:GetPos():DistToSqr( self:GetPlayer():WorldSpaceCenter() ) <= ( 10 * 10 ) then
             self:Remove()

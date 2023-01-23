@@ -47,6 +47,12 @@ function ENT:ModelGet()
     return "models/player/zombie_classic.mdl"
 end
 
+local freaktypes = {
+    { dmgmult = 1, scale = 1, health = 75 }, -- Normal
+    { dmgmult = 2, scale = 1.3, health = 150 }, -- Big Freak
+    { dmgmult = 0.8, scale = 0.8, health = 50 } -- Small Freak
+}
+
 local random = math.random
 local sound_Play = sound.Play
 local rand = math.Rand 
@@ -60,9 +66,12 @@ function ENT:Initialize2()
         net.WriteBool( false  )
         net.Broadcast()
 
-        self:SetModelScale( math.Rand( 0.7, 1.4 ), 0 )
+        self.cd2_freaktype = freaktypes[ random( 1, 3 ) ]
 
-        self:SetHealth( 75 + ( 5 * self:GetModelScale() ) )
+        self:SetModelScale( self.cd2_freaktype.scale, 0 )
+
+        self:SetHealth( self.cd2_freaktype.health )
+        self:SetMaxHealth( self.cd2_freaktype.health )
 
         self:Hook( "EntityEmitSound", "hearing", function( snddata )
             if IsValid( self:GetEnemy() ) then return end
@@ -210,7 +219,7 @@ function ENT:Swipe()
         self:GetEnemy():EmitSound( "npc/zombie/claw_strike" .. random( 1, 3 ) .. ".wav", 70, 100, 1, CHAN_WEAPON )
         local info = DamageInfo()
         info:SetAttacker( self ) 
-        info:SetDamage( 10 + ( 5 * self:GetModelScale() ) ) 
+        info:SetDamage( 10 * self.cd2_freaktype.dmgmult ) 
         info:SetDamageType( DMG_DIRECT )
         self:GetEnemy():TakeDamageInfo( info )
     end )

@@ -161,7 +161,7 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
             local trail2 = util.SpriteTrail( ply, ply:LookupAttachment( "anim_attachment_LH"), red, true, 20, 0, 1.5, 1 / ( 20 + 0 ) * 0.5, "trails/laser" )
 
             while !ply:IsOnGround() do
-                ply:SetVelocity( Vector( 0, 0, -10 ) )
+                ply:SetVelocity( Vector( 0, 0, -20 ) )
                 coroutine.yield()
             end
 

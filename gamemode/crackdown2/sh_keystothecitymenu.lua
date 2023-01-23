@@ -541,7 +541,7 @@ elseif SERVER then
         beacon:SetRandomSoundTrack()
         beacon:Spawn()
 
-        timer.Simple( 0.1, function() beacon:DropBeacon() end )
+        timer.Simple( 0.3, function() beacon:DropBeacon() end )
     end )
 
     net.Receive( "cd2net_kttc_emptystreets", function( len, ply )

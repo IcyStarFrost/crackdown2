@@ -16,6 +16,7 @@ local chargecol = Color( 0, 110, 255 )
 local beaconiconcol = Color( 0, 110, 255 )
 local beaconblue = Color( 0, 217, 255 )
 local beam = Material( "crackdown2/effects/beam.png", "smooth" )
+local FreakIcon = Material( "crackdown2/ui/freak.png", "smooth" )
 
 
 local glow = Material( "crackdown2/ui/skillglow2.png" )
@@ -42,7 +43,7 @@ function ENT:Initialize()
         self.RingMid:SetParent( self.Ring )
 
         self:SetEmitter( self.RingMid )
-        self:SetBeaconHealth( 100 )
+        self:SetBeaconHealth( 200 )
         self:SetCore( self.Core )
 
         self.cd2_currentlerp = 0
@@ -75,6 +76,23 @@ function ENT:Initialize()
         local endtime
 
         hook.Add( "PreDrawEffects", self, function()
+
+            if self:GetIsCharging() then
+                local nearby = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" end )
+
+                for i = 1, #nearby do
+                    local freak = nearby[ i ]
+                    if !IsValid( freak ) or !IsValid( freak:GetEnemy() ) then continue end
+
+                    if freak:GetEnemy() == self or freak:GetEnemy():GetOwner() == self then
+                        render.SetMaterial( FreakIcon )
+                        render.DepthRange( 0, 0 )
+                            render.DrawSprite( freak:WorldSpaceCenter() + ( freak:OBBCenter() + Vector( 0, 0, 20 ) ), 30, 30, color_white )
+                        render.DepthRange( 0, 1 )
+                    end
+                end
+            end
+
             if !self:GetRenderBeam() then return end
 
             starttime = starttime or SysTime()
@@ -151,7 +169,7 @@ function ENT:Initialize()
             surface.SetDrawColor( linecol )
             surface.DrawOutlinedRect( ScrW() - 345,  50, 290, 20, 1 )
 
-            local healthW = ( self:GetBeaconHealth() / 100 ) * 280
+            local healthW = ( self:GetBeaconHealth() / 200 ) * 280
         
             -- Beacon Health Bar
             surface.SetDrawColor( orangeish )
@@ -279,7 +297,7 @@ function ENT:OnBeamStart()
             coroutine.wait( 0.5 )
             if !IsValid( self ) then return end
 
-            if self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:Kill() end
+            if self.cd2_beaconmusic and self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:Kill() end
             local first = true
             self.cd2_beaconmusic = CD2StartMusic( self:GetSoundTrack(), 600, false, false, nil, nil, nil, nil, nil, function( chan )
                 if !IsValid( self ) then chan:FadeOut() return end
@@ -350,7 +368,7 @@ function ENT:OnBeaconDestroyed()
         hook.Remove( "HUDPaint", self )
 
 
-        if self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:Kill() end
+        if self.cd2_beaconmusic and self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:Kill() end
 
         if LocalPlayer():SqrRangeTo( self:GetBeaconPos() ) > ( 2000 * 2000 ) then return end
 
@@ -414,7 +432,7 @@ function ENT:BeaconDetonate()
         end )
         CD2CreateThread( function()
 
-            if self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:FadeOut() end
+            if self.cd2_beaconmusic and self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:FadeOut() end
 
             CD2StartMusic( "sound/crackdown2/music/beacon_victory.mp3", 605 )
 
@@ -542,7 +560,7 @@ function ENT:StartBeaconasActive()
 end
 
 -- The begin now begins charging 10 seconds after being supplied by the energy beam 
-local energy = Material( "crackdown2/effects/energy.png" )
+local energy = Material( "crackdown2/effects/energy.png", "smooth" )
 function ENT:BeginBeaconCharge()
     if SERVER then
         for i = 1, 4 do
@@ -646,6 +664,51 @@ function ENT:Think()
             self.Core:SetAngles( Angle( CurTime() * 200, CurTime() * 200, CurTime() * 200 ) / ( self.cd2_curtimeduration - CurTime() )  )
         end
 
+        if self:GetIsCharging() and !self.cd2_25percentway and ( ( self.cd2_curtimeduration - CurTime() ) < self:GetChargeDuration() * 0.75 ) then
+            local players = player.GetAll()
+            for i = 1, #players do 
+                local ply = players[ i ]
+                if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2SendTextBoxMessage( ply, "25 Percent Charged - Defend the Beacon" ) end
+            end
+            self.cd2_25percentway = true
+        end
+
+        if self:GetIsCharging() and !self.cd2_50percentway and ( ( self.cd2_curtimeduration - CurTime() ) < self:GetChargeDuration() * 0.5 ) then
+            local players = player.GetAll()
+            for i = 1, #players do 
+                local ply = players[ i ]
+                if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2SendTextBoxMessage( ply, "50 Percent Charged - Defend the Beacon" ) end
+            end
+
+            if !KeysToTheCity() then
+                for i = 1, #players do 
+                    local ply = players[ i ]
+                    if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/beaconchargeprogress" .. random( 1, 2 ) .. ".mp3" ) end
+                end
+            end
+
+            self.cd2_50percentway = true
+        end
+
+        if self:GetIsCharging() and !self.cd2_75percentway and ( ( self.cd2_curtimeduration - CurTime() ) < self:GetChargeDuration() * 0.25 ) then
+            local players = player.GetAll()
+            for i = 1, #players do 
+                local ply = players[ i ]
+                if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2SendTextBoxMessage( ply, "75 Percent Charged - Defend the Beacon" ) end
+            end
+            self.cd2_75percentway = true
+        end
+
+        if self:GetIsCharging() and !self.cd2_damagewarning and self:GetBeaconHealth() < 60 then
+            if !KeysToTheCity() then
+                for i = 1, #players do 
+                    local ply = players[ i ]
+                    if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/beacondamaged.mp3" ) end
+                end
+            end
+            self.cd2_damagewarning = true
+        end
+
         -- Final Step: The Beacon finished charging and will now detonate
         if self:GetIsCharging() and CurTime() > self.cd2_curtimeduration then
             self:BeaconDetonate()
@@ -706,7 +769,7 @@ function ENT:Think()
                 light.DieTime = CurTime() + 5
             end
 
-            if !self.cd2_nextenergycoreparticle or SysTime() > self.cd2_nextenergycoreparticle then
+            if IsValid( self:GetCore() ) and ( !self.cd2_nextenergycoreparticle or SysTime() > self.cd2_nextenergycoreparticle ) then
                 local particle = ParticleEmitter( self:GetCore():GetPos() )
                 local part = particle:Add( energy, self:GetCore():GetPos() )
 

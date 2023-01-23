@@ -289,4 +289,7 @@ function OpenIntelConsole()
     end
 end
 
-function GM:ScoreboardShow() OpenIntelConsole() end
+hook.Add( "ScoreboardShow", "crackdown2_intelconsole", function()
+    OpenIntelConsole()
+    return true
+end )

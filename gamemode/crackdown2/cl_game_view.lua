@@ -138,7 +138,7 @@ function GM:CreateMove( cmd )
         end
         CD2_lerpfreecam = CD2_lerpfreecam or CD2_viewangles * 1
         CD2_lerpfreecampos = CD2_lerpfreecampos or CD2_vieworigin * 1
-        CD2_lerpfreecamfov = CD2_lerpfreecamfov or CD2_viewFOV * 1
+        CD2_lerpfreecamfov = CD2_lerpfreecamfov or CD2_fieldofview * 1
         
         CD2_lerpfreecamfov = math.Clamp( CD2_lerpfreecamfov + cmd:GetMouseWheel(), 10, 90 )
         CD2_FreecamFOV = Lerp( ( !cmd:KeyDown( IN_DUCK ) and 4 or 0.6 ) * FrameTime(), CD2_FreecamFOV, CD2_lerpfreecamfov )
@@ -179,7 +179,7 @@ function GM:CreateMove( cmd )
     
     local lockontarget = self:GetNW2Entity( "cd2_lockontarget", nil )
 
-    if IsValid( lockontarget ) and ( lockontarget:IsCD2Agent() or lockontarget:IsCD2NPC() ) and cmd:GetMouseY() < 0 then
+    if IsValid( lockontarget ) and !lockontarget.cd2_NoHeadShot and ( lockontarget:IsCD2Agent() or lockontarget:IsCD2NPC() ) and cmd:GetMouseY() < 0 then
         CD2_LockOnPos = "head"
     elseif !IsValid( lockontarget ) or cmd:GetMouseY() > 0 then
         CD2_LockOnPos = "body"

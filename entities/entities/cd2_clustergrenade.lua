@@ -13,7 +13,7 @@ ENT.TickSound = "weapons/grenade/tick1.wav"
 ENT.DropMenu_RequiresCollect = true
 ENT.DropMenu_SkillLevel = 0
 ENT.DropMenu_Damage = 8
-ENT.DropMenu_Range = 7
+ENT.DropMenu_Range = 10
 
 ENT.Clusters = {}
 

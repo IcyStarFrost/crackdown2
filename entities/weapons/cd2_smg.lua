@@ -9,7 +9,7 @@ SWEP.Primary.ClipSize = 30
 SWEP.Primary.DefaultClip = 300
 SWEP.Primary.Automatic = true
 
-SWEP.Primary.RPM = 900
+SWEP.Primary.RPM = 800
 SWEP.Primary.Damage = 8
 SWEP.Primary.Force = nil
 SWEP.Primary.Tracer = 1
@@ -21,9 +21,9 @@ SWEP.ReloadSounds = { { 0, "weapons/smg1/smg1_reload.wav" } }
 
 SWEP.DropMenu_RequiresCollect = true
 SWEP.DropMenu_SkillLevel = 0
-SWEP.DropMenu_Damage = 3
+SWEP.DropMenu_Damage = 2
 SWEP.DropMenu_Range = 4
-SWEP.DropMenu_FireRate = 7
+SWEP.DropMenu_FireRate = 5
 
 SWEP.DamageFalloffDiv = 250
 SWEP.HoldType = "smg"

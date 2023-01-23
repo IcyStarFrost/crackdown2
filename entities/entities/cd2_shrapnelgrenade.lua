@@ -13,11 +13,13 @@ ENT.TickSound = "buttons/button16.wav"
 ENT.DropMenu_RequiresCollect = true
 ENT.DropMenu_SkillLevel = 0
 ENT.DropMenu_Damage = 8
-ENT.DropMenu_Range = 7
+ENT.DropMenu_Range = 10
 
 ENT.Clusters = {}
 
 local random = math.random
+local Trace = util.TraceLine
+local normaltrace = {}
 local util_SpriteTrail = util.SpriteTrail
 
 local skillsounds = { [ 1 ] = "crackdown2/weapons/explosiveskill1.wav", [ 2 ] = "crackdown2/weapons/explosiveskill2.wav", [ 3 ] = "crackdown2/weapons/explosiveskill3.wav" }
@@ -45,7 +47,7 @@ function ENT:OnDelayEnd()
         blast:SetDamageType( DMG_BLAST )
         blast:SetDamagePosition( self:GetPos() )
 
-        if skilllevel > 1 and skilllevel < 4 then
+        if skilllevel < 4 then
             sound.Play( skillsounds[ skilllevel ], self:GetPos(), 80, 100, 1 )
         elseif skilllevel >= 4 then
             sound.Play( highskillsounds[ random( 3 ) ], self:GetPos(), 90, 100, 1 )
@@ -65,33 +67,47 @@ function ENT:OnDelayEnd()
         CD2CreateThread( function()
 
             coroutine.wait( 0.5 )
-            local pos = self:GetPos() + Vector( 0, 0, 80 )
 
-            local blast = DamageInfo()
-            blast:SetAttacker( IsValid( self:GetThrower() ) and self:GetThrower() or self )
-            blast:SetInflictor( self )
-            blast:SetDamage( 200 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
-            blast:SetDamageType( DMG_BLAST )
-            blast:SetDamagePosition( pos )
-    
-            if skilllevel > 1 and skilllevel < 4 then
-                sound.Play( skillsounds[ skilllevel ], pos, 80, 100, 1 )
-            elseif skilllevel >= 4 then
-                sound.Play( highskillsounds[ random( 3 ) ], pos, 90, 100, 1 )
-            end
-    
-            if skilllevel > 1 then
-                sound.Play( "crackdown2/weapons/exp" .. random( 1, 4 ) .. ".wav", pos, 90 + ( 10 * skilllevel ), 100, 1 )
-            end
-    
-            util.BlastDamageInfo( blast, pos, 400 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
-    
-            net.Start( "cd2net_explosion" )
-            net.WriteVector( pos )
-            net.WriteFloat( 1.5 + ( skilllevel == 6 and 4 or skilllevel > 1 and 0.25 * skilllevel or 0 ) )
-            net.Broadcast()
+            for i = 1, 5 do
+                local pos = self:GetPos() + Vector( math.sin( i ) * 300, math.cos( i ) * 300, 300 )
 
+                normaltrace.start = self:GetPos()
+                normaltrace.endpos = pos
+                normaltrace.filter = self
+                normaltrace.mask = mask or MASK_SOLID
+                normaltrace.collisiongroup = col or COLLISION_GROUP_NONE
+                local result = Trace( normaltrace )
+
+                local blast = DamageInfo()
+                blast:SetAttacker( IsValid( self:GetThrower() ) and self:GetThrower() or self )
+                blast:SetInflictor( self )
+                blast:SetDamage( 250 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
+                blast:SetDamageType( DMG_BLAST )
+                blast:SetDamagePosition( result.HitPos )
+        
+                if skilllevel < 4 then
+                    sound.Play( skillsounds[ skilllevel ], result.HitPos, 80, 100, 1 )
+                elseif skilllevel >= 4 then
+                    sound.Play( highskillsounds[ random( 3 ) ], result.HitPos, 90, 100, 1 )
+                end
+        
+                if skilllevel > 1 then
+                    sound.Play( "crackdown2/weapons/exp" .. random( 1, 4 ) .. ".wav", result.HitPos, 90 + ( 10 * skilllevel ), 100, 1 )
+                end
+        
+                util.BlastDamageInfo( blast, result.HitPos, 500 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
+        
+                net.Start( "cd2net_explosion" )
+                net.WriteVector( result.HitPos )
+                net.WriteFloat( 1.5 + ( skilllevel == 6 and 4 or skilllevel > 1 and 0.25 * skilllevel or 0 ) )
+                net.Broadcast()
+
+                coroutine.yield()
+            end 
+
+            self:Remove()
         end )
+        
         
     end
 end

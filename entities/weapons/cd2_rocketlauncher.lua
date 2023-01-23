@@ -11,7 +11,7 @@ SWEP.Primary.ClipSize = 3
 SWEP.Primary.DefaultClip = 36
 SWEP.Primary.Automatic = false
 
-SWEP.Primary.RPM = 60
+SWEP.Primary.RPM = 40
 SWEP.Primary.Damage = nil
 SWEP.Primary.Force = nil
 SWEP.Primary.Tracer = 5
@@ -23,9 +23,9 @@ SWEP.ReloadSounds = { { 0, "weapons/smg1/smg1_reload.wav" }, { 2, "weapons/slam/
 
 SWEP.DropMenu_RequiresCollect = true
 SWEP.DropMenu_SkillLevel = 1
-SWEP.DropMenu_Damage = 10
+SWEP.DropMenu_Damage = 8
 SWEP.DropMenu_Range = 6
-SWEP.DropMenu_FireRate = 1
+SWEP.DropMenu_FireRate = 2
 
 SWEP.IsExplosive = true
 SWEP.HoldType = "rpg"
@@ -59,8 +59,8 @@ function SWEP:PrimaryAttack()
         rocket:SetOwner( self:GetOwner() )
         rocket:SetMoveType( MOVETYPE_FLYGRAVITY )
         rocket:SetAbsVelocity( self:GetForward() * 2000 + Vector( 0, 0, 128 ) )
-        rocket:SetCollisionGroup( COLLISION_GROUP_DEBRIS ) -- SetOwner should prevent collision but it doesn't
-        rocket:SetSaveValue( "m_flDamage", 150 + ( skilllevel > 1 and 50 * skilllevel or 0 ) ) -- Gmod RPG only does 150 damage
+        rocket:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
+        rocket:SetSaveValue( "m_flDamage", 200 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
         rocket:Spawn()
 
         rocket:CallOnRemove( "explodeeffects", function()

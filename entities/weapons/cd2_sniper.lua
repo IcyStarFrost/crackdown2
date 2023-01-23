@@ -9,7 +9,7 @@ SWEP.Primary.ClipSize = 15
 SWEP.Primary.DefaultClip = 50
 SWEP.Primary.Automatic = true
 
-SWEP.Primary.RPM = 100
+SWEP.Primary.RPM = 80
 SWEP.Primary.Damage = 30
 SWEP.Primary.Force = 3
 SWEP.Primary.Tracer = 1
@@ -22,8 +22,8 @@ SWEP.ReloadSounds = { { 0, "weapons/ar2/npc_ar2_reload.wav" } }
 
 SWEP.DropMenu_SkillLevel = 2
 SWEP.DropMenu_Damage = 8
-SWEP.DropMenu_Range = 10
-SWEP.DropMenu_FireRate = 4
+SWEP.DropMenu_Range = 8
+SWEP.DropMenu_FireRate = 2
 
 SWEP.DamageFalloffDiv = 400 -- The divisor amount to lower damage based on distance
 SWEP.LockOnRange = 3000 -- How far can the player lock onto targets

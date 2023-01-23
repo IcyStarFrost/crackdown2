@@ -20,11 +20,11 @@ SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 2
 SWEP.ReloadSounds = { { 0, "weapons/ar2/npc_ar2_reload.wav" } }
 
-SWEP.DamageFalloffDiv = 400
+SWEP.DamageFalloffDiv = 500
 
 SWEP.DropMenu_RequiresCollect = true
-SWEP.DropMenu_Damage = 3
-SWEP.DropMenu_Range = 5
+SWEP.DropMenu_Damage = 4
+SWEP.DropMenu_Range = 6
 SWEP.DropMenu_FireRate = 6
 
 SWEP.HoldType = "ar2"

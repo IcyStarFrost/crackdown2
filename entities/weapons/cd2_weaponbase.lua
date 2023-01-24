@@ -35,7 +35,7 @@ SWEP.DropMenu_SkillLevel = 0 -- The skill level the player's Weapon skill needs 
 --
 
 SWEP.IsExplosive = false -- If the weapon is explosive. used to render the dropped weapon color to yellow
-SWEP.DamageFalloffDiv = 200 -- The divisor amount to lower damage based on distance
+SWEP.DamageFalloffDiv = 200 -- The divisor amount to lower damage based on distance. The lower the value, the more damage for long range. The higher the value, the lesser the damage is for long range
 SWEP.LockOnRange = 2000 -- How far can the player lock onto targets
 SWEP.HoldType = "ar2" -- The holdtype this weapon will have
 SWEP.Primary.ShootSound = "" -- The shoot sound to play. Can be a table of sound paths

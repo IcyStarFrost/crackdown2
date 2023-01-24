@@ -5,12 +5,12 @@ SWEP.WorldModel = "models/weapons/w_rif_ak47.mdl"
 SWEP.PrintName = "Ingalls AL-107"
 
 SWEP.Primary.Ammo = "AR2"
-SWEP.Primary.ClipSize = 40
-SWEP.Primary.DefaultClip = 250
+SWEP.Primary.ClipSize = 30
+SWEP.Primary.DefaultClip = 200
 SWEP.Primary.Automatic = true
 
 SWEP.Primary.RPM = 750
-SWEP.Primary.Damage = 10
+SWEP.Primary.Damage = 15
 SWEP.Primary.Force = nil
 SWEP.Primary.Tracer = 1
 SWEP.Primary.TracerName = "AR2Tracer"

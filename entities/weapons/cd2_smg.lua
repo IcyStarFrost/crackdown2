@@ -6,14 +6,14 @@ SWEP.PrintName = "SMG"
 
 SWEP.Primary.Ammo = "SMG1"
 SWEP.Primary.ClipSize = 30
-SWEP.Primary.DefaultClip = 300
+SWEP.Primary.DefaultClip = 480
 SWEP.Primary.Automatic = true
 
-SWEP.Primary.RPM = 800
-SWEP.Primary.Damage = 8
+SWEP.Primary.RPM = 850
+SWEP.Primary.Damage = 6
 SWEP.Primary.Force = nil
 SWEP.Primary.Tracer = 1
-SWEP.Primary.Spread = 0.06
+SWEP.Primary.Spread = 0.04
 SWEP.Primary.LockOnSpread = 0
 SWEP.Primary.Bulletcount = 1
 SWEP.ReloadTime = 1.2

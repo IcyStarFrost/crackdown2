@@ -6,7 +6,7 @@ SWEP.PrintName = "Ingalls XGS"
 
 SWEP.Primary.Ammo = "SMG1"
 SWEP.Primary.ClipSize = 30
-SWEP.Primary.DefaultClip = 300
+SWEP.Primary.DefaultClip = 400
 SWEP.Primary.Automatic = true
 
 SWEP.Primary.RPM = 900

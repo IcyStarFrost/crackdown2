@@ -1,9 +1,9 @@
 
 local difficultynpcs = {
-    [ 1 ] = { "cd2_freak" },
+    [ 1 ] = { "cd2_freak", "cd2_freak", "cd2_freak", "cd2_freak", "cd2_freakslinger" },
     [ 2 ] = { "cd2_freak", "cd2_freak", "cd2_freak", "cd2_freakslinger" },
-    [ 3 ] = { "cd2_freak", "cd2_freak", "cd2_freakslinger" },
-    [ 4 ] = { "cd2_freak", "cd2_freak", "cd2_freakslinger" },
+    [ 3 ] = { "cd2_freak", "cd2_freak", "cd2_freak", "cd2_freakslinger" },
+    [ 4 ] = { "cd2_freak", "cd2_freak", "cd2_freak", "cd2_freakslinger" },
 }
 
 local random = math.random
@@ -25,7 +25,9 @@ hook.Add( "Tick", "crackdown2_antibeaconfreaks", function()
 
             beacon:DeleteOnRemove( freak )
 
-            freak:AttackTarget( beacon )
+            if freak:GetClass() != "cd2_freak" then
+                freak:AttackTarget( beacon )
+            end
 
             freak:CallOnRemove( "removeselffromcount", function()
                 if IsValid( beacon ) then beacon.cd2_freakcount = beacon.cd2_freakcount - 1 end

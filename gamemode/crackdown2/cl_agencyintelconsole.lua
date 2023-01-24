@@ -27,6 +27,7 @@ local cellwhite = Color( 255, 255, 255 )
 local Auicon = Material( "crackdown2/ui/auicon.png" )
 local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
 local celltargetred = Color( 255, 51, 0 )
+local orange = Color( 255, 115, 0 )
 
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local pingmat = Material( "crackdown2/ui/pingcircle.png" )
@@ -120,8 +121,12 @@ function OpenIntelConsole()
     leftpnl:DockMargin( 30, 200, 30, 200 )
     leftpnl:Dock( LEFT )
 
+    local buttonscroll = vgui.Create( "DScrollPanel", leftpnl )
+    buttonscroll:Dock( FILL )
+    function buttonscroll:Paint() end
+
     local midpnl = vgui.Create( "DPanel", CD2_AgencyConsole )
-    midpnl:SetSize( ScreenScale( 317), 100 )
+    midpnl:SetSize( ScreenScale( 317 ), 100 )
     midpnl:DockMargin( 30, 200, 30, 200 )
     midpnl:Dock( LEFT )
 
@@ -130,18 +135,90 @@ function OpenIntelConsole()
     rightpnl:DockMargin( 30, 200, 30, 200 )
     rightpnl:Dock( LEFT )
 
-    local iscontrollingview = false
+    local beacons = ents.FindByClass( "cd2_beacon" )
+    local locations = ents.FindByClass( "cd2_locationmarker" )
+    local activecount = 0
+    local agencylocations = 0
+    local totallocations = 0
+    local beginninglocationcaptured = false
+    local beaconcount = GetGlobal2Int( "cd2_beaconcount", 0 )
+    for k, v in ipairs( beacons ) do if v:GetIsDetonated() then activecount = activecount + 1 end end 
+    for k, v in ipairs( locations ) do if v:GetLocationType() == "agency" and v:GetIsBeginningLocation() then beginninglocationcaptured = true end if v:GetLocationType() == "agency" then agencylocations = agencylocations + 1 end if v:GetLocationType() != "beacon" then totallocations = totallocations + 1 end end
+    
 
-    local controlview = vgui.Create( "DButton", leftpnl )
-    controlview:SetSize( 100, 40 )
-    controlview:SetFont( "crackdown2_font30" )
-    controlview:SetText( "Control Map View" )
-    controlview:Dock( TOP )
+    local rightpnltext = vgui.Create( "DLabel", rightpnl )
+    rightpnltext:SetFont( "crackdown2_font50" )
+    rightpnltext:SetSize( 100, 60 )
+    rightpnltext:SetColor( orange )
+    rightpnltext:Dock( TOP )
+    rightpnltext:SetText( "             OBJECTIVES" )
+    
+    local rightpnlline = vgui.Create( "DPanel", rightpnl )
+    rightpnlline:SetSize( 100, 3 )
+    rightpnlline:Dock( TOP )
 
-    function controlview:DoClick()
-        iscontrollingview = !iscontrollingview
-        surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
+    if activecount < beaconcount then
+        local beaconobjective = vgui.Create( "DLabel", rightpnl )
+        beaconobjective:SetFont( "crackdown2_font30" )
+        beaconobjective:SetSize( 100, 100 )
+        beaconobjective:DockMargin( 10, 0, 0, 0 )
+        beaconobjective:Dock( TOP )
+        beaconobjective:SetText( "ERADICATE THE FREAKS\nDETONATE ALL BEACONS\n" .. activecount .. "/" .. beaconcount .. " BEACONS DETONATED"  )
+    elseif activecount == beaconcount then
+        local beaconobjective = vgui.Create( "DLabel", rightpnl )
+        beaconobjective:SetFont( "crackdown2_font30" )
+        beaconobjective:SetSize( 100, 100 )
+        beaconobjective:DockMargin( 10, 0, 0, 0 )
+        beaconobjective:Dock( TOP )
+        beaconobjective:SetText( "ERADICATE THE FREAKS\nDETONATE THE FINAL BEACON"  )
     end
+
+    if !beginninglocationcaptured then
+        local tacticallocationobjective = vgui.Create( "DLabel", rightpnl )
+        tacticallocationobjective:SetFont( "crackdown2_font30" )
+        tacticallocationobjective:SetSize( 100, 100 )
+        tacticallocationobjective:DockMargin( 10, 0, 0, 0 )
+        tacticallocationobjective:Dock( TOP )
+        tacticallocationobjective:SetText( "RECOVER THE BEACON PROTOTYPE\nSECURE TACTICAL LOCATION"  )
+    elseif agencylocations < totallocations then
+        local tacticallocationobjective = vgui.Create( "DLabel", rightpnl )
+        tacticallocationobjective:SetFont( "crackdown2_font30" )
+        tacticallocationobjective:SetSize( 100, 100 )
+        tacticallocationobjective:DockMargin( 10, 0, 0, 0 )
+        tacticallocationobjective:Dock( TOP )
+        tacticallocationobjective:SetText( "SECURE ALL TACTICAL LOCATIONS\n" .. agencylocations .. "/" .. totallocations .. " LOCATIONS SECURED"  )
+    end
+
+    local iscontrollingview = false
+    local panels = {}
+
+    local function AddPanelToConsole( pnl, buttontext, first )
+        panels[ #panels + 1 ] = pnl
+        local button = vgui.Create( "DButton", buttonscroll )
+        button:SetSize( 100, 40 )
+        button:SetFont( "crackdown2_font30" )
+        button:SetText( buttontext )
+        button:Dock( TOP )
+
+        function button:DoClick()
+            surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
+            for k, panel in ipairs( panels ) do
+                if panel != pnl then panel:Hide() else panel:Show() end
+            end
+        end
+    
+        function button:Paint( w, h )
+            surface_SetDrawColor( blackish )
+            surface_DrawRect( 0, 0, w, h )
+    
+            surface_SetDrawColor( fadedwhite )
+            surface_DrawOutlinedRect( 0, 0, w, h, 3 )
+        end
+
+        if !first then pnl:Hide() end
+    end
+
+
 
     local function Paint( self, w, h )
         surface_SetDrawColor( blackish )
@@ -151,48 +228,62 @@ function OpenIntelConsole()
         surface_DrawOutlinedRect( 0, 0, w, h, 3 )
     end
 
-    controlview.Paint = Paint
     leftpnl.Paint = Paint
     rightpnl.Paint = Paint
+
+
+    -- OVERHEAD VIEW --
+    local mappnl = vgui.Create( "DPanel", midpnl )
+    mappnl:Dock( FILL )
+
+    AddPanelToConsole( mappnl, "Open Overhead View", true )
 
     local viewoffset = Vector()
     local znear
     local limittime = 0
 
-    function midpnl:Think()
-        if iscontrollingview then
+    hook.Add( "Think", mappnl, function()
+        if mappnl:IsVisible() then
             local ismoving = false
 
-            if LocalPlayer():KeyDown( IN_JUMP ) then
+            local f = input.IsKeyDown( input.GetKeyCode( input.LookupBinding( "+forward" ) ) )
+            local b = input.IsKeyDown( input.GetKeyCode( input.LookupBinding( "+back" ) ) )
+            local r = input.IsKeyDown( input.GetKeyCode( input.LookupBinding( "+moveright" ) ) )
+            local l = input.IsKeyDown( input.GetKeyCode( input.LookupBinding( "+moveleft" ) ) )
+
+            local up = input.IsKeyDown( input.GetKeyCode( input.LookupBinding( "+jump" ) ) )
+            local down = input.IsKeyDown( input.GetKeyCode( input.LookupBinding( "+duck" ) ) )
+
+            if up then
                 znear = znear - 50
-            elseif LocalPlayer():KeyDown( IN_DUCK ) then
+            elseif down then
                 znear = znear + 50
             end
 
-            if LocalPlayer():KeyDown( IN_FORWARD ) then
+            if f then
                 viewoffset.x = viewoffset.x + 50
                 ismoving = true
             end
 
-            if LocalPlayer():KeyDown( IN_BACK ) then
+            if b then
                 viewoffset.x = viewoffset.x - 50
                 ismoving = true
             end
             
-            if LocalPlayer():KeyDown( IN_MOVERIGHT ) then
+            if r then
                 viewoffset.y = viewoffset.y - 50
                 ismoving = true
             end
 
-            if LocalPlayer():KeyDown( IN_MOVELEFT ) then
+            if l then
                 viewoffset.y = viewoffset.y + 50
                 ismoving = true
             end
             if ismoving then LocalPlayer():EmitSound( "crackdown2/ui/ui_move.mp3", 70, 100, 1, CHAN_WEAPON ) end
         end
-    end
+    end )
 
-    function midpnl:Paint( w, h )
+    function mappnl:Paint( w, h )
         surface_SetDrawColor( blackish )
         surface_DrawRect( 0, 0, w, h )
 
@@ -202,7 +293,7 @@ function OpenIntelConsole()
         mmTrace.collisiongroup = COLLISION_GROUP_WORLD
         local result = Trace( mmTrace )
 
-        local x, y = self:GetPos()
+        local x, y =  self:GetParent():GetPos()
 
         znear = znear or result.Hit and result.HitPos:Distance( mmTrace.endpos )
         render.RenderView( {
@@ -272,6 +363,95 @@ function OpenIntelConsole()
     
     end
 
+    --------
+
+
+    -- PLAYER LIST --
+    local players = {}
+    local refreshcooldown = 0
+
+    local playerlistmain = vgui.Create( "DPanel", midpnl )
+    playerlistmain:Dock( FILL )
+    playerlistmain:InvalidateParent( true )
+
+    local toptext = vgui.Create( "DLabel", playerlistmain )
+    toptext:SetFont( "crackdown2_font50" )
+    toptext:SetSize( 100, 60 )
+    toptext:DockMargin( ScreenScale( 317 ) / 3.5, 0, 0, 0 )
+    toptext:Dock( TOP )
+    toptext:SetText( GetHostName() )
+    
+
+    local line = vgui.Create( "DPanel", playerlistmain )
+    line:SetSize( 100, 3 )
+    line:Dock( TOP )
+
+    local playerlistscroll = vgui.Create( "DScrollPanel", playerlistmain )
+    playerlistscroll:Dock( FILL ) 
+    function playerlistscroll:Paint() end
+
+    function playerlistmain:Paint( w, h )
+        surface_SetDrawColor( blackish )
+        surface_DrawRect( 0, 0, w, h )
+    end
+
+    local function CreatePlayerBar( ply )
+        local bar = vgui.Create( "DPanel", playerlistscroll )
+        bar:SetSize( 10, 65 )
+        bar:Dock( TOP )
+
+        local profilepicture = vgui.Create( "AvatarImage", bar )
+        profilepicture:SetSize( 59, 64 )
+        profilepicture:DockMargin( 5, 5, 5, 5 )
+        profilepicture:Dock( LEFT )
+        profilepicture:SetPlayer( ply )
+
+        local plyname = vgui.Create( "DLabel", bar )
+        plyname:SetSize( 200, 100 )
+        plyname:DockMargin( 10, 0, 0, 0 )
+        plyname:Dock( LEFT )
+        plyname:SetFont( "crackdown2_font50" )
+        plyname:SetText( ply:Name() )
+
+        local skillstats = vgui.Create( "DLabel", bar )
+        skillstats:SetSize( 400, 100 )
+        skillstats:DockMargin( 10, 0, 0, 0 )
+        skillstats:Dock( LEFT )
+        skillstats:SetFont( "crackdown2_font30" )
+        skillstats:SetText( "Agility: " .. ply:GetAgilitySkill() .. " Strength: " .. ply:GetStrengthSkill() .. " Firearm: " .. ply:GetWeaponSkill() .. " Explosive: " .. ply:GetExplosiveSkill() )
+
+        hook.Add( "Think", bar, function() 
+            if !IsValid( ply ) then 
+
+                bar:Remove()
+                hook.Remove( "Think", bar )
+            end
+        end )
+
+        function bar:Paint( w, h ) 
+            surface_SetDrawColor( fadedwhite )
+            surface_DrawOutlinedRect( 0, 0, w, h, 2 )
+        end
+
+        return bar
+    end
+
+    hook.Add( "Think", playerlistmain, function()
+        if !playerlistmain:IsVisible() then return end
+        if SysTime() < refreshcooldown then return end
+
+        for k, ply in ipairs( player_GetAll() ) do
+            if !players[ ply ] then
+                local bar = CreatePlayerBar( ply )
+                players[ ply ] = bar
+            end
+        end
+
+        refreshcooldown = SysTime() + 1
+    end )
+
+    AddPanelToConsole( playerlistmain, "Open Player List" )
+    -------
 
     function CD2_AgencyConsole:Paint( w, h )
         local x, y = self:LocalToScreen( 0, 0 )

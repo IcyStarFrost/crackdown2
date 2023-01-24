@@ -43,7 +43,7 @@ function ENT:DropPeaceKeepers( pos )
                 local selfxypos = self:GetPos() selfxypos[ 3 ] = 0
                 if selfxypos:DistToSqr( posxy ) < ( 50 * 50 ) then break end
                 local pos2 = ( posxy * 1 ) pos[ 3 ] = self:GetPos()[ 3 ]
-                self:SetPos( self:GetPos() + ( pos2 - self:GetPos() ):GetNormalized() * 10 )
+                self:SetPos( self:GetPos() + ( pos2 - self:GetPos() ):GetNormalized() * 20 )
                 coroutine.yield()
             end
 
@@ -66,7 +66,7 @@ function ENT:DropPeaceKeepers( pos )
             while true do
         
                 if self:GetPos():DistToSqr( self.cd2_leavepos ) > ( 50 * 50 ) then
-                    self:SetPos( self:GetPos() + ( self.cd2_leavepos - self:GetPos() ):GetNormalized() *10 )
+                    self:SetPos( self:GetPos() + ( self.cd2_leavepos - self:GetPos() ):GetNormalized() *20 )
                 else
                     self:Remove()
                     break
@@ -92,10 +92,27 @@ function ENT:DeployPeacekeepers()
     local result = Trace( tracetable )
     self.cd2_leavepos = result.HitPos - Vector( 0, 0, 100 )
 
-    for i = 1, 4 do
+    for i = 1, 2 do
         if CD2_EmptyStreets then return end
         local peacekeeper = ents.Create( "cd2_droppeacekeeper" )
         peacekeeper:SetPos( self:GetPos() + ( self:GetForward() * ( 50 * i ) ) + self:GetRight() * 50 ) 
+        peacekeeper:Spawn()
+
+        CD2CreateThread( function()
+
+            peacekeeper:EmitSound( "crackdown2/npc/peacekeeper/drop" .. random( 1, 2 ) .. ".wav", 70 )
+
+            while IsValid( peacekeeper ) and !peacekeeper:IsOnGround() do coroutine.yield() end 
+            if !IsValid( peacekeeper ) then return end
+            
+            peacekeeper:EmitSound( "crackdown2/npc/peacekeeper/hitground" .. random( 1, 2 ) .. ".wav", 70 )
+        end )
+    end
+
+    for i = 1, 2 do
+        if CD2_EmptyStreets then return end
+        local peacekeeper = ents.Create( "cd2_droppeacekeeper" )
+        peacekeeper:SetPos( self:GetPos() + ( self:GetForward() * ( 50 * i ) ) - self:GetRight() * 50 ) 
         peacekeeper:Spawn()
 
         CD2CreateThread( function()
@@ -130,7 +147,7 @@ function ENT:ExtractEntity( ent )
                     local selfxypos = self:GetPos() selfxypos[ 3 ] = 0
                     if selfxypos:DistToSqr( self.cd2_cargoxypos ) < ( 50 * 50 ) then break end
                     local pos = ( self.cd2_cargoxypos * 1 ) pos[ 3 ] = self:GetPos()[ 3 ]
-                    self:SetPos( self:GetPos() + ( pos - self:GetPos() ):GetNormalized() * 10 )
+                    self:SetPos( self:GetPos() + ( pos - self:GetPos() ):GetNormalized() * 20 )
                     coroutine.yield()
                 end
 
@@ -150,7 +167,7 @@ function ENT:ExtractEntity( ent )
                 while true do
         
                     if self:GetPos():DistToSqr( self.cd2_leavepos ) > ( 50 * 50 ) then
-                        self:SetPos( self:GetPos() + ( self.cd2_leavepos - self:GetPos() ):GetNormalized() *10 )
+                        self:SetPos( self:GetPos() + ( self.cd2_leavepos - self:GetPos() ):GetNormalized() *20 )
                     else
                         self:Remove()
                         break

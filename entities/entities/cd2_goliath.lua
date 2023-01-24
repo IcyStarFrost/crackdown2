@@ -126,14 +126,14 @@ end
 function ENT:OnInjured2( info ) 
     local attacker = info:GetAttacker()
 
-    if self:GetEnemy().cd2_IsBeaconPart or self:GetEnemy():GetClass() == "cd2_beacon" then return end
-
     if ( ( attacker:IsCD2NPC() or attacker:IsCD2Agent() ) and attacker:GetCD2Team() != self:GetCD2Team() ) then
         self:AttackTarget( attacker )
     end
 end
 
 function ENT:AttackTarget( ent )
+    if IsValid( self:GetEnemy() ) and ( self:GetEnemy().cd2_IsBeaconPart or self:GetEnemy():GetClass() == "cd2_beacon" ) then return end
+
     self:SetEnemy( ent )
     self.cd2_EnemyLastKnownPosition = ent:GetPos()
     self.cd2_CombatTimeout = CurTime() + 10

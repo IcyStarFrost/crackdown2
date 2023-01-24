@@ -29,11 +29,11 @@ SWEP.DropMenu_FireRate = 2
 
 SWEP.IsExplosive = true
 SWEP.HoldType = "rpg"
-SWEP.Primary.ShootSound = "weapons/rpg/rocketfire1.wav"
+SWEP.Primary.ShootSound = { "crackdown2/weapons/rpgfire1.mp3", "crackdown2/weapons/rpgfire2.mp3", "crackdown2/weapons/rpgfire3.mp3" }
 
 local random = math.random
 
-local skillsounds = { [ 2 ] = "crackdown2/weapons/explosiveskill2.wav", [ 3 ] = "crackdown2/weapons/explosiveskill3.wav" }
+local skillsounds = { [ 1 ] = "crackdown2/weapons/explosiveskill1.wav", [ 2 ] = "crackdown2/weapons/explosiveskill2.wav", [ 3 ] = "crackdown2/weapons/explosiveskill3.wav" }
 local highskillsounds = { "crackdown2/weapons/explosiveskill4.wav", "crackdown2/weapons/explosiveskill5.wav", "crackdown2/weapons/explosiveskill6.wav" }
 
 function SWEP:PrimaryAttack()
@@ -75,7 +75,7 @@ function SWEP:PrimaryAttack()
 
                 util.BlastDamageInfo( blast, rocket:GetPos(), 300 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
 
-                if skilllevel > 1 and skilllevel < 4 then
+                if skilllevel < 4 then
                     sound.Play( skillsounds[ skilllevel ], rocket:GetPos(), 80, 100, 1 )
                 elseif skilllevel >= 4 then
                     sound.Play( highskillsounds[ random( 3 ) ], rocket:GetPos(), 90, 100, 1 )

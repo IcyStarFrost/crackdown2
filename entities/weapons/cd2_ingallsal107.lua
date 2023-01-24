@@ -28,4 +28,4 @@ SWEP.DropMenu_Range = 6
 SWEP.DropMenu_FireRate = 6
 
 SWEP.HoldType = "ar2"
-SWEP.Primary.ShootSound = "weapons/galil/galil-1.wav"
+SWEP.Primary.ShootSound = "crackdown2/weapons/ingalls107fire1.mp3"

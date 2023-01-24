@@ -28,4 +28,4 @@ SWEP.DropMenu_Range = 5
 SWEP.DropMenu_FireRate = 5
 
 SWEP.HoldType = "ar2"
-SWEP.Primary.ShootSound = { "^weapons/ar1/ar1_dist1.wav", "^weapons/ar1/ar1_dist2.wav" }
+SWEP.Primary.ShootSound = { "crackdown2/weapons/assaultriflefire1.mp3", "crackdown2/weapons/assaultriflefire2.mp3" }

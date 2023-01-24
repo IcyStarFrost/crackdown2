@@ -125,6 +125,8 @@ function ENT:OnInjured2( info )
 end
 
 function ENT:AttackTarget( ent )
+    if IsValid( self:GetEnemy() ) and ( self:GetEnemy().cd2_IsBeaconPart or self:GetEnemy():GetClass() == "cd2_beacon" ) and !ent.cd2_IsBeaconPart then return end
+
     self:SetEnemy( ent )
     self.cd2_EnemyLastKnownPosition = ent:GetPos()
     self.cd2_CombatTimeout = CurTime() + 10

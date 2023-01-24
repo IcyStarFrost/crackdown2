@@ -27,4 +27,4 @@ SWEP.DropMenu_FireRate = 5
 
 SWEP.DamageFalloffDiv = 250
 SWEP.HoldType = "smg"
-SWEP.Primary.ShootSound = "^weapons/smg1/npc_smg1_fire1.wav"
+SWEP.Primary.ShootSound = "crackdown2/weapons/agencysmgfire1.mp3"

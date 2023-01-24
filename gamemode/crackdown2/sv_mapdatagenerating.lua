@@ -233,7 +233,7 @@ function CD2GenerateMapData( randomize, agencystart )
         end
 
 
-        SetGlobal2Bool( "cd2_MapDataLoaded", true )
+        
         CD2_BeaconCount = #beacondata
         CD2_AgilityOrbCount = #agilityorbdata
         CD2_HiddenOrbCount = #hiddenorbdata
@@ -241,6 +241,9 @@ function CD2GenerateMapData( randomize, agencystart )
 
         CD2_BeaconData = beacondata
         CD2_CurrentBeacon = 1
+
+        SetGlobal2Bool( "cd2_MapDataLoaded", true )
+        SetGlobal2Int( "cd2_beaconcount", CD2_BeaconCount )
 
         CD2CreateBeaconSet( beacondata[ 1 ] )
 
@@ -554,6 +557,8 @@ function CD2LoadMapData()
     CD2_BeaconCount = #beacondata
     CD2_BeaconData = beacondata
     CD2_CurrentBeacon = beaconindex
+
+    SetGlobal2Int( "cd2_beaconcount", CD2_BeaconCount )
 
     CD2DebugMessage( "Loaded " .. detonatecount .. " active beacons. Loaded " .. activeaucount .. " active Absorption Units" )
     CD2DebugMessage( "Loaded " .. #beacondata .. " Beacons and " .. ( #beacondata * 3 ) .. " Absorption Units. Current beacon group is " .. beaconindex )

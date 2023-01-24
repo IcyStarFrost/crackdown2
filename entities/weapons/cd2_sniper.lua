@@ -28,7 +28,7 @@ SWEP.DropMenu_FireRate = 2
 SWEP.DamageFalloffDiv = 400 -- The divisor amount to lower damage based on distance
 SWEP.LockOnRange = 3000 -- How far can the player lock onto targets
 SWEP.HoldType = "ar2"
-SWEP.Primary.ShootSound = { "weapons/m4a1/m4a1-1.wav" }
+SWEP.Primary.ShootSound = "crackdown2/weapons/agencysniperfire1.mp3"
 
 local white = Color( 255, 255, 255, 50 )
 function SWEP:FireCallback( attacker, tr, info )

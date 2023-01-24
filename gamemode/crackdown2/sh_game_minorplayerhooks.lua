@@ -1,6 +1,5 @@
 local random = math.random
 local CurTime = CurTime
-local player_GetAll = player.GetAll
 
 if SERVER then
     
@@ -13,7 +12,7 @@ if SERVER then
 
     hook.Add( "CD2_SwitchWeapon", "crackdown2_changeholstermodel", function( ply, old, new )
         ply.cd2_holsteredweapon:SetModel( old:GetModel() )
-        local mins, maxs = ply.cd2_holsteredweapon:GetModelBounds()
+        local mins = ply.cd2_holsteredweapon:GetModelBounds()
         ply.cd2_holsteredweapon:SetLocalPos( Vector( -10, -9, 0 ) - mins / 2 )
     end )
 
@@ -96,16 +95,29 @@ if SERVER then
         end )
     end )
 
+    hook.Add( "OnCD2NPCKilled", "crackdown2_uvweaponachievement", function( npc, info )
+        local attacker = info:GetAttacker()
+        if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadUVachievement or KeysToTheCity() or npc:GetCD2Team() != "freak" then return end
+        attacker.cd2_uvkillcount = attacker.cd2_uvkillcount and attacker.cd2_uvkillcount + 1 or 1
+
+        if attacker.cd2_uvkillcount < 30 then return end
+
+        CD2FILESYSTEM:RequestPlayerData( attacker, "cd2_hadUVachievement", function( val )
+            if !val then
+                attacker:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/uv_achievement.mp3" )
+                CD2FILESYSTEM:WritePlayerData( attacker, "cd2_hadUVachievement", true )
+            else
+                attacker.cd2_hadUVachievement = true
+            end
+        end )
+    end )
+
 end
 
 
 
 
 if CLIENT then
-
-
-
-    local limit = false
 
     local actcommands = {
         "act group",

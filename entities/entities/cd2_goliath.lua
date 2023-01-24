@@ -207,13 +207,13 @@ end
 function ENT:Swipe()
     if CurTime() < self.cd2_nextattack then return end
 
-    self:EmitSound2( "crackdown2/npc/goliath/goliath_hit.mp3", 1000, 5 )
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_hit.mp3", 400, 5 )
     CD2CreateThread( function()
         self:PlayGesture( ACT_GMOD_GESTURE_RANGE_ZOMBIE )
 
         coroutine.wait( 1 )
         if !IsValid( self ) or !IsValid( self:GetEnemy() ) or self:GetRangeSquaredTo( self:GetEnemy() ) > ( 200 * 200 ) then return end
-        self:GetEnemy():EmitSound2( "crackdown2/npc/goliath/goliath_beaconhit.mp3", 1000, 10 )
+        self:GetEnemy():EmitSound2( "crackdown2/npc/goliath/goliath_beaconhit.mp3", 600, 10 )
         local info = DamageInfo()
         info:SetAttacker( self ) 
         info:SetDamage( 40 ) 
@@ -225,9 +225,9 @@ end
 
 local anims = { "zombie_slump_rise_02_fast", "zombie_slump_rise_02_slow", "zombie_slump_rise_01" }
 function ENT:SpawnAnim()
-    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 1000, 10 )
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 200, 10 )
     self:PlaySequenceAndWait( anims[ random( #anims ) ], 0.7 )
-    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 1000, 10 )
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 200, 10 )
     self:PlaySequenceAndWait( "taunt_zombie", 0.5 )
     if self:GetState() == "DieSequence" then return end
     self:SetState( "MainThink" )

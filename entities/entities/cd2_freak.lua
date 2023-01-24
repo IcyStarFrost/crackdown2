@@ -227,7 +227,7 @@ end
 
 local anims = { "zombie_slump_rise_02_fast", "zombie_slump_rise_02_slow", "zombie_slump_rise_01" }
 function ENT:SpawnAnim()
-    self:PlaySequenceAndWait( anims[ random( #anims ) ], speed )
+    self:PlaySequenceAndWait( anims[ random( #anims ) ], 3 )
     self:SetState( "MainThink" )
 end
 

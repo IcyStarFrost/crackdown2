@@ -187,7 +187,7 @@ function GM:CreateMove( cmd )
 
     if !CD2_FreeCamMode and cmd:GetMouseWheel() != 0 and CurTime() > switchcooldown then 
         for k, wep in ipairs( self:GetWeapons() ) do
-            if wep != self:GetActiveWeapon() then cmd:SelectWeapon( wep ) break end
+            if wep != self:GetActiveWeapon() and !self:GetActiveWeapon():GetIsHolstering() then cmd:SelectWeapon( wep ) break end
         end
         switchcooldown = CurTime() + 0.2
     end

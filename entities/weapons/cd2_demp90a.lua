@@ -9,7 +9,7 @@ SWEP.Primary.ClipSize = 10
 SWEP.Primary.DefaultClip = 45
 SWEP.Primary.Automatic = false
 
-SWEP.Primary.RPM = 80
+SWEP.Primary.RPM = 110
 SWEP.Primary.Damage = 8
 SWEP.Primary.Force = nil
 SWEP.Primary.Tracer = 1

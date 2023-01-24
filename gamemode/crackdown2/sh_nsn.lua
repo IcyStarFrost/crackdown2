@@ -10,7 +10,7 @@ if SERVER then
     CD2_MaxCivilians = 15
     CD2_MaxCell = 2
     CD2_MaxPeaceKeepers = 2
-    CD2_MaxFreaks = 15
+    CD2_MaxFreaks = 20
 
     CD2_NextCivilianSpawn = CurTime() + 1
     CD2_NextFreakSpawn = CurTime() + 1
@@ -162,7 +162,7 @@ if SERVER then
         if !CD2IsDay() and #GetFreaks() < CD2_MaxFreaks and CurTime() > CD2_NextFreakSpawn then
             SpawnNPC( nil, "cd2_freak", GetRandomPlayer() )
             limitfreakkill = false
-            CD2_NextFreakSpawn = CurTime() + rand( 0.1, 3 )
+            CD2_NextFreakSpawn = CurTime() + rand( 0.1, 2 )
         elseif CD2IsDay() and !limitfreakkill then
 
             CD2CreateThread( function()

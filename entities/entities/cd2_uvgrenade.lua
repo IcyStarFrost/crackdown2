@@ -47,7 +47,7 @@ function ENT:OnDelayEnd()
             v:TakeDamageInfo( blast )
         end
         sound.Play( "ambient/levels/labs/electric_explosion" .. random( 1, 5 ) .. ".wav", self:GetPos(), 90, 100, 1 )
-        sound.Play( "crackdown2/weapons/uvgrenadeblast" .. random( 1, 2 ) .. ".mp3", self:GetPos(), 100, 100, 1 )
+        sound.Play( "crackdown2/weapons/uvgrenadeblast" .. random( 1, 2 ) .. ".mp3", self:GetPos(), 120, 100, 1 )
 
         net.Start( "cd2net_uvgrenadeexplode" )
         net.WriteVector( self:GetPos() )

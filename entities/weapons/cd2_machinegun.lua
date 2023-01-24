@@ -25,4 +25,4 @@ SWEP.DropMenu_Range = 5
 SWEP.DropMenu_FireRate = 7
 
 SWEP.HoldType = "ar2"
-SWEP.Primary.ShootSound = "weapons/m249/m249-1.wav"
+SWEP.Primary.ShootSound = "crackdown2/weapons/machinegunfire1.mp3"

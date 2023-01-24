@@ -1,9 +1,6 @@
 AddCSLuaFile()
 
 ENT.Base = "base_nextbot"
-local LerpVector = LerpVector
-local FrameTime = FrameTime
-local LerpAngle = LerpAngle
 
 
 function ENT:Initialize()

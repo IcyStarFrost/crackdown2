@@ -4,7 +4,6 @@ local surface_DrawTexturedRect = surface.DrawTexturedRect
 local surface_DrawOutlinedRect = surface.DrawOutlinedRect
 local draw_DrawText = draw.DrawText
 local surface_SetMaterial = surface.SetMaterial
-local ceil = math.ceil
 local random = math.random
 local blackish = Color( 39, 39, 39)
 local fadedwhite = Color( 255, 255, 255, 10 )
@@ -256,7 +255,6 @@ function CD2OpenDropMenu( issupplypoint )
 
         local PRIMARYROW 
         local SECONDARYROW
-        local EQUIPMENTROW
         
         -- Helper function
         local function CreateWeaponRow( text, varname, statpanel, isequipment )
@@ -329,7 +327,7 @@ function CD2OpenDropMenu( issupplypoint )
 
                 coroutine.wait( 0 )
 
-                local w, h = mdlpanel:GetSize()
+                local w = mdlpanel:GetSize()
                 local lockicon = vgui.Create( "DImage", mdlpanel )
                 lockicon:SetSize( 32, 32 )
                 lockicon:SetPos( w - 32, 32 )

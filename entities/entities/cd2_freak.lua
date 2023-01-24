@@ -55,7 +55,6 @@ local freaktypes = {
 
 local random = math.random
 local sound_Play = sound.Play
-local rand = math.Rand 
 function ENT:Initialize2()
     self:SetModel( self:ModelGet() )
     self:SetState( "SpawnAnim" )
@@ -80,8 +79,8 @@ function ENT:Initialize2()
             if self:GetRangeSquaredTo( pos ) > ( self.cd2_SightDistance * self.cd2_SightDistance ) or pos == self or pos == self:GetActiveWeapon() then return end
 
             local trace = self:Trace( nil, pos, COLLISION_GROUP_WORLD )
-            
-            self.cd2_Goal = isentity( pos ) and pos:GetPos() or pos
+            if trace.Hit and random( 1, 4) == 1 then self.cd2_Goal = isentity( pos ) and pos:GetPos() or pos end
+
             if pos and chan == CHAN_WEAPON then self:LookTo( pos, 3 ) end
         end )
 

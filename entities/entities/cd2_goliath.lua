@@ -51,7 +51,6 @@ end
 
 local random = math.random
 local sound_Play = sound.Play
-local rand = math.Rand 
 function ENT:Initialize2()
     self:SetModel( self:ModelGet() )
     self:SetState( "SpawnAnim" )
@@ -72,8 +71,8 @@ function ENT:Initialize2()
             if self:GetRangeSquaredTo( pos ) > ( self.cd2_SightDistance * self.cd2_SightDistance ) or pos == self or pos == self:GetActiveWeapon() then return end
 
             local trace = self:Trace( nil, pos, COLLISION_GROUP_WORLD )
-            
-            self.cd2_Goal = isentity( pos ) and pos:GetPos() or pos
+            if trace.Hit and random( 1, 4) == 1 then self.cd2_Goal = isentity( pos ) and pos:GetPos() or pos end
+
             if pos and chan == CHAN_WEAPON then self:LookTo( pos, 3 ) end
         end )
         
@@ -208,13 +207,13 @@ end
 function ENT:Swipe()
     if CurTime() < self.cd2_nextattack then return end
 
-    self:EmitSound2( "crackdown2/npc/goliath/goliath_hit.mp3", 10000, 5 )
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_hit.mp3", 1000, 5 )
     CD2CreateThread( function()
         self:PlayGesture( ACT_GMOD_GESTURE_RANGE_ZOMBIE )
 
         coroutine.wait( 1 )
         if !IsValid( self ) or !IsValid( self:GetEnemy() ) or self:GetRangeSquaredTo( self:GetEnemy() ) > ( 200 * 200 ) then return end
-        self:GetEnemy():EmitSound2( "crackdown2/npc/goliath/goliath_beaconhit.mp3", 10000, 10 )
+        self:GetEnemy():EmitSound2( "crackdown2/npc/goliath/goliath_beaconhit.mp3", 1000, 10 )
         local info = DamageInfo()
         info:SetAttacker( self ) 
         info:SetDamage( 40 ) 
@@ -226,9 +225,9 @@ end
 
 local anims = { "zombie_slump_rise_02_fast", "zombie_slump_rise_02_slow", "zombie_slump_rise_01" }
 function ENT:SpawnAnim()
-    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 10000, 10 )
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 1000, 10 )
     self:PlaySequenceAndWait( anims[ random( #anims ) ], 0.7 )
-    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 10000, 10 )
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_roar.mp3", 1000, 10 )
     self:PlaySequenceAndWait( "taunt_zombie", 0.5 )
     if self:GetState() == "DieSequence" then return end
     self:SetState( "MainThink" )
@@ -236,7 +235,7 @@ end
 
 function ENT:DieSequence()
     self:LookTo()
-    self:EmitSound2( "crackdown2/npc/goliath/goliath_die.mp3", 10000, 10 )
+    self:EmitSound2( "crackdown2/npc/goliath/goliath_die.mp3", 200, 10 )
     --sound.Play( "crackdown2/npc/goliath/goliath_die.mp3", self:GetPos(), 100, 1 )
     self:PlaySequenceAndWait( "death_04", 0.5 )
     net.Start( "cd2net_goliathkill", true )
@@ -302,7 +301,6 @@ end
 
 
 if CLIENT then
-    local flame = Material( "crackdown2/effects/flamelet1.png", "smooth" )
     net.Receive( "cd2net_goliathkill", function()
         local pos = net.ReadVector()
 

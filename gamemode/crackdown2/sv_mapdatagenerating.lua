@@ -1,4 +1,3 @@
-local abs = math.abs
 local random = math.random
 local Trace = util.TraceLine
 local tracetable = {}
@@ -11,7 +10,6 @@ function CD2GenerateMapData( randomize, agencystart )
         local navareas = navmesh.GetAllNavAreas()
         local averagetbl = {}
         local averageZ = 0
-        local mapunderOrigin = false
         local highareas = {}
         local hiddenvectors = {}
         local pairsfunc = randomize and RandomPairs or ipairs
@@ -403,7 +401,6 @@ function CD2LoadMapData()
             CD2DebugMessage( "Creating Location marker for beacon group " .. GroupID )
         
             function marker:OnActivate( ply ) 
-                local sndtracks = { "sound/crackdown2/music/beacon/ptb.mp3", "sound/crackdown2/music/beacon/industrialfreaks.mp3" }
                 sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
 
                 CD2DebugMessage( self, "A Beacon for AUGroup " .. GroupID .. " has been called by " .. ply:Name() )
@@ -433,33 +430,29 @@ function CD2LoadMapData()
                     marker:SetIsActive( IsValid( marker.cd2_beacon ) )
                     marker:SetNoDraw( IsValid( marker.cd2_beacon ) )
         
-                    if IsValid( marker.cd2_beacon ) then
+                    if IsValid( marker.cd2_beacon ) and marker.cd2_beacon:GetIsDetonated() then
+                        marker:Remove()
         
-                        if marker.cd2_beacon:GetIsDetonated() then
-                            marker:Remove()
-        
-                            local activecount = ents.FindByClass( "cd2_beacon" )
-                            local count = 0 
-                            for i = 1, #activecount do
-                                local beacon = activecount[ i ]
-                                if IsValid( beacon ) and beacon:GetIsDetonated() then count = count + 1 end
-                            end
-        
-                            CD2_CurrentBeacon = GroupID + 1
-                            if !KeysToTheCity() then CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", GroupID + 1 ) end
-        
-                            coroutine.wait( 7 )
-
-                            if !KeysToTheCity() and count == CD2_BeaconCount then
-                                for k, v in ipairs( player.GetAll() ) do
-                                    v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allbeacons_achieve.mp3" )
-                                end
-                            end
-        
-                            CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )
-                            break
+                        local activecount = ents.FindByClass( "cd2_beacon" )
+                        local count = 0 
+                        for i = 1, #activecount do
+                            local beacon = activecount[ i ]
+                            if IsValid( beacon ) and beacon:GetIsDetonated() then count = count + 1 end
                         end
         
+                        CD2_CurrentBeacon = GroupID + 1
+                        if !KeysToTheCity() then CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", GroupID + 1 ) end
+        
+                        coroutine.wait( 7 )
+
+                        if !KeysToTheCity() and count == CD2_BeaconCount then
+                            for k, v in ipairs( player.GetAll() ) do
+                                v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allbeacons_achieve.mp3" )
+                            end
+                        end
+        
+                        CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )
+                        break
                     end
         
                     coroutine.yield()
@@ -484,7 +477,6 @@ function CD2LoadMapData()
                 CD2PingLocation( nil, beacondata.pos )
 
                 function marker:OnActivate( ply ) 
-                    local sndtracks = { "sound/crackdown2/music/beacon/ptb.mp3", "sound/crackdown2/music/beacon/industrialfreaks.mp3" }
                     sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
 
                     CD2DebugMessage( self, "A Beacon for AUGroup " .. beacondata.AUID .. " has been called by " .. ply:Name() )
@@ -514,33 +506,29 @@ function CD2LoadMapData()
                         marker:SetIsActive( IsValid( marker.cd2_beacon ) )
                         marker:SetNoDraw( IsValid( marker.cd2_beacon ) )
             
-                        if IsValid( marker.cd2_beacon ) then
+                        if IsValid( marker.cd2_beacon ) and marker.cd2_beacon:GetIsDetonated() then
+                            marker:Remove()
             
-                            if marker.cd2_beacon:GetIsDetonated() then
-                                marker:Remove()
-            
-                                local activecount = ents.FindByClass( "cd2_beacon" )
-                                local count = 0 
-                                for i = 1, #activecount do
-                                    local beacon = activecount[ i ]
-                                    if IsValid( beacon ) and beacon:GetIsDetonated() then count = count + 1 end
-                                end
-            
-                                CD2_CurrentBeacon = group + 1
-                                if !KeysToTheCity() then CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", group + 1 ) end
-            
-                                coroutine.wait( 7 )
-
-                                if !KeysToTheCity() and count == CD2_BeaconCount then
-                                    for k, v in ipairs( player.GetAll() ) do
-                                        v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allbeacons_achieve.mp3" )
-                                    end
-                                end
-            
-                                CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )
-                                break
+                            local activecount = ents.FindByClass( "cd2_beacon" )
+                            local count = 0 
+                            for i = 1, #activecount do
+                                local beacon = activecount[ i ]
+                                if IsValid( beacon ) and beacon:GetIsDetonated() then count = count + 1 end
                             end
             
+                            CD2_CurrentBeacon = group + 1
+                            if !KeysToTheCity() then CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", group + 1 ) end
+            
+                            coroutine.wait( 7 )
+
+                            if !KeysToTheCity() and count == CD2_BeaconCount then
+                                for k, v in ipairs( player.GetAll() ) do
+                                    v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allbeacons_achieve.mp3" )
+                                end
+                            end
+            
+                            CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )
+                            break
                         end
             
                         coroutine.yield()

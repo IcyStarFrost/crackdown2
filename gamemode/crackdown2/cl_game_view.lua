@@ -9,7 +9,6 @@ local Trace = util.TraceLine
 local clamp = math.Clamp
 local zerovec = Vector()
 local calctable = {} -- Recycled table
-local overridetable = {}
 
 CD2_plyangle = nil -- The angle our player is facing
 

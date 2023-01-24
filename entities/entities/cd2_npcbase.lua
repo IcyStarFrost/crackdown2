@@ -377,13 +377,10 @@ function ENT:Think()
 
     if SERVER then self.cd2_FallVelocity = !self:IsOnGround() and self.loco:GetVelocity()[ 3 ] or self.cd2_FallVelocity end
     
-    if SERVER and ( self.cd2_NextRegenTime and CurTime() > self.cd2_NextRegenTime ) and self:Health() < self:GetMaxHealth() then
-
-        if !self.cd2_NextRegen or CurTime() > self.cd2_NextRegen then
+    if SERVER and ( self.cd2_NextRegenTime and CurTime() > self.cd2_NextRegenTime ) and self:Health() < self:GetMaxHealth() and ( !self.cd2_NextRegen or CurTime() > self.cd2_NextRegen ) then
             self:SetHealth( self:Health() + 1 )
             self:SetNW2Float( "cd2_health", self:Health() )
             self.cd2_NextRegen = CurTime() + 0.03
-        end
     end
 
     if SERVER and CurTime() > self.cd2_NextPVScheck then
@@ -436,25 +433,25 @@ function ENT:Think()
             local aimangle = ( pos - self:EyePos2() ):Angle()
 
             local loca = self:WorldToLocalAngles( aimangle )
-            local approachy = Lerp( 5 * FrameTime(), self:GetPoseParameter('head_yaw'), loca[2] )
-            local approachp = Lerp( 5 * FrameTime(), self:GetPoseParameter('head_pitch'), loca[1] )
-            local approachaimy = Lerp( 5 * FrameTime(), self:GetPoseParameter('aim_yaw'), loca[2] )
-            local approachaimp = Lerp( 5 * FrameTime(), self:GetPoseParameter('aim_pitch'), loca[1] )
+            local approachy = Lerp( 5 * FrameTime(), self:GetPoseParameter("head_yaw"), loca[2] )
+            local approachp = Lerp( 5 * FrameTime(), self:GetPoseParameter("head_pitch"), loca[1] )
+            local approachaimy = Lerp( 5 * FrameTime(), self:GetPoseParameter("aim_yaw"), loca[2] )
+            local approachaimp = Lerp( 5 * FrameTime(), self:GetPoseParameter("aim_pitch"), loca[1] )
 
-            self:SetPoseParameter( 'head_yaw', approachy )
-            self:SetPoseParameter( 'head_pitch', approachp )
-            self:SetPoseParameter( 'aim_yaw', approachaimy )
-            self:SetPoseParameter( 'aim_pitch', approachaimp )
+            self:SetPoseParameter( "head_yaw", approachy )
+            self:SetPoseParameter( "head_pitch", approachp )
+            self:SetPoseParameter( "aim_yaw", approachaimy )
+            self:SetPoseParameter( "aim_pitch", approachaimp )
         else
-            local approachy = Lerp( 4 * FrameTime(), self:GetPoseParameter('head_yaw'), 0 )
-            local approachp = Lerp( 4 * FrameTime(), self:GetPoseParameter('head_pitch'), 0 )
-            local approachaimy = Lerp( 4 * FrameTime(), self:GetPoseParameter('aim_yaw'), 0 )
-            local approachaimp = Lerp( 4 * FrameTime(), self:GetPoseParameter('aim_pitch'), 0 )
+            local approachy = Lerp( 4 * FrameTime(), self:GetPoseParameter("head_yaw"), 0 )
+            local approachp = Lerp( 4 * FrameTime(), self:GetPoseParameter("head_pitch"), 0 )
+            local approachaimy = Lerp( 4 * FrameTime(), self:GetPoseParameter("aim_yaw"), 0 )
+            local approachaimp = Lerp( 4 * FrameTime(), self:GetPoseParameter("aim_pitch"), 0 )
 
-            self:SetPoseParameter( 'head_yaw', approachy )
-            self:SetPoseParameter( 'head_pitch', approachp )
-            self:SetPoseParameter( 'aim_yaw', approachaimy )
-            self:SetPoseParameter( 'aim_pitch', approachaimp )
+            self:SetPoseParameter( "head_yaw", approachy )
+            self:SetPoseParameter( "head_pitch", approachp )
+            self:SetPoseParameter( "aim_yaw", approachaimy )
+            self:SetPoseParameter( "aim_pitch", approachaimp )
         end
 
     end

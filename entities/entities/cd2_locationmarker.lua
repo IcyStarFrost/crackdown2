@@ -335,10 +335,7 @@ if CLIENT then
     local surface_DrawPoly = surface.DrawPoly
     local surface_SetDrawColor = surface.SetDrawColor
     local surface_DrawTexturedRect = surface.DrawTexturedRect
-    local render_SetMaterial = render.SetMaterial
-    local draw_NoTexture = draw.NoTexture
     local surface_SetMaterial = surface.SetMaterial
-    local clamp = math.Clamp
     local sin = math.sin
     local SysTime = SysTime
     local abs = math.abs

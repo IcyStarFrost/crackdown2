@@ -3,11 +3,9 @@ AddCSLuaFile()
 ENT.Base = "base_anim"
 
 local IsValid = IsValid
-local random = math.random
 local abs = math.abs
 local math_sin = math.sin
 local max = math.max
-local player_GetAll = player.GetAll
 local math_cos = math.cos
 local pairs = pairs
 local ipairs = ipairs

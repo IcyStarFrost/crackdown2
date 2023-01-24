@@ -850,31 +850,29 @@ function ENT:Think()
         end
 
         -- Smaller energy particles after the Beacon has detonated
-        if self:GetIsDetonated() and LocalPlayer():SqrRangeTo( self ) < ( 1500 * 1500 ) then
-            if !self.cd2_nextenergycoreparticle or SysTime() > self.cd2_nextenergycoreparticle then
-                local particle = ParticleEmitter( self:GetCore():GetPos() )
-                local part = particle:Add( energy, self:GetCore():GetPos() )
+        if self:GetIsDetonated() and LocalPlayer():SqrRangeTo( self ) < ( 1500 * 1500 ) and ( !self.cd2_nextenergycoreparticle or SysTime() > self.cd2_nextenergycoreparticle ) then
+            local particle = ParticleEmitter( self:GetCore():GetPos() )
+            local part = particle:Add( energy, self:GetCore():GetPos() )
 
-                if part then
-                    part:SetStartSize( 10 )
-                    part:SetEndSize( 10 ) 
-                    part:SetStartAlpha( 255 )
-                    part:SetEndAlpha( 0 )
+            if part then
+                part:SetStartSize( 10 )
+                part:SetEndSize( 10 ) 
+                part:SetStartAlpha( 255 )
+                part:SetEndAlpha( 0 )
         
-                    part:SetColor( 255, 255, 255 )
-                    part:SetLighting( false )
-                    part:SetCollide( false )
+                part:SetColor( 255, 255, 255 )
+                part:SetLighting( false )
+                part:SetCollide( false )
         
-                    part:SetDieTime( 3 )
-                    part:SetGravity( Vector() )
-                    part:SetAirResistance( 100 )
-                    part:SetVelocity( VectorRand( -100, 100 ) )
-                    part:SetAngleVelocity( AngleRand( -1, 1 ) )
-                end
-
-                particle:Finish()
-                self.cd2_nextenergycoreparticle = SysTime() + 0.08
+                part:SetDieTime( 3 )
+                part:SetGravity( Vector() )
+                part:SetAirResistance( 100 )
+                part:SetVelocity( VectorRand( -100, 100 ) )
+                part:SetAngleVelocity( AngleRand( -1, 1 ) )
             end
+
+            particle:Finish()
+            self.cd2_nextenergycoreparticle = SysTime() + 0.08
         end
 
     end
@@ -885,16 +883,14 @@ function ENT:Think()
 end
 
 function ENT:OnRemove()
-    if SERVER then
-        
-    elseif CLIENT then
+    if CLIENT then
         if IsValid( self.cd2_beaconambient ) then self.cd2_beaconambient:Stop() end
         if IsValid( self.cd2_ringambient ) then self.cd2_ringambient:Stop() end
     end
 end
 
 function ENT:SetRandomSoundTrack()
-    local files, dirs = file.Find( "sound/crackdown2/music/beacon/*", "GAME" )
+    local files = file.Find( "sound/crackdown2/music/beacon/*", "GAME" )
     for k, v in RandomPairs( files ) do
         if string.EndsWith( v, "_intro.mp3" ) then
             self:SetSoundTrack( "sound/crackdown2/music/beacon/" .. string.Replace( v, "_intro", "" ) )

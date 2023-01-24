@@ -77,7 +77,7 @@ end
 function CD2DrawInputbar( x, y, keyname, text )
 
     surface_SetFont( "crackdown2_font30" )
-    local sizex, sizey = surface_GetTextSize( text )
+    local sizex = surface_GetTextSize( text )
 
     draw.NoTexture()
     surface_SetDrawColor( blackish )
@@ -92,7 +92,6 @@ function CD2DrawInputbar( x, y, keyname, text )
     
 end
 
-local explosives = {}
 local fireicon = Material( "crackdown2/ui/explosive.png" )
 
 local pingtimes
@@ -112,7 +111,6 @@ local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
 local downicon = Material( "crackdown2/ui/down.png", "smooth" )
 local skillcircle = Material( "crackdown2/ui/skillcircle.png" )
 local hex = Material( "crackdown2/ui/hex.png", "smooth" )
-local peacekeepertrace = {}
 
 local skillglow = Material( "crackdown2/ui/skillglow2.png" )
 local agilityicon = Material( "crackdown2/ui/agilityicon.png", "smooth" )
@@ -372,7 +370,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
     -- Health and Shields --
     if CD2_DrawHealthandShields then
-        local hp, maxhp, shield, maxshields, hpbars = ply:Health(), ply:GetMaxHealth(), clamp( ply:Armor(), 0, 100 ), ply:GetMaxArmor(), ( ceil( ply:Health() / 100 ) )
+        local hp, shield, maxshields, hpbars = ply:Health(), clamp( ply:Armor(), 0, 100 ), ply:GetMaxArmor(), ( ceil( ply:Health() / 100 ) )
 
         hplerp = hplerp == -1 and hp or hplerp
         shieldlerp = shieldlerp == -1 and shield or shieldlerp
@@ -677,7 +675,7 @@ local explosivemodels = {
 
 -- Peacekeeper/Cell logos --
 hook.Add( "PreDrawEffects", "crackdown2_peacekeepericons/cellicons", function()
-    local scrw, scrh, ply = ScrW(), ScrH(), LocalPlayer()
+    local ply = LocalPlayer()
     if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then return end
     
 

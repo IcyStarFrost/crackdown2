@@ -241,7 +241,7 @@ function ENT:Panicked()
     
     self:StartPanicAnim()
 
-    local result = self:MoveToPos( pos )
+    self:MoveToPos( pos )
 
 end
 

@@ -20,7 +20,6 @@ ENT.Clusters = {}
 local random = math.random
 local Trace = util.TraceLine
 local normaltrace = {}
-local util_SpriteTrail = util.SpriteTrail
 
 local skillsounds = { [ 1 ] = "crackdown2/weapons/explosiveskill1.wav", [ 2 ] = "crackdown2/weapons/explosiveskill2.wav", [ 3 ] = "crackdown2/weapons/explosiveskill3.wav" }
 local highskillsounds = { "crackdown2/weapons/explosiveskill4.wav", "crackdown2/weapons/explosiveskill5.wav", "crackdown2/weapons/explosiveskill6.wav" }

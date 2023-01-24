@@ -27,7 +27,7 @@ hook.Add( "PlayerCanPickupWeapon", "crackdown2_npcweapons", function( ply, wep )
             for k, v in ipairs( ply:GetWeapons() ) do
                 if v != ply:GetActiveWeapon() then 
                     ply.cd2_holsteredweapon:SetModel( v:GetModel() )
-                    local mins, maxs = ply.cd2_holsteredweapon:GetModelBounds()
+                    local mins = ply.cd2_holsteredweapon:GetModelBounds()
                     ply.cd2_holsteredweapon:SetLocalPos( Vector( -10, -9, 0 ) - mins / 2 )
                     break 
                 end 

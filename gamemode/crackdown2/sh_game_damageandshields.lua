@@ -1,4 +1,3 @@
-local abs = math.abs
 
 if SERVER then
 
@@ -12,8 +11,6 @@ if SERVER then
 
         local shields = ent:Armor()
         local damage = info:GetDamage()
-        local shielddamage = ent:Armor() - damage
-        local leftover = abs( shielddamage )
 
         if shields >= damage then
             ent:SetArmor( shields - damage )

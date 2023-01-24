@@ -27,7 +27,6 @@ function CD2CreateRagdoll( ply )
 
     for i = 0, ply:GetBoneCount() - 1 do
         local phys = ragdoll:GetPhysicsObjectNum( ragdoll:TranslateBoneToPhysBone( i ) )
-        local phys2 = ply:GetPhysicsObjectNum( ply:TranslateBoneToPhysBone( i ) )
         if IsValid( phys ) then phys:SetVelocity( ply:GetVelocity() ) end
     end
 

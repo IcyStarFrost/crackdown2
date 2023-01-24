@@ -4,7 +4,6 @@ ENT.Base = "base_anim"
 
 local IsValid = IsValid
 local random = math.random
-local LerpVector = LerpVector
 local Trace = util.TraceLine
 local ztrace = {}
 local skillparticle = Material( "crackdown2/effects/skillparticle.png" )

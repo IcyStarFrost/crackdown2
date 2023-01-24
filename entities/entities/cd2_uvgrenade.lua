@@ -29,11 +29,11 @@ function ENT:OnDelayEnd()
         blast:SetDamage( 20 + ( skilllevel > 1 and 30 * skilllevel or 0 ) )
         blast:SetDamageType( DMG_BLAST + DMG_SHOCK )
         blast:SetDamagePosition( self:GetPos() )
-
+        
         util.BlastDamageInfo( blast, self:GetPos(), 600 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
 
         for k, v in ipairs( CD2FindInSphere( self:GetPos(), 600 + ( skilllevel > 1 and 50 * skilllevel or 0 ), function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" end ) ) do
-            local blast = DamageInfo()
+            blast = DamageInfo()
             blast:SetAttacker( IsValid( self:GetThrower() ) and self:GetThrower() or self )
             blast:SetInflictor( self )
             blast:SetDamage( v:GetMaxHealth() )
@@ -47,7 +47,7 @@ function ENT:OnDelayEnd()
             v:TakeDamageInfo( blast )
         end
         sound.Play( "ambient/levels/labs/electric_explosion" .. random( 1, 5 ) .. ".wav", self:GetPos(), 90, 100, 1 )
-        sound.Play( "ambient/explosions/explode_7.wav", self:GetPos(), 90, 100, 1 )
+        sound.Play( "crackdown2/weapons/uvgrenadeblast" .. random( 1, 2 ) .. ".mp3", self:GetPos(), 100, 100, 1 )
 
         net.Start( "cd2net_uvgrenadeexplode" )
         net.WriteVector( self:GetPos() )
@@ -132,7 +132,7 @@ if CLIENT then
     
         particle:Finish()
 
-        local particle = ParticleEmitter( pos )
+        particle = ParticleEmitter( pos )
         for i = 1, 40 do
             
             local part = particle:Add( energy, pos )

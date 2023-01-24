@@ -230,9 +230,7 @@ end
 
 function PLAYER:BuildSkills()
     local strength = self:GetStrengthSkill()
-    local firearm = self:GetWeaponSkill()
     local agility = self:GetAgilitySkill()
-    local explosive = self:GetExplosiveSkill()
 
     self:SetMeleeDamage( 25 * strength )
     self:SetMaxPickupWeight( 200 * strength )

@@ -62,9 +62,7 @@ end )
 
 -- Melee System
 
-local TraceHull = util.TraceHull
 local FindInBox = ents.FindInBox
-local hulltbl = {}
 local meleeanims = { ACT_HL2MP_GESTURE_RANGE_ATTACK_FIST, ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE2 }
 local red = Color( 209, 42, 0 )
 

@@ -1,7 +1,6 @@
 DEFINE_BASECLASS( "player_default" )
 
 local black = Color( 0, 0, 0 )
-local random = math.random
  
 local PLAYER = {} 
 
@@ -149,7 +148,7 @@ function PLAYER:Spawn()
             ply.cd2_holsteredweapon:SetAngles( ply:GetAngles() )
             ply.cd2_holsteredweapon:Spawn()
 
-            local mins, maxs = ply.cd2_holsteredweapon:GetModelBounds()
+            local mins = ply.cd2_holsteredweapon:GetModelBounds()
             ply.cd2_holsteredweapon:FollowBone( ply, ply:LookupBone( "ValveBiped.Bip01_Spine2" ) )
             ply.cd2_holsteredweapon:SetLocalPos( Vector( -10, -9, 0 ) - mins / 2 ) 
             ply.cd2_holsteredweapon:SetLocalAngles( Angle( 40, 0, 0 ) )

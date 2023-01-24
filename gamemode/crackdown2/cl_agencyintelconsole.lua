@@ -10,7 +10,6 @@ local Trace = util.TraceLine
 local fadedwhite = Color( 255, 255, 255, 10 )
 local math_deg = math.deg
 local math_rad = math.rad
-local math_sqrt = math.sqrt
 local math_atan2 = math.atan2
 local math_cos = math.cos
 local player_GetAll = player.GetAll
@@ -18,11 +17,8 @@ local math_sin = math.sin
 local surface_SetDrawColor = surface.SetDrawColor
 local surface_SetMaterial = surface.SetMaterial
 local surface_DrawTexturedRectRotated = surface.DrawTexturedRectRotated
-local curfov = 90
-local clamp = math.Clamp
 local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
 local beaconicon = Material( "crackdown2/ui/beacon.png" )
-local cellicon = Material( "crackdown2/ui/celltrackericon.png" )
 local cellwhite = Color( 255, 255, 255 )
 local Auicon = Material( "crackdown2/ui/auicon.png" )
 local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
@@ -240,7 +236,6 @@ function OpenIntelConsole()
 
     local viewoffset = Vector()
     local znear
-    local limittime = 0
 
     hook.Add( "Think", mappnl, function()
         if mappnl:IsVisible() then

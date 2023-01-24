@@ -2,7 +2,6 @@ local random = math.random
 local rand = math.Rand
 local IsValid = IsValid
 local table_remove = table.remove
-local RandomPairs = RandomPairs
 
 if SERVER then
     -- Setting up the npc limits
@@ -129,7 +128,7 @@ if SERVER then
 
         -- Civilians --
         if GetCivilianCount() < CD2_MaxCivilians and CurTime() > CD2_NextCivilianSpawn then
-            local civ = SpawnNPC( nil, "cd2_civilian", GetRandomPlayer() )
+            SpawnNPC( nil, "cd2_civilian", GetRandomPlayer() )
             CD2_NextCivilianSpawn = CD2IsDay() and CurTime() + 1 or !CD2IsDay() and CurTime() + 4
         end
         --
@@ -140,7 +139,7 @@ if SERVER then
                 local lead = SpawnNPC( nil, npcs[ random( #npcs ) ], GetRandomPlayer() )
 
                 if IsValid( lead ) and GetCellCount() < CD2_MaxCell then
-                    local other = SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), npcs[ random( #npcs ) ], GetRandomPlayer() )
+                    SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), npcs[ random( #npcs ) ], GetRandomPlayer() )
                 end
 
                 CD2_NextCellSpawn = CurTime() + rand( 1, 25 )
@@ -152,7 +151,7 @@ if SERVER then
             local lead = SpawnNPC( nil, "cd2_peacekeeper", GetRandomPlayer() )
 
             if IsValid( lead ) and GetPeaceKeeperCount() < CD2_MaxPeaceKeepers then
-                local other = SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), "cd2_peacekeeper", GetRandomPlayer() )
+                SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), "cd2_peacekeeper", GetRandomPlayer() )
             end
 
             CD2_NextPeaceKeeperSpawn = CurTime() + rand( 1, 30 )

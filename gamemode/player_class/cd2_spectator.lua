@@ -1,6 +1,4 @@
 DEFINE_BASECLASS( "player_default" )
-
-local black = Color( 0, 0, 0 )
  
 local PLAYER = {} 
 

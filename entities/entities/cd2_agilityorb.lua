@@ -3,7 +3,6 @@ AddCSLuaFile()
 ENT.Base = "base_anim"
 
 local IsValid = IsValid
-local random = math.random
 local beam = Material( "crackdown2/effects/lightbeam.png", "smooth" )
 local abs = math.abs
 local math_sin = math.sin

@@ -254,8 +254,6 @@ function CD2OpenMainMenu()
     end
 
     function CD2_MainMenu:OnKeyCodePressed( key ) 
-        local jumpbind = input.LookupBinding( "+jump" ) or "SPACE"
-        local jumpcode = input.GetKeyCode( jumpbind )
 
         if key and !MenuPanelHolder:IsVisible() then
             surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )

@@ -1,4 +1,3 @@
-local Lerp = Lerp
 local Trace = util.TraceLine
 local random = math.random
 
@@ -6,9 +5,6 @@ local random = math.random
 net.Receive( "cd2net_playerhurt", function()
     LocalPlayer().cd_NextRegenTime = CurTime() + 8
 end )
-
-local volume = 1
-local fadeout = 1
 
 -- Death music
 net.Receive( "cd2net_playerkilled", function()
@@ -69,7 +65,6 @@ net.Receive( "cd2net_playerrespawn_revive", function()
 end )
 
 local util_DecalEx = util.DecalEx
-local render_GetSurfaceColor = render.GetSurfaceColor
 local landingtbl = {}
 net.Receive( "cd2net_playerlandingdecal", function() 
     local pos = net.ReadVector()
@@ -182,7 +177,6 @@ local surface_SetMaterial = surface.SetMaterial
 local surface_SetDrawColor = surface.SetDrawColor
 local surface_DrawRect = surface.DrawRect
 local background = Material( "crackdown2/dropmenu/bg.png", "smooth" )
-local black = Color( 0, 0, 0 )
 local blackish = Color( 39, 39, 39)
 local grey = Color( 100, 100, 100 )
 net.Receive( "cd2net_playerinitialspawn", function()
@@ -409,7 +403,6 @@ net.Receive( "cd2net_playerlevelupeffect", function()
     end )
 end )
 
-local flame = Material( "crackdown2/effects/flamelet1.png" )
 net.Receive( "cd2net_freakkill", function()
     local pos = net.ReadVector()
 
@@ -452,6 +445,7 @@ net.Receive( "cd2net_emitsound2", function()
         if id then return end
         chan:SetVolume( volume )
         chan:SetPos( ent:GetPos() )
+        chan:Set3DFadeDistance( snddist or 200, 0 )
         chan:Play()
 
         hook.Add( "Think", ent, function()  

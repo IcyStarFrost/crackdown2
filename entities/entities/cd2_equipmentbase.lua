@@ -33,7 +33,6 @@ local max = math.max
 local IsValid = IsValid
 local util_SpriteTrail = util.SpriteTrail
 local IsValid = IsValid
-local random = math.random
 local clamp = math.Clamp
 local LerpVector = LerpVector 
 local Lerp = Lerp
@@ -44,7 +43,6 @@ local surface_DrawPoly = CLIENT and surface.DrawPoly
 local surface_SetDrawColor = CLIENT and surface.SetDrawColor
 local surface_SetMaterial = CLIENT and surface.SetMaterial
 local draw_NoTexture = CLIENT and draw.NoTexture
-local surface_DrawRect = CLIENT and surface.DrawRect
 local Trace = util.TraceLine
 local math_cos = math.cos
 local math_sin = math.sin
@@ -268,8 +266,6 @@ function ENT:Draw()
 
     self.cd2_effectdelay = self.cd2_effectdelay or SysTime() + 0.5
     if !IsValid( self:GetThrower() ) and !self:GetHadThrower() and self:GetVelocity():IsZero() and LocalPlayer():SqrRangeTo( self ) < ( 2000 * 2000 ) then
-        local wep = LocalPlayer():GetWeapon( self:GetClass() )
-
         if !LocalPlayer():IsCD2Agent() or SysTime() < self.cd2_effectdelay or ( LocalPlayer():GetEquipmentCount() == LocalPlayer():GetMaxEquipmentCount() and LocalPlayer():GetEquipment() == self:GetClass() ) then 
             self:SetupBones()
             self:SetPos( self:GetNetworkOrigin() )

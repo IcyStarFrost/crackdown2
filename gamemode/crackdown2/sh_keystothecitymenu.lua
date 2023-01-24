@@ -1,7 +1,6 @@
 if CLIENT then
     local surface_SetDrawColor = surface.SetDrawColor
     local surface_DrawRect = surface.DrawRect
-    local blackish = Color( 39, 39, 39 )
     local black = Color( 0, 0, 0 )
     local bg = Color( 39, 39, 39, 100 )
     local linecol = Color( 61, 61, 61, 100 )
@@ -442,7 +441,6 @@ if CLIENT then
         local nextcanpress = 0
         function CD2_KeysToTheCityMenu:Think()
             if SysTime() < nextcanpress or LocalPlayer():IsTyping() then return end
-            local ply = LocalPlayer()
 
             if input.IsKeyDown( KEY_DOWN ) then
 
@@ -521,9 +519,7 @@ elseif SERVER then
 
     local Trace = util.TraceLine
     local tracetable = {}
-    local random = math.random
     
-    local sndtracks = { "sound/crackdown2/music/beacon/ptb.mp3", "sound/crackdown2/music/beacon/industrialfreaks.mp3" }
     net.Receive( "cd2net_kttc_spawnbeacon", function( len, ply )
         local pos = ply:GetPos() + ply:GetForward() * 100
 

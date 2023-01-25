@@ -131,8 +131,8 @@ function ENT:EnableBeam()
 end
 
 function ENT:OnRemove()
-    if CLIENT then
-        if IsValid( self.cd2_ambientsnd ) then self.cd2_ambientsnd:Stop() end
+    if CLIENT and IsValid( self.cd2_ambientsnd ) then
+        self.cd2_ambientsnd:Stop()
     end
 end
 

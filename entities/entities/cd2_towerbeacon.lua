@@ -89,7 +89,7 @@ function ENT:HUDDraw()
     -- Icon
     surface.SetDrawColor( color_white )
     surface.SetMaterial( core1icon )
-    surface.DrawTexturedRect( ScrW() - 420,  40, 64, 64 )
+    surface.DrawTexturedRect( ScrW() - 460,  40, 100, 100 )
 
     self.cd2_corecolor.r = Lerp( 1 * FrameTime(), self.cd2_corecolor.r, 0 )
     self.cd2_corecolor.g = Lerp( 1 * FrameTime(), self.cd2_corecolor.g, 110 )

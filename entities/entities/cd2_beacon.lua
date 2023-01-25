@@ -194,8 +194,8 @@ end
 local difficultydividers = {
     [ 1 ] = 20,
     [ 2 ] = 20,
-    [ 3 ] = 30,
-    [ 4 ] = 30,
+    [ 3 ] = 20,
+    [ 4 ] = 20,
 }
 
 
@@ -714,6 +714,7 @@ function ENT:Think()
         end
 
         if self:GetIsCharging() and !self.cd2_damagewarning and self:GetBeaconHealth() < 60 then
+            local players = player.GetAll()
             if !KeysToTheCity() then
                 for i = 1, #players do 
                     local ply = players[ i ]

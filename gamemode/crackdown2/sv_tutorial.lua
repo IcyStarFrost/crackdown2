@@ -495,6 +495,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             ply:Freeze( false )
             ply.cd2_godmode = false
 
+            CD2PingLocation( ply, GetGlobal2Vector( "cd2_beginnerlocation" ) )
+
             while !CD2_BeginnerLocation:GetIsActive() do coroutine.yield() end
 
             coroutine.wait( 5 )

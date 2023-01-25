@@ -15,6 +15,7 @@ function CD2GenerateMapData( randomize, agencystart )
         local pairsfunc = randomize and RandomPairs or ipairs
 
         local agilityorbdata = {}
+        local finalbeacondata = {}
         local tacticallocationdata = {}
         local hiddenorbdata = {}
         local onlineorbdata = {}
@@ -221,6 +222,16 @@ function CD2GenerateMapData( randomize, agencystart )
 
         CD2DebugMessage( "Generated " .. #tacticallocationdata .. " Tactical Locations" )
 
+
+        -- Final Beacon --
+        for k, nav in pairsfunc( navareas ) do
+            if !IsValid( nav ) or nav:IsUnderwater() or nav:GetSizeX() < 80 and nav:GetSizeY() < 80 or !nav:IsFlat() then continue end
+            local pos = nav:GetCenter()
+            finalbeacondata[ 1 ] = { pos = pos, isdetonated = false }
+            break
+        end
+        
+
         -- First Beacon --
         local pos = GetGlobal2Vector( "cd2_beginnerlocation" )
 
@@ -237,6 +248,7 @@ function CD2GenerateMapData( randomize, agencystart )
         CD2_HiddenOrbCount = #hiddenorbdata
         CD2_OnlineOrbCount = #onlineorbdata
 
+        CD2_FinalBeaconData = finalbeacondata
         CD2_BeaconData = beacondata
         CD2_CurrentBeacon = 1
 
@@ -248,6 +260,7 @@ function CD2GenerateMapData( randomize, agencystart )
         CD2DebugMessage( "Completed Map Data Generation for " .. game.GetMap() )
         
         if !KeysToTheCity() then
+            CD2FILESYSTEM:WriteMapData( "cd2_map_finalbeacon", finalbeacondata )
             CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", 1 )
             CD2FILESYSTEM:WriteMapData( "cd2_map_beacondata", beacondata )
             CD2FILESYSTEM:WriteMapData( "cd2_map_agilityorbdata", agilityorbdata )
@@ -463,30 +476,30 @@ function CD2LoadMapData()
             local id = tostring( beacondata )
 
             hook.Add( "CD2_PowerNetworkComplete", "crackdown2_networkwatcher" .. id, function( group )
-                if group != beacondata.AUID then return end
+                if group != beacongroup.AUID then return end
                 CD2DebugMessage( "AU Group " .. group .. " power network has been completed!" )
                 hook.Remove( "CD2_PowerNetworkComplete", "crackdown2_networkwatcher" .. id )
 
                 local marker = ents.Create( "cd2_locationmarker" )
-                marker:SetPos( beacondata.pos ) 
+                marker:SetPos( beacongroup.pos ) 
                 marker:SetLocationType( "beacon" )
                 au.cd2_map_isgenerated = true
                 au.cd2_map_id = AUID
-                marker.cd2_AUgroup = beacondata.AUID
+                marker.cd2_AUgroup = beacongroup.AUID
             
-                CD2PingLocation( nil, beacondata.pos )
+                CD2PingLocation( nil, beacongroup.pos )
 
                 function marker:OnActivate( ply ) 
                     sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
 
-                    CD2DebugMessage( self, "A Beacon for AUGroup " .. beacondata.AUID .. " has been called by " .. ply:Name() )
+                    CD2DebugMessage( self, "A Beacon for AUGroup " .. beacongroup.AUID .. " has been called by " .. ply:Name() )
             
                     marker.cd2_beacon = ents.Create( "cd2_beacon" )
-                    marker.cd2_beacon:SetPos( beacondata.beaconspawnpos )
+                    marker.cd2_beacon:SetPos( beacongroup.beaconspawnpos )
                     
                     marker.cd2_beacon.cd2_map_isgenerated = true
-                    marker.cd2_beacon.cd2_map_id = beacondata.id
-                    marker.cd2_beacon.cd2_AUgroup = beacondata.AUID
+                    marker.cd2_beacon.cd2_map_id = beacongroup.id
+                    marker.cd2_beacon.cd2_AUgroup = beacongroup.AUID
             
                     marker.cd2_beacon:SetRandomSoundTrack()
             

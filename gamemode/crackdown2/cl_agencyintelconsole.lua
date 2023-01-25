@@ -32,6 +32,7 @@ local pingtimes
 local pingscale = 0
 local pinglocation
 local canping = true
+local viewoffset = Vector()
 
 function CD2PingLocationOnConsole( pos )
     pingtimes = 0
@@ -86,6 +87,8 @@ function OpenIntelConsole()
     end
 
     if !CD2_CanOpenAgencyConsole then return end
+
+    viewoffset = Vector()
 
     net.Start( "cd2net_playeropenintelconsole" )
     net.WriteBool( true )
@@ -234,7 +237,6 @@ function OpenIntelConsole()
 
     AddPanelToConsole( mappnl, "Open Overhead View", true )
 
-    local viewoffset = Vector()
     local znear
 
     hook.Add( "Think", mappnl, function()
@@ -309,7 +311,7 @@ function OpenIntelConsole()
                 pingtimes = nil
             else
                 pingscale = Lerp( 3.5 * FrameTime(), pingscale, 40 )
-                DrawCoordsOnMap( self, pinglocation, plypos, CD2_viewangles, pingmat, pingscale, cellwhite, 30 )
+                DrawCoordsOnMap( self, pinglocation - viewoffset, plypos, CD2_viewangles, pingmat, pingscale, cellwhite, 30 )
 
                 if canping then
                     surface.PlaySound( "crackdown2/ui/ping.mp3" )

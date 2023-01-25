@@ -269,6 +269,8 @@ function ENT:Initialize()
     self:SetShouldServerRagdoll( true )
     self:AddFlags( FL_NPC )
 
+    if SERVER then self.cd2_deletetime = CurTime() + 2 end
+
     if SERVER and self.cd2_Weapon != "none" then self:Give( self.cd2_Weapon ) end
 
     if SERVER then
@@ -358,6 +360,12 @@ function ENT:Think()
             self:SetIsDisabled( false )
         end
         if Entity( 1 ):TestPVS( self ) or Entity( 1 ):SqrRangeTo( self ) < ( 1500 * 1500 ) then self.cd2_pvsremovetime = CurTime() + 10 end
+    end
+
+    if SERVER and self:Health() > 0 then
+        self.cd2_deletetime = CurTime() + 10
+    elseif SERVER and self:Health() <= 0 and CurTime() > self.cd2_deletetime then
+        self:Remove()
     end
 
     if CurTime() > self.cd2_PhysicsUpdate then

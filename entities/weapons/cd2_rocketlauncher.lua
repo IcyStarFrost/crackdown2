@@ -63,6 +63,8 @@ function SWEP:PrimaryAttack()
         rocket:SetSaveValue( "m_flDamage", 200 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
         rocket:Spawn()
 
+        rocket:SetLocalVelocity( rocket:GetForward() * 2000 )
+
         rocket:CallOnRemove( "explodeeffects", function()
 
             if skilllevel > 1 then

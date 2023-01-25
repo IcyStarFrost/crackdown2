@@ -100,7 +100,6 @@ function ENT:OnCollected( ply )
 
     if CLIENT then
         sound.Play( "crackdown2/ambient/agilityorbcollect.mp3", self:GetPos(), 80, 100, 1 )    
-        if ply == LocalPlayer() then CD2SetTextBoxText( "Well done. You found a Agility Orb!" ) end
     end
 
     if SERVER then
@@ -109,6 +108,8 @@ function ENT:OnCollected( ply )
         for i = 1, orbcount do
             CD2CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, Color( 0, 255, 0 ) )
         end
+
+        CD2SendTextBoxMessage( ply, "Well done. You found a Agility Orb!" )
 
         if !KeysToTheCity() and !ply.cd2_InTutorial and !ply.cd2_hadfirstagilityorb then
             CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstagilityorb", function( val ) 

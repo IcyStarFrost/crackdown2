@@ -115,7 +115,7 @@ if SERVER then
 
             CD2DebugMessage( "Received a data chunk from " .. ply:Name() .. " for " .. var  )
 
-            if isdone then callback( JSONToTable( chunks )[ 1 ] ) CD2DebugMessage( "Received all data chunks for " .. var ) end
+            if isdone then local tbl = JSONToTable( chunks ) local val = tbl and tbl[ 1 ] or nil callback( val ) CD2DebugMessage( "Received all data chunks for " .. var ) end
         end )
     end
 

@@ -98,7 +98,6 @@ function ENT:OnCollected( ply )
 
     if CLIENT then
         sound.Play( "crackdown2/ambient/hiddenorb_collect.mp3", self:GetPos(), 80, 100, 1 )    
-        if ply == LocalPlayer() then CD2SetTextBoxText( "Well done. You found a Hidden Orb!" ) end
     end
 
     if SERVER then
@@ -109,6 +108,8 @@ function ENT:OnCollected( ply )
             CD2CreateSkillGainOrb( self:GetPos(), ply, "Strength", 1, strengthskillcolor )
             CD2CreateSkillGainOrb( self:GetPos(), ply, "Explosive", 0.4, explosiveskillcolor )
         end
+
+        CD2SendTextBoxMessage( ply, "Well done. You found a Hidden Orb!" )
 
         if !KeysToTheCity() and !ply.cd2_hadfirsthiddenorb then
             CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firsthiddenorb", function( val ) 

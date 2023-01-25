@@ -241,6 +241,13 @@ if CLIENT then
             net.Start( "cd2net_kttc_spawnbeacon" )
             net.SendToServer()
         end )
+
+        AddOption( "Spawn Tower Beacon", "Agency", "Button", { default = false }, function( pnl )
+            net.Start( "cd2net_kttc_spawnnpc" )
+            net.WriteString( "cd2_towerbeacon" )
+            net.WriteAngle( Angle() )
+            net.SendToServer()
+        end )
         --
 
         -- Civilians --

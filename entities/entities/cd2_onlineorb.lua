@@ -87,10 +87,12 @@ function ENT:OnCollected( ply )
 
     if CLIENT then
         sound.Play( "crackdown2/ambient/hiddenorb_collect.mp3", self:GetPos(), 80, 100, 1 )    
-        if ply == LocalPlayer() then CD2SetTextBoxText( "Well done. You found a Online Orb!" ) end
     end
 
     if SERVER then
+
+        CD2SendTextBoxMessage( ply, "Well done. You found a Online Orb!" )
+
         for i = 1, 6 do
             CD2CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, agilityskillcolor )
             CD2CreateSkillGainOrb( self:GetPos(), ply, "Weapon", 0.2, weaponskillcolor )

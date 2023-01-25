@@ -88,10 +88,15 @@ if SERVER then
         for i = 1, #players do
             local ply = players[ i ]
             ply.cd2_LockOnPos = ply.cd2_LockOnPos or "body"
+            ply.cd2_lockondecayspeed = ply.cd2_lockondecayspeed or 10
             if !ply:IsCD2Agent() then return end
             
             if ply:GetLockonSpreadDecay() > 0 then
-                ply:SetLockonSpreadDecay( Lerp( ply.cd2_LockOnPos == "body" and 10 * FrameTime() or 4 * FrameTime(), ply:GetLockonSpreadDecay(), 0 ) )
+                if IsValid( ply:GetNW2Entity( "cd2_lockontarget", nil ) ) then 
+                    ply:SetLockonSpreadDecay( Lerp( ply.cd2_lockondecayspeed * FrameTime(), ply:GetLockonSpreadDecay(), 0 ) )
+                else
+                    ply:SetLockonSpreadDecay( 0 )
+                end
             end
         end
     end )
@@ -102,9 +107,12 @@ if SERVER then
         local targ = ply:GetNW2Entity( "cd2_lockontarget", nil )
         
         if IsValid( targ ) and ply.cd2_LockOnPos == "head" then 
-            local dist = ply:GetPos():Distance( targ:GetPos() ) / 150
+            local dist = ply:GetPos():Distance( targ:GetPos() )
 
-            ply:SetLockonSpreadDecay( dist * 0.08 ) 
+            ply.cd2_lockondecayspeed = 10 / ( dist / 300 )
+            ply:SetLockonSpreadDecay( ( dist / 200 ) * 0.08 ) 
+        elseif IsValid( targ ) and ply.cd2_LockOnPos == "body" then
+            ply:SetLockonSpreadDecay( 0 ) 
         end
         
     end )

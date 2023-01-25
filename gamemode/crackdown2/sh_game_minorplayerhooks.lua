@@ -98,7 +98,10 @@ if SERVER then
     hook.Add( "OnCD2NPCKilled", "crackdown2_uvweaponachievement", function( npc, info )
         local attacker = info:GetAttacker()
         if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadUVachievement or KeysToTheCity() or npc:GetCD2Team() != "freak" then return end
+        local wep = attacker:GetActiveWeapon()
+        if wep:GetClass() != "cd2_uvshotgun" then return end
         attacker.cd2_uvkillcount = attacker.cd2_uvkillcount and attacker.cd2_uvkillcount + 1 or 1
+
 
         if attacker.cd2_uvkillcount < 30 then return end
 

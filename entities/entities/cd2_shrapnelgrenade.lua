@@ -3,6 +3,7 @@ AddCSLuaFile()
 ENT.Base = "cd2_equipmentbase"
 ENT.WorldModel = "models/items/ar2_grenade.mdl"
 ENT.PrintName = "Shrapnel Grenade"
+ENT.IsEquipment = true
 
 ENT.Cooldown = 1
 ENT.MaxGrenadeCount = 8

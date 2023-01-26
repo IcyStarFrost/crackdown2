@@ -24,7 +24,8 @@ local Auicon = Material( "crackdown2/ui/auicon.png" )
 local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
 local celltargetred = Color( 255, 51, 0 )
 local orange = Color( 255, 115, 0 )
-
+local beaconblue = Color( 0, 217, 255 )
+local staricon = Material( "crackdown2/ui/star.png", "smooth" )
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local pingmat = Material( "crackdown2/ui/pingcircle.png" )
 local cell = Material( "crackdown2/ui/cell.png", "smooth" )
@@ -339,7 +340,9 @@ function OpenIntelConsole()
             elseif IsValid( ent ) and ent:GetClass() == "cd2_agencyhelicopter" then
                 DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, ent:GetAngles(), heloicon, 20, color_white, 30 )
             elseif IsValid( ent ) and ent:GetClass() == "cd2_au" and !ent:GetActive() then
-                DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, ent:GetAngles(), Auicon, 15, color_white, 30 )
+                DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, Angle(), Auicon, 15, color_white, 30 )
+            elseif IsValid( ent ) and ent:GetClass() == "cd2_towerbeacon" and !ent:GetIsDetonated() and ent:CanBeActivated() then
+                DrawCoordsOnMap( self, ent:GetPos() - viewoffset, plypos, Angle( 0, 0, 0 ), staricon, 10, beaconblue, 30 )
             end
         end
         

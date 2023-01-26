@@ -23,6 +23,7 @@ local surface_DrawCircle = surface.DrawCircle
 local input_GetKeyName = input.GetKeyName
 local render_SetMaterial = render.SetMaterial
 local render_DrawSprite = render.DrawSprite
+local beaconblue = Color( 0, 217, 255 )
 local weaponskillcolor = Color( 0, 225, 255)
 local strengthskillcolor = Color( 255, 251, 0)
 local explosiveskillcolor = Color( 0, 110, 255 )
@@ -110,6 +111,7 @@ local upicon = Material( "crackdown2/ui/up.png", "smooth" )
 local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
 local downicon = Material( "crackdown2/ui/down.png", "smooth" )
 local skillcircle = Material( "crackdown2/ui/skillcircle.png" )
+local staricon = Material( "crackdown2/ui/star.png", "smooth" )
 local hex = Material( "crackdown2/ui/hex.png", "smooth" )
 
 local skillglow = Material( "crackdown2/ui/skillglow2.png" )
@@ -635,7 +637,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         --
         
         
-        -- Tacticle Locations | Helicopters | AUs --
+        -- Tacticle Locations | Helicopters | ect --
         local ents_ = ents.FindByClass( "cd2_*" )
         for i = 1, #ents_ do
             local ent = ents_[ i ]
@@ -646,6 +648,8 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
                 DrawCoordsOnMiniMap( ent:GetPos(), ent:GetAngles(), heloicon, 15, color_white, fov )
             elseif IsValid( ent ) and ent:GetClass() == "cd2_au" and !ent:GetActive() then
                 DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), Auicon, 10, color_white, fov )
+            elseif IsValid( ent ) and ent:GetClass() == "cd2_towerbeacon" and !ent:GetIsDetonated() and ent:CanBeActivated() then
+                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), staricon, 10, beaconblue, fov )
             end
         end
         --

@@ -15,7 +15,6 @@ function CD2GenerateMapData( randomize, agencystart )
         local pairsfunc = randomize and RandomPairs or ipairs
 
         local agilityorbdata = {}
-        local finalbeacondata = {}
         local tacticallocationdata = {}
         local hiddenorbdata = {}
         local onlineorbdata = {}
@@ -63,7 +62,7 @@ function CD2GenerateMapData( randomize, agencystart )
             if !IsValid( nav ) or nav:IsUnderwater() then continue end
             local pos = nav:GetRandomPoint()
 
-            local nearorbs = CD2FindInSphere( pos, 2500, function( ent ) return ent:GetClass() == "cd2_agilityorb" end )
+            local nearorbs = CD2FindInSphere( pos, 1500, function( ent ) return ent:GetClass() == "cd2_agilityorb" end )
 
             if #nearorbs > 0 then continue end
 
@@ -227,9 +226,16 @@ function CD2GenerateMapData( randomize, agencystart )
         for k, nav in pairsfunc( navareas ) do
             if !IsValid( nav ) or nav:IsUnderwater() or nav:GetSizeX() < 80 and nav:GetSizeY() < 80 or !nav:IsFlat() then continue end
             local pos = nav:GetCenter()
-            finalbeacondata[ 1 ] = { pos = pos, isdetonated = false }
+
+            CD2_BeaconTower = ents.Create( "cd2_towerbeacon" )
+            CD2_BeaconTower:SetPos( pos )
+            CD2_BeaconTower:Spawn()
+
+            finalbeacondata = { pos = pos, isdetonated = false }
             break
         end
+
+        CD2DebugMessage( "Generated Beacon Tower" )
         
 
         -- First Beacon --
@@ -282,6 +288,7 @@ function CD2LoadMapData()
     local hiddenorbs = mapdata.cd2_map_hiddenorbdata
     local onlineorbs = mapdata.cd2_map_onlineorbdata
     local beacondata = mapdata.cd2_map_beacondata
+    local finalbeacondata = mapdata.cd2_map_finalbeacon
 
     -- Load agility orbs
     for i = 1, #agilityorbs do
@@ -336,6 +343,12 @@ function CD2LoadMapData()
     end
 
     CD2DebugMessage( "Loaded " .. #hiddenorbs .. " Hidden Orbs" )
+
+    CD2_BeaconTower = ents.Create( "cd2_towerbeacon" )
+    CD2_BeaconTower:SetPos( finalbeacondata.pos )
+    CD2_BeaconTower:Spawn()
+
+    CD2DebugMessage( "Loaded the Tower Beacon" )
 
     CD2_AgilityOrbCount = #agilityorbs
     CD2_HiddenOrbCount = #hiddenorbs
@@ -483,8 +496,8 @@ function CD2LoadMapData()
                 local marker = ents.Create( "cd2_locationmarker" )
                 marker:SetPos( beacongroup.pos ) 
                 marker:SetLocationType( "beacon" )
-                au.cd2_map_isgenerated = true
-                au.cd2_map_id = AUID
+                marker.cd2_map_isgenerated = true
+                marker.cd2_map_id = beacongroup.AUID
                 marker.cd2_AUgroup = beacongroup.AUID
             
                 CD2PingLocation( nil, beacongroup.pos )
@@ -538,6 +551,44 @@ function CD2LoadMapData()
                                 for k, v in ipairs( player.GetAll() ) do
                                     v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allbeacons_achieve.mp3" )
                                 end
+        
+                                CD2CreateThread( function()
+                                    coroutine.wait( 8 )
+                                    for k, v in ipairs( player.GetAll() ) do
+                                        v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/final1.mp3" )
+                                    end
+        
+                                    coroutine.wait( 4 )
+        
+                                    for k, v in ipairs( player.GetAll() ) do
+                                        v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/final2.mp3" )
+                                    end
+        
+                                    coroutine.wait( 2 )
+        
+                                    for k, v in ipairs( player.GetAll() ) do
+                                        v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/final3.mp3" )
+                                    end
+        
+                                    coroutine.wait( 9 )
+        
+                                    for k, v in ipairs( player.GetAll() ) do
+                                        v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/final4.mp3" )
+                                    end
+        
+                                    coroutine.wait( 6 )
+        
+                                    for k, v in ipairs( player.GetAll() ) do
+                                        CD2PingLocation( v, CD2_BeaconTower:GetPos() )
+                                    end
+        
+                                    coroutine.wait( 2 )
+        
+                                    for k, v in ipairs( player.GetAll() ) do
+                                        CD2PingLocation( v, CD2_BeaconTower:GetPos() )
+                                    end
+                                
+                                end )
                             end
             
                             CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )

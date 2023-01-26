@@ -115,6 +115,44 @@ function CD2CreateBeaconSet( beacondata )
                         for k, v in ipairs( player.GetAll() ) do
                             v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allbeacons_achieve.mp3" )
                         end
+
+                        CD2CreateThread( function()
+                            coroutine.wait( 8 )
+                            for k, v in ipairs( player.GetAll() ) do
+                                v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/final1.mp3" )
+                            end
+
+                            coroutine.wait( 4 )
+
+                            for k, v in ipairs( player.GetAll() ) do
+                                v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/final2.mp3" )
+                            end
+
+                            coroutine.wait( 2 )
+
+                            for k, v in ipairs( player.GetAll() ) do
+                                v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/final3.mp3" )
+                            end
+
+                            coroutine.wait( 9 )
+
+                            for k, v in ipairs( player.GetAll() ) do
+                                v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/final4.mp3" )
+                            end
+
+                            coroutine.wait( 6 )
+
+                            for k, v in ipairs( player.GetAll() ) do
+                                CD2PingLocation( v, CD2_BeaconTower:GetPos() )
+                            end
+
+                            coroutine.wait( 2 )
+
+                            for k, v in ipairs( player.GetAll() ) do
+                                CD2PingLocation( v, CD2_BeaconTower:GetPos() )
+                            end
+                        
+                        end )
                     end
     
                     CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )

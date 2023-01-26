@@ -87,11 +87,6 @@ function ENT:Initialize()
                 self:SetCurrentCoreHealth( self:GetCurrentCoreHealth() - info:GetDamage() / 20 )
             end
         end )
-
-        timer.Simple( 1, function() 
-            self:StartEndingCutscene()
-        end )
-
     end
 end
 
@@ -105,6 +100,15 @@ local beam = Material( "crackdown2/effects/beam.png", "smooth" )
 local coreicons = { Material( "crackdown2/ui/core1.png", "smooth" ), Material( "crackdown2/ui/core2.png", "smooth" ), Material( "crackdown2/ui/core3.png", "smooth" ) }
 
 function ENT:HUDDraw()
+
+    if !self:GetIsCharging() and !self:GetIsDetonated() and LocalPlayer():SqrRangeTo( self ) < ( 300 * 300 ) and self:CanBeActivated() then
+        local usebind = input.LookupBinding( "+use" ) or "e"
+        local code = input.GetKeyCode( usebind )
+        local buttonname = input.GetKeyName( code )
+        local screen = ( self:GetPos() + Vector( 0, 0, 100 ) ):ToScreen()
+        CD2DrawInputbar( screen.x, screen.y, string.upper( buttonname ), "Start Beacon Charge" )
+    end
+
     if !self:GetIsCharging() or LocalPlayer():SqrRangeTo( self ) > ( 2000 * 2000 ) then return end
 
     -- Base
@@ -327,6 +331,10 @@ function ENT:DrawEffects()
 
 end
 
+function ENT:UpdateTransmitState()
+    return TRANSMIT_ALWAYS
+end
+
 function ENT:SetupDataTables()
     self:NetworkVar( "Bool", 0, "IsCharging" )
     self:NetworkVar( "Bool", 1, "IsDetonated" )
@@ -371,10 +379,11 @@ function ENT:Think()
             snd:EnableLooping( true )
             snd:Set3DFadeDistance( 900, 1000000000  )
         end )
-
+    elseif CLIENT and !self:GetIsCharging() and IsValid( self.cd2_chargesound )then
+        self.cd2_chargesound:Stop()
     end
 
-    if CLIENT and SysTime() > self.cd2_nextfloatingenergyparticle then
+    if CLIENT and self:GetIsCharging() and SysTime() > self.cd2_nextfloatingenergyparticle then
         
         local particle = ParticleEmitter( self:GetPos() + VectorRand( -600, 600 ) )
         local part = particle:Add( energy, self:GetPos() + VectorRand( -600, 600 ) )
@@ -404,8 +413,38 @@ function ENT:Think()
 
     if CLIENT then return end
 
+    if !self:GetIsCharging() and !self:GetIsDetonated() and self:CanBeActivated() then
+        local near = CD2FindInSphere( self:GetPos() + Vector( 0, 0, 100 ), 300, function( ent ) return ent:IsCD2Agent() end )
+
+        for k, ply in ipairs( near ) do
+            if ply:KeyDown( IN_USE ) then
+                self:BeginCharge()
+            end
+        end
+    end
+
     if self:GetIsCharging() and self:GetCurrentCoreHealth() <= 0 then
-        self:Remove()
+        net.Start( "cd2net_explosion" )
+        net.WriteVector( self:GetPos() )
+        net.WriteFloat( 6 )
+        net.Broadcast()
+
+        local players = player.GetAll()
+        for i = 1, #players do 
+            local ply = players[ i ]
+            if IsValid( ply ) and ply:SqrRangeTo( self:GetPos() ) < ( 2000 * 2000 ) then CD2SetTypingText( ply, "OBJECTIVE INCOMPLETE", "Beacon Core Destroyed", true ) ply:Kill() end
+        end
+
+        self:FlareFreaks()
+
+        self:SetIsCharging( false )
+        self:SetIsCore1Charging( false )
+        self:SetIsCore2Charging( false )
+        self:SetIsCore3Charging( false )
+
+        self:SetCore1Charged( false )
+        self:SetCore2Charged( false )
+        self:SetCore3Charged( false )
     end
 
     if self:GetIsCharging() and CurTime() > self.cd2_delay and ( self.cd2_freakcount < 8 ) and CurTime() > self.cd2_nextspawn then
@@ -437,9 +476,23 @@ function ENT:Think()
         self.cd2_haswarnedtable[ self:GetCurrentCore() ] = true
     end
 
+    if self:GetIsCharging() and self:GetCurrentCore() == 3 and ( self:GetChargeCurTime() - CurTime() ) < 7 and !self.cd2_finishstatement then
+        self:DispatchDirectorLine( "sound/crackdown2/vo/agencydirector/finalbeaconfinished.mp3" ) 
+        self.cd2_finishstatement = true 
+        timer.Simple( 10, function() if IsValid( self ) then self.cd2_finishstatement = false end end )
+    end
+
     if self:GetIsCharging() and CurTime() > self:GetChargeCurTime() then
         self:EndCoreCharge( self:GetCurrentCore() )
     end
+
+end
+
+function ENT:CanBeActivated() 
+    local beacons = ents.FindByClass( "cd2_beacon" )
+    local count = 0 
+    for k, v in ipairs( beacons ) do if v:GetIsDetonated() then count = count + 1 end end
+    return count == GetGlobal2Int( "cd2_beaconcount", 0 ) 
 end
 
 function ENT:EndCoreCharge( num )
@@ -475,7 +528,7 @@ function ENT:StartMusic()
 end
 
 function ENT:DispatchDirectorLine( path ) 
-    --if KeysToTheCity() then return end
+    if KeysToTheCity() then return end
     for k, ply in ipairs( player.GetAll() ) do
         if ply:SqrRangeTo( self ) < ( 2000 * 2000 ) then
             ply:PlayDirectorVoiceLine( path )
@@ -494,18 +547,18 @@ function ENT:BeginCharge()
         self:DispatchDirectorLine( "sound/crackdown2/vo/agencydirector/finalfight1.mp3" ) 
 
         coroutine.wait( 10 )
-        if !IsValid( self ) then return end
+        if !IsValid( self ) or !self:GetIsCharging() then return end
 
         self:DispatchDirectorLine( "sound/crackdown2/vo/agencydirector/finalfight2.mp3" ) 
 
         coroutine.wait( 9 )
-        if !IsValid( self ) then return end
+        if !IsValid( self ) or !self:GetIsCharging() then return end
 
         self:DispatchDirectorLine( "sound/crackdown2/vo/agencydirector/finalfight3.mp3" ) 
         local core = self:GetActiveCore()
 
         while IsValid( core ) and core:IsCharging() do if !IsValid( self ) then return end coroutine.yield() end
-        if !IsValid( self ) then return end
+        if !IsValid( self ) or !self:GetIsCharging() then return end
     
         
         self.cd2_delay = CurTime() + 15
@@ -517,7 +570,7 @@ function ENT:BeginCharge()
         core = self:GetActiveCore()
 
         while IsValid( core ) and core:IsCharging() do if !IsValid( self ) then return end coroutine.yield() end
-        if !IsValid( self ) then return end
+        if !IsValid( self ) or !self:GetIsCharging() then return end
 
         self.cd2_delay = CurTime() + 15
         self:BeginCoreCharge( 3 )
@@ -527,9 +580,19 @@ function ENT:BeginCharge()
         core = self:GetActiveCore()
 
         while IsValid( core ) and core:IsCharging() do if !IsValid( self ) then return end coroutine.yield() end
-        if !IsValid( self ) then return end
+        if !IsValid( self ) or !self:GetIsCharging() then return end
 
-        self:Remove()
+        self:SetIsDetonated( true )
+        self:SetCore1Charged( true )
+        self:SetCore2Charged( true )
+        self:SetCore3Charged( true )
+        self:SetIsCharging( false )
+
+        timer.Simple( 60, function() if !IsValid( self ) then return end self:SetIsDetonated( false ) end )
+
+        CD2_EmptyStreets = true
+        CD2ClearNPCS()
+        self:StartEndingCutscene()
 
     end )
 
@@ -612,7 +675,7 @@ function ENT:StartEndingCutscene()
         self:SetCore3Charged( false )
 
         coroutine.wait( 20 )
-        self:Remove()
+        CD2_EmptyStreets = false
     end )
 
 end
@@ -788,6 +851,7 @@ if CLIENT then
         CD2CreateThread( function() 
             sound.PlayFile( "sound/crackdown2/ending/finalsequence.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
 
+            CD2_InCutscene = true
             CD2_DrawAgilitySkill = false
             CD2_DrawFirearmSkill = false
             CD2_DrawStrengthSkill = false
@@ -948,6 +1012,8 @@ if CLIENT then
 
             coroutine.wait( 8 )
 
+            CD2_InCutscene = false
+
             CD2PlayCredits()
 
 
@@ -959,7 +1025,7 @@ if CLIENT then
         if !IsValid( tower ) then return end 
 
         CD2StartMusic( "sound/crackdown2/music/towerbeacon.mp3", 700, nil, nil, nil, nil, nil, nil, nil, function( CD2Musicchannel )
-            if !IsValid( tower ) then CD2Musicchannel:FadeOut() return end
+            if !IsValid( tower ) or !tower:GetIsCharging() then CD2Musicchannel:FadeOut() return end
 
             if LocalPlayer():SqrRangeTo( tower:GetPos() ) > ( 2000 * 2000 ) then
                 CD2Musicchannel:GetChannel():SetVolume( 0 )

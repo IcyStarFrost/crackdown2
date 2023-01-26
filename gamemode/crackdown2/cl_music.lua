@@ -41,6 +41,7 @@ function CD2MusicChannelMeta:IsHighestPriority()
             ishighest = false
         end
     end
+    if CD2_InCutscene then return false end
     return ishighest
 end
 

@@ -352,7 +352,7 @@ function CD2OpenDropMenu( issupplypoint )
                             
                             if !KeysToTheCity() and ( v.DropMenu_RequiresCollect and !PlayerHasWeapon( v.ClassName ) ) or !KeysToTheCity() and ( v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyexplosiveskill ) then
                                 lockicon:Show()
-                            elseif !KeysToTheCity() and ( v.DropMenu_RequiresCollect and !PlayerHasWeapon( v.ClassName ) )  or !KeysToTheCity() and !v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyweaponskill then
+                            elseif !KeysToTheCity() and ( v.DropMenu_RequiresCollect and !PlayerHasWeapon( v.ClassName ) )  or !KeysToTheCity() and ( !v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyweaponskill ) then
                                 lockicon:Show()
                             else
                                 lockicon:Hide()

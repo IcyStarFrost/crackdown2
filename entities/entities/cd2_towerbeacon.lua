@@ -30,6 +30,7 @@ function ENT:Initialize()
             core:SetAngles( ang + Angle( 0, 90, 0 ) )
             core.cd2_towerbeaconcore = true
             core:Spawn()
+            core:SetNWBool( "cd2_towerbeaconpart", true )
 
             function core:IsCharging()
                 return self:GetOwner()[ "GetIsCore" .. num .. "Charging" ]( self:GetOwner() )
@@ -544,7 +545,39 @@ function ENT:BeginCharge()
         self.cd2_delay = CurTime() + 34
         self:BeginCoreCharge( 1 )
         timer.Simple( 0, function() self:StartMusic() end ) 
-        self:DispatchDirectorLine( "sound/crackdown2/vo/agencydirector/finalfight1.mp3" ) 
+        self:DispatchDirectorLine( "sound/crackdown2/vo/agencydirector/finalfight1.mp3" )
+        
+        local aborttime = CurTime() + 10
+        local limitwarning = false
+        CD2CreateThread( function()
+            while true do 
+                if !IsValid( self ) or !self:GetIsCharging() then break end
+                local players = player.GetAll()
+    
+                local playernear = false
+                for i = 1, #players do
+                    local player = players[ i ]
+                    if player:IsCD2Agent() and player:SqrRangeTo( self ) < ( 2000 * 2000 ) and player:Alive() then playernear = true break end
+                end
+    
+                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2SendTextBoxMessage( nil, "Return to the Tower Beacon!" ) limitwarning = true end end
+    
+                if CurTime() > aborttime then
+                    CD2PingLocation( nil, self:GetPos() )
+                    self:SetIsCharging( false )
+                    self:SetIsDetonated( false )
+                    self:SetCore1Charged( false )
+                    self:SetCore2Charged( false )
+                    self:SetCore3Charged( false )
+                    self:SetIsCore1Charging( false )
+                    self:SetIsCore2Charging( false )
+                    self:SetIsCore3Charging( false )
+                    break
+                end
+    
+                coroutine.wait( 1 )
+            end
+        end )
 
         coroutine.wait( 10 )
         if !IsValid( self ) or !self:GetIsCharging() then return end

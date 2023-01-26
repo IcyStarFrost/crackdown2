@@ -44,6 +44,7 @@ function ENT:Initialize()
         self.Ring:SetParent( self )
         self.Ring:SetOwner( self )
         self.Ring.cd2_IsBeaconPart = true
+        self.Ring:SetNWBool( "cd2_beaconpart", true )
         self:DeleteOnRemove( self.Ring )
         self.Ring:Spawn()
 
@@ -937,6 +938,7 @@ function ENT:CreatePart( pos, ang, mdl, mat, scale )
     part:SetOwner( self )
     part:SetMaterial( mat or "" )
     part:Spawn()
+    part:SetNWBool( "cd2_beaconpart", true )
 
     part.cd2_IsBeaconPart = true
     part:AddFlags( FL_OBJECT )

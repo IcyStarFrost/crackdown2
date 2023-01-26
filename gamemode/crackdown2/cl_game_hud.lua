@@ -1,7 +1,5 @@
 local table_insert = table.insert
-local math_rad = math.rad
-local math_sin = math.sin
-local math_cos = math.cos
+local math = math
 local clamp = math.Clamp
 local ceil = math.ceil
 local surface_SetDrawColor = surface.SetDrawColor
@@ -28,9 +26,6 @@ local weaponskillcolor = Color( 0, 225, 255)
 local strengthskillcolor = Color( 255, 251, 0)
 local explosiveskillcolor = Color( 0, 110, 255 )
 local agilityskillcolor = Color( 72, 255, 0)
-local math_atan2 = math.atan2
-local math_deg = math.deg
-local math_sqrt = math.sqrt
 
 local cellwhite = Color( 255, 255, 255 )
 local celltargetred = Color( 255, 51, 0 )
@@ -46,12 +41,12 @@ local function draw_Circle( x, y, radius, seg, rotate )
 
 	table_insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
 	for i = 0, seg do
-		local a = math_rad( ( i / seg ) * -360 + rotate )
-		table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
+		local a = math.rad( ( i / seg ) * -360 + rotate )
+		table_insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
 	end
 
-	local a = math_rad( rotate ) -- This is needed for non math.absolute segment counts
-	table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
+	local a = math.rad( rotate ) -- This is needed for non math.absolute segment counts
+	table_insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
 
 	surface.DrawPoly( cir )
 end
@@ -63,12 +58,12 @@ local function DrawSkillCircle( x, y, radius, arc, rotate )
 
 	table_insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
 	for i = 0, seg do
-		local a = math_rad( ( i / seg ) * -arc + rotate )
-		table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
+		local a = math.rad( ( i / seg ) * -arc + rotate )
+		table_insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
 	end
 
-	local a = math_rad( rotate ) -- This is needed for non math.absolute segment counts
-	table_insert( cir, { x = x + math_sin( a ) * radius, y = y + math_cos( a ) * radius, u = math_sin( a ) / 2 + 0.5, v = math_cos( a ) / 2 + 0.5 } )
+	local a = math.rad( rotate ) -- This is needed for non math.absolute segment counts
+	table_insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
 
 	surface.DrawPoly( cir )
 end
@@ -112,6 +107,7 @@ local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
 local downicon = Material( "crackdown2/ui/down.png", "smooth" )
 local skillcircle = Material( "crackdown2/ui/skillcircle.png" )
 local staricon = Material( "crackdown2/ui/star.png", "smooth" )
+local FreakIcon = Material( "crackdown2/ui/freak.png", "smooth" )
 local hex = Material( "crackdown2/ui/hex.png", "smooth" )
 
 local skillglow = Material( "crackdown2/ui/skillglow2.png" )
@@ -139,20 +135,20 @@ local function WorldVectorToScreen2( pos, origin, rotation, scale, radius )
 
     relativePosition:Rotate( Angle( 0, -rotation, 0 ) )
 
-    local angle = math_atan2( relativePosition.y, relativePosition.x )
-    angle = math_deg( angle )
+    local angle = math.atan2( relativePosition.y, relativePosition.x )
+    angle = math.deg( angle )
 
     local distance = relativePosition:Length()
 
-    local x = math_cos( math_rad( angle ) ) * distance * scale
-    local y = math_sin( math_rad( angle ) ) * distance * scale
+    local x = math.cos( math.rad( angle ) ) * distance * scale
+    local y = math.sin( math.rad( angle ) ) * distance * scale
 
-    sqr = math_sqrt( x ^ 2 + y ^ 2 )
+    sqr = math.sqrt( x ^ 2 + y ^ 2 )
 
     if sqr > radius then
-        local angle = math_atan2( y, x )
-        x = math_cos( angle ) * radius
-        y = math_sin( angle ) * radius
+        local angle = math.atan2( y, x )
+        x = math.cos( angle ) * radius
+        y = math.sin( angle ) * radius
     end
 
     return Vector( x, y )
@@ -401,9 +397,9 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         surface_DrawRect( 75, 55, shieldlerp, 10 )
 
         if hpbars == 1 then
-            hpred.r = math.max( 30, ( math.abs( math_sin( SysTime() * 1.5 ) * 163 ) ), ( math.abs( math_cos( SysTime() * 1.5 ) * 163 ) ) )
-            hpred.g = ( math.abs( math_sin( SysTime() * 1.5 ) * 12 ) )
-            hpred.b = ( math.abs( math_sin( SysTime() * 1.5 ) * 12 ) )
+            hpred.r = math.max( 30, ( math.abs( math.sin( SysTime() * 1.5 ) * 163 ) ), ( math.abs( math.cos( SysTime() * 1.5 ) * 163 ) ) )
+            hpred.g = ( math.abs( math.sin( SysTime() * 1.5 ) * 12 ) )
+            hpred.b = ( math.abs( math.sin( SysTime() * 1.5 ) * 12 ) )
         end
 
         surface_SetDrawColor( hpbars > 1 and orangeish or hpred  )
@@ -650,6 +646,8 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
                 DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), Auicon, 10, color_white, fov )
             elseif IsValid( ent ) and ent:GetClass() == "cd2_towerbeacon" and !ent:GetIsDetonated() and ent:CanBeActivated() then
                 DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), staricon, 10, beaconblue, fov )
+            elseif IsValid( ent ) and ent:IsCD2NPC() and ent:GetCD2Team() == "freak" and IsValid( ent:GetEnemy() ) and ( ( ent:GetEnemy():GetNWBool( "cd2_beaconpart", false ) or ent:GetEnemy():GetClass() == "cd2_beacon" ) or ( ent:GetEnemy():GetNWBool( "cd2_towerbeaconpart", false ) ) ) then
+                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), FreakIcon, 10, color_white, fov )
             end
         end
         --

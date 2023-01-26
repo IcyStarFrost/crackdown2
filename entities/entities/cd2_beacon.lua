@@ -38,7 +38,15 @@ function ENT:Initialize()
         self.Core = self:CreatePart( self:GetPos() + Vector( 0, 0, 70 ), Angle( 0, 0, 180 ), "models/maxofs2d/hover_rings.mdl", nil, 4.8 )
         self.Core:SetMoveType( MOVETYPE_NONE )
 
-        self.Ring = self:CreatePart( self:GetPos() + Vector( 0, 0, 120 ), Angle( 0, 0, 180 ), "models/hunter/tubes/tube2x2x1.mdl", "models/props_combine/metal_combinebridge001" , 1 )
+        self.Ring = ents.Create( "cd2_beaconring" )
+        self.Ring:SetPos( self:GetPos() + Vector( 0, 0, 120 ) )
+        self.Ring:SetAngles( Angle( 0, 0, 180 ) )
+        self.Ring:SetParent( self )
+        self.Ring:SetOwner( self )
+        self.Ring.cd2_IsBeaconPart = true
+        self:DeleteOnRemove( self.Ring )
+        self.Ring:Spawn()
+
         self.RingMid = self:CreatePart( self.Ring:GetPos(), Angle( 0, 0, 180 ), "models/hunter/tubes/tube2x2x05.mdl", "models/dav0r/hoverball" , 0.2 )
         self.RingMid:SetParent( self.Ring )
 
@@ -56,12 +64,6 @@ function ENT:Initialize()
             if IsValid( phys ) then phys:SetMass( 700 ) end
         end
 
-        timer.Simple( 0.01, function()
-            net.Start( "cd2net_beaconscale" )
-            net.WriteEntity( self.Ring ) 
-            net.WriteVector( Vector( 0.7, 0.7, 0.3 ) )
-            net.Broadcast()
-        end )
         
         hook.Add( "EntityTakeDamage", self, function( selfent, ent, info )
             if self:GetIsCharging() and ( ent.cd2_IsBeaconPart and ent:GetOwner() == self or ent == self ) and info:GetAttacker():IsCD2NPC() and info:GetAttacker():GetCD2Team() == "freak" then

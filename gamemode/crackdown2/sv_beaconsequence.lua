@@ -39,7 +39,6 @@ function CD2CreateBeaconSet( beacondata )
     CD2DebugMessage( "Creating Beacon set for " .. beacondata.AUID )
 
     -- Beacon vars --
-    local landingpos = beacondata.pos
     local spawnpos = beacondata.beaconspawnpos
     local beaconID = beacondata.id
     local isdetonated = beacondata.isdetonated

@@ -152,7 +152,15 @@ function CD2PlayCredits()
             while credit:IsValid() do coroutine.yield() end
             if endcred then return end
 
-            credit = DrawCredit( "Thank you For playing, Agent!", "" .. game.GetMap() .. " was only the beginning" )
+            credit = DrawCredit( "Special thanks:", "Xenia Emulator which made extracting game sounds possible" )
+            while credit:IsValid() do coroutine.yield() end
+            if endcred then return end
+            
+            credit = DrawCredit( "Special thanks:", "Pyri for finding the original game music" )
+            while credit:IsValid() do coroutine.yield() end
+            if endcred then return end
+
+            credit = DrawCredit( "Thank you For playing, Agent!", "" .. game.GetMap() .. " was only the beginning.." )
             while credit:IsValid() do coroutine.yield() end
             if endcred then return end
 

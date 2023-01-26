@@ -591,6 +591,31 @@ function ENT:BeginBeaconCharge()
             end )
         end
 
+        local aborttime = CurTime() + 10
+        local limitwarning = false
+        CD2CreateThread( function()
+            while true do 
+                if !IsValid( self ) or !self:GetIsCharging() then return end
+                local players = player_GetAll()
+
+                local playernear = false
+                for i = 1, #players do
+                    local player = players[ i ]
+                    if player:IsCD2Agent() and player:SqrRangeTo( self ) < ( 2000 * 2000 ) and player:Alive() then playernear = true break end
+                end
+
+                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2SendTextBoxMessage( nil, "Return to the Beacon!" ) limitwarning = true end end
+
+                if CurTime() > aborttime then
+                    CD2PingLocation( nil, self:GetPos() )
+                    self:Remove()
+                    return
+                end
+
+                coroutine.wait( 1 )
+            end
+        end )
+
         self.Core:SetParent()
         self.Core:SetPos( self:GetPos() + Vector( 0, 0, 70 ) )
         self.cd2_chargestart = CurTime()

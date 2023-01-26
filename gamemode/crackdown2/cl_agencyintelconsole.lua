@@ -297,7 +297,7 @@ function OpenIntelConsole()
         render.RenderView( {
             origin = LocalPlayer():GetPos() + Vector( 0, 0, 20000 ) + viewoffset,
             angles = Angle( 90, 0, 0 ),
-            znear = !iscontrollingview and result.Hit and result.HitPos:Distance( mmTrace.endpos ) or iscontrollingview and znear or 10,
+            znear = znear,
             fov = 30,
             x = x, y = y,
             w = w, h = h

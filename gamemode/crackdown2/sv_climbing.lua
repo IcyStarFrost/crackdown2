@@ -1,5 +1,6 @@
 local ipairs = ipairs
 
+-- Ledge grabbing system
 local cooldown = 0
 hook.Add( "Tick", "crackdown2_climbing", function()
 
@@ -9,7 +10,15 @@ hook.Add( "Tick", "crackdown2_climbing", function()
         if ply.cd2_grabbedledge then
             ply:SetVelocity( -ply:GetVelocity() )
             ply:SetPos( ply.cd2_grabbedpos )
-            if ply:KeyDown( IN_JUMP ) then ply.cd2_ledgedelay = CurTime() + 1 ply.cd2_grabbedledge = false ply:SetVelocity( Vector( 0, 0, ply:GetJumpPower() ) ) ply:EmitSound( "crackdown2/ply/jump" .. math.random( 1, 4 ) .. ".wav", 60, 100, 0.2, CHAN_AUTO ) end
+            if ply:KeyDown( IN_JUMP ) then 
+                ply.cd2_ledgedelay = CurTime() + 1 
+                ply.cd2_grabbedledge = false 
+                ply:SetVelocity( Vector( 0, 0, ply:GetJumpPower() ) ) 
+                ply:EmitSound( "crackdown2/ply/jump" .. math.random( 1, 4 ) .. ".wav", 60, 100, 0.2, CHAN_AUTO ) 
+            elseif ply:KeyDown( IN_BACK ) then
+                ply.cd2_ledgedelay = CurTime() + 1 
+                ply.cd2_grabbedledge = false 
+            end
         end
 
         if CurTime() > cooldown then 
@@ -18,6 +27,8 @@ hook.Add( "Tick", "crackdown2_climbing", function()
 
             if !ply:IsOnGround() and !ply.cd2_grabbedledge and midresult.Hit and !topresult.Hit and ( !ply.cd2_ledgedelay or CurTime() > ply.cd2_ledgedelay ) then
                 ply:EmitSound( "crackdown2/ply/ledgegrab" .. math.random( 1, 2 ) .. ".mp3", 60, 100, 0.5 )
+                BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_HL2MP_GESTURE_RANGE_ATTACK_FIST, true )" )
+                
                 ply.cd2_grabbedledge = true
                 ply.cd2_grabbedpos = ply:GetPos()
                 local dmg = gmod.GetGamemode():GetFallDamage( ply, math.abs( ply:GetVelocity()[ 3 ] ) ) 
@@ -27,6 +38,9 @@ hook.Add( "Tick", "crackdown2_climbing", function()
                     fall:SetDamageType( DMG_FALL )
                     ply:TakeDamageInfo( fall )
                 end
+            elseif ply.cd2_grabbedledge and !midresult.Hit and !topresult.Hit then
+                ply.cd2_ledgedelay = CurTime() + 1 
+                ply.cd2_grabbedledge = false 
             end
             cooldown = CurTime() + 0.05
         end

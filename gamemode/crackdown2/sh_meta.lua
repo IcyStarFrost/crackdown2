@@ -39,6 +39,27 @@ if SERVER then
     end
 end
 
+if CLIENT then
+    local incre = 0
+    function ENT:EmitSound2( path, snddist, volume )
+        sound.PlayFile( "sound/" .. path, "3d mono noplay", function( chan, id, name )
+            if id then return end
+            incre = incre + 1
+            chan:SetVolume( volume )
+            chan:SetPos( self:GetPos() )
+            chan:Set3DFadeDistance( snddist or 200, 0 )
+            chan:Play()
+
+            local id = "crackdown2_emitsound2_" .. incre
+            hook.Add( "Think", id, function()  
+                if !IsValid( self ) or !IsValid( chan ) or chan:GetState() == GMOD_CHANNEL_STOPPED then hook.Remove( "Think", id ) return end
+                chan:SetPos( self:GetPos() )
+            end )
+        end )
+    end
+
+end
+
 function PLAYER:IsCD2Agent()
     return player_manager.GetPlayerClass( self ) == "cd2_player"
 end

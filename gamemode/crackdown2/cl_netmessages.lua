@@ -405,21 +405,25 @@ net.Receive( "cd2net_freakkill", function()
 
 end )
 
+local incre = 0
 net.Receive( "cd2net_emitsound2", function()
     local ent = net.ReadEntity()
     if !IsValid( ent ) then return end 
     local path = net.ReadString()
     local snddist = net.ReadUInt( 32 )
     local volume = net.ReadFloat()
+    
     sound.PlayFile( path, "3d mono noplay", function( chan, id, name )
         if id then return end
+        incre = incre + 1
         chan:SetVolume( volume )
         chan:SetPos( ent:GetPos() )
         chan:Set3DFadeDistance( snddist or 200, 0 )
         chan:Play()
 
-        hook.Add( "Think", ent, function()  
-            if !IsValid( chan ) or chan:GetState() == GMOD_CHANNEL_STOPPED then hook.Remove( "Think", ent ) return end
+        local id = "crackdown2_emitsound2_" .. incre
+        hook.Add( "Think", id, function()  
+            if !IsValid( ent ) or !IsValid( chan ) or chan:GetState() == GMOD_CHANNEL_STOPPED then hook.Remove( "Think", id ) return end
             chan:SetPos( ent:GetPos() )
         end )
     end )

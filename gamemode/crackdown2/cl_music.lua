@@ -4,7 +4,7 @@ local Lerp = Lerp
 local FrameTime = FrameTime
 
 -- Table holding all currently playing music
-local MusicChannels = {}
+CD2_MusicChannels = CD2_MusicChannels or {}
 
 -- Meta table
 local CD2MusicChannelMeta = {}
@@ -33,9 +33,9 @@ end
 -- Returns if this channel is top priority
 function CD2MusicChannelMeta:IsHighestPriority()
     local ishighest = true
-    for i = 1, #MusicChannels do
-        local channel = MusicChannels[ i ]
-        if !IsValid( channel ) then table_remove( MusicChannels, i ) continue end
+    for i = 1, #CD2_MusicChannels do
+        local channel = CD2_MusicChannels[ i ]
+        if !IsValid( channel ) then table_remove( CD2_MusicChannels, i ) continue end
 
         if channel != self and channel:GetPriority() > self:GetPriority() and !channel:IsFading() then
             ishighest = false
@@ -98,7 +98,7 @@ function CD2StartMusic( path, priority, looped, killonpriorityfade, overridevolu
 
         CD2Musicchannel:SetPriority( priority )
         CD2Musicchannel:SetChannel( snd )
-        table_insert( MusicChannels, CD2Musicchannel )
+        table_insert( CD2_MusicChannels, CD2Musicchannel )
 
         CD2DebugMessage( "Created Music Channel for file path " .. path .. " with a priority of " .. priority )
 

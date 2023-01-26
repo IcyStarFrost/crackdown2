@@ -948,18 +948,7 @@ if CLIENT then
 
             coroutine.wait( 8 )
 
-            CD2_PreventMovement = false
-            CD2_ViewOverride = nil
-            CD2_DrawAgilitySkill = true
-            CD2_DrawFirearmSkill = true
-            CD2_DrawStrengthSkill = true
-            CD2_DrawExplosiveSkill = true
-
-            CD2_DrawTargetting = true
-            CD2_DrawHealthandShields = true
-            CD2_DrawWeaponInfo = true
-            CD2_DrawMinimap = true
-            CD2_DrawBlackbars = false
+            CD2PlayCredits()
 
 
         end )

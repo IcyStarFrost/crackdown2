@@ -51,17 +51,13 @@ end )
 
 -- Respawn music
 net.Receive( "cd2net_playerrespawn", function()
-    
     CD2_DrawBlackbars = false 
-     CD2StartMusic( "sound/crackdown2/music/playerspawn.mp3", 2, false, true )
-
+    CD2StartMusic( "sound/crackdown2/music/playerspawn.mp3", 2, false, true )
 end )
 
 net.Receive( "cd2net_playerrespawn_revive", function()
-    
     CD2_DrawBlackbars = false 
     CD2StartMusic( "sound/crackdown2/music/revive.mp3", 2, false, true )
-
 end )
 
 local util_DecalEx = util.DecalEx
@@ -142,20 +138,6 @@ net.Receive( "cd2net_playersoftland", function()
 
 end )
 
-net.Receive( "cd2net_opendropmenu", function() 
-    local isresupply = net.ReadBool()
-    CD2OpenDropMenu( isresupply )
-end )
-
-net.Receive( "cd2net_openspawnpointmenu", function() 
-    CD2OpenSpawnPointMenu()
-end )
-
-net.Receive( "cd2net_playmainmenumusic", function()
-    CD2StartMusic( "sound/crackdown2/music/mainmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
-        if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
-    end )
-end )
 
 net.Receive( "cd2net_sendspawnvectors", function()
     local json = net.ReadString()
@@ -294,18 +276,6 @@ net.Receive( "cd2net_stopguitar", function()
     if IsValid( CD2_GuitarPlayer ) then
         CD2_GuitarPlayer:FadeOut()
     end
-end )
-
-net.Receive( "cd2net_pingsounds", function()
-    local times = net.ReadUInt( 4 )
-
-    CD2CreateThread( function()
-        for i = 1, times do
-            surface.PlaySound( "crackdown2/ui/ping.mp3" )
-            coroutine.wait( 0.6 )
-        end
-    end )
-
 end )
 
 net.Receive( "cd2net_sendtext", function()

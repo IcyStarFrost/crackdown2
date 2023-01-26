@@ -26,9 +26,7 @@ net.Receive( "cd2net_playercallforhelp", function( len, ply )
 
     for k, v in ipairs( player.GetAll() ) do
         if v == ply then continue end
-        net.Start( "cd2net_pingsounds" )
-        net.WriteUInt( 3, 4 )
-        net.Send( v )
+        CD2PingLocation( nil, ply:GetPos() )
         CD2SendTextBoxMessage( v, ply:Name() .. " needs to be revived!" )
     end
 end )

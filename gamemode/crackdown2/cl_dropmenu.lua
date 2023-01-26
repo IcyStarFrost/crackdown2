@@ -22,7 +22,7 @@ CD2_DropMenu = CD2_DropMenu or nil
 
 
 CD2_DropPrimary = "cd2_assaultrifle"
-CD2_DropSecondary = "cd2_pistol"
+CD2_DropSecondary = "cd2_shotgun"
 CD2_DropEquipment = "cd2_grenade"
 
 local function PlayerHasWeapon( class )

@@ -19,7 +19,7 @@ end
 function CD2OpenMainMenu()
 
     local mapname = GetMapName()
-    local channel = CD2StartMusic( "sound/crackdown2/music/startmenu.mp3", 490, true )
+    local channel = CD2StartMusic( "sound/crackdown2/music/startmenu.mp3", 800, true )
     local optionspnl
 
     CD2_MainMenu = vgui.Create( "DPanel", GetHUDPanel() )
@@ -206,7 +206,7 @@ function CD2OpenMainMenu()
                     end )
             
                     CD2OpenSpawnPointMenu()
-                    CD2StartMusic( "sound/crackdown2/music/droppointmusic.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
+                    CD2StartMusic( "sound/crackdown2/music/droppointmusic.mp3", 800, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
                         if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
                     end )
 
@@ -259,7 +259,7 @@ function CD2OpenMainMenu()
             surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
             MenuPanelHolder:Show()
             channel:FadeOut()
-            channel = CD2StartMusic( "sound/crackdown2/music/mainmusic.mp3", 490, true )
+            channel = CD2StartMusic( "sound/crackdown2/music/mainmusic.mp3", 800, true )
 
             local fadepanel = vgui.Create( "DPanel" )
             fadepanel:Dock( FILL )

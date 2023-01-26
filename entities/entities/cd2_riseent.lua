@@ -12,8 +12,8 @@ function ENT:Initialize()
         local len = self:SetSequence( anims[ random( 2 ) ] )
         self:ResetSequenceInfo()
         self:SetCycle( 0 )
-        self:SetPlaybackRate( 1 )
-        coroutine.wait( len / 1 )
+        self:SetPlaybackRate( 3 )
+        coroutine.wait( len / 3 )
         if !IsValid( self ) or !IsValid( self:GetPlayer() ) then return end
         if SERVER then self:Remove() self:Callback() end
     end )

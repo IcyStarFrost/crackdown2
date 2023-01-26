@@ -77,7 +77,7 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
                 ply:GetRagdoll():Remove()
                 ply:SetIsStunned( false )
             else
-                ply.cd2_stunendtime = CurTime() + 3
+                ply.cd2_stunendtime = CurTime() + 2
             end
 
             if ply:GetIsStunned() and !ply:Alive() then

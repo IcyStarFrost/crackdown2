@@ -173,7 +173,7 @@ function GM:CreateMove( cmd )
     
     CD2_viewangles[ 1 ] = clamp( CD2_viewangles[ 1 ] +  cmd:GetMouseY() * 0.02, -90, 90 )
 
-    CD2_plyangle[ 1 ] = CD2_viewangles[ 1 ]
+    if !CD2_PreventMovement then CD2_plyangle[ 1 ] = CD2_viewangles[ 1 ] end
 
     
     local lockontarget = self:GetNW2Entity( "cd2_lockontarget", nil )

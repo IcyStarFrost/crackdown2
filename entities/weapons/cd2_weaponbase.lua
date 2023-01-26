@@ -240,11 +240,12 @@ end
 
 -- Play a small third person animation before switching
 function SWEP:Holster( wep )
-    if self:GetPickupMode() or self:GetIsHolstering() then return end
+    if self:GetPickupMode() or self:GetIsHolstering() or !IsFirstTimePredicted() then return end
     self:SetIsHolstering( true )
     self:SetIsReloading( false )
     self:SetHoldType( "passive" )
-    self:GetOwner():EmitSound( "crackdown2/ply/weaponswitch" .. random( 1, 2 ) .. ".mp3", 70, 100, 0.5, CHAN_AUTO )
+    if SERVER then self:GetOwner():EmitSound( "crackdown2/ply/weaponswitch" .. random( 1, 2 ) .. ".mp3", 70, 100, 0.5, CHAN_AUTO ) end
+    
     self.cd2_Ammocount = self:GetOwner():GetAmmoCount( self.Primary.Ammo )
 
     timer.Simple( 0.6, function()

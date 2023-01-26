@@ -190,7 +190,7 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
                 local force = ent:IsCD2NPC() and 20000 or IsValid( hitphys ) and hitphys:GetMass() * 50 or 20000
                 local info = DamageInfo()
                 info:SetAttacker( ply )
-                info:SetInflictor( wep )
+                info:SetInflictor( wep or ply )
                 info:SetDamage( ply:GetMeleeDamage() * 4 )
                 info:SetDamageType( DMG_CLUB )
                 info:SetDamageForce( ( ent:WorldSpaceCenter() - ply:GetPos() ):GetNormalized() * force )

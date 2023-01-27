@@ -599,7 +599,7 @@ function ENT:BeginBeaconCharge()
         CD2CreateThread( function()
             while true do 
                 if !IsValid( self ) or !self:GetIsCharging() then return end
-                local players = player_GetAll()
+                local players = player.GetAll()
 
                 local playernear = false
                 for i = 1, #players do

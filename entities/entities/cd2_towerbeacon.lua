@@ -490,6 +490,7 @@ function ENT:Think()
 end
 
 function ENT:CanBeActivated() 
+    if KeysToTheCity() then return true end
     local beacons = ents.FindByClass( "cd2_beacon" )
     local count = 0 
     for k, v in ipairs( beacons ) do if v:GetIsDetonated() then count = count + 1 end end
@@ -621,11 +622,15 @@ function ENT:BeginCharge()
         self:SetCore3Charged( true )
         self:SetIsCharging( false )
 
-        timer.Simple( 60, function() if !IsValid( self ) then return end self:SetIsDetonated( false ) end )
+        if !KeysToTheCity() then
+            timer.Simple( 60, function() if !IsValid( self ) then return end self:SetIsDetonated( false ) end )
 
-        CD2_EmptyStreets = true
-        CD2ClearNPCS()
-        self:StartEndingCutscene()
+            CD2_EmptyStreets = true
+            CD2ClearNPCS()
+            self:StartEndingCutscene()
+        else
+            self:SetIsDetonated( true )
+        end
 
     end )
 

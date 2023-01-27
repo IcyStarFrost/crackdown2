@@ -405,6 +405,11 @@ net.Receive( "cd2net_freakkill", function()
 
 end )
 
+net.Receive( "cd2net_opendropmenu", function() 
+    local resupply = net.ReadBool()
+    CD2OpenDropMenu( resupply )
+end )
+
 local incre = 0
 net.Receive( "cd2net_emitsound2", function()
     local ent = net.ReadEntity()

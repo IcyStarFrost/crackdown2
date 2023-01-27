@@ -7,7 +7,8 @@ local isphysics = {
     [ "prop_physics" ] = true,
     [ "prop_physics_multiplayer" ] = true,
     [ "prop_ragdoll" ] = true,
-    [ "func_physbox" ] = true
+    [ "func_physbox" ] = true,
+    [ "cd2_prop" ] = true
 }
 
 -- New rewritten pick up system

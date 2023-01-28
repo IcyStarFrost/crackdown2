@@ -165,42 +165,7 @@ net.Receive( "cd2net_playerinitialspawn", function()
     CD2_HasNavMesh = net.ReadBool()
 
     if !CD2_HasNavMesh then
-        local pnl = vgui.Create( "DPanel", GetHUDPanel() )
-        pnl:Dock( FILL ) 
-        pnl:MakePopup()
-        
-        local lbl = vgui.Create("DLabel", pnl )
-        lbl:SetFont( "crackdown2_font60" )
-        lbl:SetText( "This map does not have a Navigation Mesh! The CRACKDOWN 2 Gamemode requires you to play on a map with a Navigation Mesh! Press the button below to generate a Navigation Mesh or play a map that has one" )
-        lbl:SetWrap( true )
-        lbl:SetSize( ScrW() / 2, 500 )
-        lbl:SetPos( ( ScrW() / 3 ), ( ScrH() / 5 ) - 250 )
-
-        local button = vgui.Create( "DButton", pnl )
-        button:SetSize( 200, 30 )
-        button:SetPos( ( ScrW() / 2 ) - 30, ( ScrH() / 2 ) - 15 )
-        button:SetText( "Generate NavMesh" )
-
-        function button:DoClick()
-            lbl:SetText( "Please wait while a nav mesh generates..")
-            net.Start( "cd2net_generatenavmesh" )
-            net.SendToServer()
-        end
-
-        function button:Paint( w, h )
-            surface_SetDrawColor( blackish )
-            surface_DrawRect( 0, 0, w, h )
-        end
-
-        CD2StartMusic( "sound/crackdown2/music/startmenu.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
-            if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
-        end )
-
-        function pnl:Paint( w, h ) 
-            surface_SetDrawColor( grey )
-            surface_SetMaterial( background )
-            surface_DrawTexturedRect( 0, 0, w, h )
-        end
+        CD2ShowFailMenu( "This map does not have a Navigation Mesh! The CRACKDOWN 2 Gamemode requires you to play on a map with a Navigation Mesh! Press the button below to generate a Navigation Mesh or play a map that has one", true )
         return
     end
 

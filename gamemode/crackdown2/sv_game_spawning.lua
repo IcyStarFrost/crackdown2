@@ -32,6 +32,14 @@ hook.Add( "PlayerInitialSpawn", "crackdown2_setplayerclass", function( ply )
     elseif KeysToTheCity() and !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then
         CD2GenerateMapData( true, true )
     end
+
+    if GetGlobal2Bool( "cd2_mapgenfailed", false ) then
+        timer.Simple( 5, function()
+            ply:SendLua( "CD2ShowFailMenu( 'The Map Data Generator deemed this map to be unplayable. Please pick a different map' )" )
+        end )
+    end
+    
+    
     
 end )
 --

@@ -164,6 +164,13 @@ function CD2GenerateMapData( randomize, agencystart )
             coroutine.wait( 0.01 )
         end
 
+        if #beacondata < 1 then  
+            coroutine.wait( 1 )
+            BroadcastLua( "CD2ShowFailMenu( 'The Map Data Generator deemed this map to be unplayable. Please pick a different map' )" )
+            SetGlobal2Bool( "cd2_mapgenfailed", true )
+            return 
+        end 
+
         CD2DebugMessage( "Generated " .. ( #beacondata * 3 ) .. " AU positions and " .. #beacondata .. " Beacon Positions" )
 
         -- Create Hidden Orbs
@@ -220,6 +227,13 @@ function CD2GenerateMapData( randomize, agencystart )
                 coroutine.wait( 0.01 )
             end
         end
+
+        if #tacticallocationdata < 2 then  
+            coroutine.wait( 1 )
+            SetGlobal2Bool( "cd2_mapgenfailed", true )
+            BroadcastLua( "CD2ShowFailMenu( 'The Map Data Generator deemed this map to be unplayable. Please pick a different map' )" )
+            return 
+        end 
 
         CD2DebugMessage( "Generated " .. #tacticallocationdata .. " Tactical Locations" )
 

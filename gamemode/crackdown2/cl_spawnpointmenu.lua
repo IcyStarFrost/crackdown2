@@ -53,6 +53,24 @@ function CD2OpenSpawnPointMenu()
         CD2_SpawnPointMenu:MakePopup()
         CD2_SpawnPointMenu:SetKeyBoardInputEnabled( false )
 
+        hook.Add( "SetupWorldFog", CD2_SpawnPointMenu, function()
+            render.FogStart( 0 )
+            render.FogEnd( 0 )
+            render.FogMaxDensity( 0 )
+            render.FogMode( MATERIAL_FOG_LINEAR )
+            render.FogColor( 0, 0, 0 )
+            return true 
+        end )
+    
+        hook.Add( "SetupSkyboxFog", CD2_SpawnPointMenu, function()
+            render.FogStart( 0 )
+            render.FogEnd( 0 )
+            render.FogMaxDensity( 0 )
+            render.FogMode( MATERIAL_FOG_LINEAR )
+            render.FogColor( 0, 0, 0 )
+            return true 
+        end )
+
         local toptext = vgui.Create( "DLabel", CD2_SpawnPointMenu )
         toptext:SetFont( "crackdown2_font60" )
         toptext:SetSize( 100, 100 )
@@ -104,7 +122,7 @@ function CD2OpenSpawnPointMenu()
             viewtbl.angles = Angle( 90, 0, 0 )
             viewtbl.znear = result.Hit and result.HitPos:Distance( viewtrace.endpos ) or 10
             viewtbl.fov = 20
-            viewtbl.zfar = zfar
+            viewtbl.zfar = 1000000000
             viewtbl.drawviewer = true
 
             return viewtbl

@@ -93,7 +93,7 @@ end
 
 -- This base is typically used for Cell and Agency. So we override it so both side don't attack civilians
 function ENT:CanAttack( ent )
-    return ( ( ent:IsCD2NPC() or ent:IsCD2Agent() ) and ent:GetCD2Team() != self:GetCD2Team() and ent:GetCD2Team() != "civilian" ) and self:CanSee( ent )
+    return ( ( ent:IsCD2NPC() or ent:IsCD2Agent() and !ent.cd2_notarget ) and ent:GetCD2Team() != self:GetCD2Team() and ent:GetCD2Team() != "civilian" ) and self:CanSee( ent )
 end
 
 

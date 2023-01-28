@@ -319,7 +319,7 @@ function ENT:Think()
 
     if CLIENT and IsValid( self.cd2_ambient ) then
         self.cd2_ambient:SetPos( self:GetPos() )
-        self.cd2_ambient:SetVolume( self:SqrRangeTo( LocalPlayer() ) < ( 2000 * 2000 ) and 1 or 0 )
+        self.cd2_ambient:SetVolume( self:SqrRangeTo( LocalPlayer() ) < ( 1000 * 1000 ) and 1 or 0 )
     end
 
     self:NextThink( CurTime() )

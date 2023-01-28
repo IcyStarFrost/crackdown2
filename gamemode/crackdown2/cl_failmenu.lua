@@ -1,3 +1,10 @@
+local surface_DrawTexturedRect = surface.DrawTexturedRect
+local surface_SetMaterial = surface.SetMaterial
+local surface_SetDrawColor = surface.SetDrawColor
+local surface_DrawRect = surface.DrawRect
+local background = Material( "crackdown2/dropmenu/bg.png", "smooth" )
+local blackish = Color( 39, 39, 39)
+local grey = Color( 100, 100, 100 )
 
 function CD2ShowFailMenu( text, isnavmesh )
     if IsValid( CD2_AgencyConsole ) then CD2_AgencyConsole:Remove() end 

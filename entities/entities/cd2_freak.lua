@@ -204,7 +204,7 @@ function ENT:ControlMovement( pos, update )
 end
 
 function ENT:CanAttack( ent )
-    return ( ( ent:IsCD2NPC() or ent:IsCD2Agent() ) and ent:GetCD2Team() != self:GetCD2Team() or ( ent.cd2_IsBeaconPart and ent:GetOwner():GetIsCharging() and ( ( ent:GetOwner().cd2_curtimeduration - CurTime() ) < ent:GetOwner():GetChargeDuration() * 0.40 or random( 1, 100 ) == 1 ) ) ) and self:CanSee( ent )
+    return ( ( ent:IsCD2NPC() or ent:IsCD2Agent() and !ent.cd2_notarget ) and ent:GetCD2Team() != self:GetCD2Team() or ( ent.cd2_IsBeaconPart and ent:GetOwner():GetIsCharging() and ( ( ent:GetOwner().cd2_curtimeduration - CurTime() ) < ent:GetOwner():GetChargeDuration() * 0.40 or random( 1, 100 ) == 1 ) ) ) and self:CanSee( ent )
 end
 
 function ENT:Swipe()

@@ -43,7 +43,7 @@ function ENT:DropPeaceKeepers( pos )
                 local selfxypos = self:GetPos() selfxypos[ 3 ] = 0
                 if selfxypos:DistToSqr( posxy ) < ( 50 * 50 ) then break end
                 local pos2 = ( posxy * 1 ) pos[ 3 ] = self:GetPos()[ 3 ]
-                self:SetPos( self:GetPos() + ( pos2 - self:GetPos() ):GetNormalized() * 20 )
+                self:SetPos( self:GetPos() + ( pos2 - self:GetPos() ):GetNormalized() * 10 )
                 coroutine.yield()
             end
 
@@ -51,7 +51,7 @@ function ENT:DropPeaceKeepers( pos )
         
             while true do
                 if self:GetPos():DistToSqr( pos ) < ( 50 * 50 ) then break end
-                self:SetPos( self:GetPos() + ( pos - self:GetPos() ):GetNormalized() * 5 )
+                self:SetPos( self:GetPos() + ( pos - self:GetPos() ):GetNormalized() * 10 )
 
                 coroutine.yield()
             end
@@ -66,7 +66,7 @@ function ENT:DropPeaceKeepers( pos )
             while true do
         
                 if self:GetPos():DistToSqr( self.cd2_leavepos ) > ( 50 * 50 ) then
-                    self:SetPos( self:GetPos() + ( self.cd2_leavepos - self:GetPos() ):GetNormalized() *20 )
+                    self:SetPos( self:GetPos() + ( self.cd2_leavepos - self:GetPos() ):GetNormalized() * 10 )
                 else
                     self:Remove()
                     break
@@ -147,7 +147,7 @@ function ENT:ExtractEntity( ent )
                     local selfxypos = self:GetPos() selfxypos[ 3 ] = 0
                     if selfxypos:DistToSqr( self.cd2_cargoxypos ) < ( 50 * 50 ) then break end
                     local pos = ( self.cd2_cargoxypos * 1 ) pos[ 3 ] = self:GetPos()[ 3 ]
-                    self:SetPos( self:GetPos() + ( pos - self:GetPos() ):GetNormalized() * 20 )
+                    self:SetPos( self:GetPos() + ( pos - self:GetPos() ):GetNormalized() * 10 )
                     coroutine.yield()
                 end
 
@@ -155,7 +155,7 @@ function ENT:ExtractEntity( ent )
         
                 while true do
                     if self:GetPos():DistToSqr( self.cd2_pickuppos ) < ( 50 * 50 ) then break end
-                    self:SetPos( self:GetPos() + ( self.cd2_pickuppos - self:GetPos() ):GetNormalized() * 5 )
+                    self:SetPos( self:GetPos() + ( self.cd2_pickuppos - self:GetPos() ):GetNormalized() * 10 )
 
                     coroutine.yield()
                 end
@@ -167,7 +167,7 @@ function ENT:ExtractEntity( ent )
                 while true do
         
                     if self:GetPos():DistToSqr( self.cd2_leavepos ) > ( 50 * 50 ) then
-                        self:SetPos( self:GetPos() + ( self.cd2_leavepos - self:GetPos() ):GetNormalized() *20 )
+                        self:SetPos( self:GetPos() + ( self.cd2_leavepos - self:GetPos() ):GetNormalized() *10 )
                     else
                         self:Remove()
                         break

@@ -1,5 +1,6 @@
 local table_insert = table.insert
 local math = math
+local surface = surface
 local clamp = math.Clamp
 local ceil = math.ceil
 local surface_SetDrawColor = surface.SetDrawColor
@@ -638,9 +639,9 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         for i = 1, #ents_ do
             local ent = ents_[ i ]
     
-            if IsValid( ent ) and ent:GetClass() == "cd2_locationmarker" then 
+            if IsValid( ent ) and ent:GetClass() == "cd2_locationmarker" and ( ent:SqrRangeTo( LocalPlayer() ) < ( 6000 * 6000 ) or ent:GetLocationType() == "beacon" ) then 
                 DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), ent:GetLocationType() == "beacon" and beaconicon or ent:GetLocationType() == "cell" and cell or peacekeeper, ent:GetLocationType() == "beacon" and 20 or 10, ent:GetLocationType() == "cell" and celltargetred or color_white, fov )
-            elseif IsValid( ent ) and ent:GetClass() == "cd2_agencyhelicopter" then
+            elseif IsValid( ent ) and ent:GetClass() == "cd2_agencyhelicopter" and ent:SqrRangeTo( LocalPlayer() ) < ( 6000 * 6000 ) then
                 DrawCoordsOnMiniMap( ent:GetPos(), ent:GetAngles(), heloicon, 15, color_white, fov )
             elseif IsValid( ent ) and ent:GetClass() == "cd2_au" and !ent:GetActive() then
                 DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), Auicon, 10, color_white, fov )

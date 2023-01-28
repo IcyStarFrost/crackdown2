@@ -222,6 +222,13 @@ if CLIENT then
             net.WriteAngle( CD2_viewangles )
             net.SendToServer()
         end )
+
+        AddOption( "Spawn Speaker", "Objects", "Button", { default = false }, function( pnl )
+            net.Start( "cd2net_kttc_spawnnpc" )
+            net.WriteString( "cd2_speaker" )
+            net.WriteAngle( CD2_viewangles )
+            net.SendToServer()
+        end )
         --
 
 
@@ -403,6 +410,13 @@ if CLIENT then
             net.WriteBool( pnl:GetValue() )
             net.SendToServer()
         end )
+
+        AddOption( "No Target", "global", "Check", { default = false }, function( pnl )
+            pnl:SetValue( !pnl:GetValue() )
+            net.Start( "cd2net_kttc_notarget" )
+            net.WriteBool( pnl:GetValue() )
+            net.SendToServer()
+        end )
         
         AddOption( "Freeze Time", "global", "Check", { default = false }, function( pnl )
             pnl:SetValue( !pnl:GetValue() )
@@ -426,7 +440,7 @@ if CLIENT then
                 CD2_KeysToTheCityMenu:SetPos( ScrW() - 400, ScrH() - 450 )
             end
 
-            GetConVar( "cd2_drawhud" ):SetBool( !pnl:GetValue() )
+            RunConsoleCommand( "cd2_drawhud", !pnl:GetValue() and "1" or "0" )
         end )
         
         AddOption( "Empty Streets", "global", "Check", { default = false }, function( pnl )
@@ -523,9 +537,14 @@ elseif SERVER then
     util.AddNetworkString( "cd2net_kttc_freezetime" )
     util.AddNetworkString( "cd2net_kttc_spawnbeacon" )
     util.AddNetworkString( "cd2net_kttc_emptystreets" )
+    util.AddNetworkString( "cd2net_kttc_notarget" )
 
     local Trace = util.TraceLine
     local tracetable = {}
+
+    net.Receive( "cd2net_kttc_notarget", function( len, ply ) 
+        ply.cd2_notarget = net.ReadBool()
+    end )
     
     net.Receive( "cd2net_kttc_spawnbeacon", function( len, ply )
         local pos = ply:GetPos() + ply:GetForward() * 100

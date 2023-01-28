@@ -13,6 +13,8 @@ net.Receive( "cd2net_playerkilled", function()
         if LocalPlayer():Alive() and SysTime() > time then channel:FadeOut() end
     end )
 
+    if IsValid( CD2_DropMenu ) then CD2_DropMenu:Remove() end
+
     CD2_DrawBlackbars = true
     surface.PlaySound( "crackdown2/ply/die.mp3" )
 
@@ -154,13 +156,7 @@ net.Receive( "cd2net_tutorial_activatehud", function()
     _G[ variable ] = true
 end )
 
-local surface_DrawTexturedRect = surface.DrawTexturedRect
-local surface_SetMaterial = surface.SetMaterial
-local surface_SetDrawColor = surface.SetDrawColor
-local surface_DrawRect = surface.DrawRect
-local background = Material( "crackdown2/dropmenu/bg.png", "smooth" )
-local blackish = Color( 39, 39, 39)
-local grey = Color( 100, 100, 100 )
+
 net.Receive( "cd2net_playerinitialspawn", function()
     CD2_HasNavMesh = net.ReadBool()
 

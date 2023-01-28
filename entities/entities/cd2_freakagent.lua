@@ -209,7 +209,7 @@ function ENT:ControlMovement( pos, update )
 end
 
 function ENT:CanAttack( ent )
-    return ( ( ent:IsCD2NPC() or ent:IsCD2Agent() ) and ent:GetCD2Team() != self:GetCD2Team() ) and self:CanSee( ent )
+    return ( ( ent:IsCD2NPC() or ent:IsCD2Agent() and !ent.cd2_notarget ) and ent:GetCD2Team() != self:GetCD2Team() ) and self:CanSee( ent )
 end
 
 function ENT:Swipe()

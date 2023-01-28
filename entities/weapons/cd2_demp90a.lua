@@ -20,6 +20,7 @@ SWEP.ReloadTime = 2
 SWEP.ReloadSounds = {}
 SWEP.DamageFalloffDiv = 400
 
+SWEP.DropMenu_RequiresCollect = true
 SWEP.DropMenu_SkillLevel = 0
 SWEP.DropMenu_Damage = 6
 SWEP.DropMenu_Range = 2

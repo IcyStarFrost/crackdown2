@@ -75,7 +75,7 @@ end
 
 
 function OpenIntelConsole()
-
+    
     if IsValid( CD2_AgencyConsole ) then 
         CD2_AgencyConsole:Remove() 
         surface.PlaySound( "crackdown2/ui/ui_back.mp3" )
@@ -86,6 +86,8 @@ function OpenIntelConsole()
 
         return 
     end
+
+    if IsValid( CD2_SpawnPointMenu ) or IsValid( CD2_DropMenu ) then return end
 
     if !CD2_CanOpenAgencyConsole then return end
 
@@ -101,6 +103,25 @@ function OpenIntelConsole()
     CD2_AgencyConsole:Dock( FILL )
     CD2_AgencyConsole:MakePopup()
     CD2_AgencyConsole:SetKeyBoardInputEnabled( false )
+
+
+    hook.Add( "SetupWorldFog", CD2_AgencyConsole, function()
+        render.FogStart( 0 )
+        render.FogEnd( 0 )
+        render.FogMaxDensity( 0 )
+        render.FogMode( MATERIAL_FOG_LINEAR )
+        render.FogColor( 0, 0, 0 )
+        return true 
+    end )
+
+    hook.Add( "SetupSkyboxFog", CD2_AgencyConsole, function()
+        render.FogStart( 0 )
+        render.FogEnd( 0 )
+        render.FogMaxDensity( 0 )
+        render.FogMode( MATERIAL_FOG_LINEAR )
+        render.FogColor( 0, 0, 0 )
+        return true 
+    end )
 
     CD2_PreventMovement = true
 
@@ -298,6 +319,7 @@ function OpenIntelConsole()
             origin = LocalPlayer():GetPos() + Vector( 0, 0, 20000 ) + viewoffset,
             angles = Angle( 90, 0, 0 ),
             znear = znear,
+            zfar = 10000000,
             fov = 30,
             x = x, y = y,
             w = w, h = h

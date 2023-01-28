@@ -36,7 +36,7 @@ end
 
 -- Move to position function
 function ENT:MoveToPos( pos, options )
-
+    if !pos then return end
     self.cd2_MoveGoal = pos
 
 	local options = options or {}
@@ -93,7 +93,7 @@ end
 
 -- Returns if we can attack the entity or not
 function ENT:CanAttack( ent )
-    return ( ( ent:IsCD2NPC() or ent:IsCD2Agent() ) and ent:GetCD2Team() != self:GetCD2Team() ) and self:CanSee( ent )
+    return ( ( ent:IsCD2NPC() or ent:IsCD2Agent() and !ent.cd2_notarget ) and ent:GetCD2Team() != self:GetCD2Team() ) and self:CanSee( ent )
 end
 
 -- Shared function of GetRangeSquaredTo()

@@ -179,7 +179,7 @@ function CD2GenerateMapData( randomize, agencystart )
         for k, pos in pairsfunc( hiddenvectors ) do
             if !pos then continue end
 
-            local nearorbs = CD2FindInSphere( pos, 3000, function( ent ) return ent:GetClass() == "cd2_hiddenorb" end )
+            local nearorbs = CD2FindInSphere( pos, 2500, function( ent ) return ent:GetClass() == "cd2_hiddenorb" end )
 
             if #nearorbs > 0 then continue end
 

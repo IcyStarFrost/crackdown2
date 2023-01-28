@@ -167,6 +167,17 @@ end
 
 function ENT:DrawEffects()
 
+    render.SetMaterial( beam )
+
+    local beacons = ents.FindByClass( "cd2_beacon" )
+
+    for k, v in ipairs( beacons ) do
+        local emitter = v:GetEmitter()
+        if IsValid( emitter ) and v:GetIsDetonated() then
+            render.DrawBeam( emitter:GetPos(), self:GetPos() + Vector( 0, 0, util.SharedRandom( "rndbeampos", 300, 500, emitter:EntIndex() ) ), 40, 0, math.random( 0, 400 ), beaconblue )
+        end
+    end
+
     if self:GetIsCharging() or self:GetIsDetonated() then
         local core1 = self:GetCore1()
         local core2 = self:GetCore2()

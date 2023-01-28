@@ -109,7 +109,7 @@ hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
                     if hitent != ply and hitent != ply.cd2_HeldObject and ( trace.Entity == hitent or !trace.Hit ) then
                         hitent:EmitSound( "physics/flesh/flesh_impact_hard" .. random( 1, 6 ) .. ".wav")
                         local heldobjectphys = IsValid( ply.cd2_HeldObject ) and ply.cd2_HeldObject:GetPhysicsObject()
-                        local add = IsValid( heldobjectphys ) and heldobjectphys:GetMass() / 10 or 0
+                        local add = IsValid( heldobjectphys ) and heldobjectphys:GetMass() / 2 or 0
 
                         local hitphys = hitent:GetPhysicsObject()
                         local force = hitent:IsCD2NPC() and 20000 or IsValid( hitphys ) and hitphys:GetMass() * 10 or 20000

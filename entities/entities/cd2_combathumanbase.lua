@@ -53,6 +53,7 @@ end
 
 -- Simple function for setting enemies
 function ENT:AttackTarget( ent )
+    if !IsValid( ent ) then return end
     self:SetEnemy( ent )
     self.cd2_EnemyLastKnownPosition = ent:GetPos()
     self.cd2_CombatTimeout = CurTime() + 10

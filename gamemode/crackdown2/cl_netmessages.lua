@@ -29,7 +29,7 @@ net.Receive( "cd2net_playerspawnlight", function()
     ply:EmitSound( "crackdown2/ply/spawnenergy.mp3", 70, 100, 1, CHAN_AUTO )
 
     hook.Add( "Think", "crackdown2_spawnlight", function()
-        if SysTime() > lightend then hook.Remove( "Think", "crackdown2_spawnlight" ) return end
+        if SysTime() > lightend or !IsValid( ply ) then hook.Remove( "Think", "crackdown2_spawnlight" ) return end
         local dlight = DynamicLight( ply:EntIndex() )
 
         if dlight then

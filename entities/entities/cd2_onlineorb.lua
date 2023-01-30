@@ -106,10 +106,7 @@ end
 
 -- Returns if this orb was collected by the player
 function ENT:IsCollectedBy( ply )
-    for k, v in pairs( self.cd2_missingplayers ) do
-        if k == ply:SteamID() then return false end
-    end
-    return true
+    return self.cd2_collectedby[ ply:SteamID() ]
 end
 
 function ENT:CheckPlayers()

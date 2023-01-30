@@ -19,7 +19,7 @@ PLAYER.MaxArmor = 100
 --
 
 PLAYER.DropWeaponOnDie = false
-PLAYER.TeammateNoCollide = false
+PLAYER.TeammateNoCollide = true
 PLAYER.AvoidPlayers = true
 PLAYER.CanUseFlashlight = false
 

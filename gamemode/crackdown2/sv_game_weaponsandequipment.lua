@@ -167,6 +167,8 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
                 coroutine.yield()
             end
 
+            if !IsValid( wep ) then return end
+
             
             ply:StopSound( "crackdown2/ply/die.mp3" )
             ply:StopSound( "crackdown2/ply/groundstrikeinit.mp3" )
@@ -181,10 +183,8 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
             net.WriteVector( ply:GetPos() )
             net.Broadcast()
 
-            if IsValid( wep ) then
-                wep:SetPickupMode( false )
-                wep:SetHoldType( wep.HoldType )
-            end
+            wep:SetPickupMode( false )
+            wep:SetHoldType( wep.HoldType )
 
             local near = CD2FindInSphere( ply:GetPos(), 200, function( ent ) return ent != ply end )
 
@@ -194,7 +194,7 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
                 local force = ent:IsCD2NPC() and 20000 or IsValid( hitphys ) and hitphys:GetMass() * 50 or 20000
                 local info = DamageInfo()
                 info:SetAttacker( ply )
-                info:SetInflictor( wep or ply )
+                info:SetInflictor( wep )
                 info:SetDamage( ply:GetMeleeDamage() * 4 )
                 info:SetDamageType( DMG_CLUB )
                 info:SetDamageForce( ( ent:WorldSpaceCenter() - ply:GetPos() ):GetNormalized() * force )

@@ -8,7 +8,7 @@ local beaconblue = Color( 0, 217, 255 )
 local corebeamcolor = Color( 0, 255, 213)
 local FreakIcon = Material( "crackdown2/ui/freak.png", "smooth" )
 local energy = Material( "crackdown2/effects/energy.png", "smooth" )
-if SERVER then util.AddNetworkString( "cd2net_towerbeacon_beginmusic" ) util.AddNetworkString( "cd2net_towerbeacon_ending" ) end
+if SERVER then util.AddNetworkString( "cd2net_towerbeacon_beginmusic" ) util.AddNetworkString( "cd2net_towerbeacon_ending" ) util.AddNetworkString( "cd2net_towerbeacon_corestartcharge" ) end
 
 function ENT:Initialize()
 
@@ -383,11 +383,11 @@ function ENT:Think()
 
     if CLIENT and self:GetIsCharging() and !IsValid( self.cd2_chargesound )then
 
-        sound.PlayFile( "sound/crackdown2/ambient/beacon/beaconambientcharge.mp3", "3d mono", function( snd, id, name )
+        sound.PlayFile( "sound/crackdown2/ambient/beacon/towerbeacon_charging.mp3", "3d mono", function( snd, id, name )
             if id then return end
             self.cd2_chargesound = snd
             snd:SetPos( self:GetPos() )
-            snd:SetVolume( 2 )
+            snd:SetVolume( 3 )
             snd:EnableLooping( true )
             snd:Set3DFadeDistance( 900, 1000000000  )
         end )
@@ -532,6 +532,10 @@ function ENT:BeginCoreCharge( num )
     self:SetChargeStart( CurTime() )
     self:SetChargeCurTime( CurTime() + self:GetChargeDuration() )
     self:SetCurrentCore( num )
+
+    net.Start( "cd2net_towerbeacon_corestartcharge" )
+    net.WriteVector( self:GetActiveCore():GetPos() )
+    net.Broadcast()
 end
 
 function ENT:StartMusic() 
@@ -1066,6 +1070,16 @@ if CLIENT then
             CD2PlayCredits()
 
 
+        end )
+    end )
+
+    net.Receive( "cd2net_towerbeacon_corestartcharge", function() 
+        local pos = net.ReadVector()
+        sound.PlayFile( "sound/crackdown2/ambient/beacon/towerbeacon_startcharge.mp3", "3d mono noplay", function( chan, id, name )
+            if id then return end
+            chan:SetPos( pos )
+            chan:SetVolume( 10 )
+            chan:Play()
         end )
     end )
 

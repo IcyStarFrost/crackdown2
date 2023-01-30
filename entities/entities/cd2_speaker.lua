@@ -34,7 +34,7 @@ function ENT:PlayNextTrack()
         if id then return end
         if !IsValid( self ) then return end
         chan:SetPos( self:GetPos() )
-        chan:Set3DFadeDistance( 400, -1 )
+        chan:Set3DFadeDistance( 1000, -1 )
         chan:Play()
         self.cd2_music = chan
     end )

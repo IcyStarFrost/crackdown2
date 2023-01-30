@@ -67,7 +67,7 @@ function CD2GenerateMapData( randomize, agencystart )
             if #nearorbs > 0 then continue end
 
             local agilityorb = ents.Create( "cd2_agilityorb" )
-            agilityorb:SetPos( pos + Vector( 0, 0, 10) )
+            agilityorb:SetPos( pos + Vector( 0, 0, 20 ) )
 
             agilityorb.cd2_map_isgenerated = true
             agilityorb.cd2_map_id = "agilityorb:" .. agilityorb:GetCreationID()

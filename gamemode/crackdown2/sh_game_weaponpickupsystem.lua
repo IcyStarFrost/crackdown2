@@ -42,7 +42,7 @@ hook.Add( "PlayerCanPickupWeapon", "crackdown2_npcweapons", function( ply, wep )
 
         ply:SetNW2Entity( "cd2_targetweapon", wep )
         ply:SetNW2Float( "cd2_weapondrawcur", CurTime() + 0.1 )
-        timer.Create( "crackdown2_removetargetweapon" .. ply:EntIndex(), 0.1, 1, function() ply:SetNW2Entity( "cd2_targetweapon", nil ) end )
+        timer.Create( "crackdown2_removetargetweapon" .. ply:EntIndex(), 0.1, 1, function() if !IsValid( ply ) then return end ply:SetNW2Entity( "cd2_targetweapon", nil ) end )
         local activewep = ply:GetActiveWeapon()
 
         if ply:KeyDown( IN_RELOAD ) then ply.cd2_PickupWeaponDelay = ply.cd2_PickupWeaponDelay or CurTime() + 1 else ply.cd2_PickupWeaponDelay = nil end

@@ -37,6 +37,7 @@ function ENT:Initialize()
         self.Leg4 = self:CreatePart( self:GetPos() + Vector( -30, 0, 23 ), Angle( 45, 0, -90 ), "models/hunter/triangles/075x075.mdl", "models/dav0r/hoverball", 1 )
         self.Core = self:CreatePart( self:GetPos() + Vector( 0, 0, 70 ), Angle( 0, 0, 180 ), "models/maxofs2d/hover_rings.mdl", nil, 4.8 )
         self.Core:SetMoveType( MOVETYPE_NONE )
+        self.Core:SetCollisionGroup( COLLISION_GROUP_WORLD )
 
         self.Ring = ents.Create( "cd2_beaconring" )
         self.Ring:SetPos( self:GetPos() + Vector( 0, 0, 120 ) )
@@ -607,7 +608,7 @@ function ENT:BeginBeaconCharge()
                     if player:IsCD2Agent() and player:SqrRangeTo( self ) < ( 2000 * 2000 ) and player:Alive() then playernear = true break end
                 end
 
-                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2SendTextBoxMessage( nil, "Return to the Beacon!" ) limitwarning = true end end
+                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2PingLocation( nil, self:GetPos() ) CD2SendTextBoxMessage( nil, "Return to the Beacon!" ) limitwarning = true end end
 
                 if CurTime() > aborttime then
                     CD2PingLocation( nil, self:GetPos() )

@@ -195,9 +195,9 @@ net.Receive( "cd2net_reviveplayer", function( len, ply )
         local class = weps[ i ][ 1 ]
         local reserve = weps[ i ][ 2 ]
 
-        if class == primary:GetClass() then
+        if IsValid( primary ) and class == primary:GetClass() then
             agent:SetAmmo( reserve, primary.Primary.Ammo )
-        elseif class == secondary:GetClass() then
+        elseif IsValid( secondary ) and class == secondary:GetClass() then
             agent:SetAmmo( reserve, secondary.Primary.Ammo )
         end
     end

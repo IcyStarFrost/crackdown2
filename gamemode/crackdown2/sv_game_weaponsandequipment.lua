@@ -46,9 +46,13 @@ hook.Add( "KeyPress", "crackdown2_equipmentuse", function( ply, key )
             BroadcastLua( "Entity( " .. ply:EntIndex() .. " ):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_GMOD_GESTURE_ITEM_THROW, true )" )
             coroutine.wait( 0.5 )
 
+            if !IsValid( ply ) then return end
+
             ply:EmitSound( "crackdown2/weapons/grenadethrow.mp3", 60, 100, 1, CHAN_WEAPON )
 
             coroutine.wait( 0.3 )
+
+            if !IsValid( ply ) then return end
 
             if SERVER then
                 local pos = ply:GetEyeTrace().HitPos
@@ -117,7 +121,7 @@ hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
                         
                         local info = DamageInfo()
                         info:SetAttacker( ply )
-                        info:SetInflictor( wep )
+                        info:SetInflictor( ( IsValid( wep ) and wep or ply ) )
                         info:SetDamage( ply:GetMeleeDamage() + add )
                         info:SetDamageType( DMG_CLUB )
                         info:SetDamageForce( normal * force )

@@ -1,4 +1,3 @@
-
 local ENT = FindMetaTable( "Entity" )
 local PLAYER = FindMetaTable( "Player" )
 

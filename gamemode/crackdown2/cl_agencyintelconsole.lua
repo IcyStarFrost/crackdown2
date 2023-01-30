@@ -209,8 +209,7 @@ function OpenIntelConsole()
         tacticallocationobjective:Dock( TOP )
         tacticallocationobjective:SetText( "SECURE ALL TACTICAL LOCATIONS\n" .. agencylocations .. "/" .. totallocations .. " LOCATIONS SECURED"  )
     end
-
-    local iscontrollingview = false
+    
     local panels = {}
 
     local function AddPanelToConsole( pnl, buttontext, first )

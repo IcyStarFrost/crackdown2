@@ -34,12 +34,14 @@ function CD2ShowFailMenu( text, isnavmesh )
             net.Start( "cd2net_generatenavmesh" )
             net.SendToServer()
         end
+
+        function button:Paint( w, h )
+            surface_SetDrawColor( blackish )
+            surface_DrawRect( 0, 0, w, h )
+        end
     end
 
-    function button:Paint( w, h )
-        surface_SetDrawColor( blackish )
-        surface_DrawRect( 0, 0, w, h )
-    end
+
 
     CD2StartMusic( "sound/crackdown2/music/startmenu.mp3", 2000, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
         if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end

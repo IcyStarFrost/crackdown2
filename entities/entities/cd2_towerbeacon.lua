@@ -637,7 +637,7 @@ function ENT:BeginCharge()
         self:SetCore3Charged( true )
         self:SetIsCharging( false )
 
-        if KeysToTheCity() then
+        if !KeysToTheCity() then
             timer.Simple( 60, function() if !IsValid( self ) then return end self:SetIsDetonated( false ) end )
 
             CD2_EmptyStreets = true

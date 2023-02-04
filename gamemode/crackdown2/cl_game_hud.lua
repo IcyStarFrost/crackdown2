@@ -110,6 +110,7 @@ local skillcircle = Material( "crackdown2/ui/skillcircle.png" )
 local staricon = Material( "crackdown2/ui/star.png", "smooth" )
 local FreakIcon = Material( "crackdown2/ui/freak.png", "smooth" )
 local hex = Material( "crackdown2/ui/hex.png", "smooth" )
+local agentdown = Material( "crackdown2/ui/agentdown.png", "smooth" )
 
 local skillglow = Material( "crackdown2/ui/skillglow2.png" )
 local agilityicon = Material( "crackdown2/ui/agilityicon.png", "smooth" )
@@ -283,6 +284,13 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             local ent = IsValid( v:GetRagdollEntity() ) and v:GetRagdollEntity() or v
             local screen = ( ent:GetPos() + Vector( 0, 0, 100 ) ):ToScreen()
             draw_DrawText( v:Name(), "crackdown2_agentnames", screen.x, screen.y, v:GetPlayerColor():ToColor(), TEXT_ALIGN_CENTER )
+
+            if !v:Alive() then 
+                local screen = ( ent:GetPos() + Vector( 0, 0, 10 ) ):ToScreen()
+                surface_SetMaterial( agentdown )
+                surface_SetDrawColor( color_white )
+                surface.DrawTexturedRect( screen.x - 65, screen.y - 25, 130, 70 )
+            end
         end
     end
 

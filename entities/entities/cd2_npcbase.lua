@@ -290,6 +290,10 @@ function ENT:Initialize()
     if CLIENT then self.cd2_candrawmodel = true self.cd2_nextdrawmodelcheck = CurTime() + 1 end
 
     if self.Initialize2 then self:Initialize2() end
+
+    if SERVER and ( !self:IsInWorld() or util.TraceHull( { start = self:GetPos() + Vector( 0, 0, 5 ), endpos = self:GetPos() + Vector( 0, 0, 5 ), filter = self, mins = Vector( -17, -17, 0 ), maxs = Vector( 17, 17, 60 ) } ).Hit ) then 
+        self:Remove()
+    end
     
 end
 

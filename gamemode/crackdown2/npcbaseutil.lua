@@ -64,9 +64,9 @@ function ENT:MoveToPos( pos, options )
 
         
 
-		if GetConVar( "developer" ):GetBool() then
-			path:Draw()
-		end
+        if GetConVar( "cd2_drawpathfinding" ):GetBool() then
+            path:Draw()
+        end
 
         if self.cd2_RecomputeMove then path:Compute( self, ( isentity( self.cd2_MoveGoal ) and self.cd2_MoveGoal:GetPos() or self.cd2_MoveGoal ) ) end
         

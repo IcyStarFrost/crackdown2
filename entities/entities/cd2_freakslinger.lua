@@ -185,7 +185,7 @@ function ENT:ControlMovement( pos, update )
         end
 
 
-        if GetConVar( "developer" ):GetBool() then
+        if GetConVar( "cd2_drawpathfinding" ):GetBool() then
             self.cd2_Path:Draw()
         end
 

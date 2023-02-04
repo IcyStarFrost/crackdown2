@@ -54,6 +54,10 @@ end
 
 
 function PLAYER:Init()
+    if SERVER then
+        self.Player:SetTeam( 1 )
+    end
+
     self.Player:SetCanUseLockon( true )
     self.Player:SetCanUseMelee( true )
     self.Player:SetCD2Team( "agency" )

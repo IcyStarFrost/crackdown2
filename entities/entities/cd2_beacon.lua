@@ -707,6 +707,7 @@ function ENT:Think()
             self.Core:SetAngles( Angle( CurTime() * 200, CurTime() * 200, CurTime() * 200 ) / ( self.cd2_curtimeduration - CurTime() )  )
         end
 
+
         if self:GetIsCharging() and !self.cd2_25percentway and ( ( self.cd2_curtimeduration - CurTime() ) < self:GetChargeDuration() * 0.75 ) then
             local players = player.GetAll()
             for i = 1, #players do 

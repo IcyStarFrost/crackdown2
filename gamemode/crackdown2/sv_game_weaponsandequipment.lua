@@ -162,12 +162,17 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
             local trail1 = util.SpriteTrail( ply, ply:LookupAttachment( "anim_attachment_RH"), red, true, 20, 0, 1.5, 1 / ( 20 + 0 ) * 0.5, "trails/laser" )
             local trail2 = util.SpriteTrail( ply, ply:LookupAttachment( "anim_attachment_LH"), red, true, 20, 0, 1.5, 1 / ( 20 + 0 ) * 0.5, "trails/laser" )
 
-            while !ply:IsOnGround() do
+            while IsValid( ply ) and !ply:IsOnGround() do
                 ply:SetVelocity( Vector( 0, 0, -20 ) )
                 coroutine.yield()
             end
 
-            if !IsValid( wep ) then return end
+            if !IsValid( wep ) then 
+                trail1:Remove() 
+                trail2:Remove() 
+                if IsValid( ply ) then ply.cd2_IsUsingGroundStrike = false end
+                return 
+            end
 
             
             ply:StopSound( "crackdown2/ply/die.mp3" )

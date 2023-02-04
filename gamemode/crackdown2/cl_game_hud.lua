@@ -278,7 +278,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     if CD2_InDropMenu or IsValid( CD2_AgencyConsole ) then RemoveHUDpanels() return end
     if !CD2_DrawWeaponInfo then RemoveHUDpanels() end
 
-    if !game.SinglePlayer() then
+    if !game.SinglePlayer() and GetConVar( "cd2_drawhud" ):GetBool() then
         for k, v in ipairs( player.GetAll() ) do
             if v == LocalPlayer() or !v:IsCD2Agent() then continue end
             local ent = IsValid( v:GetRagdollEntity() ) and v:GetRagdollEntity() or v

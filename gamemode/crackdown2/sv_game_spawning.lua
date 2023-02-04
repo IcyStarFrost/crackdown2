@@ -164,11 +164,13 @@ net.Receive( "cd2net_reviveplayer", function( len, ply )
 
     CD2DebugMessage( agent:Name() .. " Was revived by " .. ply:Name() )
 
+    BroadcastLua( "Entity(" .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_GMOD_GESTURE_ITEM_PLACE, true )" )
+
     agent.cd2_revived = true
     agent.cd2_WeaponSpawnDelay = CurTime() + 0.5
 
     agent:Spawn()
-    agent:SetPos( ply:GetPos() + ply:GetForward() * 60 + Vector( 0, 0, 5 ) )
+    agent:SetPos( ply:GetPos() + Vector( 0, 0, 5 ) )
     agent:EmitSound( "crackdown2/ply/revived.mp3", 80 )
 
     agent:SetNoDraw( true )

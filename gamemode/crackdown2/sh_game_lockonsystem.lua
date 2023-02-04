@@ -28,6 +28,7 @@ hook.Add( "Think", "crackdown2_lockon", function()
 
                 if IsValid( ply:GetNW2Entity( "cd2_lockontarget", nil ) ) then
                     local pos = ply.cd2_LockOnPos == "body" and ply:GetNW2Entity( "cd2_lockontarget", nil ):WorldSpaceCenter() or ply:GetNW2Entity( "cd2_lockontarget", nil ):CD2EyePos()
+                    if !pos then return end
                     ply:SetEyeAngles( ( pos - ply:EyePos() ):Angle() )
                 end
 

@@ -72,6 +72,10 @@ local explosivemodels = {
     [ "models/props_junk/gascan001a.mdl" ] = 0.6
 }
 
+hook.Add( "CreateTeams", "crackdown2_createteams", function()
+    team.SetUp( 1, "Agents", Color( 0, 140, 255), true )
+end )
+
 
 if SERVER then
     hook.Add( "OnEntityCreated", "crackdown2_explosivepropeffects", function( ent )

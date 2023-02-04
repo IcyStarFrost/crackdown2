@@ -166,6 +166,7 @@ function CD2GenerateMapData( randomize, agencystart )
 
         if #beacondata < 1 then  
             coroutine.wait( 1 )
+            CD2DebugMessage( "WARNING! MAP GENERATOR DEEMED THE CURRENT MAP UNPLAYABLE" )
             BroadcastLua( "CD2ShowFailMenu( 'The Map Data Generator deemed this map to be unplayable. Please pick a different map' )" )
             SetGlobal2Bool( "cd2_mapgenfailed", true )
             return 
@@ -231,6 +232,7 @@ function CD2GenerateMapData( randomize, agencystart )
         if #tacticallocationdata < 2 then  
             coroutine.wait( 1 )
             SetGlobal2Bool( "cd2_mapgenfailed", true )
+            CD2DebugMessage( "WARNING! MAP GENERATOR DEEMED THE CURRENT MAP UNPLAYABLE" )
             BroadcastLua( "CD2ShowFailMenu( 'The Map Data Generator deemed this map to be unplayable. Please pick a different map' )" )
             return 
         end 

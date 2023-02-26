@@ -234,7 +234,7 @@ if SERVER then
             net.WriteBool( vel >= 1000  )
             net.Broadcast()
 
-            if vel >= 1000 then
+            if vel >= 1000 and !ply.cd2_IsUsingGroundStrike then
                 local near = CD2FindInSphere( ply:GetPos(), 200, function( ent ) return ent != ply end )
 
                 for i = 1, #near do

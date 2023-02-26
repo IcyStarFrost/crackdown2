@@ -716,11 +716,11 @@ function ENT:StartEndingCutscene()
 
         coroutine.wait( 2 )
 
-        for k, v in ipairs( freaks ) do v:SetIsDisabled( true ) end
+        for k, v in ipairs( freaks ) do if IsValid( v ) then v:SetIsDisabled( true ) end end
 
         coroutine.wait( 7.1 )
 
-        for k, v in ipairs( freaks ) do v:TakeDamage( 10000, Entity( 0 ), Entity( 0 ) ) end
+        for k, v in ipairs( freaks ) do if IsValid( v ) then v:TakeDamage( 10000, Entity( 0 ), Entity( 0 ) ) end end
 
         self:SetIsDetonated( false )
         self:SetCore1Charged( false )

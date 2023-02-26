@@ -170,7 +170,7 @@ net.Receive( "cd2net_reviveplayer", function( len, ply )
     agent.cd2_WeaponSpawnDelay = CurTime() + 0.5
 
     agent:Spawn()
-    agent:SetPos( ply:GetPos() + Vector( 0, 0, 5 ) )
+    agent:SetPos( ply:GetPos() + Vector( 0, 0, 5 ) + ply:GetForward() * 30 )
     agent:EmitSound( "crackdown2/ply/revived.mp3", 80 )
 
     agent:SetNoDraw( true )

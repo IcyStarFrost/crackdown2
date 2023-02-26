@@ -514,7 +514,7 @@ hook.Add( "CD2_OnTacticalLocationCaptured", "crackdown2_locationcaptured", funct
         CD2FILESYSTEM:WriteMapData( "cd2_map_tacticallocationdata", locationdata )
     end
     
-    if location:GetIsBeginningLocation() and !KeysToTheCity() then
+    if location:GetIsBeginningLocation() and !KeysToTheCity() and IsValid( CD2_Firstbeacon ) then
         tracetable.start = location:GetPos()
         tracetable.endpos = location:GetPos() + Vector( 0, 0, 6000 )
         tracetable.mask = MASK_SOLID_BRUSHONLY

@@ -667,7 +667,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         for i = 1, #players do
             local otherplayer = players[ i ]
             if IsValid( otherplayer ) and otherplayer:IsCD2Agent() and otherplayer != ply then
-                DrawCoordsOnMiniMap( otherplayer:GetPos(), otherplayer:EyeAngles(), playerarrow, 10, otherplayer:GetPlayerColor():ToColor(), fov )
+                DrawCoordsOnMiniMap( otherplayer:GetPos(), otherplayer:EyeAngles(), otherplayer:Alive() and playerarrow or agentdown, 10, otherplayer:GetPlayerColor():ToColor(), fov )
             end
         end
         --

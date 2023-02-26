@@ -183,7 +183,7 @@ function ENT:Initialize()
                         coroutine.yield()
                     end
 
-                    self.Path:Invalidate()
+                    if IsValid( self.Path ) then self.Path:Invalidate() end
                 end
 
                 coroutine.yield()

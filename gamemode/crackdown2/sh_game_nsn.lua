@@ -69,8 +69,7 @@ if SERVER then
     -- Returns a random player
     local function GetRandomPlayer()
         local players = player.GetAll()
-        for i = 1, #players do
-            local ply = players[ i ]
+        for k, ply in RandomPairs( players ) do
             if ply:IsCD2Agent() then return ply end
         end
     end

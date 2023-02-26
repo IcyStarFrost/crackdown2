@@ -29,6 +29,7 @@ local staricon = Material( "crackdown2/ui/star.png", "smooth" )
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local pingmat = Material( "crackdown2/ui/pingcircle.png" )
 local cell = Material( "crackdown2/ui/cell.png", "smooth" )
+local agentdown = Material( "crackdown2/ui/agentdown.png", "smooth" )
 local pingtimes
 local pingscale = 0
 local pinglocation
@@ -376,7 +377,7 @@ function OpenIntelConsole()
         for i = 1, #players do
             local otherplayer = players[ i ]
             if IsValid( otherplayer ) and otherplayer:IsCD2Agent() then
-                DrawCoordsOnMap( self, otherplayer:GetPos() - viewoffset, plypos, otherplayer:EyeAngles(), playerarrow, ScreenScale( 3 ), otherplayer:GetPlayerColor():ToColor(), 30 )
+                DrawCoordsOnMap( self, otherplayer:GetPos() - viewoffset, plypos, otherplayer:EyeAngles(), otherplayer:Alive() and playerarrow or agentdown, ScreenScale( 3 ), otherplayer:GetPlayerColor():ToColor(), 30 )
             end
         end
         --

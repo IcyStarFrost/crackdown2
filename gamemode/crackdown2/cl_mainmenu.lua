@@ -230,6 +230,7 @@ function CD2OpenMainMenu()
         scroll:Dock( FILL )
 
         local musicvolume = vgui.Create( "DNumSlider", scroll )
+        musicvolume:Dock( TOP )
         musicvolume:SetSize( 200, 30 )
         musicvolume:SetConVar( "cd2_musicvolume" )
         musicvolume:SetText( "Music Volume" )
@@ -238,6 +239,45 @@ function CD2OpenMainMenu()
         musicvolume:SetMax( 1 )
         musicvolume:SetValue( GetConVar( "cd2_musicvolume" ):GetFloat() )
 
+        local resetprogress = vgui.Create( "DButton", scroll )
+        resetprogress:SetSize( 200, 30 )
+        resetprogress:SetText( "Reset Agent Progress/Stats" )
+        resetprogress:Dock( TOP )
+        
+        function resetprogress:DoClick()
+            Derma_Query( "Are you sure you want to reset your Agent's progress? This will restart the map or disconnect you if you are in multiplayer", "Reset Progress", "YES", function()
+                file.Delete( "crackdown2/agentdata.dat")
+                if game.SinglePlayer() then
+                    RunConsoleCommand( "map", game.GetMap() )
+                else
+                    RunConsoleCommand( "disconnect" )
+                end
+            end, "CANCEL" )
+        end
+
+        if game.SinglePlayer() then
+            local resetmapprogress = vgui.Create( "DButton", scroll )
+            resetmapprogress:SetSize( 200, 30 )
+            resetmapprogress:SetText( "Reset Current Map's Progress" )
+            resetmapprogress:Dock( TOP )
+            
+            function resetmapprogress:DoClick()
+                Derma_Query( "Are you sure you want to reset this map's progress? This will restart the map", "Reset Map Progress", "YES", function()
+                    file.Delete( "crackdown2/mapdata/" .. game.GetMap() .. "data.dat" )
+                    RunConsoleCommand( "map", game.GetMap() )
+                end, "CANCEL" )
+            end
+
+            function resetmapprogress:Paint( w, h ) 
+                surface_SetDrawColor( blackish )
+                surface_DrawRect( 0, 0, w, h )
+            end
+        end
+
+        function resetprogress:Paint( w, h ) 
+            surface_SetDrawColor( blackish )
+            surface_DrawRect( 0, 0, w, h )
+        end
 
         function optionspnl:Paint( w, h ) 
             surface_SetDrawColor( blackish )

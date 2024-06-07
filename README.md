@@ -1,6 +1,4 @@
 # Crackdown 2 
-## This is no longer being developed as I lost interest in gmod. Do whatever you want with this as long as you credit me as usual
-
 
 A Garry's Mod Recreation of the 2010 Crackdown 2 game originally released on Xbox 360
 

@@ -77,7 +77,6 @@ function PLAYER:Init()
     self.Player:SetWeaponXP( 0 )
     self.Player:SetStrengthXP( 0 )
     self.Player:SetExplosiveXP( 0 )
-    self.Player:SetDrivingXP( 0 )
 
     if CLIENT then
 
@@ -209,13 +208,11 @@ function PLAYER:SetupDataTables()
     self.Player:NetworkVar( "Int", 1, "WeaponSkill" )
     self.Player:NetworkVar( "Int", 2, "StrengthSkill" )
     self.Player:NetworkVar( "Int", 3, "ExplosiveSkill" )
-    self.Player:NetworkVar( "Int", 4, "DrivingSkill" )
 
     self.Player:NetworkVar( "Float", 2, "AgilityXP" )
     self.Player:NetworkVar( "Float", 3, "WeaponXP" )
     self.Player:NetworkVar( "Float", 4, "StrengthXP" )
     self.Player:NetworkVar( "Float", 5, "ExplosiveXP" )
-    self.Player:NetworkVar( "Float", 6, "DrivingXP" )
     --
 
     self.Player:NetworkVar( "Int", 5, "SafeFallSpeed" ) -- The speed the player won't take damage from

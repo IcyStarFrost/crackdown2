@@ -573,29 +573,6 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             end
         end
 
-       --[[  if pingtimes then
-            
-            if pingtimes == 3 then
-                pingtimes = nil
-            else
-                pingscale = Lerp( 3.5 * FrameTime(), pingscale, 40 )
-                DrawCoordsOnMiniMap( pinglocation, CD2_viewangles, pingmat, pingscale, cellwhite, fov )
-
-                if canping then
-                    surface.PlaySound( "crackdown2/ui/ping.mp3" )
-                    canping = false
-                end
-            end
-
-
-
-            if pingscale > 35 then
-                canping = true
-                pingscale = 0
-                pingtimes = pingtimes + 1
-            end
-        end ]]
-
         surface.SetDrawColor( ply:GetPlayerColor():ToColor() )
         surface.SetMaterial( playerarrow )
         local _, angle = WorldToLocal( Vector(), ply:GetAngles(), ply:GetPos(), CD2_viewangles )

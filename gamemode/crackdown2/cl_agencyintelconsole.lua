@@ -1,46 +1,40 @@
 
 local blur = Material( "pp/blurscreen" )
 CD2_CanOpenAgencyConsole = true
-local surface_DrawRect = surface.DrawRect
-local surface_SetDrawColor = surface.SetDrawColor
-local surface_DrawOutlinedRect = surface.DrawOutlinedRect
-local blackish = Color( 39, 39, 39)
+
 local mmTrace = {}
 local Trace = util.TraceLine
+
+local blackish = Color( 39, 39, 39)
 local fadedwhite = Color( 255, 255, 255, 10 )
-local math_deg = math.deg
-local math_rad = math.rad
-local math_atan2 = math.atan2
-local math_cos = math.cos
-local player_GetAll = player.GetAll
-local math_sin = math.sin
-local surface_SetDrawColor = surface.SetDrawColor
-local surface_SetMaterial = surface.SetMaterial
-local surface_DrawTexturedRectRotated = surface.DrawTexturedRectRotated
-local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
-local beaconicon = Material( "crackdown2/ui/beacon.png" )
-local cellwhite = Color( 255, 255, 255 )
-local Auicon = Material( "crackdown2/ui/auicon.png" )
-local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
 local celltargetred = Color( 255, 51, 0 )
 local orange = Color( 255, 115, 0 )
 local beaconblue = Color( 0, 217, 255 )
+local cellwhite = Color( 255, 255, 255 )
+
+local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
+local beaconicon = Material( "crackdown2/ui/beacon.png" )
+local Auicon = Material( "crackdown2/ui/auicon.png" )
+local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
 local staricon = Material( "crackdown2/ui/star.png", "smooth" )
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local pingmat = Material( "crackdown2/ui/pingcircle.png" )
 local cell = Material( "crackdown2/ui/cell.png", "smooth" )
 local agentdown = Material( "crackdown2/ui/agentdown.png", "smooth" )
-local pingtimes
-local pingscale = 0
-local pinglocation
-local canping = true
+
+local ping_locations = {}
 local viewoffset = Vector()
 
-function CD2PingLocationOnConsole( pos )
-    pingtimes = 0
-    pingscale = 0
-    pinglocation = pos
-    canping = true
+local uniqueid = 0
+function CD2PingLocationOnConsole( id, pos, times, persist )
+    id = id or uniqueid
+    ping_locations[ id ] = { pos = pos, ping_scale = 0, times = times, can_ping = true, times_pinged = 0, persist = persist }
+    uniqueid = uniqueid + 1
+    return id
+end
+
+function CD2RemovePingLocationConsole( id )
+    ping_locations[ id ] = nil
 end
 
 
@@ -49,13 +43,13 @@ local function WorldVectorToScreen2( pnl, pos, origin, rotation, scale, radius )
 
     relativePosition:Rotate( Angle( 0, -rotation, 0 ) )
 
-    local angle = math_atan2( relativePosition.y, relativePosition.x )
-    angle = math_deg( angle )
+    local angle = math.atan2( relativePosition.y, relativePosition.x )
+    angle = math.deg( angle )
 
     local distance = relativePosition:Length()
 
-    local x = math_cos( math_rad( angle ) ) * distance * scale
-    local y = math_sin( math_rad( angle ) ) * distance * scale
+    local x = math.cos( math.rad( angle ) ) * distance * scale
+    local y = math.sin( math.rad( angle ) ) * distance * scale
 
     return Vector( x, y )
 end
@@ -67,11 +61,11 @@ local function DrawCoordsOnMap( pnl, pos, origin, ang, icon, iconsize, color, fo
     
     local _, angs = WorldToLocal( pos, Angle( 0, ang[ 2 ], 0 ), LocalPlayer():GetPos(), Angle() )
 
-    surface_SetDrawColor( color or color_white )
-    surface_SetMaterial( icon or playerarrow )
+    surface.SetDrawColor( color or color_white )
+    surface.SetMaterial( icon or playerarrow )
 
     local vec = WorldVectorToScreen2( pnl, pos, origin, -90, radius / ( fov * 390 ), radius )
-    surface_DrawTexturedRectRotated( ( pnl:GetWide() / 2 ) + vec[ 1 ], ( pnl:GetTall() / 2 ) - vec[ 2 ], ScreenScale( iconsize ), ScreenScale( iconsize ), angs[ 2 ] )
+    surface.DrawTexturedRectRotated( ( pnl:GetWide() / 2 ) + vec[ 1 ], ( pnl:GetTall() / 2 ) - vec[ 2 ], ScreenScale( iconsize ), ScreenScale( iconsize ), angs[ 2 ] )
 end
 
 
@@ -229,11 +223,11 @@ function OpenIntelConsole()
         end
     
         function button:Paint( w, h )
-            surface_SetDrawColor( blackish )
-            surface_DrawRect( 0, 0, w, h )
+            surface.SetDrawColor( blackish )
+            surface.DrawRect( 0, 0, w, h )
     
-            surface_SetDrawColor( fadedwhite )
-            surface_DrawOutlinedRect( 0, 0, w, h, 3 )
+            surface.SetDrawColor( fadedwhite )
+            surface.DrawOutlinedRect( 0, 0, w, h, 3 )
         end
 
         if !first then pnl:Hide() end
@@ -242,11 +236,11 @@ function OpenIntelConsole()
 
 
     local function Paint( self, w, h )
-        surface_SetDrawColor( blackish )
-        surface_DrawRect( 0, 0, w, h )
+        surface.SetDrawColor( blackish )
+        surface.DrawRect( 0, 0, w, h )
 
-        surface_SetDrawColor( fadedwhite )
-        surface_DrawOutlinedRect( 0, 0, w, h, 3 )
+        surface.SetDrawColor( fadedwhite )
+        surface.DrawOutlinedRect( 0, 0, w, h, 3 )
     end
 
     leftpnl.Paint = Paint
@@ -303,8 +297,8 @@ function OpenIntelConsole()
     end )
 
     function mappnl:Paint( w, h )
-        surface_SetDrawColor( blackish )
-        surface_DrawRect( 0, 0, w, h )
+        surface.SetDrawColor( blackish )
+        surface.DrawRect( 0, 0, w, h )
 
         mmTrace.start = LocalPlayer():WorldSpaceCenter()
         mmTrace.endpos = LocalPlayer():GetPos() + Vector( 0, 0, 20000 )
@@ -328,7 +322,28 @@ function OpenIntelConsole()
         local plypos = LocalPlayer():GetPos()
         plypos[ 3 ] = 0
 
-        if pingtimes then
+        for id, ping in pairs( ping_locations ) do
+            if ping.times <= ping.times_pinged and !ping.persist then
+                ping_locations[ id ] = nil
+                continue 
+            end
+
+            ping.ping_scale = Lerp( 3.5 * FrameTime(), ping.ping_scale, ping.times > ping.times_pinged and 40 or 20 )
+            DrawCoordsOnMap( self, ping.pos - viewoffset, plypos, CD2_viewangles, pingmat, ping.ping_scale, cellwhite, 30 )
+
+            if ping.can_ping and ping.times > ping.times_pinged then
+                surface.PlaySound( "crackdown2/ui/ping.mp3" )
+                ping.can_ping = false
+            end
+
+            if ping.ping_scale > ( ping.times > ping.times_pinged and 35 or 18 ) then
+                ping.can_ping = true
+                ping.ping_scale = 0
+                ping.times_pinged = ping.times_pinged + 1
+            end
+        end
+
+--[[         if pingtimes then
             
             if pingtimes == 3 then
                 pingtimes = nil
@@ -349,7 +364,7 @@ function OpenIntelConsole()
                 pingscale = 0
                 pingtimes = pingtimes + 1
             end
-        end
+        end ]]
 
         local entities = ents.FindByClass( "cd2_*" )
 
@@ -372,7 +387,7 @@ function OpenIntelConsole()
         --
         
         -- Players --
-        local players = player_GetAll()
+        local players = player.GetAll()
 
         for i = 1, #players do
             local otherplayer = players[ i ]
@@ -413,8 +428,8 @@ function OpenIntelConsole()
     function playerlistscroll:Paint() end
 
     function playerlistmain:Paint( w, h )
-        surface_SetDrawColor( blackish )
-        surface_DrawRect( 0, 0, w, h )
+        surface.SetDrawColor( blackish )
+        surface.DrawRect( 0, 0, w, h )
     end
 
     local function CreatePlayerBar( ply )
@@ -451,8 +466,8 @@ function OpenIntelConsole()
         end )
 
         function bar:Paint( w, h ) 
-            surface_SetDrawColor( fadedwhite )
-            surface_DrawOutlinedRect( 0, 0, w, h, 2 )
+            surface.SetDrawColor( fadedwhite )
+            surface.DrawOutlinedRect( 0, 0, w, h, 2 )
         end
 
         return bar
@@ -462,7 +477,7 @@ function OpenIntelConsole()
         if !playerlistmain:IsVisible() then return end
         if SysTime() < refreshcooldown then return end
 
-        for k, ply in ipairs( player_GetAll() ) do
+        for k, ply in ipairs( player.GetAll() ) do
             if !players[ ply ] then
                 local bar = CreatePlayerBar( ply )
                 players[ ply ] = bar

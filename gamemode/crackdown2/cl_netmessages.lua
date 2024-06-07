@@ -179,7 +179,7 @@ net.Receive( "cd2net_pinglocation", function()
     local persist = net.ReadBool()
     local pingconsole = net.ReadBool()
     if pingconsole then
-        CD2PingLocationOnConsole( pos )
+        CD2PingLocationOnConsole( id != "" and id or nil, pos, times, persist )
     else
         CD2PingLocationTracker( id != "" and id or nil, pos, times, persist )
     end
@@ -237,7 +237,7 @@ net.Receive( "cd2net_playguitar", function()
     if !IsValid( entity ) then return end
     if IsValid( CD2_GuitarPlayer ) then CD2_GuitarPlayer:FadeOut() end
 
-    CD2_GuitarPlayer = CD2StartMusic( path, 1, true, false, nil, true, nil, nil, entity )
+    CD2_GuitarPlayer = CD2StartMusic( path, 0, true, false, nil, true, nil, nil, entity )
 end )
 
 net.Receive( "cd2net_stopguitar", function()

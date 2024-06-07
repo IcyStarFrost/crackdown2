@@ -343,29 +343,6 @@ function OpenIntelConsole()
             end
         end
 
---[[         if pingtimes then
-            
-            if pingtimes == 3 then
-                pingtimes = nil
-            else
-                pingscale = Lerp( 3.5 * FrameTime(), pingscale, 40 )
-                DrawCoordsOnMap( self, pinglocation - viewoffset, plypos, CD2_viewangles, pingmat, pingscale, cellwhite, 30 )
-
-                if canping then
-                    surface.PlaySound( "crackdown2/ui/ping.mp3" )
-                    canping = false
-                end
-            end
-
-
-
-            if pingscale > 35 then
-                canping = true
-                pingscale = 0
-                pingtimes = pingtimes + 1
-            end
-        end ]]
-
         local entities = ents.FindByClass( "cd2_*" )
 
         -- Tacticle Locations | Helicopters | AUs --
@@ -396,7 +373,6 @@ function OpenIntelConsole()
             end
         end
         --
-
     
     end
 

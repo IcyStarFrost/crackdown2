@@ -17,7 +17,7 @@ hook.Add( "Tick", "crackdown2_regeneration", function()
             if ply:Health() == ply:GetMaxHealth() then
                 ply.cd2_cancallHealthsound = true
             end
-            print("Tick", ply:Armor() < ply:GetMaxArmor() and ( ply.cd2_NextRegenTime and CurTime() > ply.cd2_NextRegenTime ), ply:Armor(), ply:GetMaxArmor(), ( ply.cd2_NextRegenTime and CurTime() > ply.cd2_NextRegenTime ) )
+
             -- Shields recharging --
             if ply:Armor() < ply:GetMaxArmor() and ( ply.cd2_NextRegenTime and CurTime() > ply.cd2_NextRegenTime ) then
                 

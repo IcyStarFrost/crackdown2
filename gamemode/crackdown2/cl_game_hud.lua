@@ -75,8 +75,6 @@ end
 local fireicon = Material( "crackdown2/ui/explosive.png" )
 
 local ping_locations = {}
-local canping = true
-local pingscale = 0
 local hplerp = -1
 local shieldlerp = -1
 local hlerp1

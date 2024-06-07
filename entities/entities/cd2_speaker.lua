@@ -64,6 +64,6 @@ function ENT:Think()
 
     if !IsValid( self.cd2_music ) or self.cd2_music:GetState() == GMOD_CHANNEL_STOPPED and SysTime() > self.cd2_delay then
         self:PlayNextTrack()
-        self.cd2_delay = SysTime() + 1
+        self.cd2_delay = SysTime() + 2
     end
 end

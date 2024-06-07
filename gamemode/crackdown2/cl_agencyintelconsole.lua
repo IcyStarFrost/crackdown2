@@ -466,6 +466,65 @@ function OpenIntelConsole()
     AddPanelToConsole( playerlistmain, "Open Player List" )
     -------
 
+    -- Skill Progress --
+    local skillmain = vgui.Create( "DPanel", midpnl )
+    skillmain:Dock( FILL )
+    skillmain:InvalidateParent( true )
+
+    function skillmain:Paint( w, h )
+        surface.SetDrawColor( blackish )
+        surface.DrawRect( 0, 0, w, h )
+    end
+
+    local function CreateSkillBar( skill )
+        local bar = vgui.Create( "DPanel", skillmain )
+        bar:SetSize( 60, 65 )
+        bar:Dock( TOP )
+
+        local curprogress = LocalPlayer()[ "Get" .. skill .. "XP" ]()
+
+        local skillname = vgui.Create( "DLabel", bar )
+        skillname:SetSize( 100, 64 )
+        skillname:DockMargin( 5, 5, 5, 5 )
+        skillname:Dock( LEFT )
+        skillname:SetText( skill )
+        skillname:SetFont( "crackdown2_font40" )
+
+        local skillprogress = vgui.Create( "DPanel", bar )
+        skillprogress:SetSize( 600, 100 )
+        skillprogress:DockMargin( 10, 10, 0, 10 )
+        skillprogress:Dock( LEFT )
+
+        function skillprogress:Paint( w, h )
+            surface.SetDrawColor( fadedwhite )
+            surface.DrawOutlinedRect( 0, 0, w, h, 2 )
+            surface.SetDrawColor( color_white )
+            surface.DrawRect( 2, 2, w * ( curprogress / 100 ), h - 4  )
+        end
+
+
+        local skillstats = vgui.Create( "DLabel", bar )
+        skillstats:SetSize( 400, 100 )
+        skillstats:DockMargin( 10, 0, 0, 0 )
+        skillstats:Dock( LEFT )
+        skillstats:SetFont( "crackdown2_font30" )
+        skillstats:SetText( "" .. math.Round( curprogress ) .. "/100" )
+
+        function bar:Paint( w, h ) 
+            surface.SetDrawColor( fadedwhite )
+            surface.DrawOutlinedRect( 0, 0, w, h, 2 )
+        end
+
+        return bar
+    end
+
+    CreateSkillBar( "Agility" )
+    CreateSkillBar( "Weapon" )
+    CreateSkillBar( "Strength" )
+    CreateSkillBar( "Explosive" )
+
+    AddPanelToConsole( skillmain, "Skill Progress" )
+
     function CD2_AgencyConsole:Paint( w, h )
         local x, y = self:LocalToScreen( 0, 0 )
 

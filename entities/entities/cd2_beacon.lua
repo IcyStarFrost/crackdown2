@@ -611,7 +611,7 @@ function ENT:BeginBeaconCharge()
                 if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2PingLocation( nil, self:GetPos() ) CD2SendTextBoxMessage( nil, "Return to the Beacon!" ) limitwarning = true end end
 
                 if CurTime() > aborttime then
-                    CD2PingLocation( nil, self:GetPos() )
+                    CD2PingLocation( nil, nil, self:GetPos(), 6 )
                     self:Remove()
                     return
                 end

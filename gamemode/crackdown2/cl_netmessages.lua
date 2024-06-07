@@ -168,16 +168,23 @@ net.Receive( "cd2net_playerinitialspawn", function()
     CD2OpenMainMenu()
 end )
 
+net.Receive( "cd2net_removeping", function()
+    CD2RemovePingLocation( net.ReadString() )
+end )
+
 net.Receive( "cd2net_pinglocation", function() 
     local pos = net.ReadVector()
+    local id = net.ReadString()
+    local times = net.ReadUInt( 8 )
+    local persist = net.ReadBool()
     local pingconsole = net.ReadBool()
-
     if pingconsole then
         CD2PingLocationOnConsole( pos )
     else
-        CD2PingLocationTracker( pos )
+        CD2PingLocationTracker( id != "" and id or nil, pos, times, persist )
     end
 end )
+
 
 net.Receive( "cd2net_playergroundpound", function() 
     local pos = net.ReadVector()

@@ -483,7 +483,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             coroutine.wait( 9 )
 
-            CD2PingLocation( ply, GetGlobal2Vector( "cd2_beginnerlocation" ), true )
+            CD2PingLocation( ply, nil, GetGlobal2Vector( "cd2_beginnerlocation" ), 3, nil, true )
 
             coroutine.wait( 9 )
 
@@ -494,12 +494,12 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             coroutine.wait( 5 )
 
-            CD2FILESYSTEM:WritePlayerData( ply, "c_completedtutorial", true )
+            CD2FILESYSTEM:WritePlayerData( ply, "c_completedtutorial", 3, nil, true )
 
             ply:Freeze( false )
             ply.cd2_godmode = false
 
-            CD2PingLocation( ply, GetGlobal2Vector( "cd2_beginnerlocation" ) )
+            CD2PingLocation( ply, nil, GetGlobal2Vector( "cd2_beginnerlocation" ), 3 )
 
             while !CD2_BeginnerLocation:GetIsActive() do coroutine.yield() end
 

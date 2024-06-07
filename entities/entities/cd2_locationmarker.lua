@@ -165,7 +165,7 @@ function ENT:OnActivate( ply )
                     if player:IsCD2Agent() and player:SqrRangeTo( self ) < ( 2000 * 2000 ) and player:Alive() then playernear = true break end
                 end
 
-                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2PingLocation( nil, self:GetPos() ) CD2SendTextBoxMessage( nil, "Return to the Tactical Location!" ) limitwarning = true end end
+                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2PingLocation( nil, nil, self:GetPos(), 3 ) CD2SendTextBoxMessage( nil, "Return to the Tactical Location!" ) limitwarning = true end end
 
                 if CurTime() > aborttime then
                     self:SetIsActive( false )

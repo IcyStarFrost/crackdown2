@@ -74,8 +74,7 @@ end
 
 local fireicon = Material( "crackdown2/ui/explosive.png" )
 
-local pingtimes
-local pinglocation
+local ping_locations = {}
 local canping = true
 local pingscale = 0
 local hplerp = -1
@@ -101,20 +100,9 @@ local agilityicon = Material( "crackdown2/ui/agilityicon.png", "smooth" )
 local weaponicon = Material( "crackdown2/ui/weaponicon.png", "smooth" )
 local strengthicon = Material( "crackdown2/ui/strengthicon.png", "smooth" )
 local explosiveicon = Material( "crackdown2/ui/explosiveicon.png", "smooth" )
---local drivingicon = Material( "crackdown2/ui/drivingicon.png", "smooth" )
-
 local pingmat = Material( "crackdown2/ui/pingcircle.png" )
--- Minimap vars
-local minimapRT = GetRenderTarget( "crackdown2_minimaprt", 1024, 1024 )
-local mmTrace = {}
-local addfov = 0
 local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
 local cellicon = Material( "crackdown2/ui/celltrackericon.png" )
-local minimapRTMat = CreateMaterial( "crackdown2_minimapmaterial", "UnlitGeneric", {
-	["$basetexture"] = "crackdown2_minimaprt",
-	["$translucent"] = 1,
-	["$vertexcolor"] = 1
-} )
 
 local function WorldVectorToScreen2( pos, origin, rotation, scale, radius )
     local relativePosition = pos - origin
@@ -140,11 +128,17 @@ local function WorldVectorToScreen2( pos, origin, rotation, scale, radius )
     return Vector( x, y )
 end
 
-function CD2PingLocationTracker( pos )
-    canping = true
-    pinglocation = pos
-    pingtimes = 0
-    pingscale = 0
+
+local uniqueid = 0
+function CD2PingLocationTracker( id, pos, times, persist )
+    id = id or uniqueid
+    ping_locations[ id ] = { pos = pos, ping_scale = 0, times = times, can_ping = true, times_pinged = 0, persist = persist }
+    uniqueid = uniqueid + 1
+    return id
+end
+
+function CD2RemovePingLocation( id )
+    ping_locations[ id ] = nil
 end
 
 local function DrawCoordsOnMiniMap( pos, ang, icon, iconsize, color, fov )
@@ -559,7 +553,29 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         surface.SetDrawColor( blackish )
         draw_Circle( 200, scrh - 200, ScreenScale( 50 ), 30 )
 
-        if pingtimes then
+        -- { id = uniqueid, pos = pos, times = times, ping_scale = 0, can_ping = true, times_pinged = 0, persist = persist }
+        for id, ping in pairs( ping_locations ) do
+            if ping.times <= ping.times_pinged and !ping.persist then
+                ping_locations[ id ] = nil
+                continue 
+            end
+
+            ping.ping_scale = Lerp( 3.5 * FrameTime(), ping.ping_scale, ping.times > ping.times_pinged and 40 or 20 )
+            DrawCoordsOnMiniMap( ping.pos, CD2_viewangles, pingmat, ping.ping_scale, cellwhite, fov )
+
+            if ping.can_ping and ping.times > ping.times_pinged then
+                surface.PlaySound( "crackdown2/ui/ping.mp3" )
+                ping.can_ping = false
+            end
+
+            if ping.ping_scale > ( ping.times > ping.times_pinged and 35 or 18 ) then
+                ping.can_ping = true
+                ping.ping_scale = 0
+                ping.times_pinged = ping.times_pinged + 1
+            end
+        end
+
+       --[[  if pingtimes then
             
             if pingtimes == 3 then
                 pingtimes = nil
@@ -580,7 +596,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
                 pingscale = 0
                 pingtimes = pingtimes + 1
             end
-        end
+        end ]]
 
         surface.SetDrawColor( ply:GetPlayerColor():ToColor() )
         surface.SetMaterial( playerarrow )

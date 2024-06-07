@@ -388,10 +388,20 @@ if SERVER then
     end
 
     -- Pings a location on a Player's minimap or intel console
-    function CD2PingLocation( ply, pos, pingintelconsole )
+    function CD2PingLocation( ply, id, pos, times, persist, pingintelconsole )
         net.Start( "cd2net_pinglocation" )
         net.WriteVector( pos )
+        net.WriteString( id or "" )
+        net.WriteUInt( times, 8 )
+        net.WriteBool( persist or false )
         net.WriteBool( pingintelconsole or false )
+        if !ply then net.Broadcast() else net.Send( ply ) end
+    end
+
+    -- Removes a persistent ping
+    function CD2RemovePingLocation( ply, id )
+        net.Start( "cd2net_removeping" )
+        net.WriteString( id )
         if !ply then net.Broadcast() else net.Send( ply ) end
     end
 end

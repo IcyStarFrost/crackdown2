@@ -95,7 +95,7 @@ function CD2CreateBeaconSet( beacondata )
         marker:SetLocationType( "beacon" )
         marker.cd2_AUgroup = beacondata.AUID
 
-        CD2PingLocation( nil, beacondata.pos )
+        CD2PingLocation( nil, nil, beacondata.pos, 3 )
     
         function marker:OnActivate( ply ) 
             sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
@@ -174,13 +174,13 @@ function CD2CreateBeaconSet( beacondata )
                             coroutine.wait( 6 )
 
                             for k, v in ipairs( player.GetAll() ) do
-                                CD2PingLocation( v, CD2_BeaconTower:GetPos() )
+                                CD2PingLocation( v, nil, CD2_BeaconTower:GetPos(), 5 )
                             end
 
                             coroutine.wait( 2 )
 
                             for k, v in ipairs( player.GetAll() ) do
-                                CD2PingLocation( v, CD2_BeaconTower:GetPos() )
+                                CD2PingLocation( v, nil, CD2_BeaconTower:GetPos(), 5 )
                             end
                         
                         end )

@@ -37,6 +37,7 @@ util.AddNetworkString( "cd2net_setplayercolor" )
 util.AddNetworkString( "cd2net_pinglocation" )
 util.AddNetworkString( "cd2net_emitsound2" )
 util.AddNetworkString( "cd2net_opendropmenu" )
+util.AddNetworkString( "cd2net_removeping" )
 
 util.AddNetworkString( "cd2filesystem_requestplayerdata" )
 util.AddNetworkString( "cd2filesystem_dispatchplayerdata" )

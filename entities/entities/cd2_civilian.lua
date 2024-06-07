@@ -55,18 +55,22 @@ local mdls = {
 
 function ENT:Initialize2()
     if SERVER then 
+
+        AccessorFunc( self, "cd2_ispanicked", "IsPanicked" )
+
         local model = mdls[ random( #mdls ) ]
         self:SetModel( model ) 
         self.cd2_gender = string_find( model, "female" ) != nil and "female" or "male"
         self.cd2_FreakCheck = CurTime() + 0.5
 
         self:Hook( "EntityFireBullets", "bullethearing", function( ent, bullet ) 
+            if self:GetIsPanicked() then return end
             local pos = bullet.Src 
 
             local trace = self:Trace( nil, pos, COLLISION_GROUP_WORLD )
             if trace.Hit then return end
             
-            if !self:GetIsPanicked() and self:GetRangeSquaredTo( pos ) <= ( self.cd2_SightDistance * self.cd2_SightDistance ) then
+            if self:GetRangeSquaredTo( pos ) <= ( self.cd2_SightDistance * self.cd2_SightDistance ) then
                 self.cd2_FirstPanic = true
                 self.cd2_Panickedlocation = pos
                 self:LookTo( bullet.Attacker, 3 )
@@ -77,12 +81,13 @@ function ENT:Initialize2()
         end )
 
         self:Hook( "EntityEmitSound", "hearing", function( snddata )
+            if self:GetIsPanicked() then return end
             local chan = snddata.Channel
             local pos = IsValid( snddata.Entity ) and snddata.Entity or snddata.Pos
 
             if isentity( pos ) and !self:CanSee( pos ) then return end
 
-            if chan == CHAN_WEAPON and !self:GetIsPanicked() and self:GetRangeSquaredTo( pos ) <= ( self.cd2_SightDistance * self.cd2_SightDistance ) then
+            if chan == CHAN_WEAPON and self:GetRangeSquaredTo( pos ) <= ( self.cd2_SightDistance * self.cd2_SightDistance ) then
                 self.cd2_FirstPanic = true
                 self.cd2_Panickedlocation = isentity( pos ) and pos:GetPos() or pos
                 self:LookTo( pos, 3 )
@@ -148,6 +153,7 @@ function ENT:OnOtherKilled( victim )
 end
 
 function ENT:Think2()
+    if CLIENT then return end
     self:HandleVoiceLines()
 
     self:SetIsPanicked( self:GetState() == "Panicked" )
@@ -157,7 +163,7 @@ function ENT:Think2()
         self:StopMovement() 
     end
 
-    if SERVER and CurTime() > self.cd2_FreakCheck then
+    if SERVER and CurTime() > self.cd2_FreakCheck and self:GetState() != "Panicked" then
         local nearzombies = CD2FindInSphere( self:GetPos(), self.cd2_SightDistance, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" and self:Visible( ent ) end )
         
 
@@ -183,10 +189,6 @@ function ENT:EndPanicAnim()
     self.cd2_holdtypetranslations[ "normal" ].idle = ACT_IDLE
 end
 --
-
-function ENT:SetupDataTables2()
-    self:NetworkVar( "Bool", 4, "IsPanicked" )
-end
 
 local function GetNavmeshFiltered()
     local areas = {} 

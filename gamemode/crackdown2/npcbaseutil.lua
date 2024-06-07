@@ -28,6 +28,46 @@ function ENT:Trace( start, endpos, col, mask )
     return result
 end
 
+function ENT:SetCrouch( bool )
+    self.cd2_iscrouching = bool
+end
+
+function ENT:GetCrouch()
+    return self.cd2_iscrouching
+end
+
+function ENT:SetIsDisabled( bool )
+    self.cd2_isdisabled = bool
+end
+
+function ENT:GetIsDisabled()
+    return self.cd2_isdisabled
+end
+
+function ENT:SetSightDistance( bool )
+    self.cd2_sighdistance = bool
+end
+
+function ENT:GetSightDistance()
+    return self.cd2_sighdistance
+end
+
+function ENT:SetWalk( bool )
+    self.cd2_iscwalking = bool
+end
+
+function ENT:GetWalk()
+    return self.cd2_iscwalking
+end
+
+function ENT:SetIsMoving( bool )
+    self.cd2_ismoving = bool
+end
+
+function ENT:GetIsMoving()
+    return self.cd2_ismoving
+end
+
 -- Look at a entity or position
 function ENT:LookTo( target, endtime )
     self.cd2_facetarget = target

@@ -1,16 +1,5 @@
-local table_insert = table.insert
 local math = math
 local surface = surface
-local clamp = math.Clamp
-local ceil = math.ceil
-local surface_SetDrawColor = surface.SetDrawColor
-local surface_DrawLine = surface.DrawLine
-local draw_DrawText = draw.DrawText
-local Trace = util.TraceLine
-local surface_SetMaterial = surface.SetMaterial
-local surface_DrawRect = surface.DrawRect
-local surface_SetFont = surface.SetFont
-local surface_GetTextSize = surface.GetTextSize
 local shadedwhite = Color( 177, 177, 177 )
 local red = Color( 163, 12, 12)
 local orangeish = Color( 202, 79, 22)
@@ -18,19 +7,13 @@ local blackish = Color( 39, 39, 39)
 local black = Color( 0, 0, 0 )
 local grey = Color( 61, 61, 61)
 local linecol = Color( 61, 61, 61, 100 )
-local surface_DrawCircle = surface.DrawCircle
-local input_GetKeyName = input.GetKeyName
-local render_SetMaterial = render.SetMaterial
-local render_DrawSprite = render.DrawSprite
 local beaconblue = Color( 0, 217, 255 )
 local weaponskillcolor = Color( 0, 225, 255)
 local strengthskillcolor = Color( 255, 251, 0)
 local explosiveskillcolor = Color( 0, 110, 255 )
 local agilityskillcolor = Color( 72, 255, 0)
-
 local cellwhite = Color( 255, 255, 255 )
 local celltargetred = Color( 255, 51, 0 )
-
 local hpred = Color( 163, 12, 12)
 
 
@@ -40,14 +23,14 @@ local function draw_Circle( x, y, radius, seg, rotate )
     rotate = rotate or 0
 	local cir = {}
 
-	table_insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
+	table.insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
 	for i = 0, seg do
 		local a = math.rad( ( i / seg ) * -360 + rotate )
-		table_insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+		table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
 	end
 
 	local a = math.rad( rotate ) -- This is needed for non math.absolute segment counts
-	table_insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+	table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
 
 	surface.DrawPoly( cir )
 end
@@ -57,14 +40,14 @@ local function DrawSkillCircle( x, y, radius, arc, rotate )
     local seg = 30
 	local cir = {}
 
-	table_insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
+	table.insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
 	for i = 0, seg do
 		local a = math.rad( ( i / seg ) * -arc + rotate )
-		table_insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+		table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
 	end
 
 	local a = math.rad( rotate ) -- This is needed for non math.absolute segment counts
-	table_insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+	table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
 
 	surface.DrawPoly( cir )
 end
@@ -73,19 +56,19 @@ end
 
 function CD2DrawInputbar( x, y, keyname, text )
 
-    surface_SetFont( "crackdown2_font30" )
-    local sizex = surface_GetTextSize( text )
+    surface.SetFont( "crackdown2_font30" )
+    local sizex = surface.GetTextSize( text )
 
     draw.NoTexture()
-    surface_SetDrawColor( blackish )
-    surface_DrawRect( x, y - 15, sizex + 30, 30 )
+    surface.SetDrawColor( blackish )
+    surface.DrawRect( x, y - 15, sizex + 30, 30 )
     
-    surface_SetDrawColor( grey )
+    surface.SetDrawColor( grey )
     draw_Circle( x, y, 20, 6 )
 
-    draw_DrawText( keyname, "crackdown2_font30", x, y - 15, color_white, TEXT_ALIGN_CENTER )
+    draw.DrawText( keyname, "crackdown2_font30", x, y - 15, color_white, TEXT_ALIGN_CENTER )
 
-    draw_DrawText( text, "crackdown2_font30", x + 20, y - 17, color_white, TEXT_ALIGN_LEFT )
+    draw.DrawText( text, "crackdown2_font30", x + 20, y - 17, color_white, TEXT_ALIGN_LEFT )
     
 end
 
@@ -99,6 +82,7 @@ local hplerp = -1
 local shieldlerp = -1
 local hlerp1
 local hlerp2
+local alphawhite = Color( 255, 255, 255, 10 )
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local cell = Material( "crackdown2/ui/cell.png", "smooth" )
 local beaconicon = Material( "crackdown2/ui/beacon.png" )
@@ -170,8 +154,8 @@ local function DrawCoordsOnMiniMap( pos, ang, icon, iconsize, color, fov )
     
     local _, angs = WorldToLocal( pos, Angle( 0, ang[ 2 ], 0 ), LocalPlayer():GetPos(), CD2_viewangles )
 
-    surface_SetDrawColor( color or color_white )
-    surface_SetMaterial( icon or playerarrow )
+    surface.SetDrawColor( color or color_white )
+    surface.SetMaterial( icon or playerarrow )
 
     local vec = WorldVectorToScreen2( pos, plypos, CD2_viewangles[ 2 ] - 90, radius / ( fov * 170 ), radius ) --WorldVectorToScreen( pos, plypos, 0.2, CD2_viewangles[ 2 ] - 90, radius, fov )
     surface.DrawTexturedRectRotated( 200 + vec[ 1 ], ( ScrH() - 200 ) - vec[ 2 ], ScreenScale( iconsize ), ScreenScale( iconsize ), ( angs[ 2 ] ) )
@@ -186,22 +170,22 @@ local function DrawSkillHex( x, y, icon, level, xp, col, skillname )
     draw.NoTexture()
 
     -- Outlined circle pathing behind each skill dot
-    surface_DrawCircle( x, y, 30, 0, 0, 0 )
+    surface.DrawCircle( x, y, 30, 0, 0, 0 )
 
-    surface_SetDrawColor( color_white )
-    surface_SetMaterial( skillcircle )
+    surface.SetDrawColor( color_white )
+    surface.SetMaterial( skillcircle )
 
     -- White circle pathing behind each skill dot
     DrawSkillCircle( x, y, 33, Lerp( xp / 100, ( 55 * level ), ( 55 * ( level + 1 ) ) ) , -160 )
 
     draw.NoTexture()
 
-    surface_SetDrawColor( blackish )
+    surface.SetDrawColor( blackish )
     draw_Circle( x, y, 25, 6, 30 ) -- Base hex
 
     if icon then
-        surface_SetDrawColor( color_white )
-        surface_SetMaterial( icon )
+        surface.SetDrawColor( color_white )
+        surface.SetMaterial( icon )
         draw_Circle( x, y, 30, 6, 30 )
     end
 
@@ -210,40 +194,40 @@ local function DrawSkillHex( x, y, icon, level, xp, col, skillname )
     local dotsize = 6
     
     -- Top left dot
-    surface_SetDrawColor( level == 6 and orangeish or blackish )
+    surface.SetDrawColor( level == 6 and orangeish or blackish )
     draw_Circle( x - 15, y - 25, dotsize, 20, 0 )
-    surface_DrawCircle( x - 15, y - 25, dotsize, 160, 160, 160, 30 )
+    surface.DrawCircle( x - 15, y - 25, dotsize, 160, 160, 160, 30 )
 
     -- Top right dot
-    surface_SetDrawColor( level >= 1 and orangeish or blackish )
+    surface.SetDrawColor( level >= 1 and orangeish or blackish )
     draw_Circle( x + 15, y - 25, dotsize, 20, 0 )
-    surface_DrawCircle( x + 15, y - 25, dotsize, 160, 160, 160, 30 )
+    surface.DrawCircle( x + 15, y - 25, dotsize, 160, 160, 160, 30 )
 
     -- Right dot
-    surface_SetDrawColor( level >= 2 and orangeish or blackish )
+    surface.SetDrawColor( level >= 2 and orangeish or blackish )
     draw_Circle( x + 30, y, dotsize, 20, 0 )
-    surface_DrawCircle( x + 30, y, dotsize, 160, 160, 160, 30 )
+    surface.DrawCircle( x + 30, y, dotsize, 160, 160, 160, 30 )
 
     -- Left dot
-    surface_SetDrawColor( level >= 5 and orangeish or blackish )
+    surface.SetDrawColor( level >= 5 and orangeish or blackish )
     draw_Circle( x - 30, y, dotsize, 20, 0 )
-    surface_DrawCircle( x - 30, y, dotsize, 160, 160, 160, 30 )
+    surface.DrawCircle( x - 30, y, dotsize, 160, 160, 160, 30 )
 
     -- Bottom left dot
-    surface_SetDrawColor( level >= 4 and orangeish or blackish )
+    surface.SetDrawColor( level >= 4 and orangeish or blackish )
     draw_Circle( x - 15, y + 25, dotsize, 20, 0 )
-    surface_DrawCircle( x - 15, y + 25, dotsize, 160, 160, 160, 30 )
+    surface.DrawCircle( x - 15, y + 25, dotsize, 160, 160, 160, 30 )
 
     -- Bottom right dot
-    surface_SetDrawColor( level >= 3 and orangeish or blackish )
+    surface.SetDrawColor( level >= 3 and orangeish or blackish )
     draw_Circle( x + 15, y + 25, dotsize, 20, 0 )
-    surface_DrawCircle( x + 15, y + 25, dotsize, 160, 160, 160, 30 )
+    surface.DrawCircle( x + 15, y + 25, dotsize, 160, 160, 160, 30 )
 
     skillvars[ skillname ].col.a = Lerp( 3 * FrameTime(), skillvars[ skillname ].col.a, 0 )
 
     if skillvars[ skillname ].col.a > 5 then
-        surface_SetDrawColor( skillvars[ skillname ].col )
-        surface_SetMaterial( skillglow )
+        surface.SetDrawColor( skillvars[ skillname ].col )
+        surface.SetMaterial( skillglow )
         draw_Circle( x, y, 40, 50, 30 )
     end
 
@@ -278,17 +262,22 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     if CD2_InDropMenu or IsValid( CD2_AgencyConsole ) then RemoveHUDpanels() return end
     if !CD2_DrawWeaponInfo then RemoveHUDpanels() end
 
+    if game.GetTimeScale() < 0.90 then
+
+        draw.DrawText( "Damping frame loss.. (" .. ( math.Round( ( 1 - game.GetTimeScale() ) * 100, 0 ) ) .."%)", "crackdown2_font30", 60, scrh / 2, alphawhite, TEXT_ALIGN_LEFT )
+    end
+
     if !game.SinglePlayer() and GetConVar( "cd2_drawhud" ):GetBool() then
         for k, v in ipairs( player.GetAll() ) do
             if v == LocalPlayer() or !v:IsCD2Agent() then continue end
             local ent = IsValid( v:GetRagdollEntity() ) and v:GetRagdollEntity() or v
             local screen = ( ent:GetPos() + Vector( 0, 0, 100 ) ):ToScreen()
-            draw_DrawText( v:Name(), "crackdown2_agentnames", screen.x, screen.y, v:GetPlayerColor():ToColor(), TEXT_ALIGN_CENTER )
+            draw.DrawText( v:Name(), "crackdown2_agentnames", screen.x, screen.y, v:GetPlayerColor():ToColor(), TEXT_ALIGN_CENTER )
 
             if !v:Alive() then 
                 local screen = ( ent:GetPos() + Vector( 0, 0, 10 ) ):ToScreen()
-                surface_SetMaterial( agentdown )
-                surface_SetDrawColor( color_white )
+                surface.SetMaterial( agentdown )
+                surface.SetDrawColor( color_white )
                 surface.DrawTexturedRect( screen.x - 65, screen.y - 25, 130, 70 )
             end
         end
@@ -303,10 +292,10 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         hlerp1 = Lerp( 2 * FrameTime(), hlerp1, 0 )
         hlerp2 = Lerp( 2 * FrameTime(), hlerp2, scrh - 150 )
 
-        surface_SetDrawColor( black )
+        surface.SetDrawColor( black )
 
-        surface_DrawRect( 0, hlerp1, scrw, 150 )
-        surface_DrawRect( 0, hlerp2, scrw, 150 )
+        surface.DrawRect( 0, hlerp1, scrw, 150 )
+        surface.DrawRect( 0, hlerp2, scrw, 150 )
     else
         hlerp1 = -100
         hlerp2 = scrh
@@ -315,11 +304,11 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     if !ply:Alive() then 
         local usebind = input.LookupBinding( "+use" ) or "e"
         local code = input.GetKeyCode( usebind )
-        local buttonname = input_GetKeyName( code )
+        local buttonname = input.GetKeyName( code )
 
         local reloadbind = input.LookupBinding( "+reload" ) or "r"
         local rcode = input.GetKeyCode( reloadbind )
-        local reloadname = input_GetKeyName( rcode )
+        local reloadname = input.GetKeyName( rcode )
         
 
         CD2DrawInputbar( scrw / 2.1, 200, string.upper( buttonname ), "Regenerate" )
@@ -328,7 +317,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         if #player.GetAll() > 1 then
             local fbind = input.LookupBinding( "+forward" ) or "w"
             local fcode = input.GetKeyCode( fbind )
-            local forwardname = input_GetKeyName( fcode )
+            local forwardname = input.GetKeyName( fcode )
 
             CD2DrawInputbar( scrw / 1.9, 300, string.upper( forwardname ), "Hold to call for help" )
         end
@@ -342,20 +331,20 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     -- Crosshair --
     if CD2_DrawTargetting then
         draw.NoTexture()
-        surface_SetDrawColor( !CD2_lockon and shadedwhite or red )
+        surface.SetDrawColor( !CD2_lockon and shadedwhite or red )
         draw_Circle( scrw / 2, scrh / 2, 2, 30 )
 
         if CD2_lockon then
             local target = ply:GetNW2Entity( "cd2_lockontarget", nil )
-            surface_DrawLine( ( scrw / 2 ), ( scrh / 2 ) + 10, ( scrw / 2 ), ( scrh / 2 ) + 20 )
-            surface_DrawLine( ( scrw / 2 ), ( scrh / 2 ) - 10, ( scrw / 2 ), ( scrh / 2 ) - 20 )
-            surface_DrawLine( ( scrw / 2 ) + 10, ( scrh / 2 ), ( scrw / 2 ) + 20, ( scrh / 2 ) )
-            surface_DrawLine( ( scrw / 2 ) - 10, ( scrh / 2 ), ( scrw / 2 ) - 20, ( scrh / 2 ) )
+            surface.DrawLine( ( scrw / 2 ), ( scrh / 2 ) + 10, ( scrw / 2 ), ( scrh / 2 ) + 20 )
+            surface.DrawLine( ( scrw / 2 ), ( scrh / 2 ) - 10, ( scrw / 2 ), ( scrh / 2 ) - 20 )
+            surface.DrawLine( ( scrw / 2 ) + 10, ( scrh / 2 ), ( scrw / 2 ) + 20, ( scrh / 2 ) )
+            surface.DrawLine( ( scrw / 2 ) - 10, ( scrh / 2 ), ( scrw / 2 ) - 20, ( scrh / 2 ) )
 
             if IsValid( target ) then
                 local spread = ply:GetLockonSpreadDecay() * 500
-                surface_SetDrawColor( shadedwhite )
-                surface_SetMaterial( hex )
+                surface.SetDrawColor( shadedwhite )
+                surface.SetMaterial( hex )
                 surface.DrawTexturedRectRotated( ( scrw / 2 ), ( scrh / 2 ), spread, spread, ( SysTime() * 300 ) )
             end
         end
@@ -377,7 +366,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
     -- Health and Shields --
     if CD2_DrawHealthandShields then
-        local hp, shield, maxshields, hpbars = ply:Health(), clamp( ply:Armor(), 0, 100 ), ply:GetMaxArmor(), ( ceil( ply:Health() / 100 ) )
+        local hp, shield, maxshields, hpbars = ply:Health(), math.Clamp( ply:Armor(), 0, 100 ), ply:GetMaxArmor(), ( math.ceil( ply:Health() / 100 ) )
 
         hplerp = hplerp == -1 and hp or hplerp
         shieldlerp = shieldlerp == -1 and shield or shieldlerp
@@ -386,24 +375,24 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         hplerp = Lerp( 30 * FrameTime(), hplerp, modulate == 0 and ScreenScale( 96 ) or modulate)
         shieldlerp = Lerp( 30 * FrameTime(), shieldlerp, ( shield / maxshields ) * ScreenScale( 96 ) )
 
-        surface_SetDrawColor( blackish )
-        surface_DrawRect( 70, 50, ScreenScale( 100 ), 35 )
+        surface.SetDrawColor( blackish )
+        surface.DrawRect( 70, 50, ScreenScale( 100 ), 35 )
 
         if hpbars > 1 then
-            surface_SetDrawColor( blackish )
-            surface_DrawRect( 70, 80, ScreenScale( 30 ), 13 )
+            surface.SetDrawColor( blackish )
+            surface.DrawRect( 70, 80, ScreenScale( 30 ), 13 )
 
             for i = 1, hpbars do
                 if i == 1 then continue end
                 draw.NoTexture()
-                surface_SetDrawColor( orangeish )
-                draw_Circle( 60 + ( 20 * ( i - 1 ) ), 90, ceil( ScreenScale( 2.5 ) ), 6, 30 )
+                surface.SetDrawColor( orangeish )
+                draw_Circle( 60 + ( 20 * ( i - 1 ) ), 90, math.ceil( ScreenScale( 2.5 ) ), 6, 30 )
             end
         end
 
 
-        surface_SetDrawColor( color_white )
-        surface_DrawRect( 75, 55, shieldlerp, 10 )
+        surface.SetDrawColor( color_white )
+        surface.DrawRect( 75, 55, shieldlerp, 10 )
 
         if hpbars == 1 then
             hpred.r = math.max( 30, ( math.abs( math.sin( SysTime() * 1.5 ) * 163 ) ), ( math.abs( math.cos( SysTime() * 1.5 ) * 163 ) ) )
@@ -411,8 +400,8 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             hpred.b = ( math.abs( math.sin( SysTime() * 1.5 ) * 12 ) )
         end
 
-        surface_SetDrawColor( hpbars > 1 and orangeish or hpred  )
-        surface_DrawRect( 75, 70, hplerp, 10 )
+        surface.SetDrawColor( hpbars > 1 and orangeish or hpred  )
+        surface.DrawRect( 75, 70, hplerp, 10 )
     end
     ------
 
@@ -424,24 +413,24 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         if IsValid( weapon ) then
             local mdl = weapon:GetWeaponWorldModel()
 
-            surface_SetDrawColor( blackish )
-            surface_DrawRect( scrw - 400, scrh - 130, 300, 30 )
+            surface.SetDrawColor( blackish )
+            surface.DrawRect( scrw - 400, scrh - 130, 300, 30 )
 
-            surface_SetDrawColor( blackish )
-            surface_DrawRect( scrw - 100, scrh - 140, 70, 40 )
+            surface.SetDrawColor( blackish )
+            surface.DrawRect( scrw - 100, scrh - 140, 70, 40 )
 
-            surface_SetDrawColor( blackish )
-            surface_DrawRect( scrw - 400, scrh - 100, 300, 60 )
+            surface.SetDrawColor( blackish )
+            surface.DrawRect( scrw - 400, scrh - 100, 300, 60 )
 
-            draw_DrawText( weapon.Ammo1 and weapon:Ammo1() or "NONE", "crackdown2_font40", scrw - 35, scrh - 140, color_white, TEXT_ALIGN_RIGHT )
+            draw.DrawText( weapon.Ammo1 and weapon:Ammo1() or "NONE", "crackdown2_font40", scrw - 35, scrh - 140, color_white, TEXT_ALIGN_RIGHT )
 
 
             for i = 1, weapon:Clip1() do
                 local wscale = 300 / weapon:GetMaxClip1()
                 local x = ( scrw - 395 ) + ( wscale * ( i - 1 ) )
                 if x >= scrw - 395 and x + wscale / 2 <= scrw - 100 then
-                    surface_SetDrawColor(color_white)
-                    surface_DrawRect(x, scrh - 125, ceil( wscale / 2 ), 20)
+                    surface.SetDrawColor(color_white)
+                    surface.DrawRect(x, scrh - 125, math.ceil( wscale / 2 ), 20)
                 end
             end
 
@@ -481,11 +470,11 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             end
 
 
-            surface_SetDrawColor( blackish )
-            surface_DrawRect( scrw - 120, scrh - 100, 90, 60 )
+            surface.SetDrawColor( blackish )
+            surface.DrawRect( scrw - 120, scrh - 100, 90, 60 )
     
     
-            surface_SetDrawColor( linecol )
+            surface.SetDrawColor( linecol )
             surface.DrawOutlinedRect( scrw - 120, scrh - 100, 90, 60, 2 )
             surface.DrawOutlinedRect( scrw - 100, scrh - 140, 70, 40, 2 )
             surface.DrawOutlinedRect( scrw - 400, scrh - 130, 300, 30, 2 )
@@ -534,7 +523,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
                 end
             end
     
-            draw_DrawText( ply:GetEquipmentCount(), "crackdown2_font45", scrw - 60, scrh - 90, color_white, TEXT_ALIGN_CENTER )
+            draw.DrawText( ply:GetEquipmentCount(), "crackdown2_font45", scrw - 60, scrh - 90, color_white, TEXT_ALIGN_CENTER )
 
         end
 
@@ -551,11 +540,11 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         if IsValid( target ) then 
             local toscreen = ( target:GetPos() + Vector( 0, 0, target:GetModelRadius() ) ):ToScreen()
         
-            surface_SetDrawColor( blackish )
-            surface_DrawRect( toscreen.x - 30, toscreen.y, 60, 12 )
+            surface.SetDrawColor( blackish )
+            surface.DrawRect( toscreen.x - 30, toscreen.y, 60, 12 )
 
-            surface_SetDrawColor( orangeish )
-            surface_DrawRect( toscreen.x - 28, toscreen.y + 2, ( target:GetNW2Float( "cd2_health", 0 ) / target:GetMaxHealth() ) * 56, 8 )
+            surface.SetDrawColor( orangeish )
+            surface.DrawRect( toscreen.x - 28, toscreen.y + 2, ( target:GetNW2Float( "cd2_health", 0 ) / target:GetMaxHealth() ) * 56, 8 )
         
         end
     end
@@ -566,41 +555,9 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     if CD2_DrawMinimap then
         local fov = 15
 
-        if !CD2_CheapMinimap then
-            local vel = ply:GetVelocity():Length()
-            vel = vel > 500 and vel or 0
-            addfov = Lerp( 1 * FrameTime(), addfov, vel % 10 )
-
-            render.PushRenderTarget( minimapRT )
-
-                mmTrace.start = ply:WorldSpaceCenter()
-                mmTrace.endpos = ply:GetPos() + Vector( 0, 0, 20000 )
-                mmTrace.mask = MASK_SOLID_BRUSHONLY
-                mmTrace.collisiongroup = COLLISION_GROUP_WORLD
-                local result = Trace( mmTrace )
-                fov = 15 + addfov
-
-                render.RenderView( {
-                    origin = ply:GetPos() + Vector( 0, 0, 20000 ),
-                    angles = Angle( 90, CD2_viewangles[ 2 ], 0 ),
-                    znear = result.Hit and result.HitPos:Distance( mmTrace.endpos ) or 10,
-                    fov = fov,
-                    x = 0, y = 0,
-                    w = 1024, h = 1024
-                } )
-
-            render.PopRenderTarget()
-        end
-
         draw.NoTexture()
-        surface_SetDrawColor( blackish )
+        surface.SetDrawColor( blackish )
         draw_Circle( 200, scrh - 200, ScreenScale( 50 ), 30 )
-
-        if !CD2_CheapMinimap then
-            surface_SetDrawColor( color_white )
-            surface_SetMaterial( minimapRTMat )
-            draw_Circle( 200, scrh - 200, ScreenScale( 50 ) - 10, 30 )
-        end
 
         if pingtimes then
             
@@ -625,8 +582,8 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             end
         end
 
-        surface_SetDrawColor( ply:GetPlayerColor():ToColor() )
-        surface_SetMaterial( playerarrow )
+        surface.SetDrawColor( ply:GetPlayerColor():ToColor() )
+        surface.SetMaterial( playerarrow )
         local _, angle = WorldToLocal( Vector(), ply:GetAngles(), ply:GetPos(), CD2_viewangles )
         surface.DrawTexturedRectRotated( 200, scrh - 200, ScreenScale( 10 ), ScreenScale( 10 ), angle[ 2 ] )
 
@@ -684,41 +641,37 @@ local explosivemodels = {
     [ "models/props_junk/gascan001a.mdl" ] = true
 }
 
+local effects_ents
+local next_update_effects = 0
+
 -- Peacekeeper/Cell logos --
 hook.Add( "PreDrawEffects", "crackdown2_peacekeepericons/cellicons", function()
     local ply = LocalPlayer()
     if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then return end
     
-
-    -- Peacekeeper --
-    local near = CD2FindInSphere( ply:GetPos(), 1500, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "agency" end )
-
-    for i = 1, #near do
-        local v = near[ i ]
-        render_SetMaterial( peacekeeper )
-        render_DrawSprite( v:GetPos() + Vector( 0, 0, 100 ), 32, 20, color_white )
+    if CurTime() > next_update_effects then
+        effects_ents = CD2FindInSphere( ply:GetPos(), 1500 )
+        next_update_effects = CurTime() + 0.5
     end
-    ----
 
-    -- Explosives --
-    local near = CD2FindInSphere( ply:GetPos(), 1500, function( ent ) return explosivemodels[ ent:GetModel() ] end )
+    for i = 1, #effects_ents do
+        local v = effects_ents[ i ]
+        if !IsValid( v ) then continue end
 
-    for i = 1, #near do
-        local v = near[ i ]
-        render_SetMaterial( fireicon )
-        render_DrawSprite( v:GetPos() + Vector( 0, 0, v:GetModelRadius() + 40 ), 16, 16, color_white )
+        -- Peacekeeper --
+        if v:IsCD2NPC() and v:GetCD2Team() == "agency" then
+            render.SetMaterial( peacekeeper )
+            render.DrawSprite( v:GetPos() + Vector( 0, 0, 100 ), 32, 20, color_white )
+        -- Explosives --
+        elseif explosivemodels[ v:GetModel() ] then
+            render.SetMaterial( fireicon )
+            render.DrawSprite( v:GetPos() + Vector( 0, 0, v:GetModelRadius() + 40 ), 16, 16, color_white )
+        -- Cell --
+        elseif v:IsCD2NPC() and v:GetCD2Team() == "cell" then
+            render.SetMaterial( cell )
+            render.DrawSprite( v:GetPos() + Vector( 0, 0, 100 ), 16, 16, red )
+        end
     end
-    ----
-
-    -- Cell --
-    local near = CD2FindInSphere( ply:GetPos(), 1500, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "cell" end )
-
-    for i = 1, #near do
-        local v = near[ i ]
-        render_SetMaterial( cell )
-        render_DrawSprite( v:GetPos() + Vector( 0, 0, 100 ), 16, 16, red )
-    end
-    ----
 end )
 ----
 

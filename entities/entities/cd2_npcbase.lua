@@ -28,6 +28,7 @@ ENT.cd2_PhysicsUpdate = 0 -- The next time our physics will update
 ENT.cd2_NextPVScheck = 0 -- The next time we will check if we are in a player's pvs
 ENT.cd2_StuckTimes = 0 -- The amount of times we got stuck
 ENT.cd2_ShouldcheckPVS = true -- In singleplayer, if the npc should check if it's within the player's PVS and disable it self if it isn't
+ENT.cd2_PVSchecklimit = 0
 ENT.cd2_ClearStuckTimes = 0 -- The next time we will reset our stuck times
 ENT.cd2_facetarget = nil -- The target we are facing
 ENT.cd2_NextSpeak = 0 -- The next time we will speak
@@ -260,6 +261,8 @@ function ENT:Initialize()
     self:SetHealth( self.cd2_Health )
     if SERVER then self:SetMaxHealth( self.cd2_Health ) end
 
+    AccessorFunc( self, "cd2_state", "State" )
+
     self:SetCD2Team( self.cd2_Team )
     self:SetSightDistance( self.cd2_SightDistance )
     self:SetState( "Idle" )
@@ -309,18 +312,10 @@ function ENT:Draw()
 end
 
 function ENT:SetupDataTables()
-    self:NetworkVar( "String", 0, "CD2Team" )
-    self:NetworkVar( "String", 1, "State" )
+    self:NetworkVar( "String", 0, "CD2Team" ) 
 
     self:NetworkVar( "Entity", 0, "WeaponEntity" )
     self:NetworkVar( "Entity", 1, "Enemy" )
-
-    self:NetworkVar( "Bool", 0, "Crouch" )
-    self:NetworkVar( "Bool", 1, "Walk" )
-    self:NetworkVar( "Bool", 2, "IsMoving" )
-    self:NetworkVar( "Bool", 3, "IsDisabled" )
-
-    self:NetworkVar( "Int", 0, "SightDistance" )
 
     if self.SetupDataTables2 then self:SetupDataTables2() end
 
@@ -328,6 +323,7 @@ end
 
 
 function ENT:HandleCollision( data )
+    if CLIENT then return end
     local collider = data.HitEntity
 
     if !IsValid( collider ) then return end
@@ -356,7 +352,7 @@ end
 
 function ENT:Think()
 
-    if SERVER and game.SinglePlayer() and self.cd2_ShouldcheckPVS then
+    if SERVER and game.SinglePlayer() and self.cd2_ShouldcheckPVS and CurTime() > self.cd2_PVSchecklimit then
         if !Entity( 1 ):TestPVS( self ) and Entity( 1 ):SqrRangeTo( self ) > ( 1500 * 1500 )  or CD2_DisableAllAI then
             self:SetIsDisabled( true )
             if !Entity( 1 ):TestPVS( self ) and CurTime() > self.cd2_pvsremovetime then self:Remove() end
@@ -364,6 +360,7 @@ function ENT:Think()
             self:SetIsDisabled( false )
         end
         if Entity( 1 ):TestPVS( self ) or Entity( 1 ):SqrRangeTo( self ) < ( 1500 * 1500 ) then self.cd2_pvsremovetime = CurTime() + 10 end
+        self.cd2_PVSchecklimit = CurTime() + 1
     end
 
     if SERVER and self:Health() > 0 then

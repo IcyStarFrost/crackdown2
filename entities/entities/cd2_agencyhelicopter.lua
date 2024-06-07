@@ -14,6 +14,8 @@ end
 function ENT:Initialize()
     self:SetModel( "models/combine_helicopter.mdl" )
 
+    AccessorFunc( self, "cd2_hascargo", "HasCargo" )
+
     timer.Simple( 0, function()
         self:ResetSequence( 0 )
     end )
@@ -98,6 +100,8 @@ function ENT:DeployPeacekeepers()
         peacekeeper:SetPos( self:GetPos() + ( self:GetForward() * ( 50 * i ) ) + self:GetRight() * 50 ) 
         peacekeeper:Spawn()
 
+        if !IsValid( peacekeeper ) then continue end
+
         CD2CreateThread( function()
 
             peacekeeper:EmitSound( "crackdown2/npc/peacekeeper/drop" .. random( 1, 2 ) .. ".wav", 70 )
@@ -114,6 +118,8 @@ function ENT:DeployPeacekeepers()
         local peacekeeper = ents.Create( "cd2_droppeacekeeper" )
         peacekeeper:SetPos( self:GetPos() + ( self:GetForward() * ( 50 * i ) ) - self:GetRight() * 50 ) 
         peacekeeper:Spawn()
+
+        if !IsValid( peacekeeper ) then continue end
 
         CD2CreateThread( function()
 
@@ -239,6 +245,4 @@ end
 
 function ENT:SetupDataTables()
     self:NetworkVar( "Entity", 0, "Cargo" )
-
-    self:NetworkVar( "Bool", 0, "HasCargo" )
 end

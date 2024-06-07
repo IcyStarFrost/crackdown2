@@ -110,8 +110,10 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
                 ply:Freeze( false )
             end
 
-            while ply:IsOnGround() do coroutine.yield() end 
-            while !ply:IsOnGround() do coroutine.yield() end
+            local timeout = CurTime() + 6
+
+            while ply:IsOnGround() do if CurTime() > timeout then break end coroutine.yield() end 
+            while !ply:IsOnGround() do if CurTime() > timeout then break end coroutine.yield() end
 
             if IsValid( guide ) then guide:Remove() end
 
@@ -472,6 +474,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             coroutine.wait( 4 )
 
             ply:SendLua( "OpenIntelConsole()" )
+            ply:SendLua( "CD2_CanOpenAgencyConsole = false" )
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/intel2.mp3" )
 
             coroutine.wait( 9 )
@@ -484,6 +487,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             coroutine.wait( 9 )
 
+            ply:SendLua( "CD2_CanOpenAgencyConsole = true" )
             ply:SendLua( "OpenIntelConsole()" )
 
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firsttactical.mp3" )

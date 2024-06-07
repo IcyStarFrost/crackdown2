@@ -72,6 +72,8 @@ function SWEP:Initialize()
     self:SetHoldType( self.HoldType )
     self.DeleteTime = CurTime() + 30 -- The time until we will be deleted if we don't have a owner
 
+    AccessorFunc( self, "cd2_IsReloading", "IsReloading" )
+
     self:SetCollisionGroup( COLLISION_GROUP_WEAPON )
 
     if SERVER then
@@ -113,7 +115,7 @@ function SWEP:PrimaryAttack()
 
     self:ShootBullet( self.Primary.Damage, self.Primary.Bulletcount, self.Primary.Spread, self.Primary.Ammo, self.Primary.Force, self.Primary.Tracer, self.Primary.TracerName )
 
-    self:SetNextPrimaryFire( CurTime() + 60 / self.Primary.RPM )
+    self:SetNextPrimaryFire( ( CurTime() + 60 / ( self.Primary.RPM / game.GetTimeScale() ) ) )
 end
 
 function SWEP:CanPrimaryAttack()
@@ -193,7 +195,6 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
 end
 
 function SWEP:SetupDataTables()
-    self:NetworkVar( "Bool", 0, "IsReloading" ) -- If the weapon is reloading
     self:NetworkVar( "Bool", 1, "PickupMode" ) -- This will be set if the player picked up a object
     self:NetworkVar( "Bool", 2, "IsHolstering" )
     self:NetworkVar( "Bool", 3, "PermanentDrop" )

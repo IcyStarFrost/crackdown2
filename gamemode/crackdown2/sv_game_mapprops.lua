@@ -260,6 +260,7 @@ CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 3", "agency", function( generatep
     end
 end )
 
+local bypass_players = {} -- List of players to not run MPG on
 local freq = 0
 hook.Add( "Tick", "crackdown2_mappropgeneration", function()
     if !navmesh.IsLoaded() or CD2_EmptyStreets or !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then return end
@@ -267,8 +268,15 @@ hook.Add( "Tick", "crackdown2_mappropgeneration", function()
     if CurTime() < freq then return end
 
     for k, ply in ipairs( player.GetAll() ) do
-        if !IsValid( ply ) or !ply:IsCD2Agent() then continue end
+        if !IsValid( ply ) or !ply:IsCD2Agent() or bypass_players[ ply ] and bypass_players[ ply ] < CurTime() then continue end
         local genpos = CD2GetRandomPos( 2000, ply:GetPos() ) 
+
+        -- Do not run MPG for this player for a short time if no nav is found.
+        if genpos == vector_origin then 
+            bypass_players[ ply ] = CurTime() + 6 
+            continue 
+        end
+
         local cangenerate = CD2MAPPROPGENERATOR:CanGenerateAt( genpos )
 
         if cangenerate then

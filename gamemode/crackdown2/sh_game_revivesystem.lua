@@ -61,4 +61,58 @@ if !game.SinglePlayer() and CLIENT then
 end
 
 
+if SERVER then
+    -- Received when a Player revives another Player
+    -- ply = Reviving player
+    -- agent = Originally dead player
+    net.Receive( "cd2net_reviveplayer", function( len, ply ) 
+        local agent = net.ReadEntity()
+        if agent:Alive() or !agent:GetCanRevive() then return end
+
+        CD2DebugMessage( agent:Name() .. " Was revived by " .. ply:Name() )
+
+        BroadcastLua( "Entity(" .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_GMOD_GESTURE_ITEM_PLACE, true )" )
+
+        agent.cd2_revived = true
+        agent.cd2_WeaponSpawnDelay = CurTime() + 0.5
+
+        agent:Spawn()
+        agent:SetPos( ply:GetPos() + Vector( 0, 0, 5 ) + ply:GetForward() * 50 )
+        agent:EmitSound( "crackdown2/ply/revived.mp3", 80 )
+
+        agent:SetNoDraw( true )
+        agent:Freeze( true )
+        agent.cd2_godmode = true
+
+        local riseent = ents.Create( "cd2_riseent" )
+        riseent:SetPos( agent:GetPos() )
+        riseent:SetAngles( Angle( 0, agent:EyeAngles()[ 2 ], 0 ) )
+        riseent:SetParent( agent )
+        riseent:SetPlayer( agent )
+        riseent:Spawn()
+        riseent.Callback = function( self )
+            agent:SetNoDraw( false )
+            agent:Freeze( false )
+            agent.cd2_godmode = false
+        end
+
+        local primary = agent:Give( agent.cd2_lastspawnprimary )
+        local secondary = agent:Give( agent.cd2_lastspawnsecondary )
+
+        local weps = agent.cd2_deathweapons
+        for i = 1, #weps do
+            local class = weps[ i ][ 1 ]
+            local reserve = weps[ i ][ 2 ]
+
+            if IsValid( primary ) and class == primary:GetClass() then
+                agent:SetAmmo( reserve, primary.Primary.Ammo )
+            elseif IsValid( secondary ) and class == secondary:GetClass() then
+                agent:SetAmmo( reserve, secondary.Primary.Ammo )
+            end
+        end
+
+    end )
+end
+
+
 -----

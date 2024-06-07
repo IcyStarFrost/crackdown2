@@ -168,14 +168,6 @@ function GM:CreateMove( cmd )
 
     vec:Rotate( Angle( CD2_viewangles[ 1 ], CD2_viewangles[ 2 ], CD2_viewangles[ 3 ] ) )
 
-
-    CD2_viewangles[ 2 ] = CD2_viewangles[ 2 ] - cmd:GetMouseX() * 0.02
-    
-    CD2_viewangles[ 1 ] = clamp( CD2_viewangles[ 1 ] +  cmd:GetMouseY() * 0.02, -90, 90 )
-
-    if !CD2_PreventMovement then CD2_plyangle[ 1 ] = CD2_viewangles[ 1 ] end
-
-    
     local lockontarget = self:GetNW2Entity( "cd2_lockontarget", nil )
 
     if IsValid( lockontarget ) and !lockontarget.cd2_NoHeadShot and ( lockontarget:IsCD2Agent() or lockontarget:IsCD2NPC() ) and cmd:GetMouseY() < 0 then
@@ -183,6 +175,21 @@ function GM:CreateMove( cmd )
     elseif !IsValid( lockontarget ) or cmd:GetMouseY() > 0 then
         CD2_LockOnPos = "body"
     end
+
+
+    
+    if IsValid( lockontarget ) then
+        cmd:SetMouseX( 0 )
+        cmd:SetMouseY( 0 )
+    end
+
+
+    CD2_viewangles[ 2 ] = CD2_viewangles[ 2 ] - cmd:GetMouseX() * 0.02
+    
+    CD2_viewangles[ 1 ] = clamp( CD2_viewangles[ 1 ] +  cmd:GetMouseY() * 0.02, -90, 90 )
+
+    if !CD2_PreventMovement then CD2_plyangle[ 1 ] = CD2_viewangles[ 1 ] end
+
 
 
     if !CD2_FreeCamMode and cmd:GetMouseWheel() != 0 and CurTime() > switchcooldown then 

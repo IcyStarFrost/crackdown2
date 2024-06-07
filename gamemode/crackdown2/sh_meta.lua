@@ -226,18 +226,6 @@ function PLAYER:Stun( force )
     self:SetIsStunned( true )
 end
 
-local oldsethealth = ENT.SetHealth
-function ENT:SetHealth( newhealth )
-    if self:IsCD2Agent() then self:SetNWHealth( newhealth ) end
-    
-    oldsethealth( self, newhealth )
-end
-
-local oldsetarmor = PLAYER.SetArmor
-function PLAYER:SetArmor( newarmor )
-    if self:IsCD2Agent() then self:SetNWShields( newarmor ) end
-    oldsetarmor( self, newarmor )
-end
 
 local oldstripammo = PLAYER.StripAmmo
 function PLAYER:StripAmmo()
@@ -257,9 +245,6 @@ function PLAYER:BuildSkills()
 
     self:SetHealth( 100 * ( strength < 6 and strength or 5 ) )
     self:SetMaxHealth( 100 * ( strength < 6 and strength or 5 ) )
-
-    self:SetNWShields( self:Armor() )
-    self:SetNWHealth( self:Health() )
 
     self:SetSafeFallSpeed( 40 * agility )
     self:SetJumpPower( 400 + ( agility > 1 and 50 * agility or 0 ) )

@@ -17,15 +17,13 @@ hook.Add( "Tick", "crackdown2_regeneration", function()
             if ply:Health() == ply:GetMaxHealth() then
                 ply.cd2_cancallHealthsound = true
             end
-
+            print("Tick", ply:Armor() < ply:GetMaxArmor() and ( ply.cd2_NextRegenTime and CurTime() > ply.cd2_NextRegenTime ), ply:Armor(), ply:GetMaxArmor(), ( ply.cd2_NextRegenTime and CurTime() > ply.cd2_NextRegenTime ) )
             -- Shields recharging --
             if ply:Armor() < ply:GetMaxArmor() and ( ply.cd2_NextRegenTime and CurTime() > ply.cd2_NextRegenTime ) then
                 
                 if !ply.cd2_NextShieldRegen or CurTime() > ply.cd2_NextShieldRegen then
-
+                    print("Armor")
                     ply:SetArmor( ply:Armor() + 1 )
-                    ply:SetNWShields( ply:Armor() )
-                    ply:SetIsRechargingShield( true )
 
                     if ply.cd2_cancallShieldsound then ply:SendLua( "surface.PlaySound( 'buttons/combine_button7.wav' )" ) ply.cd2_cancallShieldsound = false end
 
@@ -33,8 +31,6 @@ hook.Add( "Tick", "crackdown2_regeneration", function()
                 end
 
                 continue
-            elseif ply.cd2_NextRegenTime and CurTime() < ply.cd2_NextRegenTime or ply:Armor() == ply:GetMaxArmor() then
-                ply:SetIsRechargingShield( false )
             end
             -----
 
@@ -44,17 +40,12 @@ hook.Add( "Tick", "crackdown2_regeneration", function()
                 if !ply.cd2_NextHealthRegen or CurTime() > ply.cd2_NextHealthRegen then
 
                     ply:SetHealth( ply:Health() + 1 )
-                    ply:SetNWHealth( ply:Health() )
-                    ply:SetIsRegeningHealth( true )
-
                     if ply.cd2_cancallHealthsound then ply:SendLua( "surface.PlaySound( 'buttons/combine_button5.wav' )" ) ply.cd2_cancallHealthsound = false end
 
                     ply.cd2_NextHealthRegen = CurTime() + 0.03
                 end
 
                 continue
-            elseif ply.cd2_NextRegenTime and CurTime() < ply.cd2_NextRegenTime or ply:Health() == ply:GetMaxHealth() then
-                ply:SetIsRegeningHealth( false )
             end
 
         end
@@ -91,8 +82,6 @@ if SERVER then
     -- Set the regen start time and updates the player's networked health. Same as above for networked health, player's networked health was updated every 0.1 seconds. Once again this is more optimized
     hook.Add( "PlayerHurt", "crackdown2_delayregen", function( ply, attacker, remaining, damagetaken )
         ply.cd2_NextRegenTime = CurTime() + 6
-        ply:SetNWShields( ply:Armor() )
-        ply:SetNWHealth( ply:Health() )
     end )
 end
 
@@ -105,11 +94,11 @@ if CLIENT then
 
         if !IsValid( ply ) or !ply:IsCD2Agent() then return end
         
-        if ply:Alive() and ply:GetNWHealth() < 70 and !limit then
+        if ply:Alive() and ply:Health() < 70 and !limit then
             lowhealthchannel = CD2StartMusic( "sound/crackdown2/music/lowhealth.mp3", 5, true )
             ply:SetDSP( 30 )
             limit = true
-        elseif ply:GetNWHealth() > 70 and limit then
+        elseif ply:Health() > 70 and limit then
             if IsValid( lowhealthchannel ) then lowhealthchannel:FadeOut() end
             CD2StartMusic( "sound/crackdown2/music/healthregenerated.mp3", 2, false, true )
             ply:SetDSP( 1 )

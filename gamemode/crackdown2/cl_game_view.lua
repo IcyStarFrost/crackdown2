@@ -170,9 +170,9 @@ function GM:CreateMove( cmd )
 
     local lockontarget = self:GetNW2Entity( "cd2_lockontarget", nil )
 
-    if IsValid( lockontarget ) and !lockontarget.cd2_NoHeadShot and ( lockontarget:IsCD2Agent() or lockontarget:IsCD2NPC() ) and cmd:GetMouseY() < 0 then
+    if IsValid( lockontarget ) and !lockontarget.cd2_NoHeadShot and ( lockontarget:IsCD2Agent() or lockontarget:IsCD2NPC() ) and cmd:GetMouseY() < -100 then
         CD2_LockOnPos = "head"
-    elseif !IsValid( lockontarget ) or cmd:GetMouseY() > 0 then
+    elseif !IsValid( lockontarget ) or cmd:GetMouseY() > 100 then
         CD2_LockOnPos = "body"
     end
 

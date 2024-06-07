@@ -79,9 +79,6 @@ function PLAYER:Init()
     self.Player:SetExplosiveXP( 0 )
     self.Player:SetDrivingXP( 0 )
 
-    self.Player:SetNWShields( 100 )
-    self.Player:SetNWHealth( 100 )
-
     if CLIENT then
 
         -- XP --
@@ -227,15 +224,11 @@ function PLAYER:SetupDataTables()
     self.Player:NetworkVar( "Int", 8, "MaxEquipmentCount" ) -- The max amount of a certain equipment a player can have
     self.Player:NetworkVar( "Int", 9, "MeleeDamage" ) -- The amount of melee damage the player can deal
 
-    self.Player:NetworkVar( "Bool", 0, "IsRechargingShield" ) -- If the Player's shields are recharging
-    self.Player:NetworkVar( "Bool", 1, "IsRegeningHealth" ) -- If the Player's health is regenerating
     self.Player:NetworkVar( "Bool", 2, "CanRevive" ) -- If the player can be revived
     self.Player:NetworkVar( "Bool", 3, "IsStunned" ) -- If the player is stunned
     self.Player:NetworkVar( "Bool", 4, "CanUseLockon" ) -- if this player can lock onto things
     self.Player:NetworkVar( "Bool", 5, "CanUseMelee" ) -- If this player can melee
 
-    self.Player:NetworkVar( "Float", 0, "NWHealth" ) -- Networked. Used for HUD and regen
-    self.Player:NetworkVar( "Float", 1, "NWShields" ) -- Networked. Used for HUD and regen
     self.Player:NetworkVar( "Float", 7, "LockonSpreadDecay" ) -- This will increase spread but will decrease down to the weapon's set lock on spread
 
 end

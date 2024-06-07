@@ -709,7 +709,7 @@ hook.Add( "RenderScreenspaceEffects", "crackdown2_lowhealthcolors", function()
     
     if !ply:IsCD2Agent() then return end
 
-    if ply:Alive() and ply:GetNWHealth() < 70 then
+    if ply:Alive() and ply:Health() < 70 then
         modify[ "$pp_colour_addr" ] = Lerp( 2 * FrameTime(), modify[ "$pp_colour_addr" ], 0.15 )
     else
         modify[ "$pp_colour_addr" ] = Lerp( 2 * FrameTime(), modify[ "$pp_colour_addr" ], 0 )

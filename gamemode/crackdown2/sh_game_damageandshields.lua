@@ -59,9 +59,8 @@ elseif CLIENT then
 
             hook.Add( "Think", "crackdown2_shieldofflinesoundhandler", function()
                 if !IsValid( snd ) or snd:GetState() == GMOD_CHANNEL_STOPPED then hook.Remove( "Think", "crackdown2_shieldofflinesoundhandler" ) return end
-                if !ply:Alive() or ply:GetNWShields() > 30 or ply:GetNWShields() <= 0 then hook.Remove( "Think", "crackdown2_shieldofflinesoundhandler" ) snd:Stop() return end
+                if !ply:Alive() or ply:Armor() > 30 or ply:Armor() <= 0 then hook.Remove( "Think", "crackdown2_shieldofflinesoundhandler" ) snd:Stop() return end
             end )
-
         end )
     end
 
@@ -73,17 +72,17 @@ elseif CLIENT then
 
         if !IsValid( ply ) or !ply:IsCD2Agent() then return end
 
-        if ply:GetNWShields() <= 30 and !limitlow then
+        if ply:Armor() <= 30 and !limitlow then
             PlayShieldsOfflineSound() 
             limitlow = true
-        elseif ply:GetNWShields() > 30 and limitlow then
+        elseif ply:Armor() > 30 and limitlow then
             limitlow = false
         end
 
-        if ply:GetNWShields() <= 0 and !limitoffline then
+        if ply:Armor() <= 0 and !limitoffline then
             sound.PlayFile( "sound/crackdown2/ply/shield_takedown.mp3", "noplay", function( snd, id ) if id then return end snd:SetVolume( 0.3 ) snd:Play() end )
             limitoffline = true
-        elseif ply:GetNWShields() > 0 and limitoffline then
+        elseif ply:Armor() > 0 and limitoffline then
             limitoffline = false
         end
 

@@ -33,10 +33,12 @@ function ENT:Initialize2()
     if SERVER then self:SetModel( self:ModelGet() ) self.cd2_Path = Path( "Follow" ) end
 
     if SERVER then
+        local cooldown = 0
         -- Hearing
         -- Look to the position or go to the position when hearing something
         self:Hook( "EntityEmitSound", "hearing", function( snddata )
-            if IsValid( self:GetEnemy() ) then return end
+            if IsValid( self:GetEnemy() ) or CurTime() < cooldown then return end
+            cooldown = CurTime() + 1
             local chan = snddata.Channel 
             local pos = snddata.Pos or IsValid( snddata.Entity ) and snddata.Entity or nil
             if self:GetRangeSquaredTo( pos ) > ( self.cd2_SightDistance * self.cd2_SightDistance ) or pos == self or pos == self:GetActiveWeapon() then return end

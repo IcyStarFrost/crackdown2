@@ -22,7 +22,7 @@ hook.Add( "Tick", "crackdown2_regeneration", function()
             if ply:Armor() < ply:GetMaxArmor() and ( ply.cd2_NextRegenTime and CurTime() > ply.cd2_NextRegenTime ) then
                 
                 if !ply.cd2_NextShieldRegen or CurTime() > ply.cd2_NextShieldRegen then
-                    print("Armor")
+
                     ply:SetArmor( ply:Armor() + 1 )
 
                     if ply.cd2_cancallShieldsound then ply:SendLua( "surface.PlaySound( 'buttons/combine_button7.wav' )" ) ply.cd2_cancallShieldsound = false end

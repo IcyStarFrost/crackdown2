@@ -18,10 +18,10 @@ function ENT:Initialize()
 
     if CLIENT then
         self.cd2_hasfiredbeam = false
-        
-        hook.Add( "HUDPaint", self, function()
+
+        CD2RegisterProgressBar( self, 300, 1, function()
             if !GetConVar( "cd2_drawhud" ):GetBool() then return end
-            if self:GetActive() or self:SqrRangeTo( LocalPlayer() ) > ( 300 * 300 ) then return end
+            if self:GetActive() then return end
         
             -- Base
             surface.SetDrawColor( blackish )
@@ -44,8 +44,8 @@ function ENT:Initialize()
         
             surface.SetDrawColor( linecol )
             surface.DrawOutlinedRect( ScrW() - 345,  50, 290, 20, 1 )
-        end )
-
+            return true
+        end  )
 
         hook.Add( "PreDrawEffects", self, function()
             if self:GetActive() then

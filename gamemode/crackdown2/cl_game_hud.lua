@@ -15,7 +15,34 @@ local agilityskillcolor = Color( 72, 255, 0)
 local cellwhite = Color( 255, 255, 255 )
 local celltargetred = Color( 255, 51, 0 )
 local hpred = Color( 163, 12, 12)
+local alphawhite = Color( 255, 255, 255, 10 )
+local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
+local cell = Material( "crackdown2/ui/cell.png", "smooth" )
+local beaconicon = Material( "crackdown2/ui/beacon.png" )
+local Auicon = Material( "crackdown2/ui/auicon.png" )
+local upicon = Material( "crackdown2/ui/up.png", "smooth" )
+local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
+local downicon = Material( "crackdown2/ui/down.png", "smooth" )
+local skillcircle = Material( "crackdown2/ui/skillcircle.png" )
+local staricon = Material( "crackdown2/ui/star.png", "smooth" )
+local FreakIcon = Material( "crackdown2/ui/freak.png", "smooth" )
+local hex = Material( "crackdown2/ui/hex.png", "smooth" )
+local agentdown = Material( "crackdown2/ui/agentdown.png", "smooth" )
+local skillglow = Material( "crackdown2/ui/skillglow2.png" )
+local agilityicon = Material( "crackdown2/ui/agilityicon.png", "smooth" )
+local weaponicon = Material( "crackdown2/ui/weaponicon.png", "smooth" )
+local strengthicon = Material( "crackdown2/ui/strengthicon.png", "smooth" )
+local explosiveicon = Material( "crackdown2/ui/explosiveicon.png", "smooth" )
+local pingmat = Material( "crackdown2/ui/pingcircle.png" )
+local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
+local cellicon = Material( "crackdown2/ui/celltrackericon.png" )
 
+CD2Progressbars = CD2Progressbars or {}
+local ping_locations = {}
+local hplerp = -1
+local shieldlerp = -1
+local hlerp1
+local hlerp2
 
 CD2_lockon = false
 
@@ -53,6 +80,11 @@ local function DrawSkillCircle( x, y, radius, arc, rotate )
 end
 
 
+function CD2RegisterProgressBar( ent, distance, priority, drawfunc )
+    CD2Progressbars[ #CD2Progressbars + 1 ] = { ent = ent, priority = priority, distance = distance, drawfunc = drawfunc }
+    table.sort( CD2Progressbars, function( a, b ) return a.priority > b.priority end )
+end
+
 
 function CD2DrawInputbar( x, y, keyname, text )
 
@@ -74,33 +106,7 @@ end
 
 local fireicon = Material( "crackdown2/ui/explosive.png" )
 
-local ping_locations = {}
-local hplerp = -1
-local shieldlerp = -1
-local hlerp1
-local hlerp2
-local alphawhite = Color( 255, 255, 255, 10 )
-local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
-local cell = Material( "crackdown2/ui/cell.png", "smooth" )
-local beaconicon = Material( "crackdown2/ui/beacon.png" )
-local Auicon = Material( "crackdown2/ui/auicon.png" )
-local upicon = Material( "crackdown2/ui/up.png", "smooth" )
-local heloicon = Material( "crackdown2/ui/helo.png", "smooth" )
-local downicon = Material( "crackdown2/ui/down.png", "smooth" )
-local skillcircle = Material( "crackdown2/ui/skillcircle.png" )
-local staricon = Material( "crackdown2/ui/star.png", "smooth" )
-local FreakIcon = Material( "crackdown2/ui/freak.png", "smooth" )
-local hex = Material( "crackdown2/ui/hex.png", "smooth" )
-local agentdown = Material( "crackdown2/ui/agentdown.png", "smooth" )
 
-local skillglow = Material( "crackdown2/ui/skillglow2.png" )
-local agilityicon = Material( "crackdown2/ui/agilityicon.png", "smooth" )
-local weaponicon = Material( "crackdown2/ui/weaponicon.png", "smooth" )
-local strengthicon = Material( "crackdown2/ui/strengthicon.png", "smooth" )
-local explosiveicon = Material( "crackdown2/ui/explosiveicon.png", "smooth" )
-local pingmat = Material( "crackdown2/ui/pingcircle.png" )
-local playerarrow = Material( "crackdown2/ui/playerarrow.png" )
-local cellicon = Material( "crackdown2/ui/celltrackericon.png" )
 
 local function WorldVectorToScreen2( pos, origin, rotation, scale, radius )
     local relativePosition = pos - origin
@@ -343,8 +349,11 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     end
     ------
     
-    
-
+    for k, tbl in ipairs( CD2Progressbars ) do
+        if !IsValid( tbl.ent ) or tbl.ent:SqrRangeTo( LocalPlayer() ) > tbl.distance ^ 2 then continue end
+        local active = tbl.drawfunc( tbl.ent )
+        if active then break end
+    end
     
     
     

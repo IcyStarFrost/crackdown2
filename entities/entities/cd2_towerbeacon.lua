@@ -76,7 +76,8 @@ function ENT:Initialize()
         self.cd2_lasthealth = 100
         self.cd2_nextfloatingenergyparticle = 0
 
-        hook.Add( "HUDPaint", self, function() self:HUDDraw() end )
+        CD2RegisterProgressBar( self, 2000, 100, self.HUDDraw )
+
         hook.Add( "PreDrawEffects", self, function() self:DrawEffects() end )
     end
 
@@ -110,7 +111,7 @@ function ENT:HUDDraw()
         CD2DrawInputbar( screen.x, screen.y, string.upper( buttonname ), "Start Beacon Charge" )
     end
 
-    if !self:GetIsCharging() or LocalPlayer():SqrRangeTo( self ) > ( 2000 * 2000 ) then return end
+    if !self:GetIsCharging() then return end
 
     -- Base
     surface.SetDrawColor( blackish )
@@ -163,6 +164,7 @@ function ENT:HUDDraw()
 
     lasthealth = self:GetCurrentCoreHealth()
 
+    return true
 end
 
 function ENT:DrawEffects()

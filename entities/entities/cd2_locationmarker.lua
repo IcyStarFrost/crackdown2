@@ -62,11 +62,9 @@ function ENT:Initialize()
 
         local cell = Material( "crackdown2/ui/cell.png", "smooth" )
 
-        hook.Add( "HUDPaint", self, function()
-            if !GetConVar( "cd2_drawhud" ):GetBool() then return end
+        hook.Add( "HudPaint", self, function()
             local ply = LocalPlayer()
             local currentlocation = ply:GetNW2Entity( "cd2_targettacticlelocation", nil )
-
             if IsValid( currentlocation ) and currentlocation == self then
                 local usebind = input_LookupBinding( "+use" ) or "e"
                 local code = input_GetKeyCode( usebind )
@@ -74,7 +72,11 @@ function ENT:Initialize()
                 local screen = ( currentlocation:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
                 CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), self:GetLocationType() == "beacon" and "Drop Beacon" or self:GetLocationType() == "agency" and "Call Helicopter" or self:GetLocationType() == "cell" and "Begin Assault on this Tactical Location" )
             end
-        
+        end )
+
+        CD2RegisterProgressBar( self, 2000, 2, function()
+            if !GetConVar( "cd2_drawhud" ):GetBool() then return end
+
             if self:GetLocationType() == "cell" and self:GetIsActive() and LocalPlayer():SqrRangeTo( self ) <= ( 2000 * 2000 ) then
                 surface_SetDrawColor( blackish )
                 draw_NoTexture()
@@ -98,11 +100,10 @@ function ENT:Initialize()
                         surface_DrawRect( x, 55, ceil( wscale / 2 ), 10 )
                     end
                 end
+                return true
             end
         end )
-
     end
-
 end
 
 

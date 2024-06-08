@@ -134,10 +134,10 @@ function ENT:Initialize()
         local curtimed
         local lasthealth = 100
 
-        hook.Add( "HUDPaint", self, function() 
+        CD2RegisterProgressBar( self, 2000, 3, function() 
             if !GetConVar( "cd2_drawhud" ):GetBool() then return end
             if self:GetIsDetonated() then hook.Remove( "HUDPaint", self ) return end
-            if !LocalPlayer():IsCD2Agent() or LocalPlayer():SqrRangeTo( self ) > ( 2000 * 2000 ) or !self.truedur or !self:GetIsCharging() then return end
+            if !LocalPlayer():IsCD2Agent() or !self.truedur or !self:GetIsCharging() then return end
             curtimed = curtimed or CurTime()
 
 
@@ -190,6 +190,7 @@ function ENT:Initialize()
 
             lasthealth = self:GetBeaconHealth()
 
+            return true
         end )
 
     end

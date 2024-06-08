@@ -192,6 +192,15 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
 
 	self:ShootEffects()
 
+    if self:GetOwner():IsCD2NPC() then
+        local effect = EffectData()
+        effect:SetOrigin( self:GetAttachment( self:LookupAttachment( "muzzle" ) ).Pos )
+        effect:SetEntity( self )
+        effect:SetAngles( self:GetForward():Angle() )
+        effect:SetFlags( tracername == "AR2Tracer" and 5 or 1 )
+        util.Effect( "MuzzleFlash", effect, true, true )
+    end
+
 end
 
 function SWEP:SetupDataTables()

@@ -26,10 +26,13 @@ function ENT:Initialize()
 end
 
 function ENT:PlayNextTrack()
+    if SysTime() < self.cd2_delay then return end
     if IsValid( self.cd2_music ) then self.cd2_music:Stop() end
     if self.cd2_currentmusicindex > #self.cd2_musictable then self.cd2_currentmusicindex = 1 end
     local track = self.cd2_musictable[ self.cd2_currentmusicindex ]
+    self.cd2_delay = SysTime() + 2
 
+    print(debug.traceback())
     sound.PlayFile( track, "3d mono noplay", function( chan, id, name )
         if id then return end
         if !IsValid( self ) then return end
@@ -62,8 +65,7 @@ function ENT:Think()
         self.cd2_music:SetPos( self:GetPos() )
     end
 
-    if !IsValid( self.cd2_music ) or self.cd2_music:GetState() == GMOD_CHANNEL_STOPPED and SysTime() > self.cd2_delay then
+    if !IsValid( self.cd2_music ) or self.cd2_music:GetState() == GMOD_CHANNEL_STOPPED then
         self:PlayNextTrack()
-        self.cd2_delay = SysTime() + 2
     end
 end

@@ -415,7 +415,7 @@ end
 function ENT:PlayPainSound( path )
     if CurTime() < self.cd2_NextPainSound then return end
     self:EmitSound( path, 70, 100, 1, CHAN_VOICE )
-    self.cd2_NextPainSound = CurTime() + SoundDuration( path )
+    self.cd2_NextPainSound = CurTime() + SoundDuration( path ) + 0.5
 end
 
 -- Checks if we should be removed if we aren't within a Player's PVS

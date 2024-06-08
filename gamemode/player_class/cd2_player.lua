@@ -71,7 +71,6 @@ function PLAYER:Init()
     self.Player:SetWeaponSkill( 1 )
     self.Player:SetStrengthSkill( 1 )
     self.Player:SetExplosiveSkill( 1 )
-    self.Player:SetDrivingSkill( 1 )
 
     self.Player:SetAgilityXP( 0 )
     self.Player:SetWeaponXP( 0 )

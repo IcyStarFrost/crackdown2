@@ -553,7 +553,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             coroutine.wait( 8 )
 
-            CD2PingLocation( ply, aupos, true )
+            CD2PingLocation( ply, nil, aupos, 3, nil, true )
 
             coroutine.wait( 7 )
 

@@ -154,7 +154,7 @@ if CLIENT then
 
         if !ply:GetNoDraw() and !IsValid( ply.cd2_light ) and ( !CD2IsDay() ) then
             ply.cd2_light = ProjectedTexture()
-            ply.cd2_light:SetPos( ply:EyePos() + ply:GetAimVector() * 100 )
+            ply.cd2_light:SetPos( ply:EyePos() + ply:GetAimVector() * 40 )
             ply.cd2_light:SetAngles( ply:EyeAngles() )
             ply.cd2_light:SetFarZ( 2000 )
             ply.cd2_light:SetEnableShadows( false )
@@ -163,7 +163,7 @@ if CLIENT then
             ply.cd2_light:SetTexture( "effects/flashlight001" )
             ply.cd2_light:Update()
         elseif !ply:GetNoDraw() and IsValid( ply.cd2_light ) and ( !CD2IsDay() ) then
-            ply.cd2_light:SetPos( ply:EyePos() )
+            ply.cd2_light:SetPos( ply:EyePos() + ply:GetAimVector() * 40 )
             ply.cd2_light:SetAngles( ply:EyeAngles() )
             ply.cd2_light:Update()
         elseif IsValid( ply.cd2_light ) and ( CD2IsDay() ) then

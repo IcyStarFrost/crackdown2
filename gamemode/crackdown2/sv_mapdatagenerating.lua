@@ -6,6 +6,7 @@ local tracetable = {}
 function CD2GenerateMapData( randomize, agencystart )
 
     CD2CreateThread( function()
+        if !navmesh.IsLoaded() then return end
 
         local navareas = navmesh.GetAllNavAreas()
         local averagetbl = {}

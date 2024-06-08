@@ -481,13 +481,14 @@ function OpenIntelConsole()
         bar:SetSize( 60, 65 )
         bar:Dock( TOP )
 
+        local curlevel = LocalPlayer()[ "Get" .. skill .. "Skill" ]()
         local curprogress = LocalPlayer()[ "Get" .. skill .. "XP" ]()
 
         local skillname = vgui.Create( "DLabel", bar )
-        skillname:SetSize( 100, 64 )
+        skillname:SetSize( 150, 64 )
         skillname:DockMargin( 5, 5, 5, 5 )
         skillname:Dock( LEFT )
-        skillname:SetText( skill )
+        skillname:SetText( skill .. ": " .. curlevel )
         skillname:SetFont( "crackdown2_font40" )
 
         local skillprogress = vgui.Create( "DPanel", bar )

@@ -40,6 +40,8 @@ function ENT:Initialize()
             self.cd2_ambient = snd
             snd:SetPos( self:GetPos() )
             snd:EnableLooping( true )
+            snd:Set3DFadeDistance( 100, 0 )
+            snd:SetVolume( 0.5 )
 
             snd:Play()
         

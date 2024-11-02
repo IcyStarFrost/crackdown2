@@ -413,9 +413,9 @@ function CD2:KeysToTheCity()
 end
 
 -- Returns if the map is the pacific city map
---[[ function InPacificCity()
+function InPacificCity()
     return game.GetMap() == "cd2_pacificcity_remap"
-end ]]
+end
 
 -- Quick test functions
 

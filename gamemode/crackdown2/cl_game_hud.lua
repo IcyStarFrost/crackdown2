@@ -257,7 +257,7 @@ CD2.DrawExplosiveSkill = true
 
 hook.Add( "HUDPaint", "crackdown2_hud", function()
     local scrw, scrh, ply = ScrW(), ScrH(), LocalPlayer()
-    if CD2_InDropMenu or IsValid( CD2_AgencyConsole ) then RemoveHUDpanels() return end
+    if CD2.InDropMenu or IsValid( CD2_AgencyConsole ) then RemoveHUDpanels() return end
     if !CD2.DrawWeaponInfo then RemoveHUDpanels() end
 
     if game.GetTimeScale() < 0.90 then
@@ -281,7 +281,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         end
     end
 
-    if CD2_InSpawnPointMenu or !ply:IsCD2Agent() then RemoveHUDpanels() return end
+    if CD2.InSpawnPointMenu or !ply:IsCD2Agent() then RemoveHUDpanels() return end
 
     if CD2.DrawBlackbars then
         hlerp1 = hlerp1 or -150
@@ -460,7 +460,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
                 function CD2_weaponpnl:LayoutEntity() end
                 function thinkpanel:Paint( w, h ) end
                 function thinkpanel:Think()
-                    if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
+                    if CD2.InDropMenu or !ply:IsCD2Agent() or CD2.InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
                     local wep = ply:GetActiveWeapon()
                     if IsValid( CD2_weaponpnl ) and IsValid( wep ) then local ent = CD2_weaponpnl:GetEntity() ent:SetModel( wep:GetWeaponWorldModel() ) CD2_weaponpnl:SetLookAt( ent:OBBCenter() ) end
                     
@@ -508,7 +508,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
                 function CD2_equipmentpnl:LayoutEntity() end
                 function thinkpanel:Paint( w, h ) end
                 function thinkpanel:Think()
-                    if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
+                    if CD2.InDropMenu or !ply:IsCD2Agent() or CD2.InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
     
                     if IsValid( CD2_equipmentpnl ) then
                         local mdl = scripted_ents.Get( ply:GetEquipment() ).WorldModel
@@ -647,7 +647,7 @@ local next_update_effects = 0
 -- Peacekeeper/Cell logos --
 hook.Add( "PreDrawEffects", "crackdown2_peacekeepericons/cellicons", function()
     local ply = LocalPlayer()
-    if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then return end
+    if CD2.InDropMenu or !ply:IsCD2Agent() or CD2.InSpawnPointMenu or !ply:Alive() then return end
     
     if CurTime() > next_update_effects then
         effects_ents = CD2:FindInSphere( ply:GetPos(), 1500 )
@@ -724,7 +724,7 @@ hook.Add( "RenderScreenspaceEffects", "crackdown2_lowhealthcolors", function()
         modify[ "$pp_colour_addr" ] = Lerp( 2 * FrameTime(), modify[ "$pp_colour_addr" ], 0 )
     end
 
-    if !ply:Alive() and !CD2_InSpawnPointMenu then
+    if !ply:Alive() and !CD2.InSpawnPointMenu then
         DrawBokehDOF( 5, 0, 1 )
     end
     

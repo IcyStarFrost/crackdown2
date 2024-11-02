@@ -66,7 +66,7 @@ end
 function ENT:OnRemove()
 
     if SERVER then
-        CD2HandleSkillXP( self:GetPlayer(), self:GetSkill(), self:GetXP() )
+        CD2:HandleSkillXP( self:GetPlayer(), self:GetSkill(), self:GetXP() )
     end
 
     if CLIENT then

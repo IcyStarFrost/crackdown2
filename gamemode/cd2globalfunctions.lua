@@ -188,7 +188,7 @@ end
 
 -- Returns a difficulty number depending on the active beacon count
 function CD2:GetBeaconDifficulty()
-    local count = CD2_BeaconCount
+    local count = CD2.BeaconCount
     local beacons = ents.FindByClass( "cd2_beacon" )
     local difficulty = 1
 

@@ -12,7 +12,7 @@ local FrameTime = FrameTime
 
 -- Because gmod's CreateRagdoll function for players actually sucks.
 -- Getting the position of the ragdoll was unreliable and gave only the position the ragdoll was spawned. So here's this function
-function CD2CreateRagdoll( ply )
+function CD2:CreateRagdoll( ply )
     local ragdoll = ents.Create( "prop_ragdoll" )
     ragdoll:SetModel( ply:GetModel() )
     ragdoll:SetPos( ply:GetPos() )
@@ -46,7 +46,7 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
             if ply:GetIsStunned() and ply:Alive() then -- If the player is currently stunned and alive
 
                 if !IsValid( ply:GetRagdoll() ) then
-                    CD2CreateRagdoll( ply )
+                    CD2:CreateRagdoll( ply )
                     ply:SetNoDraw( true )
                     continue
                 end
@@ -98,7 +98,7 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
             lastpos = ragdoll:GetPos()
 
             CD2.ViewOverride = function( ply2, origin, angles, fov, znear, zfar )
-                if !IsValid( ragdoll ) or CD2_InSpawnPointMenu then return end
+                if !IsValid( ragdoll ) or CD2.InSpawnPointMenu then return end
 
                 viewtrace.start = ( ragdoll:GetPos() + Vector( 0, 0, 18 ) )
                 viewtrace.endpos = ( ( ragdoll:GetPos() + Vector( 0, 0, 18 ) ) - CD2.viewangles:Forward() * 130 )

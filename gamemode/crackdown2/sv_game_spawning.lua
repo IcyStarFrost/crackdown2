@@ -22,7 +22,7 @@ hook.Add( "PlayerInitialSpawn", "crackdown2_setplayerclass", function( ply )
     if !CD2:KeysToTheCity() and !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then
         CD2:RequestPlayerData( ply, "c_completedtutorial", function( val )
             if val then 
-                local loaded = CD2LoadMapData()
+                local loaded = CD2:LoadMapData()
                 
                 if !loaded then
                     CD2:GenerateMapData( true, true )

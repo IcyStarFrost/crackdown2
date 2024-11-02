@@ -4,7 +4,7 @@ local ceil = math.ceil
 if SERVER then
 
     -- Gives XP to the player according to their skill level
-    function CD2HandleSkillXP( ply, skillname, xp )
+    function CD2:HandleSkillXP( ply, skillname, xp )
         if !IsValid( ply ) then return end
         local finalxp = xp
         local levelsetfunc = ply[ "Set" .. skillname .. "Skill" ] 
@@ -24,11 +24,11 @@ if SERVER then
             levelsetfunc( ply, levelgetfunc( ply ) + 1 ) 
             xpsetfunc( ply, 0 )
             
-            CD2:DebugMessage( ply:Name() .. " Leveled up their " .. skillname .. " skill to lvl " .. levelgetfunc( ply ) )
+            self:DebugMessage( ply:Name() .. " Leveled up their " .. skillname .. " skill to lvl " .. levelgetfunc( ply ) )
 
             hook.Run( "CD2_OnLevelUp", ply, skillname )
 
-            CD2:CreateThread( function()
+            self:CreateThread( function()
 
                 while IsValid( ply ) and !ply:IsOnGround() do
                     coroutine.yield()

@@ -19,7 +19,7 @@ CD2_SpawnPointMenu = CD2_SpawnPointMenu or nil
 CD2_SpawnPointIndex = 1
 CD2_SelectedSpawnPoint = Vector()
 CD2_SelectedSpawnAngle = Angle()
-CD2_InSpawnPointMenu = false
+CD2.InSpawnPointMenu = false
 local viewtrace = {}
 local viewtbl = {}
 
@@ -35,7 +35,7 @@ function CD2OpenSpawnPointMenu()
 
     CD2:CreateThread( function()
 
-        CD2_InSpawnPointMenu = true
+        CD2.InSpawnPointMenu = true
 
         local fadepanel = vgui.Create( "DPanel" )
         fadepanel:Dock( FILL )
@@ -89,7 +89,7 @@ function CD2OpenSpawnPointMenu()
         selecttext:Dock( TOP )
 
         function CD2_SpawnPointMenu:OnRemove()
-            CD2_InSpawnPointMenu = false
+            CD2.InSpawnPointMenu = false
             CD2.ViewOverride = nil
         end
 
@@ -151,7 +151,7 @@ function CD2OpenSpawnPointMenu()
                     button:SetPos( screen2.x - 15, screen2.y - 15 )
 
                     function button:Think() 
-                        if !CD2_InSpawnPointMenu then self:Remove() return end
+                        if !CD2.InSpawnPointMenu then self:Remove() return end
                         screen2 = spawnpoint:ToScreen()
                         button:SetPos( screen2.x - 15, screen2.y - 15 )
                     end
@@ -200,7 +200,7 @@ end
 hook.Add( "Think", "crackdown2_spawnpointmenu", function()
     local ply = LocalPlayer()
 
-    if !CD2_InSpawnPointMenu then return end
+    if !CD2.InSpawnPointMenu then return end
 
 
     if ply:KeyPressed( IN_USE ) then
@@ -214,7 +214,7 @@ hook.Add( "Think", "crackdown2_spawnpointmenu", function()
     elseif ply:KeyPressed( IN_JUMP ) then 
         surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
         CD2_SpawnPointMenu:Remove()
-        if !CD2_InDropMenu then
+        if !CD2.InDropMenu then
             CD2OpenDropMenu()
         end
     end

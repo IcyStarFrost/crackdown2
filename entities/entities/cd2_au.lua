@@ -107,7 +107,7 @@ function ENT:TypingText()
         if IsValid( au ) and au:GetActive() then activecount = activecount + 1 end
     end
 
-    if !CD2:KeysToTheCity() and ( CD2_BeaconCount * 3 ) == activecount then
+    if !CD2:KeysToTheCity() and ( CD2.BeaconCount * 3 ) == activecount then
         for k, v in ipairs( player.GetAll() ) do
             v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allau_achieve.mp3" )
         end

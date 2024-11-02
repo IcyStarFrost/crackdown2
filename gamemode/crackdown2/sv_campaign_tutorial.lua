@@ -501,13 +501,13 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             CD2:PingLocation( ply, nil, GetGlobal2Vector( "cd2_beginnerlocation" ), 3 )
 
-            while !CD2_BeginnerLocation:GetIsActive() do coroutine.yield() end
+            while !CD2.BeginnerLocation:GetIsActive() do coroutine.yield() end
 
             coroutine.wait( 5 )
 
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/usehud.mp3" )
 
-            while CD2_BeginnerLocation:GetLocationType() == "cell" do coroutine.yield() end 
+            while CD2.BeginnerLocation:GetLocationType() == "cell" do coroutine.yield() end 
 
             local wait = true
 

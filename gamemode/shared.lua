@@ -7,7 +7,9 @@ GM.Name = "CRACKDOWN 2"
 
 CD2 = CD2 or {}
 
-CD2.HUD_SCALE = ScreenScaleH( 0.44 )
+if CLIENT then 
+    CD2.HUD_SCALE = ScreenScaleH( 0.44 )
+end
 
 
 local function IncludeDirectory( directory )

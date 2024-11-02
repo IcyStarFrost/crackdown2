@@ -17,7 +17,7 @@ local IsValid = IsValid
 local pairs = pairs
 local ipairs = ipairs
 
-CD2_InDropMenu = false
+CD2.InDropMenu = false
 CD2_DropMenu = CD2_DropMenu or nil
 
 
@@ -63,9 +63,9 @@ function CD2OpenDropMenu( issupplypoint )
 
 
         CD2_DropMenu:MakePopup()
-        CD2_InDropMenu = true
+        CD2.InDropMenu = true
         function CD2_DropMenu:OnRemove()
-            CD2_InDropMenu = false
+            CD2.InDropMenu = false
             CD2_DropMenu:SetMouseInputEnabled( false )
             CD2_DropMenu:SetKeyBoardInputEnabled( false )
         end
@@ -536,10 +536,10 @@ end
 hook.Add( "Think", "crackdown2_regeneratemenu", function()
     local ply = LocalPlayer()
 
-    if CD2_InDropMenu or CD2_InSpawnPointMenu or ply:Alive() then return end
+    if CD2.InDropMenu or CD2.InSpawnPointMenu or ply:Alive() then return end
 
     if ply:KeyPressed( IN_USE ) then
-        if !CD2_InSpawnPointMenu then
+        if !CD2.InSpawnPointMenu then
             CD2OpenSpawnPointMenu()
 
             if !CD2:KeysToTheCity() then

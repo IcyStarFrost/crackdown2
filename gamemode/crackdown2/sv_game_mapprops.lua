@@ -1,15 +1,15 @@
-CD2MAPPROPGENERATOR = CD2MAPPROPGENERATOR or {}
-CD2MAPPROPGENERATOR.cd2_generatefunctions = {}
+CD2.MAPPROPGENERATOR = CD2.MAPPROPGENERATOR or {}
+CD2.MAPPROPGENERATOR.cd2_generatefunctions = {}
 
 
 -- Returns if the generator can spawn stuff at the specified position
-function CD2MAPPROPGENERATOR:CanGenerateAt( pos )
+function CD2.MAPPROPGENERATOR:CanGenerateAt( pos )
     local nearby = CD2:FindInSphere( pos, 3000, function( ent ) return ent.cd2_mpggenerated end )
     return #nearby == 0
 end
 
 -- Performs a vis check for the entity provided and deletes it if it fails
-function CD2MAPPROPGENERATOR:VisCheck( ent )
+function CD2.MAPPROPGENERATOR:VisCheck( ent )
     local players = player.GetAll()
     local withinPVS = false
     for i = 1, #players do
@@ -20,17 +20,17 @@ function CD2MAPPROPGENERATOR:VisCheck( ent )
 end
 
 -- Adds a optimizing Tick hook onto the specified entity
-function CD2MAPPROPGENERATOR:InstallTick( ent )
+function CD2.MAPPROPGENERATOR:InstallTick( ent )
     local freq = 0
     hook.Add( "Tick", ent, function() 
         if CurTime() < freq then return end 
         self:VisCheck( ent )
-        freq = CurTime() + 1
+        freq = CurTime() + 2
     end )
 end
 
 -- Helper function for creating props
-function CD2MAPPROPGENERATOR:SpawnProp( pos, angle, model, frozen )
+function CD2.MAPPROPGENERATOR:SpawnProp( pos, angle, model, frozen )
     local prop = ents.Create( "prop_physics" )
     prop:SetModel( model )
     prop:SetPos( pos )
@@ -52,7 +52,7 @@ function CD2MAPPROPGENERATOR:SpawnProp( pos, angle, model, frozen )
 end
 
 -- Returns what type of generate functions should be used at this position
-function CD2MAPPROPGENERATOR:DetermineGenerateType( pos )
+function CD2.MAPPROPGENERATOR:DetermineGenerateType( pos )
     local nearby = CD2:FindInSphere( pos, 2000 )
     for k, v in ipairs( nearby ) do
         if v:GetClass() == "cd2_locationmarker" and v:GetLocationType() == "cell" then return "cell" end
@@ -63,14 +63,14 @@ function CD2MAPPROPGENERATOR:DetermineGenerateType( pos )
 end
 
 -- Adds a prop generation function to a list of generating types
-function CD2MAPPROPGENERATOR:AddGenerateFunction( name, type, func )
+function CD2.MAPPROPGENERATOR:AddGenerateFunction( name, type, func )
     self.cd2_generatefunctions[ type ] = self.cd2_generatefunctions[ type ] or {}
     local typefunctions = self.cd2_generatefunctions[ type ]
     typefunctions[ #typefunctions + 1 ] = { name, func }
 end
 
 -- Runs a random generation function
-function CD2MAPPROPGENERATOR:RunRandomGenerationFunction( type, pos )
+function CD2.MAPPROPGENERATOR:RunRandomGenerationFunction( type, pos )
     local typefunctions = self.cd2_generatefunctions[ type ]
 
     if !typefunctions then return end
@@ -80,20 +80,20 @@ function CD2MAPPROPGENERATOR:RunRandomGenerationFunction( type, pos )
     if !generatefunction then return end
 
     local ok, msg = pcall( function() generatefunction[ 2 ]( pos ) end )
-    if !ok then ErrorNoHaltWithStack( "CD2 Map Props Generator had a error in the " .. generatefunction[ 1 ] .. " generation function", msg ) else CD2:DebugMessage( "CD2MAPPROPGENERATOR Generated " .. generatefunction[ 1 ] ) end
+    if !ok then ErrorNoHaltWithStack( "CD2 Map Props Generator had a error in the " .. generatefunction[ 1 ] .. " generation function", msg ) else CD2:DebugMessage( "CD2.MAPPROPGENERATOR Generated " .. generatefunction[ 1 ] ) end
 end
 
 
-CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 1", "cell", function( generatepos )
+CD2.MAPPROPGENERATOR:AddGenerateFunction( "Base 1", "cell", function( generatepos )
 
     for i = 1, math.random( 1, 5 ) do
         local pos = CD2:GetRandomPos( 500, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/concrete_barrier001a.mdl", true )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/concrete_barrier001a.mdl", true )
     end
 
     for i = 1, math.random( 1, 5 ) do
         local pos = CD2:GetRandomPos( 500, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/oildrum001_explosive.mdl", false )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/oildrum001_explosive.mdl", false )
     end
     
     local pos = CD2:GetRandomPos( 500, generatepos )
@@ -103,24 +103,24 @@ CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 1", "cell", function( generatepos
     speaker:Spawn()
 
     speaker.cd2_mpggenerated = true
-    CD2MAPPROPGENERATOR:InstallTick( speaker )
+    CD2.MAPPROPGENERATOR:InstallTick( speaker )
 
 end )
 
-CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 2", "cell", function( generatepos )
+CD2.MAPPROPGENERATOR:AddGenerateFunction( "Base 2", "cell", function( generatepos )
 
     for i = 1, math.random( 3, 5 ) do
         local pos = CD2:GetRandomPos( 500, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/concrete_barrier001a.mdl", true )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/concrete_barrier001a.mdl", true )
     end
 
     for i = 1, math.random( 1, 3 ) do
         local pos = CD2:GetRandomPos( 500, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/oildrum001_explosive.mdl", false )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/oildrum001_explosive.mdl", false )
     end
 
     local pos = CD2:GetRandomPos( 500, generatepos )
-    CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_vehicles/truck001a.mdl", false )
+    CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_vehicles/truck001a.mdl", false )
 
     local pos = CD2:GetRandomPos( 500, generatepos )
 
@@ -130,27 +130,27 @@ CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 2", "cell", function( generatepos
     speaker:Spawn()
 
     speaker.cd2_mpggenerated = true
-    CD2MAPPROPGENERATOR:InstallTick( speaker )
+    CD2.MAPPROPGENERATOR:InstallTick( speaker )
 
 end )
 
-CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 3", "cell", function( generatepos )
+CD2.MAPPROPGENERATOR:AddGenerateFunction( "Base 3", "cell", function( generatepos )
 
     for i = 1, math.random( 3, 7 ) do
         local pos = CD2:GetRandomPos( 1000, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/concrete_barrier001a.mdl", true )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/concrete_barrier001a.mdl", true )
     end
 
     for i = 1, math.random( 1, 5 ) do
         local pos = CD2:GetRandomPos( 1000, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/oildrum001_explosive.mdl", false )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_c17/oildrum001_explosive.mdl", false )
     end
 
     local mdls = { "models/props_c17/furnituretable002a.mdl", "models/props_c17/furniturechair001a.mdl", "models/props_c17/furniturecouch002a.mdl", "models/props_c17/oildrum001.mdl" }
 
     for i = 1, math.random( 1, 5 ) do
         local pos = CD2:GetRandomPos( 1000, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), mdls[ math.random( #mdls ) ], false )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), mdls[ math.random( #mdls ) ], false )
     end
 
     local pos = CD2:GetRandomPos( 1000, generatepos )
@@ -161,42 +161,42 @@ CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 3", "cell", function( generatepos
     speaker:Spawn()
 
     speaker.cd2_mpggenerated = true
-    CD2MAPPROPGENERATOR:InstallTick( speaker )
+    CD2.MAPPROPGENERATOR:InstallTick( speaker )
 
 end )
 
-CD2MAPPROPGENERATOR:AddGenerateFunction( "Radio", "global", function( generatepos )
+CD2.MAPPROPGENERATOR:AddGenerateFunction( "Radio", "global", function( generatepos )
     local radio = ents.Create( "cd2_radio" )
     radio:SetPos( generatepos )
     radio:SetAngles( Angle( 0, math.random( -180, 180 ), 0 ) )
     radio:Spawn()
     radio.cd2_mpggenerated = true
-    CD2MAPPROPGENERATOR:InstallTick( radio )
+    CD2.MAPPROPGENERATOR:InstallTick( radio )
 end )
 
-CD2MAPPROPGENERATOR:AddGenerateFunction( "Furniture", "global", function( generatepos )
+CD2.MAPPROPGENERATOR:AddGenerateFunction( "Furniture", "global", function( generatepos )
     local mdls = { "models/props_c17/furnituretable002a.mdl", "models/props_c17/furniturechair001a.mdl", "models/props_c17/furniturecouch002a.mdl", "models/props_junk/garbage256_composite002b.mdl", "models/props_junk/garbage256_composite001b.mdl" }
 
     for i = 1, math.random( 1, 5 ) do
         local pos = CD2:GetRandomPos( 500, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), mdls[ math.random( #mdls ) ], false )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), mdls[ math.random( #mdls ) ], false )
     end
 end )
 
-CD2MAPPROPGENERATOR:AddGenerateFunction( "Vehicles", "global", function( generatepos )
+CD2.MAPPROPGENERATOR:AddGenerateFunction( "Vehicles", "global", function( generatepos )
     local mdls = { "models/props_vehicles/car002a_physics.mdl", "models/props_vehicles/car002b_physics.mdl", "models/props_vehicles/car003a_physics.mdl", "models/props_vehicles/car003b_physics.mdl", "models/props_vehicles/car004a_physics.mdl", "models/props_vehicles/car005b_physics.mdl", "models/props_vehicles/carparts_axel01a.mdl", "models/props_vehicles/carparts_muffler01a.mdl", "models/props_vehicles/carparts_muffler01a.mdl", "models/props_vehicles/truck002a_cab.mdl" }
 
     for i = 1, math.random( 1, 8 ) do
         local pos = CD2:GetRandomPos( 100, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), mdls[ math.random( #mdls ) ], false )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), mdls[ math.random( #mdls ) ], false )
     end
 end )
 
-CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 1", "agency", function( generatepos )
+CD2.MAPPROPGENERATOR:AddGenerateFunction( "Base 1", "agency", function( generatepos )
 
     for i = 1, math.random( 3, 5 ) do
         local pos = CD2:GetRandomPos( 500, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_combine/combine_barricade_short01a.mdl", true )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_combine/combine_barricade_short01a.mdl", true )
     end
 
     local cache = ents.Create( "cd2_agencyweaponcache" )
@@ -206,18 +206,18 @@ CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 1", "agency", function( generatep
     cache:DropToFloor()
 
     cache.cd2_mpggenerated = true
-    CD2MAPPROPGENERATOR:InstallTick( cache )
+    CD2.MAPPROPGENERATOR:InstallTick( cache )
 end )
 
-CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 2", "agency", function( generatepos )
+CD2.MAPPROPGENERATOR:AddGenerateFunction( "Base 2", "agency", function( generatepos )
 
     for i = 1, math.random( 3, 5 ) do
         local pos = CD2:GetRandomPos( 500, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_combine/combine_barricade_short01a.mdl", true )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_combine/combine_barricade_short01a.mdl", true )
     end
 
     local pos = CD2:GetRandomPos( 500, generatepos )
-    CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_combine/combine_booth_short01a.mdl", true )
+    CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_combine/combine_booth_short01a.mdl", true )
     
 
     for i = 1, 2 do
@@ -229,22 +229,22 @@ CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 2", "agency", function( generatep
         cache:DropToFloor()
 
         cache.cd2_mpggenerated = true
-        CD2MAPPROPGENERATOR:InstallTick( cache )
+        CD2.MAPPROPGENERATOR:InstallTick( cache )
     end
 end )
 
-CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 3", "agency", function( generatepos )
+CD2.MAPPROPGENERATOR:AddGenerateFunction( "Base 3", "agency", function( generatepos )
 
     for i = 1, math.random( 3, 5 ) do
         local pos = CD2:GetRandomPos( 1000, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_combine/combine_barricade_short01a.mdl", true )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), "models/props_combine/combine_barricade_short01a.mdl", true )
     end
 
     local mdls = { "models/props_combine/combine_booth_short01a.mdl", "models/props_combine/combine_booth_med01a.mdl", "models/props_combine/combine_barricade_med03b.mdl", "models/props_combine/combine_barricade_med02a.mdl" }
     
     for i = 1, math.random( 3, 5 ) do
         local pos = CD2:GetRandomPos( 1000, generatepos )
-        CD2MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), mdls[ math.random( #mdls ) ], true )
+        CD2.MAPPROPGENERATOR:SpawnProp( pos, Angle( 0, math.random( -180, 180 ), 0 ), mdls[ math.random( #mdls ) ], true )
     end
 
     for i = 1, 2 do
@@ -256,7 +256,7 @@ CD2MAPPROPGENERATOR:AddGenerateFunction( "Base 3", "agency", function( generatep
         cache:DropToFloor()
 
         cache.cd2_mpggenerated = true
-        CD2MAPPROPGENERATOR:InstallTick( cache )
+        CD2.MAPPROPGENERATOR:InstallTick( cache )
     end
 end )
 
@@ -277,12 +277,12 @@ hook.Add( "Tick", "crackdown2_mappropgeneration", function()
             continue 
         end
 
-        local cangenerate = CD2MAPPROPGENERATOR:CanGenerateAt( genpos )
+        local cangenerate = CD2.MAPPROPGENERATOR:CanGenerateAt( genpos )
 
         if cangenerate then
-            CD2:DebugMessage( "CD2MAPPROPGENERATOR is now determining what function to use near " .. ply:Name() )
-            local generationtype = CD2MAPPROPGENERATOR:DetermineGenerateType( genpos )
-            CD2MAPPROPGENERATOR:RunRandomGenerationFunction( generationtype, genpos )
+            CD2:DebugMessage( "CD2.MAPPROPGENERATOR is now determining what function to use near " .. ply:Name() )
+            local generationtype = CD2.MAPPROPGENERATOR:DetermineGenerateType( genpos )
+            CD2.MAPPROPGENERATOR:RunRandomGenerationFunction( generationtype, genpos )
         end
 
     end

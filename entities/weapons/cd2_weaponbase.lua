@@ -168,12 +168,12 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
     local owner = self:GetOwner()
 
     damage = owner:IsPlayer() and damage + ( 5 * owner:GetWeaponSkill() ) or damage
-    spread = owner.cd2_spreadoverride or owner:IsPlayer() and IsValid( owner:GetNW2Entity( "CD2.lockontarget", nil ) ) and Vector( self.Primary.LockOnSpread + owner:GetLockonSpreadDecay(), self.Primary.LockOnSpread + owner:GetLockonSpreadDecay() ) or Vector( spread, spread, 0 )
+    spread = owner.cd2_spreadoverride or owner:IsPlayer() and IsValid( owner:GetNW2Entity( "CD2_lockontarget", nil ) ) and Vector( self.Primary.LockOnSpread + owner:GetLockonSpreadDecay(), self.Primary.LockOnSpread + owner:GetLockonSpreadDecay() ) or Vector( spread, spread, 0 )
 
 	self.bullet = self.bullet or {}
 	self.bullet.Num	= num_bullets
 	self.bullet.Src	= owner:GetShootPos()
-	self.bullet.Dir	= IsValid( owner.CD2.lockontarget ) and ( owner.CD2.lockontarget:WorldSpaceCenter() - owner:GetShootPos() ):GetNormalized() or owner:GetAimVector()
+	self.bullet.Dir	= IsValid( owner.CD2_lockontarget ) and ( owner.CD2_lockontarget:WorldSpaceCenter() - owner:GetShootPos() ):GetNormalized() or owner:GetAimVector()
 	self.bullet.Spread = spread
 	self.bullet.Tracer = tracer or 1
     self.bullet.TracerName = tracername or "Tracer"
@@ -184,8 +184,8 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
 
 	owner:FireBullets( self.bullet )
 
-    if owner:IsPlayer() and owner.CD2.lockonPos == "head" and IsValid( owner:GetNW2Entity( "CD2.lockontarget", nil ) ) then
-        local dist = owner:GetPos():Distance( owner:GetNW2Entity( "CD2.lockontarget", nil ):GetPos() ) / 150
+    if owner:IsPlayer() and owner.CD2.lockonPos == "head" and IsValid( owner:GetNW2Entity( "CD2_lockontarget", nil ) ) then
+        local dist = owner:GetPos():Distance( owner:GetNW2Entity( "CD2_lockontarget", nil ):GetPos() ) / 150
 
         owner:SetLockonSpreadDecay( dist * 0.08 ) 
     end

@@ -168,7 +168,7 @@ function GM:CreateMove( cmd )
 
     vec:Rotate( Angle( CD2.viewangles[ 1 ], CD2.viewangles[ 2 ], CD2.viewangles[ 3 ] ) )
 
-    local lockontarget = self:GetNW2Entity( "CD2.lockontarget", nil )
+    local lockontarget = self:GetNW2Entity( "CD2_lockontarget", nil )
 
     if IsValid( lockontarget ) and !lockontarget.cd2_NoHeadShot and ( lockontarget:IsCD2Agent() or lockontarget:IsCD2NPC() ) and cmd:GetMouseY() < -100 then
         CD2.LockOnPos = "head"

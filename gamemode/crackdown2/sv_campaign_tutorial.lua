@@ -17,7 +17,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             ply:SetCanUseLockon( false )
             ply:SetCanUseMelee( false )
-            CD2_FreezeTime = game.SinglePlayer()
+            CD2.FreezeTime = game.SinglePlayer()
         
             ply:Spawn()
             ply:SetPos( !InPacificCity() and spawn:GetPos() or Vector( -996.168945, 2360.628906, 593.605408 ) )
@@ -448,7 +448,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             ply:SetCanUseLockon( true )
             ply:SetCanUseMelee( true )
-            CD2_FreezeTime = false
+            CD2.FreezeTime = false
         
             ply:StripAmmo()
             ply:StripWeapons()

@@ -9,38 +9,38 @@ local linecol = Color( 61, 61, 61, 100 )
 
 function CD2SetTextBoxText( txt )
     if !GetConVar( "cd2_drawhud" ):GetBool() then return end
-    CD2_CurrentTextBoxText = txt
+    CD2.CurrentTextBoxText = txt
 end
 
-CD2_CurrentTextBoxText = nil -- The current text being displayed in the text box
-CD2_textend = nil
-CD2_TextBox = CD2_TextBox or nil -- The text box itself
+CD2.CurrentTextBoxText = nil -- The current text being displayed in the text box
+CD2.textend = nil
+CD2.TextBox = CD2.TextBox or nil -- The text box itself
 
 hook.Add( "OnGamemodeLoaded", "crackdown2_textbox", function()
-    if IsValid( CD2_TextBox ) then CD2_TextBox:Remove() end
+    if IsValid( CD2.TextBox ) then CD2.TextBox:Remove() end
     local x, y = ScreenScale( 178 ), ScreenScale( 67 )
-    CD2_TextBox = vgui.Create( "DPanel", GetHUDPanel() )
-    CD2_TextBox:SetPos( ( ScrW() / 2 ) - ( x / 2) , ScrH() - 205 )
-    CD2_TextBox:SetSize( x, y )
+    CD2.TextBox = vgui.Create( "DPanel", GetHUDPanel() )
+    CD2.TextBox:SetPos( ( ScrW() / 2 ) - ( x / 2) , ScrH() - 205 )
+    CD2.TextBox:SetSize( x, y )
 
-    CD2_TextBox.lbl = vgui.Create( "DLabel", CD2_TextBox )
-    CD2_TextBox.lbl:SetFont( "crackdown2_font30" )
-    CD2_TextBox.lbl:SetText( "" )
-    CD2_TextBox.lbl:DockMargin( 5, 5, 5, 5 )
-    CD2_TextBox.lbl:Dock( FILL )
-    CD2_TextBox.lbl:SetWrap( true )
+    CD2.TextBox.lbl = vgui.Create( "DLabel", CD2.TextBox )
+    CD2.TextBox.lbl:SetFont( "crackdown2_font30" )
+    CD2.TextBox.lbl:SetText( "" )
+    CD2.TextBox.lbl:DockMargin( 5, 5, 5, 5 )
+    CD2.TextBox.lbl:Dock( FILL )
+    CD2.TextBox.lbl:SetWrap( true )
     
-    function CD2_TextBox:Think() 
-        if CD2_CurrentTextBoxText and CD2_TextBox.lbl:GetText() != CD2_CurrentTextBoxText then
-            CD2_TextBox.lbl:SetText( CD2_CurrentTextBoxText )
-            CD2_textend = CD2_textend or SysTime() + 5
+    function CD2.TextBox:Think() 
+        if CD2.CurrentTextBoxText and CD2.TextBox.lbl:GetText() != CD2.CurrentTextBoxText then
+            CD2.TextBox.lbl:SetText( CD2.CurrentTextBoxText )
+            CD2.textend = CD2.textend or SysTime() + 5
         end
 
-        if CD2_textend and SysTime() > CD2_textend then CD2_CurrentTextBoxText = nil CD2_textend = nil CD2_TextBox.lbl:SetText( "" ) end
+        if CD2.textend and SysTime() > CD2.textend then CD2.CurrentTextBoxText = nil CD2.textend = nil CD2.TextBox.lbl:SetText( "" ) end
     end
 
-    function CD2_TextBox:Paint( w, h ) 
-        if !CD2_CurrentTextBoxText then return end
+    function CD2.TextBox:Paint( w, h ) 
+        if !CD2.CurrentTextBoxText then return end
         surface_SetDrawColor( color_white )
         surface_SetMaterial( bg )
         surface_DrawTexturedRect( 0, 0, w, h )

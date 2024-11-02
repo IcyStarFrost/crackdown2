@@ -9,7 +9,7 @@ end )
 -- Death music
 net.Receive( "cd2net_playerkilled", function()
     local time = SysTime() + 0.5 -- Have to do this small delay or else the music will fade out instantly 
-    CD2StartMusic( "sound/crackdown2/music/playerdead.mp3", 6, true, false, nil, nil, nil, nil, nil, function( channel )
+    CD2:StartMusic( "sound/crackdown2/music/playerdead.mp3", 6, true, false, nil, nil, nil, nil, nil, function( channel )
         if LocalPlayer():Alive() and SysTime() > time then channel:FadeOut() end
     end )
 
@@ -54,12 +54,12 @@ end )
 -- Respawn music
 net.Receive( "cd2net_playerrespawn", function()
     CD2.DrawBlackbars = false 
-    CD2StartMusic( "sound/crackdown2/music/playerspawn.mp3", 2, false, true )
+    CD2:StartMusic( "sound/crackdown2/music/playerspawn.mp3", 2, false, true )
 end )
 
 net.Receive( "cd2net_playerrespawn_revive", function()
     CD2.DrawBlackbars = false 
-    CD2StartMusic( "sound/crackdown2/music/revive.mp3", 2, false, true )
+    CD2:StartMusic( "sound/crackdown2/music/revive.mp3", 2, false, true )
 end )
 
 local util_DecalEx = util.DecalEx
@@ -143,7 +143,7 @@ end )
 
 net.Receive( "cd2net_sendspawnvectors", function()
     local json = net.ReadString()
-    CD2_SpawnPoints = util.JSONToTable( json )
+    CD2.SpawnPoints = util.JSONToTable( json )
 end )
 
 net.Receive( "cd2net_playdirectorsound", function()
@@ -161,11 +161,11 @@ net.Receive( "cd2net_playerinitialspawn", function()
     CD2_HasNavMesh = net.ReadBool()
 
     if !CD2_HasNavMesh then
-        CD2ShowFailMenu( "This map does not have a Navigation Mesh! The CRACKDOWN 2 Gamemode requires you to play on a map with a Navigation Mesh! Press the button below to generate a Navigation Mesh or play a map that has one", true )
+        CD2:ShowFailMenu( "This map does not have a Navigation Mesh! The CRACKDOWN 2 Gamemode requires you to play on a map with a Navigation Mesh! Press the button below to generate a Navigation Mesh or play a map that has one", true )
         return
     end
 
-    CD2OpenMainMenu()
+    CD2:OpenMainMenu()
 end )
 
 net.Receive( "cd2net_removeping", function()
@@ -237,7 +237,7 @@ net.Receive( "cd2net_playguitar", function()
     if !IsValid( entity ) then return end
     if IsValid( CD2_GuitarPlayer ) then CD2_GuitarPlayer:FadeOut() end
 
-    CD2_GuitarPlayer = CD2StartMusic( path, 0, true, false, nil, true, nil, nil, entity )
+    CD2_GuitarPlayer = CD2:StartMusic( path, 0, true, false, nil, true, nil, nil, entity )
 end )
 
 net.Receive( "cd2net_stopguitar", function()
@@ -264,7 +264,7 @@ net.Receive( "cd2net_playerlevelupeffect", function()
     CD2:CreateThread( function()
         while !ply:Alive() do coroutine.yield() end
 
-        CD2StartMusic( "sound/crackdown2/music/levelup.mp3", 3, false, true )
+        CD2:StartMusic( "sound/crackdown2/music/levelup.mp3", 3, false, true )
         ply:EmitSound( "crackdown2/ply/spawnenergy.mp3", 70, 100, 1, CHAN_AUTO )
 
         coroutine.wait( 1 )
@@ -375,7 +375,7 @@ end )
 
 net.Receive( "cd2net_opendropmenu", function() 
     local resupply = net.ReadBool()
-    CD2OpenDropMenu( resupply )
+    CD2:OpenDropMenu( resupply )
 end )
 
 local incre = 0
@@ -486,7 +486,7 @@ net.Receive( "cd2net_explosion", function()
 end )
 
 net.Receive( "cd2net_introduction_music", function()
-    CD2StartMusic( "sound/crackdown2/music/flythrough.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
+    CD2:StartMusic( "sound/crackdown2/music/flythrough.mp3", 500, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
         if !LocalPlayer():GetNW2Bool( "cd2_inintroduction", false ) then CD2Musicchannel:FadeOut() end
     end )
 end )

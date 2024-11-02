@@ -21,9 +21,9 @@ CD2.InDropMenu = false
 CD2_DropMenu = CD2_DropMenu or nil
 
 
-CD2_DropPrimary = "cd2_assaultrifle"
-CD2_DropSecondary = "cd2_shotgun"
-CD2_DropEquipment = "cd2_grenade"
+CD2.DropPrimary = "cd2_assaultrifle"
+CD2.DropSecondary = "cd2_shotgun"
+CD2.DropEquipment = "cd2_grenade"
 
 local function PlayerHasWeapon( class )
     local hasweapon = CD2:ReadPlayerData( "cd2_weaponcollect_" .. class )
@@ -31,16 +31,16 @@ local function PlayerHasWeapon( class )
 end
 
 local cooldown = 0
-function CD2OpenDropMenu( issupplypoint )
+function CD2:OpenDropMenu( issupplypoint )
 
     if SysTime() < cooldown then return end
     cooldown = SysTime() + 1
 
     surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
 
-    CD2_DropPrimary = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "cd2_dropprimary" ) or CD2_DropPrimary
-    CD2_DropSecondary = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "cd2_dropsecondary" ) or CD2_DropSecondary
-    CD2_DropEquipment = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "cd2_dropequipment" ) or CD2_DropEquipment
+    CD2.DropPrimary = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "CD2.DropPrimary" ) or CD2.DropPrimary
+    CD2.DropSecondary = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "CD2.DropSecondary" ) or CD2.DropSecondary
+    CD2.DropEquipment = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "CD2.DropEquipment" ) or CD2.DropEquipment
 
     if IsValid( CD2_DropMenu ) then CD2_DropMenu:Remove() end
 
@@ -466,9 +466,9 @@ function CD2OpenDropMenu( issupplypoint )
         backbutton:Dock( LEFT ) ]]
         
         
-        PRIMARYROW = CreateWeaponRow( "PRIMARY", "CD2_DropPrimary", detailtoppanel )
-        SECONDARYROW = CreateWeaponRow( "SECONDARY", "CD2_DropSecondary", detailmidpanel )
-        EQUIPMENTROW = CreateWeaponRow( "EXPLOSIVE", "CD2_DropEquipment", detailbottompanel, true )
+        PRIMARYROW = CreateWeaponRow( "PRIMARY", "CD2.DropPrimary", detailtoppanel )
+        SECONDARYROW = CreateWeaponRow( "SECONDARY", "CD2.DropSecondary", detailmidpanel )
+        EQUIPMENTROW = CreateWeaponRow( "EXPLOSIVE", "CD2.DropEquipment", detailbottompanel, true )
         
         function line:Paint( w, h )
             surface_SetDrawColor( color_white )
@@ -494,33 +494,33 @@ function CD2OpenDropMenu( issupplypoint )
             CD2_DropMenu:Remove()
 
             if !CD2:KeysToTheCity() then
-                CD2:WritePlayerData( "cd2_dropprimary", CD2_DropPrimary )
-                CD2:WritePlayerData( "cd2_dropsecondary", CD2_DropSecondary )
-                CD2:WritePlayerData( "cd2_dropequipment", CD2_DropEquipment )
+                CD2:WritePlayerData( "CD2.DropPrimary", CD2.DropPrimary )
+                CD2:WritePlayerData( "CD2.DropSecondary", CD2.DropSecondary )
+                CD2:WritePlayerData( "CD2.DropEquipment", CD2.DropEquipment )
             end
 
             if !issupplypoint then
                 net.Start( "cd2net_playerdropmenuconfirm" )
-                net.WriteString( CD2_DropPrimary )
-                net.WriteString( CD2_DropSecondary )
-                net.WriteString( CD2_DropEquipment )
-                net.WriteVector( CD2_SelectedSpawnPoint )
-                net.WriteAngle( CD2_SelectedSpawnAngle )
+                net.WriteString( CD2.DropPrimary )
+                net.WriteString( CD2.DropSecondary )
+                net.WriteString( CD2.DropEquipment )
+                net.WriteVector( CD2.SelectedSpawnPoint )
+                net.WriteAngle( CD2.SelectedSpawnAngle )
                 net.SendToServer()
 
                 LocalPlayer().cd2_equipment = CD2_Equipment
-                LocalPlayer().cd2_lastspawnprimary = CD2_DropPrimary
-                LocalPlayer().cd2_lastspawnsecondary = CD2_DropSecondary
+                LocalPlayer().cd2_lastspawnprimary = CD2.DropPrimary
+                LocalPlayer().cd2_lastspawnsecondary = CD2.DropSecondary
             else
                 net.Start( "cd2net_resupply" )
-                net.WriteString( CD2_DropPrimary )
-                net.WriteString( CD2_DropSecondary )
-                net.WriteString( CD2_DropEquipment )
+                net.WriteString( CD2.DropPrimary )
+                net.WriteString( CD2.DropSecondary )
+                net.WriteString( CD2.DropEquipment )
                 net.SendToServer()
 
                 LocalPlayer().cd2_equipment = CD2_Equipment
-                LocalPlayer().cd2_lastspawnprimary = CD2_DropPrimary
-                LocalPlayer().cd2_lastspawnsecondary = CD2_DropSecondary
+                LocalPlayer().cd2_lastspawnprimary = CD2.DropPrimary
+                LocalPlayer().cd2_lastspawnsecondary = CD2.DropSecondary
             end
         end
 
@@ -540,7 +540,7 @@ hook.Add( "Think", "crackdown2_regeneratemenu", function()
 
     if ply:KeyPressed( IN_USE ) then
         if !CD2.InSpawnPointMenu then
-            CD2OpenSpawnPointMenu()
+            CD2:OpenSpawnPointMenu()
 
             if !CD2:KeysToTheCity() then
                 local directorcommented = CD2:ReadPlayerData( "cd2_director_dead" )
@@ -553,9 +553,9 @@ hook.Add( "Think", "crackdown2_regeneratemenu", function()
         end
     elseif ply:KeyPressed( IN_RELOAD ) then
         net.Start( "cd2net_spawnatnearestspawn" )
-        net.WriteString( CD2_DropPrimary )
-        net.WriteString( CD2_DropSecondary )
-        net.WriteString( CD2_DropEquipment )
+        net.WriteString( CD2.DropPrimary )
+        net.WriteString( CD2.DropSecondary )
+        net.WriteString( CD2.DropEquipment )
         net.SendToServer()
     end
 

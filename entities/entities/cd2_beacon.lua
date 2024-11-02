@@ -318,7 +318,7 @@ function ENT:OnBeamStart()
 
             if self.cd2_beaconmusic and self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:Kill() end
             local first = true
-            self.cd2_beaconmusic = CD2StartMusic( self:GetSoundTrack(), 600, false, false, nil, nil, nil, nil, nil, function( chan )
+            self.cd2_beaconmusic = CD2:StartMusic( self:GetSoundTrack(), 600, false, false, nil, nil, nil, nil, nil, function( chan )
                 if !IsValid( self ) then chan:FadeOut() return end
 
                 if LocalPlayer():SqrRangeTo( self:GetBeaconPos() ) > ( 2000 * 2000 ) then
@@ -391,7 +391,7 @@ function ENT:OnBeaconDestroyed()
 
         if LocalPlayer():SqrRangeTo( self:GetBeaconPos() ) > ( 2000 * 2000 ) then return end
 
-        CD2StartMusic( "sound/crackdown2/music/beacondestroyed.mp3", 605 )
+        CD2:StartMusic( "sound/crackdown2/music/beacondestroyed.mp3", 605 )
     end
 end
 
@@ -453,7 +453,7 @@ function ENT:BeaconDetonate()
 
             if self.cd2_beaconmusic and self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:FadeOut() end
 
-            CD2StartMusic( "sound/crackdown2/music/beacon_victory.mp3", 605 )
+            CD2:StartMusic( "sound/crackdown2/music/beacon_victory.mp3", 605 )
 
             CD2.PreventMovement = true
             CD2.DrawAgilitySkill = false
@@ -978,7 +978,7 @@ elseif CLIENT then
 
         if !IsValid( beacon ) then return end
 
-        beacon.cd2_beaconmusic = CD2StartMusic( path, priority, true, false, nil, nil, nil, nil, nil, function( chan )
+        beacon.cd2_beaconmusic = CD2:StartMusic( path, priority, true, false, nil, nil, nil, nil, nil, function( chan )
             if !IsValid( beacon ) then chan:FadeOut() return end
 
             if LocalPlayer():SqrRangeTo( beacon:GetBeaconPos() ) > ( 2000 * 2000 ) then

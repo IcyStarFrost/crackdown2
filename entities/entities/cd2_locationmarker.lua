@@ -416,6 +416,6 @@ if CLIENT then
     net.Receive( "cd2net_locationcaptured", function()
         local pos = net.ReadVector()
         if LocalPlayer():SqrRangeTo( pos ) > ( 2000 * 2000 ) then return end
-        CD2StartMusic( "sound/crackdown2/music/locationcaptured.mp3", 100 )
+        CD2:StartMusic( "sound/crackdown2/music/locationcaptured.mp3", 100 )
     end )
 end

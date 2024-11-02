@@ -95,12 +95,12 @@ if CLIENT then
         if !IsValid( ply ) or !ply:IsCD2Agent() then return end
         
         if ply:Alive() and ply:Health() < 70 and !limit then
-            lowhealthchannel = CD2StartMusic( "sound/crackdown2/music/lowhealth.mp3", 5, true )
+            lowhealthchannel = CD2:StartMusic( "sound/crackdown2/music/lowhealth.mp3", 5, true )
             ply:SetDSP( 30 )
             limit = true
         elseif ply:Health() > 70 and limit then
             if IsValid( lowhealthchannel ) then lowhealthchannel:FadeOut() end
-            CD2StartMusic( "sound/crackdown2/music/healthregenerated.mp3", 2, false, true )
+            CD2:StartMusic( "sound/crackdown2/music/healthregenerated.mp3", 2, false, true )
             ply:SetDSP( 1 )
             limit = false
         end

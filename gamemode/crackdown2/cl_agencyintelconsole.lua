@@ -82,7 +82,7 @@ function OpenIntelConsole()
         return 
     end
 
-    if IsValid( CD2_SpawnPointMenu ) or IsValid( CD2_DropMenu ) then return end
+    if IsValid( CD2.SpawnPointMenu ) or IsValid( CD2_DropMenu ) then return end
 
     if !CD2_CanOpenAgencyConsole then return end
 

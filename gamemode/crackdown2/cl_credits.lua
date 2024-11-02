@@ -1,26 +1,26 @@
 
 
-function CD2PlayCredits()
-    local chan = CD2StartMusic( "sound/crackdown2/music/credits.mp3", 1000, nil, nil, 1 )
+function CD2:PlayCredits()
+    local chan = self:StartMusic( "sound/crackdown2/music/credits.mp3", 1000, nil, nil, 1 )
 
     local viewtbl = {}
 
-    CD2:CreateThread( function()
+    self:CreateThread( function()
 
 
         LocalPlayer():ScreenFade( SCREENFADE.IN, Color( 0, 0, 0 ), 4, 1 )
-        CD2.DrawAgilitySkill = false
-        CD2.DrawFirearmSkill = false
-        CD2.DrawStrengthSkill = false
-        CD2.DrawExplosiveSkill = false
+        self.DrawAgilitySkill = false
+        self.DrawFirearmSkill = false
+        self.DrawStrengthSkill = false
+        self.DrawExplosiveSkill = false
 
-        CD2.DrawTargetting = false
-        CD2.DrawHealthandShields = false
-        CD2.DrawWeaponInfo = false
-        CD2.DrawMinimap = false
-        CD2.DrawBlackbars = true
+        self.DrawTargetting = false
+        self.DrawHealthandShields = false
+        self.DrawWeaponInfo = false
+        self.DrawMinimap = false
+        self.DrawBlackbars = true
 
-        CD2.PreventMovement = true
+        self.PreventMovement = true
 
         local endcred = false
 
@@ -64,7 +64,7 @@ function CD2PlayCredits()
 
             return object
         end
-        CD2:CreateThread( function()
+        self:CreateThread( function()
 
             coroutine.wait( 2 )
             local usebind = input.LookupBinding( "+use" )
@@ -173,7 +173,7 @@ function CD2PlayCredits()
         local pos = LocalPlayer():GetPos() + Vector( math.random( -5000, 5000 ), math.random( -5000, 5000 ), ( math.random( 1, 3 ) == 1 and math.random( 10, 5000 ) or 10 ) )
         local lerppos = LocalPlayer():GetPos() + Vector( math.random( -5000, 5000 ), math.random( -5000, 5000 ), ( math.random( 1, 3 ) == 1 and math.random( 10, 5000 ) or 10 ) )
         local ang = math.random( 1, 3 ) == 1 and ( LocalPlayer():GetPos() - pos ):Angle() or Angle( math.random( -30, 30 ), math.random( -180, 180 ), 0 )
-        CD2.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+        self.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
 
             if SysTime() > nextchange then
                 pos = LocalPlayer():GetPos() + Vector( math.random( -5000, 5000 ), math.random( -5000, 5000 ), ( math.random( 1, 3 ) == 1 and math.random( 10, 5000 ) or 10 ) )
@@ -194,31 +194,31 @@ function CD2PlayCredits()
             return viewtbl
         end
 
-        while !CD2_StopCredits and !endcred do coroutine.yield() end
+        while !self.StopCredits and !endcred do coroutine.yield() end
         LocalPlayer():ScreenFade( SCREENFADE.IN, Color( 0, 0, 0 ), 4, 1 )
 
-        CD2_StopCredits = false
+        self.StopCredits = false
         endcred = true
         if chan and chan:IsValid() then chan:FadeOut() end
 
-        CD2.DrawAgilitySkill = true
-        CD2.DrawFirearmSkill = true
-        CD2.DrawStrengthSkill = true
-        CD2.DrawExplosiveSkill = true
+        self.DrawAgilitySkill = true
+        self.DrawFirearmSkill = true
+        self.DrawStrengthSkill = true
+        self.DrawExplosiveSkill = true
 
-        CD2.DrawTargetting = true
-        CD2.DrawHealthandShields = true
-        CD2.DrawWeaponInfo = true
-        CD2.DrawMinimap = true
-        CD2.DrawBlackbars = false
-        CD2.ViewOverride = nil
+        self.DrawTargetting = true
+        self.DrawHealthandShields = true
+        self.DrawWeaponInfo = true
+        self.DrawMinimap = true
+        self.DrawBlackbars = false
+        self.ViewOverride = nil
 
-        CD2.PreventMovement = false
+        self.PreventMovement = false
 
-        if !CD2:KeysToTheCity() and !CD2:ReadPlayerData( "cd2_finishedgame" ) then
-            CD2StartMusic( "sound/crackdown2/music/victory.mp3", 1000 )
+        if !self:KeysToTheCity() and !self:ReadPlayerData( "cd2_finishedgame" ) then
+            self:StartMusic( "sound/crackdown2/music/victory.mp3", 1000 )
             sound.PlayFile( "sound/crackdown2/vo/agencydirector/ending_achievement.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
-            CD2:WritePlayerData( "cd2_finishedgame", true )
+            self:WritePlayerData( "cd2_finishedgame", true )
         end
 
     end )

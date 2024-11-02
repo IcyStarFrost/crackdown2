@@ -200,7 +200,7 @@ if CLIENT then
             for i = 1, 14 do tracks[ #tracks + 1 ] = "sound/crackdown2/music/ambient/height" .. i .. ".mp3" end
             nexttrack = nil
 
-            CD2StartMusic( tracks[ random( #tracks ) ], 0, false, true, nil, nil, nil, nil, nil, function( chan )
+            CD2:StartMusic( tracks[ random( #tracks ) ], 0, false, true, nil, nil, nil, nil, nil, function( chan )
                 if !nexttrack then
                     nexttrack = CurTime() + chan:GetChannel():GetLength() + random( 90, 250 )
                 end

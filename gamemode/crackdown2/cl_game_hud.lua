@@ -44,7 +44,7 @@ local shieldlerp = -1
 local hlerp1
 local hlerp2
 
-CD2_lockon = false
+CD2.lockon = false
 
 local function draw_Circle( x, y, radius, seg, rotate )
     rotate = rotate or 0
@@ -329,11 +329,11 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     -- Crosshair --
     if CD2.DrawTargetting then
         draw.NoTexture()
-        surface.SetDrawColor( !CD2_lockon and shadedwhite or red )
+        surface.SetDrawColor( !CD2.lockon and shadedwhite or red )
         draw_Circle( scrw / 2, scrh / 2, 2, 30 )
 
-        if CD2_lockon then
-            local target = ply:GetNW2Entity( "cd2_lockontarget", nil )
+        if CD2.lockon then
+            local target = ply:GetNW2Entity( "CD2.lockontarget", nil )
             surface.DrawLine( ( scrw / 2 ), ( scrh / 2 ) + 10, ( scrw / 2 ), ( scrh / 2 ) + 20 )
             surface.DrawLine( ( scrw / 2 ), ( scrh / 2 ) - 10, ( scrw / 2 ), ( scrh / 2 ) - 20 )
             surface.DrawLine( ( scrw / 2 ) + 10, ( scrh / 2 ), ( scrw / 2 ) + 20, ( scrh / 2 ) )
@@ -536,7 +536,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     -- Lock on Entity health bars --
     if CD2.DrawTargetting then
         local lockables = CD2:FindInLockableTragets( ply )
-        local target = ply.cd2_lockontarget or lockables[ 1 ]
+        local target = ply.CD2.lockontarget or lockables[ 1 ]
 
         if IsValid( target ) then 
             local toscreen = ( target:GetPos() + Vector( 0, 0, target:GetModelRadius() ) ):ToScreen()

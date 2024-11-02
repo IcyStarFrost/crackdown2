@@ -906,7 +906,7 @@ if CLIENT then
         CD2:CreateThread( function() 
             sound.PlayFile( "sound/crackdown2/ending/finalsequence.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
 
-            CD2_InCutscene = true
+            CD2.InCutscene = true
             CD2.DrawAgilitySkill = false
             CD2.DrawFirearmSkill = false
             CD2.DrawStrengthSkill = false
@@ -1067,9 +1067,9 @@ if CLIENT then
 
             coroutine.wait( 8 )
 
-            CD2_InCutscene = false
+            CD2.InCutscene = false
 
-            CD2PlayCredits()
+            CD2:PlayCredits()
 
 
         end )
@@ -1089,7 +1089,7 @@ if CLIENT then
         local tower = net.ReadEntity()
         if !IsValid( tower ) then return end 
 
-        CD2StartMusic( "sound/crackdown2/music/towerbeacon.mp3", 700, nil, nil, nil, nil, nil, nil, nil, function( CD2Musicchannel )
+        CD2:StartMusic( "sound/crackdown2/music/towerbeacon.mp3", 700, nil, nil, nil, nil, nil, nil, nil, function( CD2Musicchannel )
             if !IsValid( tower ) or !tower:GetIsCharging() then CD2Musicchannel:FadeOut() return end
 
             if LocalPlayer():SqrRangeTo( tower:GetPos() ) > ( 2000 * 2000 ) then

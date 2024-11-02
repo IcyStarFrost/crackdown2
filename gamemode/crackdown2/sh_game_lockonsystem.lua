@@ -17,24 +17,24 @@ hook.Add( "Think", "crackdown2_lockon", function()
             if ply:KeyDown( IN_ATTACK2 ) then
                 local wep = ply:GetActiveWeapon()
                 if !IsValid( wep ) then return end
-                ply.cd2_LockOnPos = ply.cd2_LockOnPos or "body"
+                ply.CD2.lockonPos = ply.CD2.lockonPos or "body"
                 
                 local lockables = CD2:FindInLockableTragets( ply )
 
-                local oldtarget = ply:GetNW2Entity( "cd2_lockontarget", nil )
+                local oldtarget = ply:GetNW2Entity( "CD2.lockontarget", nil )
                 local target = IsValid( oldtarget ) and oldtarget:GetPos():DistToSqr( ply:GetPos() ) <= ( wep.LockOnRange * wep.LockOnRange ) and oldtarget or IsValid( lockables[ 1 ] ) and lockables[ 1 ]:GetPos():DistToSqr( ply:GetPos() ) <= ( wep.LockOnRange * wep.LockOnRange ) and lockables[ 1 ]
-                ply:SetNW2Entity( "cd2_lockontarget", target )
+                ply:SetNW2Entity( "CD2.lockontarget", target )
                 
 
-                if IsValid( ply:GetNW2Entity( "cd2_lockontarget", nil ) ) then
-                    local pos = ply.cd2_LockOnPos == "body" and ply:GetNW2Entity( "cd2_lockontarget", nil ):WorldSpaceCenter() or ply:GetNW2Entity( "cd2_lockontarget", nil ):CD2EyePos()
+                if IsValid( ply:GetNW2Entity( "CD2.lockontarget", nil ) ) then
+                    local pos = ply.CD2.lockonPos == "body" and ply:GetNW2Entity( "CD2.lockontarget", nil ):WorldSpaceCenter() or ply:GetNW2Entity( "CD2.lockontarget", nil ):CD2EyePos()
                     if !pos then return end
                     ply:SetEyeAngles( ( pos - ply:EyePos() ):Angle() )
                 end
 
             else
-                ply.cd2_LockOnPos = nil
-                ply:SetNW2Entity( "cd2_lockontarget", NULL )
+                ply.CD2.lockonPos = nil
+                ply:SetNW2Entity( "CD2.lockontarget", NULL )
             end
 
         end
@@ -45,7 +45,7 @@ hook.Add( "Think", "crackdown2_lockon", function()
         local ply = LocalPlayer()
         if !IsValid( ply ) and !ply:IsCD2Agent() then return end
 
-        local lockontarget = ply:GetNW2Entity( "cd2_lockontarget", nil )
+        local lockontarget = ply:GetNW2Entity( "CD2.lockontarget", nil )
 
         if IsValid( lockontarget ) then
             -- Play lock on sound
@@ -75,7 +75,7 @@ hook.Add( "Think", "crackdown2_lockon", function()
             limitlockonsound = false
         end
 
-        CD2_lockon = #CD2:FindInLockableTragets( ply ) > 0
+        CD2.lockon = #CD2:FindInLockableTragets( ply ) > 0
         
     end 
 
@@ -88,13 +88,13 @@ if SERVER then
         local players = player_GetAll()
         for i = 1, #players do
             local ply = players[ i ]
-            ply.cd2_LockOnPos = ply.cd2_LockOnPos or "body"
-            ply.cd2_lockondecayspeed = ply.cd2_lockondecayspeed or 10
+            ply.CD2.lockonPos = ply.CD2.lockonPos or "body"
+            ply.CD2.lockondecayspeed = ply.CD2.lockondecayspeed or 10
             if !ply:IsCD2Agent() then return end
             
             if ply:GetLockonSpreadDecay() > 0 then
-                if IsValid( ply:GetNW2Entity( "cd2_lockontarget", nil ) ) then 
-                    ply:SetLockonSpreadDecay( Lerp( ply.cd2_lockondecayspeed * FrameTime(), ply:GetLockonSpreadDecay(), 0 ) )
+                if IsValid( ply:GetNW2Entity( "CD2.lockontarget", nil ) ) then 
+                    ply:SetLockonSpreadDecay( Lerp( ply.CD2.lockondecayspeed * FrameTime(), ply:GetLockonSpreadDecay(), 0 ) )
                 else
                     ply:SetLockonSpreadDecay( 0 )
                 end
@@ -104,15 +104,15 @@ if SERVER then
 
 
     net.Receive( "cd2net_changelockonpos", function( len, ply )
-        ply.cd2_LockOnPos = net.ReadString()
-        local targ = ply:GetNW2Entity( "cd2_lockontarget", nil )
+        ply.CD2.lockonPos = net.ReadString()
+        local targ = ply:GetNW2Entity( "CD2.lockontarget", nil )
         
-        if IsValid( targ ) and ply.cd2_LockOnPos == "head" then 
+        if IsValid( targ ) and ply.CD2.lockonPos == "head" then 
             local dist = ply:GetPos():Distance( targ:GetPos() )
 
-            ply.cd2_lockondecayspeed = 10 / ( dist / 300 )
+            ply.CD2.lockondecayspeed = 10 / ( dist / 300 )
             ply:SetLockonSpreadDecay( ( dist / 200 ) * 0.08 ) 
-        elseif IsValid( targ ) and ply.cd2_LockOnPos == "body" then
+        elseif IsValid( targ ) and ply.CD2.lockonPos == "body" then
             ply:SetLockonSpreadDecay( 0 ) 
         end
         

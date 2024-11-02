@@ -12,7 +12,7 @@ hook.Add( "Tick", "crackdown2_antibeaconfreaks", function()
 
     for i = 1, #beacons do
         local beacon = beacons[ i ]
-        if IsValid( beacon ) and beacon:GetIsCharging() and ( beacon.cd2_freakcount and beacon.cd2_freakcount < 15 or !beacon.cd2_freakcount ) and ( !beacon.cd2_nextfreakspawn or CurTime() > beacon.cd2_nextfreakspawn ) then
+        if IsValid( beacon ) and beacon:GetIsCharging() and ( beacon.cd2_freakcount and beacon.cd2_freakcount < 15 or !beacon.cd2_freakcount ) and ( !beacon.CD2.NextFreakSpawn or CurTime() > beacon.CD2.NextFreakSpawn ) then
             beacon.cd2_freakcount = beacon.cd2_freakcount or 0 
             local difficulty = CD2:GetBeaconDifficulty()
             local classes = difficultynpcs[ difficulty ]
@@ -53,7 +53,7 @@ hook.Add( "Tick", "crackdown2_antibeaconfreaks", function()
 
             beacon.cd2_freakcount = beacon.cd2_freakcount + 1
             
-            beacon.cd2_nextfreakspawn = CurTime() + 1
+            beacon.CD2.NextFreakSpawn = CurTime() + 1
         end
     end
 end )

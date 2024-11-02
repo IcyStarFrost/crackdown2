@@ -41,17 +41,17 @@ net.Receive( "cd2net_generatenavmesh", function( len, ply )
     IsGenerating = true
 end )
 
-local oldtime = CD2_FreezeTime
+local oldtime = CD2.FreezeTime
 net.Receive( "cd2net_playeropenintelconsole", function( len, ply )
     if !game.SinglePlayer() then return end
     local isopened = net.ReadBool()
 
     if isopened then
-        oldtime = CD2_FreezeTime
-        CD2_FreezeTime = true
+        oldtime = CD2.FreezeTime
+        CD2.FreezeTime = true
         CD2_DisableAllAI = true
     else
-        CD2_FreezeTime = oldtime
+        CD2.FreezeTime = oldtime
         CD2_DisableAllAI = false
     end
     

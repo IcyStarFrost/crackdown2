@@ -17,31 +17,31 @@ function CD2:SetTypingText( toptext, bottomtext, red )
     topcolor.b = 255
     white.a = 255
     
-    CD2_TypingText_Red = red or false
-    CD2_TypingText_FlashColor = false
-    CD2_TypingText_Top = ""
-    CD2_TypingText_Bottom = ""
+    CD2.TypingText_Red = red or false
+    CD2.TypingText_FlashColor = false
+    CD2.TypingText_Top = ""
+    CD2.TypingText_Bottom = ""
 
-    CD2:CreateThread( function()
+    self:CreateThread( function()
         for i = 1, #toptexttbl do
             if thisid != id then return end
-            CD2_TypingText_Top = CD2_TypingText_Top .. toptexttbl[ i ]
+            CD2.TypingText_Top = CD2.TypingText_Top .. toptexttbl[ i ]
             LocalPlayer():EmitSound( "crackdown2/ui/texttype.mp3", 70, 100, 1, CHAN_WEAPON )
             coroutine.wait( 0.1 )
         end
 
         for i = 1, #bottomtexttbl do
             if thisid != id then return end
-            CD2_TypingText_Bottom = CD2_TypingText_Bottom .. bottomtexttbl[ i ]
+            CD2.TypingText_Bottom = CD2.TypingText_Bottom .. bottomtexttbl[ i ]
             LocalPlayer():EmitSound( "crackdown2/ui/texttype.mp3", 70, 100, 1, CHAN_WEAPON )
             coroutine.wait( 0.1 )
         end
 
-        CD2_TypingText_FlashColor = true
+        CD2.TypingText_FlashColor = true
 
         coroutine.wait( 4 )
 
-        CD2_TypingText_FlashColor = false
+        CD2.TypingText_FlashColor = false
         
         while true do
             if thisid != id then return end
@@ -51,8 +51,8 @@ function CD2:SetTypingText( toptext, bottomtext, red )
             coroutine.yield()
         end
 
-        CD2_TypingText_Top = nil
-        CD2_TypingText_Bottom = nil
+        CD2.TypingText_Top = nil
+        CD2.TypingText_Bottom = nil
     end )
 
 end
@@ -71,22 +71,22 @@ local draw_DrawText = draw.DrawText
 
 hook.Add( "HUDPaint", "crackdown2_typingtext", function()
     if !GetConVar( "cd2_drawhud" ):GetBool() then return end
-    if CD2_TypingText_Top then
+    if CD2.TypingText_Top then
 
-        if CD2_TypingText_FlashColor then
+        if CD2.TypingText_FlashColor then
             bluecolor.a = abs( sin( SysTime() * 4 ) * 100 )
             redcolor.a = abs( sin( SysTime() * 4 ) * 100 )
             surface_SetFont( "crackdown2_font50" )
-            local w, h = surface_GetTextSize( CD2_TypingText_Top )
-            surface_SetDrawColor( !CD2_TypingText_Red and bluecolor or redcolor )
+            local w, h = surface_GetTextSize( CD2.TypingText_Top )
+            surface_SetDrawColor( !CD2.TypingText_Red and bluecolor or redcolor )
             surface_SetMaterial( sprite )
             surface_DrawTexturedRect( ( ScrW() / 2 ) - ( w / 2 ) - 50, ( ScrH() / 2.3 ), w + 100, h )
         end
 
-        draw_DrawText( CD2_TypingText_Top, "crackdown2_font50", ScrW() / 2, ScrH() / 2.3, topcolor, TEXT_ALIGN_CENTER )
+        draw_DrawText( CD2.TypingText_Top, "crackdown2_font50", ScrW() / 2, ScrH() / 2.3, topcolor, TEXT_ALIGN_CENTER )
     end
 
-    if CD2_TypingText_Bottom then
-        draw_DrawText( CD2_TypingText_Bottom, "crackdown2_font40", ScrW() / 2, ScrH() / 2, white, TEXT_ALIGN_CENTER )
+    if CD2.TypingText_Bottom then
+        draw_DrawText( CD2.TypingText_Bottom, "crackdown2_font40", ScrW() / 2, ScrH() / 2, white, TEXT_ALIGN_CENTER )
     end
 end )

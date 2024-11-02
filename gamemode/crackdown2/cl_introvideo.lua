@@ -10,7 +10,7 @@ local IsValid = IsValid
 local upper = string.upper
 
 -- Begins the intro video
-function CD2BeginIntroVideo( endcallback )
+function CD2:BeginIntroVideo( endcallback )
     local link = "https://www.youtube.com/watch?v=_i_QKKEF1RM"
     local service = medialib.load( "media" ).guessService( link )
     local mediaclip = service:load( link )

@@ -65,7 +65,7 @@ function SWEP:PrimaryAttack()
         rocket:Spawn()
 
         CD2:CreateThread( function()
-            local target = self:GetOwner():IsPlayer() and self:GetOwner():GetNW2Entity( "cd2_lockontarget", nil ) or self:GetOwner():IsCD2NPC() and self:GetOwner():GetEnemy()
+            local target = self:GetOwner():IsPlayer() and self:GetOwner():GetNW2Entity( "CD2.lockontarget", nil ) or self:GetOwner():IsCD2NPC() and self:GetOwner():GetEnemy()
             
             while true do 
                 if !IsValid( target ) or !IsValid( rocket ) then return end

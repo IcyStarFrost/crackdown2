@@ -16,17 +16,17 @@ local function GetMapName()
     return string.upper( largest )
 end
 
-function CD2OpenMainMenu()
+function CD2:OpenMainMenu()
 
     local mapname = GetMapName()
-    local channel = CD2StartMusic( "sound/crackdown2/music/startmenu.mp3", 800, true )
+    local channel = CD2:StartMusic( "sound/crackdown2/music/startmenu.mp3", 800, true )
     local optionspnl
 
-    CD2_MainMenu = vgui.Create( "DPanel", GetHUDPanel() )
-    CD2_MainMenu:Dock( FILL )
-    CD2_MainMenu:MakePopup()
+    CD2.MainMenu = vgui.Create( "DPanel", GetHUDPanel() )
+    CD2.MainMenu:Dock( FILL )
+    CD2.MainMenu:MakePopup()
 
-    local MenuPanelHolder = vgui.Create( "DPanel", CD2_MainMenu )
+    local MenuPanelHolder = vgui.Create( "DPanel", CD2.MainMenu )
     MenuPanelHolder:Dock( FILL )
     MenuPanelHolder:Hide()
 
@@ -138,7 +138,7 @@ function CD2OpenMainMenu()
             end
 
             function confirmbutton:DoClick() 
-                CD2_MainMenu:Remove()
+                CD2.MainMenu:Remove()
                 channel:Kill()
 
                 net.Start( "cd2net_setplayercolor" )
@@ -153,7 +153,7 @@ function CD2OpenMainMenu()
                     CD2:CreateThread( function()
 
                         if BRANCH == "x86-64" or BRANCH == "chromium" then
-                            CD2BeginIntroVideo()
+                            CD2:BeginIntroVideo()
 
                             while IsValid( CD2_videopanel ) do
                                 coroutine.yield()
@@ -205,8 +205,8 @@ function CD2OpenMainMenu()
                         end
                     end )
             
-                    CD2OpenSpawnPointMenu()
-                    CD2StartMusic( "sound/crackdown2/music/droppointmusic.mp3", 800, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
+                    CD2:OpenSpawnPointMenu()
+                    CD2:StartMusic( "sound/crackdown2/music/droppointmusic.mp3", 800, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
                         if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
                     end )
 
@@ -293,13 +293,13 @@ function CD2OpenMainMenu()
         surface_DrawRect( 0, 0, w, h )
     end
 
-    function CD2_MainMenu:OnKeyCodePressed( key ) 
+    function CD2.MainMenu:OnKeyCodePressed( key ) 
 
         if key and !MenuPanelHolder:IsVisible() then
             surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
             MenuPanelHolder:Show()
             channel:FadeOut()
-            channel = CD2StartMusic( "sound/crackdown2/music/mainmusic.mp3", 800, true )
+            channel = CD2:StartMusic( "sound/crackdown2/music/mainmusic.mp3", 800, true )
 
             local fadepanel = vgui.Create( "DPanel" )
             fadepanel:Dock( FILL )
@@ -322,7 +322,7 @@ function CD2OpenMainMenu()
         surface_DrawTexturedRect( 0, 0, w, h )
     end
 
-    function CD2_MainMenu:Paint( w, h ) 
+    function CD2.MainMenu:Paint( w, h ) 
         surface_SetDrawColor( grey )
         surface_SetMaterial( startbg )
         surface_DrawTexturedRect( 0, 0, w, h )

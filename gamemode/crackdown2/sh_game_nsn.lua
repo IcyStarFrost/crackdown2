@@ -5,21 +5,21 @@ local table_remove = table.remove
 
 if SERVER then
     -- Setting up the npc limits
-    CD2_SpawnedNSNNpcs = CD2_SpawnedNSNNpcs or {}
+    CD2.SpawnedNSNNpcs = CD2.SpawnedNSNNpcs or {}
 
-    CD2_MaxCivilians = 15
-    CD2_MaxCell = 2
-    CD2_MaxPeaceKeepers = 2
-    CD2_MaxFreaks = 20
+    CD2.MaxCivilians = 15
+    CD2.MaxCell = 2
+    CD2.MaxPeaceKeepers = 2
+    CD2.MaxFreaks = 20
 
-    CD2_NextCivilianSpawn = CurTime() + 1
-    CD2_NextFreakSpawn = CurTime() + 1
-    CD2_NextCellSpawn = CurTime() + rand( 1, 25 )
-    CD2_NextPeaceKeeperSpawn = CurTime() + rand( 1, 30 )
+    CD2.NextCivilianSpawn = CurTime() + 1
+    CD2.NextFreakSpawn = CurTime() + 1
+    CD2.NextCellSpawn = CurTime() + rand( 1, 25 )
+    CD2.NextPeaceKeeperSpawn = CurTime() + rand( 1, 30 )
     local limitfreakkill = false
 
-    for i = 1, #CD2_SpawnedNSNNpcs do
-        local npc = CD2_SpawnedNSNNpcs[ i ]
+    for i = 1, #CD2.SpawnedNSNNpcs do
+        local npc = CD2.SpawnedNSNNpcs[ i ]
         if IsValid( npc ) then npc:Remove() end
     end
 
@@ -100,15 +100,15 @@ if SERVER then
         local npc = ents.Create( class )
         npc:SetPos( pos )
         npc:SetAngles( Angle( 0, random( -180, 180 ), 0 ) )
-        CD2_SpawnedNSNNpcs[ #CD2_SpawnedNSNNpcs + 1 ] = npc
+        CD2.SpawnedNSNNpcs[ #CD2.SpawnedNSNNpcs + 1 ] = npc
         npc:Spawn()
         return npc
     end
 
     hook.Add( "OnCD2NPCKilled", "crackdown2_removefromnsntable", function( ent, info )
-        for i = 1, #CD2_SpawnedNSNNpcs do
-            local npc = CD2_SpawnedNSNNpcs[ i ]
-            if npc == ent then table_remove( CD2_SpawnedNSNNpcs, i ) break end
+        for i = 1, #CD2.SpawnedNSNNpcs do
+            local npc = CD2.SpawnedNSNNpcs[ i ]
+            if npc == ent then table_remove( CD2.SpawnedNSNNpcs, i ) break end
         end
     end )
 
@@ -126,46 +126,46 @@ if SERVER then
         if ( game.SinglePlayer() or IsValid( Entity( 1 ) ) and Entity( 1 ):IsListenServerHost() ) and ( !IsValid( Entity( 1 ) ) or !Entity( 1 ):IsCD2Agent() or Entity( 1 ).cd2_InTutorial ) then return end
         if limit_time > CurTime() then return end
         limit_time = CurTime() + 0.3
-        CD2_MaxCivilians = CD2IsDay() and 15 or !CD2IsDay() and 6
+        CD2.MaxCivilians = CD2IsDay() and 15 or !CD2IsDay() and 6
 
 
         -- Civilians --
-        if GetCivilianCount() < CD2_MaxCivilians and CurTime() > CD2_NextCivilianSpawn then
+        if GetCivilianCount() < CD2.MaxCivilians and CurTime() > CD2.NextCivilianSpawn then
             SpawnNPC( nil, "cd2_civilian", GetRandomPlayer() )
-            CD2_NextCivilianSpawn = CD2IsDay() and CurTime() + 1 or !CD2IsDay() and CurTime() + 4
+            CD2.NextCivilianSpawn = CD2IsDay() and CurTime() + 1 or !CD2IsDay() and CurTime() + 4
         end
         --
 
         -- Cell --
-            if GetCellCount() < CD2_MaxCell and CurTime() > CD2_NextCellSpawn then
+            if GetCellCount() < CD2.MaxCell and CurTime() > CD2.NextCellSpawn then
                 local npcs = difficultynpcs[ CD2:GetTacticalLocationDifficulty() ]
                 local lead = SpawnNPC( nil, npcs[ random( #npcs ) ], GetRandomPlayer() )
 
-                if IsValid( lead ) and GetCellCount() < CD2_MaxCell then
+                if IsValid( lead ) and GetCellCount() < CD2.MaxCell then
                     SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), npcs[ random( #npcs ) ], GetRandomPlayer() )
                 end
 
-                CD2_NextCellSpawn = CurTime() + rand( 1, 25 )
+                CD2.NextCellSpawn = CurTime() + rand( 1, 25 )
             end
         --
         
         -- PeaceKeepers --
-        if GetPeaceKeeperCount() < CD2_MaxPeaceKeepers and CurTime() > CD2_NextPeaceKeeperSpawn then
+        if GetPeaceKeeperCount() < CD2.MaxPeaceKeepers and CurTime() > CD2.NextPeaceKeeperSpawn then
             local lead = SpawnNPC( nil, "cd2_peacekeeper", GetRandomPlayer() )
 
-            if IsValid( lead ) and GetPeaceKeeperCount() < CD2_MaxPeaceKeepers then
+            if IsValid( lead ) and GetPeaceKeeperCount() < CD2.MaxPeaceKeepers then
                 SpawnNPC( lead:GetPos() + Vector( random( -80, 80 ), random( -80, 80 ), 0 ), "cd2_peacekeeper", GetRandomPlayer() )
             end
 
-            CD2_NextPeaceKeeperSpawn = CurTime() + rand( 1, 30 )
+            CD2.NextPeaceKeeperSpawn = CurTime() + rand( 1, 30 )
         end
         --
 
         -- Freaks --
-        if !CD2IsDay() and #GetFreaks() < CD2_MaxFreaks and CurTime() > CD2_NextFreakSpawn then
+        if !CD2IsDay() and #GetFreaks() < CD2.MaxFreaks and CurTime() > CD2.NextFreakSpawn then
             SpawnNPC( nil, "cd2_freak", GetRandomPlayer() )
             limitfreakkill = false
-            CD2_NextFreakSpawn = CurTime() + rand( 0.1, 2 )
+            CD2.NextFreakSpawn = CurTime() + rand( 0.1, 2 )
         elseif CD2IsDay() and !limitfreakkill then
 
             CD2:CreateThread( function()

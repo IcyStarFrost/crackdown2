@@ -572,13 +572,13 @@ elseif SERVER then
 
         if val then
             CD2:ClearNPCS()
-            table.Empty( CD2_SpawnedNSNNpcs )
+            table.Empty( CD2.SpawnedNSNNpcs )
         end
     end )
 
     net.Receive( "cd2net_kttc_nexttime", function( len, ply )
         if !CD2:KeysToTheCity() then return end
-        CD2_NextFreakSpawn = CurTime() + 10
+        CD2.NextFreakSpawn = CurTime() + 10
         SetGlobalBool( "cd2_isday", !GetGlobalBool( "cd2_isday", false ) )
 
         CD2:DebugMessage( "Time is now changing to " .. ( GetGlobalBool( "cd2_isday", false ) and "Dawn" or "Dusk" ) )
@@ -587,13 +587,13 @@ elseif SERVER then
         net.WriteBool( GetGlobalBool( "cd2_isday", false ) )
         net.Broadcast()
 
-        CD2_NextTimeChange = CurTime() + 720
+        CD2.NextTimeChange = CurTime() + 720
     end )
 
     net.Receive( "cd2net_kttc_freezetime", function( len, ply )
         if !CD2:KeysToTheCity() then return end
         local bool = net.ReadBool()
-        CD2_FreezeTime = bool
+        CD2.FreezeTime = bool
     end )
 
     net.Receive( "cd2net_kttc_godmode", function( len, ply )

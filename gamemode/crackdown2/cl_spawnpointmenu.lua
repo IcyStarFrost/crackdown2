@@ -15,27 +15,27 @@ local surface_SetMaterial = surface.SetMaterial
 local input_GetKeyCode = input.GetKeyCode
 local star = Material( "crackdown2/ui/star.png" )
 
-CD2_SpawnPointMenu = CD2_SpawnPointMenu or nil
-CD2_SpawnPointIndex = 1
-CD2_SelectedSpawnPoint = Vector()
-CD2_SelectedSpawnAngle = Angle()
+CD2.SpawnPointMenu = CD2.SpawnPointMenu or nil
+CD2.SpawnPointIndex = 1
+CD2.SelectedSpawnPoint = Vector()
+CD2.SelectedSpawnAngle = Angle()
 CD2.InSpawnPointMenu = false
 local viewtrace = {}
 local viewtbl = {}
 
 
 
-function CD2OpenSpawnPointMenu()
+function CD2:OpenSpawnPointMenu()
 
-    CD2.DrawBlackbars = false
+    self.DrawBlackbars = false
     surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
 
     net.Start( "cd2net_playerregenerate" )
     net.SendToServer()
 
-    CD2:CreateThread( function()
+    self:CreateThread( function()
 
-        CD2.InSpawnPointMenu = true
+        self.InSpawnPointMenu = true
 
         local fadepanel = vgui.Create( "DPanel" )
         fadepanel:Dock( FILL )
@@ -48,12 +48,12 @@ function CD2OpenSpawnPointMenu()
             surface_DrawRect( 0, 0, w, h )
         end
 
-        CD2_SpawnPointMenu = vgui.Create( "DPanel", GetHUDPanel() )
-        CD2_SpawnPointMenu:Dock( FILL )
-        CD2_SpawnPointMenu:MakePopup()
-        CD2_SpawnPointMenu:SetKeyBoardInputEnabled( false )
+        self.SpawnPointMenu = vgui.Create( "DPanel", GetHUDPanel() )
+        self.SpawnPointMenu:Dock( FILL )
+        self.SpawnPointMenu:MakePopup()
+        self.SpawnPointMenu:SetKeyBoardInputEnabled( false )
 
-        hook.Add( "SetupWorldFog", CD2_SpawnPointMenu, function()
+        hook.Add( "SetupWorldFog", self.SpawnPointMenu, function()
             render.FogStart( 0 )
             render.FogEnd( 0 )
             render.FogMaxDensity( 0 )
@@ -62,7 +62,7 @@ function CD2OpenSpawnPointMenu()
             return true 
         end )
     
-        hook.Add( "SetupSkyboxFog", CD2_SpawnPointMenu, function()
+        hook.Add( "SetupSkyboxFog", self.SpawnPointMenu, function()
             render.FogStart( 0 )
             render.FogEnd( 0 )
             render.FogMaxDensity( 0 )
@@ -71,41 +71,41 @@ function CD2OpenSpawnPointMenu()
             return true 
         end )
 
-        local toptext = vgui.Create( "DLabel", CD2_SpawnPointMenu )
+        local toptext = vgui.Create( "DLabel", self.SpawnPointMenu )
         toptext:SetFont( "crackdown2_font60" )
         toptext:SetSize( 100, 100 )
         toptext:SetText( "             AGENCY REDEPLOYMENT PROGRAM" )
         toptext:Dock( TOP )
 
-        local line = vgui.Create( "DPanel", CD2_SpawnPointMenu )
+        local line = vgui.Create( "DPanel", self.SpawnPointMenu )
         line:SetSize( 100, 3 )
         line:Dock( TOP )
 
-        local selecttext = vgui.Create( "DLabel", CD2_SpawnPointMenu )
+        local selecttext = vgui.Create( "DLabel", self.SpawnPointMenu )
         selecttext:SetFont( "crackdown2_font50" )
         selecttext:SetSize( 100, 60 )
         selecttext:SetColor( Color( 218, 103, 10 ) )
         selecttext:SetText( "             CHOOSE A DROP POINT TO DEPLOY YOUR AGENT" )
         selecttext:Dock( TOP )
 
-        function CD2_SpawnPointMenu:OnRemove()
-            CD2.InSpawnPointMenu = false
-            CD2.ViewOverride = nil
+        function self.SpawnPointMenu:OnRemove()
+            self.InSpawnPointMenu = false
+            self.ViewOverride = nil
         end
 
         local viewpos
         local spawnpointpanels = {}
 
-        CD2.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
-            local spawns = CD2_SpawnPoints
-            local spawnpoint = spawns[ CD2_SpawnPointIndex ]
+        self.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+            local spawns = self.SpawnPoints
+            local spawnpoint = spawns[ self.SpawnPointIndex ]
 
-            if CD2_SelectedSpawnPoint != spawnpoint[ 1 ] then
-                CD2_SelectedSpawnPoint = spawnpoint[ 1 ]
+            if self.SelectedSpawnPoint != spawnpoint[ 1 ] then
+                self.SelectedSpawnPoint = spawnpoint[ 1 ]
             end
 
-            if CD2_SelectedSpawnAngle != spawnpoint[ 2 ] then
-                CD2_SelectedSpawnAngle = spawnpoint[ 2 ]
+            if self.SelectedSpawnAngle != spawnpoint[ 2 ] then
+                self.SelectedSpawnAngle = spawnpoint[ 2 ]
             end
 
             viewpos = viewpos or spawnpoint[ 1 ]
@@ -129,15 +129,15 @@ function CD2OpenSpawnPointMenu()
         end
 
 
-        function CD2_SpawnPointMenu:Paint( w, h ) 
-            local spawns = CD2_SpawnPoints
+        function CD2.SpawnPointMenu:Paint( w, h ) 
+            local spawns = CD2.SpawnPoints
 
             for k, v in ipairs( spawns ) do
                 local screen = v[ 1 ]:ToScreen()
 
                 surface_SetDrawColor( gold )
                 surface_SetMaterial( star )
-                surface_DrawTexturedRectRotated( screen.x, screen.y, 20, 20, k == CD2_SpawnPointIndex and -( SysTime() * 200 ) or 0 )
+                surface_DrawTexturedRectRotated( screen.x, screen.y, 20, 20, k == CD2.SpawnPointIndex and -( SysTime() * 200 ) or 0 )
 
                 draw_NoTexture()
 
@@ -145,7 +145,7 @@ function CD2OpenSpawnPointMenu()
                     local spawnpoint = v[ 1 ]
                     local screen2 = spawnpoint:ToScreen()
                     local index = k
-                    local button = vgui.Create( "DButton", CD2_SpawnPointMenu )
+                    local button = vgui.Create( "DButton", CD2.SpawnPointMenu )
                     button:SetText( "" )
                     button:SetSize( 30, 30 )
                     button:SetPos( screen2.x - 15, screen2.y - 15 )
@@ -157,7 +157,7 @@ function CD2OpenSpawnPointMenu()
                     end
 
                     function button:DoClick()
-                        CD2_SpawnPointIndex = index
+                        CD2.SpawnPointIndex = index
                         surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
                     end
 
@@ -205,17 +205,17 @@ hook.Add( "Think", "crackdown2_spawnpointmenu", function()
 
     if ply:KeyPressed( IN_USE ) then
         surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
-        CD2_SpawnPointIndex = CD2_SpawnPointIndex - 1
-        if CD2_SpawnPointIndex <= 0 then CD2_SpawnPointIndex = #CD2_SpawnPoints end
+        CD2.SpawnPointIndex = CD2.SpawnPointIndex - 1
+        if CD2.SpawnPointIndex <= 0 then CD2.SpawnPointIndex = #CD2.SpawnPoints end
     elseif ply:KeyPressed( IN_RELOAD ) then
         surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
-        CD2_SpawnPointIndex = CD2_SpawnPointIndex + 1
-        if CD2_SpawnPointIndex > #CD2_SpawnPoints then CD2_SpawnPointIndex = 1 end
+        CD2.SpawnPointIndex = CD2.SpawnPointIndex + 1
+        if CD2.SpawnPointIndex > #CD2.SpawnPoints then CD2.SpawnPointIndex = 1 end
     elseif ply:KeyPressed( IN_JUMP ) then 
         surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
-        CD2_SpawnPointMenu:Remove()
+        CD2.SpawnPointMenu:Remove()
         if !CD2.InDropMenu then
-            CD2OpenDropMenu()
+            CD2:OpenDropMenu()
         end
     end
 

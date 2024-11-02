@@ -10,21 +10,21 @@ if SERVER then
 
     SetGlobalBool( "cd2_isday", true )
     
-    CD2_NextTimeChange = CurTime() + 720
-    CD2_FreezeTime = false -- Freezes time
+    CD2.NextTimeChange = CurTime() + 720
+    CD2.FreezeTime = false -- Freezes time
 
-    local lasttime = CD2_NextTimeChange
+    local lasttime = CD2.NextTimeChange
     local debugupdate = CurTime() + 60
 
     hook.Add( "Tick", "crackdown2_dawnduskcycle", function()
-        if CD2_FreezeTime then CD2_NextTimeChange = lasttime return end
+        if CD2.FreezeTime then CD2.NextTimeChange = lasttime return end
         if CurTime() > debugupdate then
-            CD2:DebugMessage( "Next time change will occur in " .. tostring( string.NiceTime( CD2_NextTimeChange - CurTime(), 0 ) ) )
+            CD2:DebugMessage( "Next time change will occur in " .. tostring( string.NiceTime( CD2.NextTimeChange - CurTime(), 0 ) ) )
             debugupdate = CurTime() + 60
         end
 
-        if CurTime() > CD2_NextTimeChange then
-            CD2_NextFreakSpawn = CurTime() + 10
+        if CurTime() > CD2.NextTimeChange then
+            CD2.NextFreakSpawn = CurTime() + 10
             SetGlobalBool( "cd2_isday", !GetGlobalBool( "cd2_isday", false ) )
 
             CD2:DebugMessage( "Time is now changing to " .. ( GetGlobalBool( "cd2_isday", false ) and "Dawn" or "Dusk" ) )
@@ -33,10 +33,10 @@ if SERVER then
             net.WriteBool( GetGlobalBool( "cd2_isday", false ) )
             net.Broadcast()
 
-            CD2_NextTimeChange = CurTime() + 720
+            CD2.NextTimeChange = CurTime() + 720
         end
 
-        lasttime = CD2_NextTimeChange
+        lasttime = CD2.NextTimeChange
     end )
 
 elseif CLIENT then
@@ -45,9 +45,9 @@ elseif CLIENT then
         local isdawn = net.ReadBool()
     
         if isdawn then
-            CD2StartMusic( "sound/crackdown2/music/duskdawn/dawn" .. random( 1, 5 ) .. ".mp3", 4, false, false )
+            CD2:StartMusic( "sound/crackdown2/music/duskdawn/dawn" .. random( 1, 5 ) .. ".mp3", 4, false, false )
         else
-            CD2StartMusic( "sound/crackdown2/music/duskdawn/dusk" .. random( 1, 5 ) .. ".mp3", 4, false, false )
+            CD2:StartMusic( "sound/crackdown2/music/duskdawn/dusk" .. random( 1, 5 ) .. ".mp3", 4, false, false )
         end
     end )
 

@@ -184,7 +184,7 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
 
 	owner:FireBullets( self.bullet )
 
-    if owner:IsPlayer() and owner.CD2.lockonPos == "head" and IsValid( owner:GetNW2Entity( "CD2_lockontarget", nil ) ) then
+    if owner:IsPlayer() and owner.CD2_lockonPos == "head" and IsValid( owner:GetNW2Entity( "CD2_lockontarget", nil ) ) then
         local dist = owner:GetPos():Distance( owner:GetNW2Entity( "CD2_lockontarget", nil ):GetPos() ) / 150
 
         owner:SetLockonSpreadDecay( dist * 0.08 ) 

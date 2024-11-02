@@ -33,7 +33,7 @@ hook.Add( "Think", "crackdown2_lockon", function()
                 end
 
             else
-                ply.CD2.lockonPos = nil
+                ply.CD2_lockonPos = nil
                 ply:SetNW2Entity( "CD2_lockontarget", NULL )
             end
 

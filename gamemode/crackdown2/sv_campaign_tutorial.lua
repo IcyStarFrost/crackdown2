@@ -41,25 +41,25 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             ply:SendLua( "surface.PlaySound( 'crackdown2/ui/hudactivate.mp3' )")
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2.DrawHealthandShields" )
+            net.WriteString( "DrawHealthandShields" )
             net.Send( ply )
 
             coroutine.wait( 4.8 )
 
             ply:SendLua( "surface.PlaySound( 'crackdown2/ui/hudactivate.mp3' )")
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2.DrawMinimap" )
+            net.WriteString( "DrawMinimap" )
             net.Send( ply )
 
             coroutine.wait( 2.3 )
 
             ply:SendLua( "surface.PlaySound( 'crackdown2/ui/hudactivate.mp3' )")
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2.DrawTargetting" )
+            net.WriteString( "DrawTargetting" )
             net.Send( ply )
 
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2.DrawWeaponInfo" )
+            net.WriteString( "DrawWeaponInfo" )
             net.Send( ply )
 
             coroutine.wait( 3 )
@@ -139,7 +139,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             ply:Freeze( false )
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2.DrawAgilitySkill" )
+            net.WriteString( "DrawAgilitySkill" )
             net.Send( ply )
 
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag5.mp3" ) 
@@ -168,7 +168,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             coroutine.wait( 7 ) 
 
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2.DrawFirearmSkill" )
+            net.WriteString( "DrawFirearmSkill" )
             net.Send( ply )
 
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag6.mp3" ) 
@@ -301,7 +301,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag11.mp3" ) 
 
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2.DrawStrengthSkill" )
+            net.WriteString( "DrawStrengthSkill" )
             net.Send( ply )
 
             coroutine.wait( 8 )
@@ -350,7 +350,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             ply:SetCanUseMelee( false )
 
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2.DrawExplosiveSkill" )
+            net.WriteString( "DrawExplosiveSkill" )
             net.Send( ply )
 
 

@@ -153,7 +153,7 @@ end )
 
 net.Receive( "cd2net_tutorial_activatehud", function()
     local variable = net.ReadString()
-    _G[ variable ] = true
+    CD2[ variable ] = true
 end )
 
 

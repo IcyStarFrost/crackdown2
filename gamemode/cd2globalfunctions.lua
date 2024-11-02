@@ -3,7 +3,7 @@ local IsValid = IsValid
 local random = math.random
 
 -- Simple function for creating coroutine threads easily
-function CD2CreateThread( func )
+function CD2:CreateThread( func )
     local thread = coroutine.create( func ) 
     hook.Add( "Think", "Crackdown2Thread_" .. tostring( func ), function() 
         if coroutine.status( thread ) != "dead" then
@@ -15,14 +15,14 @@ function CD2CreateThread( func )
     end )
 end
 
-function CD2DebugMessage( ... )
+function CD2:DebugMessage( ... )
     if !GetConVar( "cd2_enableconsolemessages" ):GetBool() then return end
     print( "Crackdown 2 Console: ", ...)
 end
 
 
 -- Throws the specified equipment to the position. Owned by thrower
-function CD2ThrowEquipment( class, thrower, pos )
+function CD2:ThrowEquipment( class, thrower, pos )
     local grenade = ents.Create( class )
     grenade:SetPos( thrower:GetShootPos() )
     grenade:SetThrower( thrower ) 
@@ -35,7 +35,7 @@ end
 
 local FindByClass = ents.FindByClass
 local table_Add = table.Add
-function CD2GetPossibleSpawns()
+function CD2:GetPossibleSpawns()
     local info_player_starts = FindByClass( "info_player_start" )
     local info_player_teamspawns = FindByClass( "info_player_teamspawn" )
     local info_player_terrorist = FindByClass( "info_player_terrorist" )
@@ -61,10 +61,10 @@ function CD2GetPossibleSpawns()
 end
 
 -- Returns the closest spawn to the player
-function CD2GetClosestSpawn( ply )
+function CD2:GetClosestSpawn( ply )
     local closest
     local dist
-    local spawns = CD2GetPossibleSpawns()
+    local spawns = self:GetPossibleSpawns()
 
     for k, v in ipairs( spawns ) do
         local range = ply:SqrRangeTo( v )
@@ -79,7 +79,7 @@ function CD2GetClosestSpawn( ply )
 end
 
 -- Returns a random CD2 weapon classname
-function CD2GetRandomWeapon()
+function CD2:GetRandomWeapon()
     local weps = {}
 
     for k, v in ipairs( weapons.GetList() ) do
@@ -92,7 +92,7 @@ function CD2GetRandomWeapon()
 end
 
 -- Returns a random CD2 equipment classname
-function CD2GetRandomEquipment()
+function CD2:GetRandomEquipment()
     local equipment = {}
 
     for ClassName, tbl in pairs( scripted_ents.GetList() ) do
@@ -106,7 +106,7 @@ end
 
 -- Find in Sphere function with a filter function
 local FindInSphere = ents.FindInSphere
-function CD2FindInSphere( pos, radius, filter )
+function CD2:FindInSphere( pos, radius, filter )
     local entities = {}
     local find = FindInSphere( pos, radius )
 
@@ -120,7 +120,7 @@ function CD2FindInSphere( pos, radius, filter )
 end
 
 -- Returns the closest entity in the table near target
-function CD2GetClosestInTable( tbl, target )
+function CD2:GetClosestInTable( tbl, target )
     local closest
     local dist 
     for i = 1, #tbl do
@@ -138,28 +138,28 @@ end
 
 
 -- Returns if ply can lock onto ent
-function CD2CanLockOn( ply, ent )
+function CD2:CanLockOn( ply, ent )
     return ( ent:IsCD2NPC() or ent:IsPlayer() and ent:IsCD2Agent() ) and ent != ply and ( ent:GetCD2Team() != ply:GetCD2Team() and ent:GetCD2Team() != "civilian" ) or ent:AlwaysLockon() or false
 end
 
 local ents_FindInCone = ents.FindInCone
 -- Finds targets that the ply can lock onto using their view
-function CD2FindInLockableTragets( ply )
+function CD2:FindInLockableTragets( ply )
     local wep = ply:GetActiveWeapon()
     if !IsValid( wep ) then return {} end
     local entities = {}
-    local cone = ents_FindInCone( CLIENT and CD2_vieworigin or ply:EyePos(), CLIENT and CD2_viewangles:Forward() or ply:EyeAngles():Forward(), ( wep.LockOnRange or 2000 ), 0.99 )
+    local cone = ents_FindInCone( CLIENT and CD2.vieworigin or ply:EyePos(), CLIENT and CD2.viewangles:Forward() or ply:EyeAngles():Forward(), ( wep.LockOnRange or 2000 ), 0.99 )
 
     for i = 1, #cone do
         local ent = cone[ i ]
-        if CD2CanLockOn( ply, ent ) and ( CLIENT and ply:Trace( CD2_vieworigin, ent:WorldSpaceCenter() ).Entity == ent or SERVER and ply:Visible( ent ) ) then entities[ #entities + 1 ] = ent end
+        if self:CanLockOn( ply, ent ) and ( CLIENT and ply:Trace( CD2.vieworigin, ent:WorldSpaceCenter() ).Entity == ent or SERVER and ply:Visible( ent ) ) then entities[ #entities + 1 ] = ent end
     end
 
     return entities
 end
 
 -- Returns a difficulty number depending on the captured location count
-function CD2GetTacticalLocationDifficulty()
+function CD2:GetTacticalLocationDifficulty()
     local locations = ents.FindByClass( "cd2_locationmarker" )
     local agencylocations = 0
     local totalcount = 0
@@ -187,7 +187,7 @@ function CD2GetTacticalLocationDifficulty()
 end
 
 -- Returns a difficulty number depending on the active beacon count
-function CD2GetBeaconDifficulty()
+function CD2:GetBeaconDifficulty()
     local count = CD2_BeaconCount
     local beacons = ents.FindByClass( "cd2_beacon" )
     local difficulty = 1
@@ -204,7 +204,7 @@ function CD2GetBeaconDifficulty()
 end
 
 -- Removes all NPCs
-function CD2ClearNPCS()
+function CD2:ClearNPCS()
     local ents_ = ents.FindByClass( "cd2_*" )
     for i = 1, #ents_ do
         local v = ents_[ i ]
@@ -213,7 +213,7 @@ function CD2ClearNPCS()
 end
 
 -- Function describes itself
-function CD2CreateSkillGainOrb( pos, ply, skillname, xp, col )
+function CD2:CreateSkillGainOrb( pos, ply, skillname, xp, col )
     local orb = ents.Create( "cd2_skillgainorb" )
     orb:SetPos( pos )
     orb:SetPlayer( ply )
@@ -224,17 +224,17 @@ function CD2CreateSkillGainOrb( pos, ply, skillname, xp, col )
 end
 
 -- Creates a guide entity that spawns trailers that pathfinds from start to endpos
-function CD2CreateGuide( start, endpos )
+function CD2:CreateGuide( start, endpos )
     local ent = ents.Create( "cd2_guidepather" )
     ent:SetPos( start )
     ent:SetGoalPosition( endpos )
     ent:Spawn()
-    CD2DebugMessage( "Created Trailer Guide at ", start, " that ends at ", endpos  )
+    self:DebugMessage( "Created Trailer Guide at ", start, " that ends at ", endpos  )
     return ent
 end
 
 -- Sends a message to a player's or all player's chat
-function CD2SendText( ply, ... )
+function CD2:SendText( ply, ... )
     net.Start( "cd2net_sendtext" )
     net.WriteString( util.TableToJSON( { ... } ) )
     if ply then
@@ -253,7 +253,7 @@ local weaponskillcolor = Color( 0, 225, 255)
 local agilityskillcolor = Color( 0, 255, 0 )
 local strengthskillcolor = Color( 255, 251, 0)
 local explosiveskillcolor = Color( 0, 110, 255 )
-function CD2AssessSkillGainOrbs( victimnpc, damagelog )
+function CD2:AssessSkillGainOrbs( victimnpc, damagelog )
     if victimnpc.cd2_maxskillorbs == 0 then return end -- Do not run for npcs that don't allow skill orbs
 
     for steamid, dmgtbl in pairs( damagelog ) do
@@ -283,7 +283,7 @@ function CD2AssessSkillGainOrbs( victimnpc, damagelog )
                 for i = 1, orbcount do
                     if remaining_orbs <= 0 then break end
                     remaining_orbs = remaining_orbs - 1
-                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Agility", 2, agilityskillcolor )
+                    self:CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Agility", 2, agilityskillcolor )
                 end
             end
 
@@ -292,7 +292,7 @@ function CD2AssessSkillGainOrbs( victimnpc, damagelog )
                 for i = 1, orbcount do
                     if remaining_orbs <= 0 then break end
                     remaining_orbs = remaining_orbs - 1
-                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Weapon", 0.2, weaponskillcolor )
+                    self:CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Weapon", 0.2, weaponskillcolor )
                 end
             end
 
@@ -301,7 +301,7 @@ function CD2AssessSkillGainOrbs( victimnpc, damagelog )
                 for i = 1, orbcount do
                     if remaining_orbs <= 0 then break end
                     remaining_orbs = remaining_orbs - 1
-                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Strength", 1, strengthskillcolor )
+                    self:CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Strength", 1, strengthskillcolor )
                 end
             end
 
@@ -310,7 +310,7 @@ function CD2AssessSkillGainOrbs( victimnpc, damagelog )
                 for i = 1, orbcount do
                     if remaining_orbs <= 0 then break end
                     remaining_orbs = remaining_orbs - 1
-                    CD2CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Explosive", 0.4, explosiveskillcolor )
+                    self:CreateSkillGainOrb( victimnpc:WorldSpaceCenter(), ply, "Explosive", 0.4, explosiveskillcolor )
                 end
             end
 
@@ -320,7 +320,7 @@ end
 --
 
 -- Sends a message to a player or players via the Text Box
-function CD2SendTextBoxMessage( ply, text )
+function CD2:SendTextBoxMessage( ply, text )
     net.Start( "cd2net_sendtextboxmessage" ) 
     net.WriteString( text )
     if !ply then 
@@ -331,7 +331,7 @@ function CD2SendTextBoxMessage( ply, text )
 end
 
 local RandomPairs = RandomPairs
-function CD2GetClosestNavAreas( pos, dist )
+function CD2:GetClosestNavAreas( pos, dist )
     local navareas = navmesh.GetAllNavAreas()
     local areas = {} 
     for i = 1, #navareas do
@@ -344,7 +344,7 @@ function CD2GetClosestNavAreas( pos, dist )
 end
 
 -- Returns a list of nav areas that are specifically filtered
-function CD2GetNavmeshFiltered()
+function CD2:GetNavmeshFiltered()
     local navareas = navmesh.GetAllNavAreas()
     local areas = {} 
     for i = 1, #navareas do
@@ -360,8 +360,8 @@ local TraceHull = util.TraceHull
 local hulltrace = {}
 
 -- Returns a random position on the navmesh
-function CD2GetRandomPos( dist, pos ) 
-    local areas = dist and CD2GetClosestNavAreas( pos, dist ) or CD2GetNavmeshFiltered()
+function CD2:GetRandomPos( dist, pos ) 
+    local areas = dist and self:GetClosestNavAreas( pos, dist ) or self:GetNavmeshFiltered()
     
     for k, v in RandomPairs( areas ) do
         if IsValid( v ) then
@@ -379,7 +379,7 @@ end
 
 if SERVER then
     -- Sets the text to type in the middle of the player's screen
-    function CD2SetTypingText( ply, top, bottom, isred )
+    function CD2:SetTypingText( ply, top, bottom, isred )
         net.Start( "cd2net_sendtypingtext" )
         net.WriteString( top )
         net.WriteString( bottom )
@@ -388,7 +388,7 @@ if SERVER then
     end
 
     -- Pings a location on a Player's minimap or intel console
-    function CD2PingLocation( ply, id, pos, times, persist, pingintelconsole )
+    function CD2:PingLocation( ply, id, pos, times, persist, pingintelconsole )
         net.Start( "cd2net_pinglocation" )
         net.WriteVector( pos )
         net.WriteString( id or "" )
@@ -399,7 +399,7 @@ if SERVER then
     end
 
     -- Removes a persistent ping
-    function CD2RemovePingLocation( ply, id )
+    function CD2:RemovePingLocation( ply, id )
         net.Start( "cd2net_removeping" )
         net.WriteString( id )
         if !ply then net.Broadcast() else net.Send( ply ) end
@@ -408,36 +408,36 @@ end
 
 
 -- Returns if the server is currently running Keys to the city mode
-function KeysToTheCity()
+function CD2:KeysToTheCity()
     return GetConVar( "cd2_keystothecitymode" ):GetBool()
 end
 
 -- Returns if the map is the pacific city map
-function InPacificCity()
+--[[ function InPacificCity()
     return game.GetMap() == "cd2_pacificcity_remap"
-end
+end ]]
 
 -- Quick test functions
 
-function CD2QuickSpawnCellNPC()
+function CD2:QuickSpawnCellNPC()
     local ent = ents.Create( "cd2_smgcellsoldier" )
     ent:SetPos( Entity( 1 ):GetEyeTrace().HitPos )
     ent:Spawn()
 end
 
-function CD2QuickSpawnCivilianNPC()
+function CD2:QuickSpawnCivilianNPC()
     local ent = ents.Create( "cd2_civilian" )
     ent:SetPos( Entity( 1 ):GetEyeTrace().HitPos )
     ent:Spawn()
 end
 
-function CD2QuickSpawnPeaceKeeperNPC()
+function CD2:QuickSpawnPeaceKeeperNPC()
     local ent = ents.Create( "cd2_peacekeeper" )
     ent:SetPos( Entity( 1 ):GetEyeTrace().HitPos )
     ent:Spawn()
 end
 
-function CD2QuickSpawnFreakNPC()
+function CD2:QuickSpawnFreakNPC()
     local ent = ents.Create( "cd2_freakslinger" )
     ent:SetDangerLevel( 1 )
     ent:SetPos( Entity( 1 ):GetEyeTrace().HitPos )

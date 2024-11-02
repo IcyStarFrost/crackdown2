@@ -97,23 +97,23 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
         if IsValid( ragdoll ) and ply:Alive() and ply:GetIsStunned() and shouldoverride then
             lastpos = ragdoll:GetPos()
 
-            CD2_ViewOverride = function( ply2, origin, angles, fov, znear, zfar )
+            CD2.ViewOverride = function( ply2, origin, angles, fov, znear, zfar )
                 if !IsValid( ragdoll ) or CD2_InSpawnPointMenu then return end
 
                 viewtrace.start = ( ragdoll:GetPos() + Vector( 0, 0, 18 ) )
-                viewtrace.endpos = ( ( ragdoll:GetPos() + Vector( 0, 0, 18 ) ) - CD2_viewangles:Forward() * 130 )
+                viewtrace.endpos = ( ( ragdoll:GetPos() + Vector( 0, 0, 18 ) ) - CD2.viewangles:Forward() * 130 )
                 viewtrace.filter = { ply, ragdoll }
                 local result = Trace( viewtrace )
                 local pos = result.HitPos - result.Normal * 8
 
-                CD2_lockonoffset = LerpVector( 20 * FrameTime(), CD2_lockonoffset, zerovec )
-                CD2_fieldofview = Lerp( 20 * FrameTime(), CD2_fieldofview, fov )
+                CD2.lockonoffset = LerpVector( 20 * FrameTime(), CD2.lockonoffset, zerovec )
+                CD2.fieldofview = Lerp( 20 * FrameTime(), CD2.fieldofview, fov )
 
 
-                CD2_vieworigin = pos
+                CD2.vieworigin = pos
                 calctable.origin = pos
-                calctable.angles = CD2_viewangles
-                calctable.fov = CD2_fieldofview
+                calctable.angles = CD2.viewangles
+                calctable.fov = CD2.fieldofview
                 calctable.znear = znear
                 calctable.zfar = zfar
 
@@ -122,7 +122,7 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
 
             shouldoverride = false
         elseif ( !ply:GetIsStunned() or !ply:Alive() ) and !shouldoverride then 
-            CD2_ViewOverride = nil
+            CD2.ViewOverride = nil
             shouldoverride = true
         end
 

@@ -103,7 +103,7 @@ if SERVER then
             end
         end
 
-        CD2GenerateMapData( true )
+        CD2:GenerateMapData( true )
 
         for k, ply in ipairs( player.GetAll() ) do
             timer.Simple( 0.01, function()

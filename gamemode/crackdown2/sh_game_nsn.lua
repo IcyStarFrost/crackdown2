@@ -138,7 +138,7 @@ if SERVER then
 
         -- Cell --
             if GetCellCount() < CD2_MaxCell and CurTime() > CD2_NextCellSpawn then
-                local npcs = difficultynpcs[ CD2GetTacticalLocationDifficulty() ]
+                local npcs = difficultynpcs[ CD2:GetTacticalLocationDifficulty() ]
                 local lead = SpawnNPC( nil, npcs[ random( #npcs ) ], GetRandomPlayer() )
 
                 if IsValid( lead ) and GetCellCount() < CD2_MaxCell then
@@ -168,7 +168,7 @@ if SERVER then
             CD2_NextFreakSpawn = CurTime() + rand( 0.1, 2 )
         elseif CD2IsDay() and !limitfreakkill then
 
-            CD2CreateThread( function()
+            CD2:CreateThread( function()
                 coroutine.wait( 3 )
                 local freaks = GetFreaks()
                 for i = 1, #freaks do

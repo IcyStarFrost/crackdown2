@@ -82,7 +82,7 @@ function ENT:Initialize()
         hook.Add( "PreDrawEffects", self, function()
 
             if self:GetIsCharging() then
-                local nearby = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" end )
+                local nearby = CD2:FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" end )
 
                 for i = 1, #nearby do
                     local freak = nearby[ i ]
@@ -124,9 +124,9 @@ function ENT:Initialize()
                     self.SunDistance = Lerp( self.cd2_currentbeamlerp / time, self.SunDistance, 1500 )
                 end
 
-                local dist_mult = -clamp( CD2_vieworigin:Distance( pos ) / self.SunDistance, 0, 1 ) + 1
+                local dist_mult = -clamp( CD2.vieworigin:Distance( pos ) / self.SunDistance, 0, 1 ) + 1
             
-                DrawSunbeams( self.SunBeamDark, dist_mult * self.SunBeamMult * ( math.Clamp( CD2_viewangles:Forward():Dot( ( pos - CD2_vieworigin ):GetNormalized() ) - 0.5, 0, 1 ) * 2 ) ^ 5, self.SunSize, screen.x / ScrW(), screen.y / ScrH() )
+                DrawSunbeams( self.SunBeamDark, dist_mult * self.SunBeamMult * ( math.Clamp( CD2.viewangles:Forward():Dot( ( pos - CD2.vieworigin ):GetNormalized() ) - 0.5, 0, 1 ) * 2 ) ^ 5, self.SunSize, screen.x / ScrW(), screen.y / ScrH() )
             cam.End2D()
         end )
         
@@ -206,7 +206,7 @@ local difficultydividers = {
 
 function ENT:OnBeaconTakeDamage( info )
     self:EmitSound( "physics/metal/metal_box_impact_bullet" .. random( 1, 3 ) .. ".wav", 80, 100, 1 ) 
-    local divide = difficultydividers[ CD2GetBeaconDifficulty() ]
+    local divide = difficultydividers[ CD2:GetBeaconDifficulty() ]
     self:SetBeaconHealth( self:GetBeaconHealth() - ( info:GetDamage() / divide ) )
 end
 
@@ -240,8 +240,8 @@ function ENT:OnLand()
         net.WriteBool( true )
         net.Broadcast()
 
-        if !KeysToTheCity() then
-            local nearbyplayers = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2Agent() end )
+        if !CD2:KeysToTheCity() then
+            local nearbyplayers = CD2:FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2Agent() end )
 
             
             for k, v in ipairs( nearbyplayers ) do 
@@ -291,13 +291,13 @@ function ENT:OnBeamStart()
         local players = player.GetAll()
         for i = 1, #players do 
             local ply = players[ i ]
-            if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2SendTextBoxMessage( ply, "Protect the Beacon" ) end
+            if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2:SendTextBoxMessage( ply, "Protect the Beacon" ) end
         end
 
-        if !KeysToTheCity() then
+        if !CD2:KeysToTheCity() then
             timer.Simple( 2, function()
                 if !IsValid( self ) then return end
-                local nearbyplayers = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2Agent() end )
+                local nearbyplayers = CD2:FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2Agent() end )
 
                 for k, v in ipairs( nearbyplayers ) do 
                     if IsValid( v ) then
@@ -311,7 +311,7 @@ function ENT:OnBeamStart()
         
         
 
-        CD2CreateThread( function() 
+        CD2:CreateThread( function() 
 
             coroutine.wait( 0.5 )
             if !IsValid( self ) then return end
@@ -378,7 +378,7 @@ function ENT:OnBeaconDestroyed()
         local players = player.GetAll()
         for i = 1, #players do 
             local ply = players[ i ]
-            if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2SetTypingText( ply, "OBJECTIVE INCOMPLETE", "Beacon Destroyed", true ) ply:Kill() end
+            if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2:SetTypingText( ply, "OBJECTIVE INCOMPLETE", "Beacon Destroyed", true ) ply:Kill() end
         end
 
         timer.Simple( 7, function() if IsValid( self ) then self:Remove() end end )
@@ -414,11 +414,11 @@ function ENT:BeaconDetonate()
 
         hook.Run( "CD2_BeaconDetonate", self )
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             coroutine.wait( 2 )
 
-            local near = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return !ent:IsPlayer() end )
+            local near = CD2:FindInSphere( self:GetPos(), 2000, function( ent ) return !ent:IsPlayer() end )
 
             for i = 1, #near do
                 local ent = near[ i ]
@@ -445,32 +445,32 @@ function ENT:BeaconDetonate()
 
         if LocalPlayer():GetPos():DistToSqr( self:GetPos() ) > ( 2500 * 2500 ) then return end
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
             coroutine.wait( 2 ) 
             LocalPlayer():ScreenFade( SCREENFADE.IN, color_white, 2, 1 )
         end )
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             if self.cd2_beaconmusic and self.cd2_beaconmusic:IsValid() then self.cd2_beaconmusic:FadeOut() end
 
             CD2StartMusic( "sound/crackdown2/music/beacon_victory.mp3", 605 )
 
-            CD2_PreventMovement = true
-            CD2_DrawAgilitySkill = false
-            CD2_DrawFirearmSkill = false
-            CD2_DrawStrengthSkill = false
-            CD2_DrawExplosiveSkill = false
+            CD2.PreventMovement = true
+            CD2.DrawAgilitySkill = false
+            CD2.DrawFirearmSkill = false
+            CD2.DrawStrengthSkill = false
+            CD2.DrawExplosiveSkill = false
 
-            CD2_DrawTargetting = false
-            CD2_DrawHealthandShields = false
-            CD2_DrawWeaponInfo = false
-            CD2_DrawMinimap = false
-            CD2_DrawBlackbars = true
+            CD2.DrawTargetting = false
+            CD2.DrawHealthandShields = false
+            CD2.DrawWeaponInfo = false
+            CD2.DrawMinimap = false
+            CD2.DrawBlackbars = true
 
             
             local lerpup = true
             local pos = self:GetPos() + Vector( math.sin( SysTime() ) * 2000, math.cos( SysTime() ) * 2000, 1000 )
-            CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+            CD2.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
 
                 if lerpup then
                     self.SunBeamMult = Lerp( 1 * FrameTime(), self.SunBeamMult, 3 )
@@ -498,23 +498,23 @@ function ENT:BeaconDetonate()
 
             coroutine.wait( 2 )
             
-            CD2_PreventMovement = nil
-            CD2_ViewOverride = nil
+            CD2.PreventMovement = nil
+            CD2.ViewOverride = nil
 
-            CD2_DrawAgilitySkill = true
-            CD2_DrawFirearmSkill = true
-            CD2_DrawStrengthSkill = true
-            CD2_DrawExplosiveSkill = true
+            CD2.DrawAgilitySkill = true
+            CD2.DrawFirearmSkill = true
+            CD2.DrawStrengthSkill = true
+            CD2.DrawExplosiveSkill = true
 
-            CD2_DrawTargetting = true
-            CD2_DrawHealthandShields = true
-            CD2_DrawWeaponInfo = true
-            CD2_DrawMinimap = true
-            CD2_DrawBlackbars = false
+            CD2.DrawTargetting = true
+            CD2.DrawHealthandShields = true
+            CD2.DrawWeaponInfo = true
+            CD2.DrawMinimap = true
+            CD2.DrawBlackbars = false
 
-            if !KeysToTheCity() and !CD2FILESYSTEM:ReadPlayerData( "cd2_firstbeacon" ) then
+            if !CD2:KeysToTheCity() and !CD2:ReadPlayerData( "cd2_firstbeacon" ) then
                 sound.PlayFile( "sound/crackdown2/vo/agencydirector/firstbeacon_achieve.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
-                CD2FILESYSTEM:WritePlayerData( "cd2_firstbeacon", true )
+                CD2:WritePlayerData( "cd2_firstbeacon", true )
             end
 
 
@@ -598,7 +598,7 @@ function ENT:BeginBeaconCharge()
 
         local aborttime = CurTime() + 10
         local limitwarning = false
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
             while true do 
                 if !IsValid( self ) or !self:GetIsCharging() then return end
                 local players = player.GetAll()
@@ -609,10 +609,10 @@ function ENT:BeginBeaconCharge()
                     if player:IsCD2Agent() and player:SqrRangeTo( self ) < ( 2000 * 2000 ) and player:Alive() then playernear = true break end
                 end
 
-                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2PingLocation( nil, self:GetPos() ) CD2SendTextBoxMessage( nil, "Return to the Beacon!" ) limitwarning = true end end
+                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2:PingLocation( nil, self:GetPos() ) CD2:SendTextBoxMessage( nil, "Return to the Beacon!" ) limitwarning = true end end
 
                 if CurTime() > aborttime then
-                    CD2PingLocation( nil, nil, self:GetPos(), 6 )
+                    CD2:PingLocation( nil, nil, self:GetPos(), 6 )
                     self:Remove()
                     return
                 end
@@ -713,7 +713,7 @@ function ENT:Think()
             local players = player.GetAll()
             for i = 1, #players do 
                 local ply = players[ i ]
-                if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2SendTextBoxMessage( ply, "25 Percent Charged - Defend the Beacon" ) end
+                if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2:SendTextBoxMessage( ply, "25 Percent Charged - Defend the Beacon" ) end
             end
             self.cd2_25percentway = true
         end
@@ -722,10 +722,10 @@ function ENT:Think()
             local players = player.GetAll()
             for i = 1, #players do 
                 local ply = players[ i ]
-                if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2SendTextBoxMessage( ply, "50 Percent Charged - Defend the Beacon" ) end
+                if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2:SendTextBoxMessage( ply, "50 Percent Charged - Defend the Beacon" ) end
             end
 
-            if !KeysToTheCity() then
+            if !CD2:KeysToTheCity() then
                 for i = 1, #players do 
                     local ply = players[ i ]
                     if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/beaconchargeprogress" .. random( 1, 2 ) .. ".mp3" ) end
@@ -739,14 +739,14 @@ function ENT:Think()
             local players = player.GetAll()
             for i = 1, #players do 
                 local ply = players[ i ]
-                if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2SendTextBoxMessage( ply, "75 Percent Charged - Defend the Beacon" ) end
+                if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then CD2:SendTextBoxMessage( ply, "75 Percent Charged - Defend the Beacon" ) end
             end
             self.cd2_75percentway = true
         end
 
         if self:GetIsCharging() and !self.cd2_damagewarning and self:GetBeaconHealth() < 60 then
             local players = player.GetAll()
-            if !KeysToTheCity() then
+            if !CD2:KeysToTheCity() then
                 for i = 1, #players do 
                     local ply = players[ i ]
                     if IsValid( ply ) and ply:SqrRangeTo( self:GetBeaconPos() ) < ( 2000 * 2000 ) then ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/beacondamaged.mp3" ) end

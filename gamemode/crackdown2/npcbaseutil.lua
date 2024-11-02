@@ -162,8 +162,8 @@ end
 
 -- Checks for any entities we can attack and returns the closest
 function ENT:CheckSightLine()
-    local near = CD2FindInSphere( self:GetPos(), self.cd2_SightDistance, function( ent ) return self:CanAttack( ent ) end )
-    return CD2GetClosestInTable( near, self )
+    local near = CD2:FindInSphere( self:GetPos(), self.cd2_SightDistance, function( ent ) return self:CanAttack( ent ) end )
+    return CD2:GetClosestInTable( near, self )
 end
 
 -- Changes the movement goal position or entity

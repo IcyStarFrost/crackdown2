@@ -6,8 +6,8 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
     ply.cd2_InTutorial = true
 
     pcall( function()
-        CD2CreateThread( function()
-            local spawns = CD2GetPossibleSpawns()
+        CD2:CreateThread( function()
+            local spawns = CD2:GetPossibleSpawns()
             local spawn = spawns[ random( #spawns ) ]
 
             if player_manager.GetPlayerClass( ply ) == "cd2_spectator" then
@@ -41,25 +41,25 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             ply:SendLua( "surface.PlaySound( 'crackdown2/ui/hudactivate.mp3' )")
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2_DrawHealthandShields" )
+            net.WriteString( "CD2.DrawHealthandShields" )
             net.Send( ply )
 
             coroutine.wait( 4.8 )
 
             ply:SendLua( "surface.PlaySound( 'crackdown2/ui/hudactivate.mp3' )")
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2_DrawMinimap" )
+            net.WriteString( "CD2.DrawMinimap" )
             net.Send( ply )
 
             coroutine.wait( 2.3 )
 
             ply:SendLua( "surface.PlaySound( 'crackdown2/ui/hudactivate.mp3' )")
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2_DrawTargetting" )
+            net.WriteString( "CD2.DrawTargetting" )
             net.Send( ply )
 
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2_DrawWeaponInfo" )
+            net.WriteString( "CD2.DrawWeaponInfo" )
             net.Send( ply )
 
             coroutine.wait( 3 )
@@ -76,7 +76,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
                 ply:SetPos( pos )
 
-                CD2CreateThread( function()
+                CD2:CreateThread( function()
                     if !IsValid( ply ) then return end
             
                     for i = 1, 100 do
@@ -103,9 +103,9 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
                 coroutine.wait( 8 )
 
-                guide = CD2CreateGuide( ply:GetPos(), Vector( -1073.387817, 3436.303955, 122.956322 ) )
+                guide = CD2:CreateGuide( ply:GetPos(), Vector( -1073.387817, 3436.303955, 122.956322 ) )
 
-                CD2SendTextBoxMessage( ply, "Jump off the edge" )
+                CD2:SendTextBoxMessage( ply, "Jump off the edge" )
                 
                 ply:Freeze( false )
             end
@@ -135,23 +135,23 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             coroutine.wait( 14 ) 
 
-            CD2SendTextBoxMessage( ply, "Run to the Agility Orb and collect it" )
+            CD2:SendTextBoxMessage( ply, "Run to the Agility Orb and collect it" )
 
             ply:Freeze( false )
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2_DrawAgilitySkill" )
+            net.WriteString( "CD2.DrawAgilitySkill" )
             net.Send( ply )
 
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag5.mp3" ) 
 
-            local pos = !InPacificCity() and CD2GetRandomPos( 3000, ply:GetPos() ) or Vector( -519.097351, 3134.323486, 349.921356 )
+            local pos = !InPacificCity() and CD2:GetRandomPos( 3000, ply:GetPos() ) or Vector( -519.097351, 3134.323486, 349.921356 )
             
             local agilityorb = ents.Create( "cd2_agilityorb" )
             agilityorb:SetPos( pos )
             agilityorb:SetLevel( 1 )
             agilityorb:Spawn()
 
-            local guide = CD2CreateGuide( ply:GetPos(), agilityorb:GetPos() )
+            local guide = CD2:CreateGuide( ply:GetPos(), agilityorb:GetPos() )
 
             coroutine.wait( 8 )
 
@@ -168,14 +168,14 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             coroutine.wait( 7 ) 
 
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2_DrawFirearmSkill" )
+            net.WriteString( "CD2.DrawFirearmSkill" )
             net.Send( ply )
 
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag6.mp3" ) 
 
-            pos = !InPacificCity() and CD2GetRandomPos( 3000, ply:GetPos() ) or Vector( 2770.546875, 958.698730, 153.634186 )
+            pos = !InPacificCity() and CD2:GetRandomPos( 3000, ply:GetPos() ) or Vector( 2770.546875, 958.698730, 153.634186 )
 
-            local guide = CD2CreateGuide( ply:GetPos(), pos )
+            local guide = CD2:CreateGuide( ply:GetPos(), pos )
 
             local rifle = ents.Create( "cd2_assaultrifle" )
             rifle:SetPos( pos + Vector( 0, 0, 5 ) )
@@ -183,7 +183,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             rifle.cd2_reservedplayer = ply
             rifle:Spawn()
 
-            CD2SendTextBoxMessage( ply, "Follow the trail to the weapon provided" )
+            CD2:SendTextBoxMessage( ply, "Follow the trail to the weapon provided" )
 
             while !IsValid( rifle:GetOwner() ) do coroutine.yield() end
 
@@ -195,9 +195,9 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             coroutine.wait( 14 )
 
-            pos = !InPacificCity() and CD2GetRandomPos( 500, ply:GetPos() ) or Vector( 2862.898682, 775.964539, 71.023209 )
+            pos = !InPacificCity() and CD2:GetRandomPos( 500, ply:GetPos() ) or Vector( 2862.898682, 775.964539, 71.023209 )
             
-            local guide = CD2CreateGuide( ply:GetPos(), pos )
+            local guide = CD2:CreateGuide( ply:GetPos(), pos )
 
             local ent = ents.Create( "cd2_freak" )
             ent:SetPos( pos )
@@ -215,10 +215,10 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             coroutine.wait( 5 )
 
-            CD2SendTextBoxMessage( ply, "Hold your secondary fire while looking at the freak to lock onto it. While locked on, move your mouse up to target the head and move your mouse back down to return to the body" )
+            CD2:SendTextBoxMessage( ply, "Hold your secondary fire while looking at the freak to lock onto it. While locked on, move your mouse up to target the head and move your mouse back down to return to the body" )
             ply:SetCanUseLockon( true )
 
-            local guide = CD2CreateGuide( ply:GetPos(), pos )
+            local guide = CD2:CreateGuide( ply:GetPos(), pos )
 
             local ent = ents.Create( "cd2_freak" )
             ent:SetPos( pos )
@@ -235,7 +235,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             pos = InPacificCity() and Vector( 2770.546875, 958.698730, 153.634186 ) or nil
             local trace = ply:Trace( ply:WorldSpaceCenter(), ply:GetPos() + ply:GetForward() * 400 ).HitPos
 
-            local guide = CD2CreateGuide( ply:GetPos(), pos or trace )
+            local guide = CD2:CreateGuide( ply:GetPos(), pos or trace )
 
             local shotgun = ents.Create( "cd2_shotgun" )
             shotgun:SetPos( pos or trace )
@@ -245,7 +245,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             while !IsValid( shotgun:GetOwner() ) do coroutine.yield() end
 
-            CD2SendTextBoxMessage( ply, "Move your mouse wheel to switch to your secondary" )
+            CD2:SendTextBoxMessage( ply, "Move your mouse wheel to switch to your secondary" )
 
             if IsValid( guide ) then guide:Remove() end
 
@@ -256,7 +256,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             coroutine.wait( 8 )
             local freaks = {}
             for i = 1, 4 do
-                pos = CD2GetRandomPos( 500, ply:GetPos() )
+                pos = CD2:GetRandomPos( 500, ply:GetPos() )
                 local ent = ents.Create( "cd2_freak" )
                 ent:SetPos( pos )
                 ent:AttackTarget( ply )
@@ -264,7 +264,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
                 ent:Spawn()
             end
 
-            CD2SendTextBoxMessage( ply, "Kill all Freaks" )
+            CD2:SendTextBoxMessage( ply, "Kill all Freaks" )
 
             while true do
                 local shouldbreak = true
@@ -288,9 +288,9 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag10_finish.mp3" ) 
 
-            pos = !InPacificCity() and CD2GetRandomPos( 3000, ply:GetPos() ) or Vector( 1939.180298, -800.069397, 126.819649 )
+            pos = !InPacificCity() and CD2:GetRandomPos( 3000, ply:GetPos() ) or Vector( 1939.180298, -800.069397, 126.819649 )
 
-            local guide = CD2CreateGuide( ply:GetPos(), pos )
+            local guide = CD2:CreateGuide( ply:GetPos(), pos )
 
             coroutine.wait( 3 )
 
@@ -301,16 +301,16 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/diag11.mp3" ) 
 
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2_DrawStrengthSkill" )
+            net.WriteString( "CD2.DrawStrengthSkill" )
             net.Send( ply )
 
             coroutine.wait( 8 )
 
             ply:SetCanUseMelee( true )
 
-            CD2SendTextBoxMessage( ply, "Hold USE key and press your attack/fire button to melee" )
+            CD2:SendTextBoxMessage( ply, "Hold USE key and press your attack/fire button to melee" )
 
-            pos = CD2GetRandomPos( 500, ply:GetPos() )
+            pos = CD2:GetRandomPos( 500, ply:GetPos() )
 
             local ent = ents.Create( "cd2_freak" )
             ent:SetPos( pos )
@@ -327,7 +327,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             local freaks = {}
             for i = 1, 7 do
-                pos = CD2GetRandomPos( 500, ply:GetPos() )
+                pos = CD2:GetRandomPos( 500, ply:GetPos() )
                 local ent = ents.Create( "cd2_freak" )
                 ent:SetPos( pos )
                 ent:AttackTarget( ply )
@@ -350,7 +350,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             ply:SetCanUseMelee( false )
 
             net.Start( "cd2net_tutorial_activatehud" )
-            net.WriteString( "CD2_DrawExplosiveSkill" )
+            net.WriteString( "CD2.DrawExplosiveSkill" )
             net.Send( ply )
 
 
@@ -359,7 +359,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             local pos = InPacificCity() and Vector( 2254.297119, -975.715820, 153.978546 )
             local trace = ply:Trace( ply:WorldSpaceCenter(), ply:GetPos() + ply:GetForward() * 400 ).HitPos
 
-            local guide = CD2CreateGuide( ply:GetPos(), pos or trace )
+            local guide = CD2:CreateGuide( ply:GetPos(), pos or trace )
 
             local grenade = ents.Create( "cd2_grenade" )
             grenade:SetPos( pos or trace )
@@ -369,7 +369,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             
             while IsValid( grenade ) do coroutine.yield() end
 
-            CD2SendTextBoxMessage( ply, "Bind a key to +grenade1 and press that key to throw grenades. Example console command, bind g +grenade1" )
+            CD2:SendTextBoxMessage( ply, "Bind a key to +grenade1 and press that key to throw grenades. Example console command, bind g +grenade1" )
 
             if IsValid( guide ) then guide:Remove() end
 
@@ -379,10 +379,10 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             coroutine.wait( 8 )
 
-            CD2SendTextBoxMessage( ply, "Press your +grenade1 bind/key to throw a grenade" )
+            CD2:SendTextBoxMessage( ply, "Press your +grenade1 bind/key to throw a grenade" )
 
             local freaks = {}
-            pos = !InPacificCity() and CD2GetRandomPos( 500, ply:GetPos() ) or Vector( 1807.129517, -1427.410889, -35.290722 )
+            pos = !InPacificCity() and CD2:GetRandomPos( 500, ply:GetPos() ) or Vector( 1807.129517, -1427.410889, -35.290722 )
             
             for i = 1, 5 do
                 local ent = ents.Create( "cd2_freak" )
@@ -425,7 +425,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             cam:SetPlayer( ply )
             cam:Spawn()
 
-            if !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then CD2GenerateMapData( true ) end
+            if !GetGlobal2Bool( "cd2_MapDataLoaded", false ) then CD2:GenerateMapData( true ) end
 
             coroutine.wait( 3 )
 
@@ -443,7 +443,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             net.Send( ply )
 
             local locationpos = GetGlobal2Vector( "cd2_beginnerlocation" )
-            local playerspawnpos = CD2GetRandomPos( 2000, locationpos )
+            local playerspawnpos = CD2:GetRandomPos( 2000, locationpos )
             local ang = ( locationpos - playerspawnpos ):Angle() ang[ 1 ] = 0 ang[ 3 ] = 0
 
             ply:SetCanUseLockon( true )
@@ -483,7 +483,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             coroutine.wait( 9 )
 
-            CD2PingLocation( ply, nil, GetGlobal2Vector( "cd2_beginnerlocation" ), 3, nil, true )
+            CD2:PingLocation( ply, nil, GetGlobal2Vector( "cd2_beginnerlocation" ), 3, nil, true )
 
             coroutine.wait( 9 )
 
@@ -494,12 +494,12 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             coroutine.wait( 5 )
 
-            CD2FILESYSTEM:WritePlayerData( ply, "c_completedtutorial", 3, nil, true )
+            CD2:WritePlayerData( ply, "c_completedtutorial", 3, nil, true )
 
             ply:Freeze( false )
             ply.cd2_godmode = false
 
-            CD2PingLocation( ply, nil, GetGlobal2Vector( "cd2_beginnerlocation" ), 3 )
+            CD2:PingLocation( ply, nil, GetGlobal2Vector( "cd2_beginnerlocation" ), 3 )
 
             while !CD2_BeginnerLocation:GetIsActive() do coroutine.yield() end
 
@@ -511,11 +511,11 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             local wait = true
 
-            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firsttacticallocation", function( val ) 
+            CD2:RequestPlayerData( ply, "cd2_firsttacticallocation", function( val ) 
 
                 if !val then
                     ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firsttacticallocation_achieve.mp3" )
-                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firsttacticallocation", true )
+                    CD2:WritePlayerData( ply, "cd2_firsttacticallocation", true )
                     timer.Simple( 6, function() wait = false end )
                 else
                     wait = false
@@ -530,10 +530,10 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             local aupos
             
             while true do 
-                local near = CD2FindInSphere( ply:GetPos(), 3000, function( ent ) return ent:GetClass() == "cd2_au" end )
+                local near = CD2:FindInSphere( ply:GetPos(), 3000, function( ent ) return ent:GetClass() == "cd2_au" end )
 
                 if #near > 0 then
-                    local au = CD2GetClosestInTable( near, ply )
+                    local au = CD2:GetClosestInTable( near, ply )
                     aupos = au:GetPos()
                     break
                 end
@@ -553,7 +553,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
 
             coroutine.wait( 8 )
 
-            CD2PingLocation( ply, nil, aupos, 3, nil, true )
+            CD2:PingLocation( ply, nil, aupos, 3, nil, true )
 
             coroutine.wait( 7 )
 

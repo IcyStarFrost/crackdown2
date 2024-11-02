@@ -58,7 +58,7 @@ function ENT:Initialize2()
         net.WriteBool( false  )
         net.Broadcast()
 
-        self:SetDangerLevel( math.Clamp( CD2GetBeaconDifficulty(), 1, 3 ) )
+        self:SetDangerLevel( math.Clamp( CD2:GetBeaconDifficulty(), 1, 3 ) )
 
         self:Hook( "EntityEmitSound", "hearing", function( snddata )
             if IsValid( self:GetEnemy() ) then return end
@@ -201,7 +201,7 @@ end
 function ENT:Sling()
     if CurTime() < self.cd2_nextattack then return end
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
 
         self:PlayGesture( ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE )
 

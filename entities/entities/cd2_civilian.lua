@@ -164,7 +164,7 @@ function ENT:Think2()
     end
 
     if SERVER and CurTime() > self.cd2_FreakCheck and self:GetState() != "Panicked" then
-        local nearzombies = CD2FindInSphere( self:GetPos(), self.cd2_SightDistance, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" and self:Visible( ent ) end )
+        local nearzombies = CD2:FindInSphere( self:GetPos(), self.cd2_SightDistance, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" and self:Visible( ent ) end )
         
 
         if #nearzombies > 0 and !self:GetIsPanicked() then

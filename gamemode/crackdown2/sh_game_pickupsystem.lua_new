@@ -21,38 +21,31 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
         if !ply:IsCD2Agent() or ply:GetIsStunned() or !IsValid( ply:GetActiveWeapon() ) then continue end
 
         local near = CD2:FindInSphere( ply:GetPos(), 100, function( ent ) return ( isphysics[ ent:GetClass() ] or ent.cd2_allowpickup ) and ent:GetNW2Int( "cd2_mass", math.huge ) < ply:GetMaxPickupWeight() and ply:Visible( ent ) and ent:SqrRangeTo( ply ) < ( 100 * 100 ) and IsValid( ent:GetPhysicsObject() ) and ent:GetPhysicsObject():IsMotionEnabled() end )
-        
-        if ( !ply.cd2_meleecooldown or CurTime() > ply.cd2_meleecooldown ) then
-            ply:SetNW2Entity( "cd2_pickuptarget", CD2:GetClosestInTable( near, ply ) )
-        else
-            ply:SetNW2Entity( "cd2_pickuptarget", nil )
+        local closest = CD2:GetClosestInTable( near, ply )
+        if IsValid( closest ) and !CD2HasInput( ply, closest ) and !closest.cd2_held then
+            CD2AdjustInput( ply, true, "pickup", closest, "+use", "Hold to pickup/drop object", 100, function( ent )
+                CD2AdjustInput( ply, false, "pickup", closest )
+                ply:GetActiveWeapon():EnterPickupMode()
+    
+                ent:SetPos( ply:HandsPos() )
+                ent:SetAngles( ply:HandsAngles() )
+                ent.cd2_held = true
+    
+                if !ent:IsRagdoll() then
+                    ent:SetParent( ply, ply:LookupAttachment( "anim_attachment_RH" ) )
+                end
+    
+                ent:SetOwner( ply )
+                ent:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
+                ent:Use( ply, ply, USE_TOGGLE )
+    
+                ply:SetNW2Bool( "cd2_isholdingent", true )
+                ply.cd2_HeldObject = ent
+                ply.cd2_PickupDelay = math.huge -- Prevent the delayed code from running again until the use key is lifted
+            end )
         end
 
-
-        -- Held key
-        if ply:KeyDown( IN_USE ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) then ply.cd2_PickupDelay = ply.cd2_PickupDelay or CurTime() + 1 else ply.cd2_PickupDelay = nil end
-
-        -- Pickup a new object
-        if !IsValid( ply.cd2_HeldObject ) and CurTime() > ply:GetNW2Float( "cd2_weapondrawcur", 0 ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) and ( ply.cd2_PickupDelay and CurTime() > ply.cd2_PickupDelay ) then
-            ply:GetActiveWeapon():EnterPickupMode()
-            local ent = ply:GetNW2Entity( "cd2_pickuptarget", nil )
-
-            ent:SetPos( ply:HandsPos() )
-            ent:SetAngles( ply:HandsAngles() )
-
-            if !ent:IsRagdoll() then
-                ent:SetParent( ply, ply:LookupAttachment( "anim_attachment_RH" ) )
-            end
-
-            ent:SetOwner( ply )
-            ent:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
-            ent:Use( ply, ply, USE_TOGGLE )
-
-            ply:SetNW2Bool( "cd2_isholdingent", true )
-            ply.cd2_HeldObject = ent
-            ply.cd2_PickupDelay = math.huge -- Prevent the delayed code from running again until the use key is lifted
-
-        elseif IsValid( ply.cd2_HeldObject ) and ( ply.cd2_PickupDelay and CurTime() > ply.cd2_PickupDelay or !ply:Alive() ) then -- Drop the held object
+        if IsValid( ply.cd2_HeldObject ) and ( ply.cd2_PickupDelay and CurTime() > ply.cd2_PickupDelay or !ply:Alive() ) then -- Drop the held object
 
             local ent = ply.cd2_HeldObject
             ent:SetParent()
@@ -67,6 +60,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
             if IsValid( ply:GetActiveWeapon() ) then ply:GetActiveWeapon():ExitPickupMode() end
             ply.cd2_HeldObject = nil
             ply.cd2_PickupDelay = math.huge -- Prevent the delayed code from running again until the use key is lifted
+            ent.cd2_held = false
 
         elseif IsValid( ply.cd2_HeldObject ) and ply:KeyPressed( IN_ATTACK ) and !ply:KeyDown( IN_USE ) then -- Throw the held object
 
@@ -97,6 +91,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
                 end
             end )
             ply.cd2_HeldObject = nil
+            ent.cd2_held = false
         end
 
         -- Code to set ragdoll's position to the player's hands
@@ -120,7 +115,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
 end )
 
 if CLIENT then
-    local input_LookupBinding = input.LookupBinding
+--[[     local input_LookupBinding = input.LookupBinding
     local input_GetKeyCode = input.GetKeyCode
     local input_GetKeyName = input.GetKeyName
 
@@ -139,6 +134,6 @@ if CLIENT then
         
         local screen = ( targ:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
         CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), "Hold to pickup/drop object" )
-    end )
+    end ) ]]
 
 end

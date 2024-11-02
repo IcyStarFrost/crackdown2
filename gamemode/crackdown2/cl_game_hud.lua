@@ -134,14 +134,14 @@ end
 
 
 local uniqueid = 0
-function CD2PingLocationTracker( id, pos, times, persist )
+function CD2:PingLocationTracker( id, pos, times, persist )
     id = id or uniqueid
     ping_locations[ id ] = { pos = pos, ping_scale = 0, times = times, can_ping = true, times_pinged = 0, persist = persist }
     uniqueid = uniqueid + 1
     return id
 end
 
-function CD2RemovePingLocation( id )
+function CD2:RemovePingLocation( id )
     ping_locations[ id ] = nil
 end
 
@@ -150,12 +150,12 @@ local function DrawCoordsOnMiniMap( pos, ang, icon, iconsize, color, fov )
     pos[ 3 ] = 0
     local plypos = LocalPlayer():GetPos() plypos[ 3 ] = 0
     
-    local _, angs = WorldToLocal( pos, Angle( 0, ang[ 2 ], 0 ), LocalPlayer():GetPos(), CD2_viewangles )
+    local _, angs = WorldToLocal( pos, Angle( 0, ang[ 2 ], 0 ), LocalPlayer():GetPos(), CD2.viewangles )
 
     surface.SetDrawColor( color or color_white )
     surface.SetMaterial( icon or playerarrow )
 
-    local vec = WorldVectorToScreen2( pos, plypos, CD2_viewangles[ 2 ] - 90, radius / ( fov * 170 ), radius ) --WorldVectorToScreen( pos, plypos, 0.2, CD2_viewangles[ 2 ] - 90, radius, fov )
+    local vec = WorldVectorToScreen2( pos, plypos, CD2.viewangles[ 2 ] - 90, radius / ( fov * 170 ), radius ) --WorldVectorToScreen( pos, plypos, 0.2, CD2.viewangles[ 2 ] - 90, radius, fov )
     surface.DrawTexturedRectRotated( 200 + vec[ 1 ], ( ScrH() - 200 ) - vec[ 2 ], ScreenScale( iconsize ), ScreenScale( iconsize ), ( angs[ 2 ] ) )
 end
 
@@ -244,21 +244,21 @@ end
 
 CD2_CheapMinimap = true
 
-CD2_DrawTargetting = true -- Draws crosshair and target healthbars
-CD2_DrawHealthandShields = true -- Draws health and shields bars
-CD2_DrawWeaponInfo = true -- Draws weapon info and equipment
-CD2_DrawMinimap = true -- Draws the tracker
-CD2_DrawBlackbars = false -- Draws the top and bottom black bars
+CD2.DrawTargetting = true -- Draws crosshair and target healthbars
+CD2.DrawHealthandShields = true -- Draws health and shields bars
+CD2.DrawWeaponInfo = true -- Draws weapon info and equipment
+CD2.DrawMinimap = true -- Draws the tracker
+CD2.DrawBlackbars = false -- Draws the top and bottom black bars
 
-CD2_DrawAgilitySkill = true
-CD2_DrawFirearmSkill = true
-CD2_DrawStrengthSkill = true
-CD2_DrawExplosiveSkill = true
+CD2.DrawAgilitySkill = true
+CD2.DrawFirearmSkill = true
+CD2.DrawStrengthSkill = true
+CD2.DrawExplosiveSkill = true
 
 hook.Add( "HUDPaint", "crackdown2_hud", function()
     local scrw, scrh, ply = ScrW(), ScrH(), LocalPlayer()
     if CD2_InDropMenu or IsValid( CD2_AgencyConsole ) then RemoveHUDpanels() return end
-    if !CD2_DrawWeaponInfo then RemoveHUDpanels() end
+    if !CD2.DrawWeaponInfo then RemoveHUDpanels() end
 
     if game.GetTimeScale() < 0.90 then
 
@@ -283,7 +283,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
     if CD2_InSpawnPointMenu or !ply:IsCD2Agent() then RemoveHUDpanels() return end
 
-    if CD2_DrawBlackbars then
+    if CD2.DrawBlackbars then
         hlerp1 = hlerp1 or -150
         hlerp2 = hlerp2 or scrh
 
@@ -327,7 +327,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     if !GetConVar( "cd2_drawhud" ):GetBool() then RemoveHUDpanels() return end 
 
     -- Crosshair --
-    if CD2_DrawTargetting then
+    if CD2.DrawTargetting then
         draw.NoTexture()
         surface.SetDrawColor( !CD2_lockon and shadedwhite or red )
         draw_Circle( scrw / 2, scrh / 2, 2, 30 )
@@ -358,15 +358,15 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     
     
     -- Skill Counters --
-    if CD2_DrawAgilitySkill then DrawSkillHex( 130, 170, agilityicon, ply:GetAgilitySkill(), ply:GetAgilityXP(), agilityskillcolor, "Agility" ) end
-    if CD2_DrawFirearmSkill then DrawSkillHex( 130, 170 * 1.5, weaponicon, ply:GetWeaponSkill(), ply:GetWeaponXP(), weaponskillcolor, "Weapon" ) end
-    if CD2_DrawStrengthSkill then DrawSkillHex( 130, 170 * 2, strengthicon, ply:GetStrengthSkill(), ply:GetStrengthXP(), strengthskillcolor, "Strength" ) end
-    if CD2_DrawExplosiveSkill then DrawSkillHex( 130, 170 * 2.5, explosiveicon, ply:GetExplosiveSkill(), ply:GetExplosiveXP(), explosiveskillcolor, "Explosive" ) end
+    if CD2.DrawAgilitySkill then DrawSkillHex( 130, 170, agilityicon, ply:GetAgilitySkill(), ply:GetAgilityXP(), agilityskillcolor, "Agility" ) end
+    if CD2.DrawFirearmSkill then DrawSkillHex( 130, 170 * 1.5, weaponicon, ply:GetWeaponSkill(), ply:GetWeaponXP(), weaponskillcolor, "Weapon" ) end
+    if CD2.DrawStrengthSkill then DrawSkillHex( 130, 170 * 2, strengthicon, ply:GetStrengthSkill(), ply:GetStrengthXP(), strengthskillcolor, "Strength" ) end
+    if CD2.DrawExplosiveSkill then DrawSkillHex( 130, 170 * 2.5, explosiveicon, ply:GetExplosiveSkill(), ply:GetExplosiveXP(), explosiveskillcolor, "Explosive" ) end
     ------
 
 
     -- Health and Shields --
-    if CD2_DrawHealthandShields then
+    if CD2.DrawHealthandShields then
         local hp, shield, maxshields, hpbars = ply:Health(), math.Clamp( ply:Armor(), 0, 100 ), ply:GetMaxArmor(), ( math.ceil( ply:Health() / 100 ) )
 
         hplerp = hplerp == -1 and hp or hplerp
@@ -408,7 +408,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
 
     -- Weapon Info --
-    if CD2_DrawWeaponInfo then
+    if CD2.DrawWeaponInfo then
         local weapon = ply:GetActiveWeapon()
 
         if IsValid( weapon ) then
@@ -534,8 +534,8 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
 
     -- Lock on Entity health bars --
-    if CD2_DrawTargetting then
-        local lockables = CD2FindInLockableTragets( ply )
+    if CD2.DrawTargetting then
+        local lockables = CD2:FindInLockableTragets( ply )
         local target = ply.cd2_lockontarget or lockables[ 1 ]
 
         if IsValid( target ) then 
@@ -553,7 +553,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
 
     -- MiniMap --
-    if CD2_DrawMinimap then
+    if CD2.DrawMinimap then
         local fov = 15
 
         draw.NoTexture()
@@ -568,7 +568,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             end
 
             ping.ping_scale = Lerp( 3.5 * FrameTime(), ping.ping_scale, ping.times > ping.times_pinged and 40 or 20 )
-            DrawCoordsOnMiniMap( ping.pos, CD2_viewangles, pingmat, ping.ping_scale, cellwhite, fov )
+            DrawCoordsOnMiniMap( ping.pos, CD2.viewangles, pingmat, ping.ping_scale, cellwhite, fov )
 
             if ping.can_ping and ping.times > ping.times_pinged then
                 surface.PlaySound( "crackdown2/ui/ping.mp3" )
@@ -584,17 +584,17 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
 
         surface.SetDrawColor( ply:GetPlayerColor():ToColor() )
         surface.SetMaterial( playerarrow )
-        local _, angle = WorldToLocal( Vector(), ply:GetAngles(), ply:GetPos(), CD2_viewangles )
+        local _, angle = WorldToLocal( Vector(), ply:GetAngles(), ply:GetPos(), CD2.viewangles )
         surface.DrawTexturedRectRotated( 200, scrh - 200, ScreenScale( 10 ), ScreenScale( 10 ), angle[ 2 ] )
 
-        local nearbyminimap = CD2FindInSphere( LocalPlayer():GetPos(), 3500, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "cell" end )
+        local nearbyminimap = CD2:FindInSphere( LocalPlayer():GetPos(), 3500, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "cell" end )
 
         -- Cell --
         for i = 1, #nearbyminimap do
             local ent = nearbyminimap[ i ]
             local z = ent:GetPos().z
             local icon = z > ply:GetPos().z + 50 and upicon or z < ply:GetPos().z - 50 and downicon or cellicon
-            DrawCoordsOnMiniMap( ent:GetPos(), CD2_viewangles, icon, 4, ent:GetEnemy() == ply and celltargetred or cellwhite, fov )
+            DrawCoordsOnMiniMap( ent:GetPos(), CD2.viewangles, icon, 4, ent:GetEnemy() == ply and celltargetred or cellwhite, fov )
         end
         --
         
@@ -605,15 +605,15 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             local ent = ents_[ i ]
     
             if IsValid( ent ) and ent:GetClass() == "cd2_locationmarker" and ( ent:SqrRangeTo( LocalPlayer() ) < ( 6000 * 6000 ) or ent:GetLocationType() == "beacon" ) then 
-                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), ent:GetLocationType() == "beacon" and beaconicon or ent:GetLocationType() == "cell" and cell or peacekeeper, ent:GetLocationType() == "beacon" and 20 or 10, ent:GetLocationType() == "cell" and celltargetred or color_white, fov )
+                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2.viewangles[ 2 ], 0 ), ent:GetLocationType() == "beacon" and beaconicon or ent:GetLocationType() == "cell" and cell or peacekeeper, ent:GetLocationType() == "beacon" and 20 or 10, ent:GetLocationType() == "cell" and celltargetred or color_white, fov )
             elseif IsValid( ent ) and ent:GetClass() == "cd2_agencyhelicopter" and ent:SqrRangeTo( LocalPlayer() ) < ( 6000 * 6000 ) then
                 DrawCoordsOnMiniMap( ent:GetPos(), ent:GetAngles(), heloicon, 15, color_white, fov )
             elseif IsValid( ent ) and ent:GetClass() == "cd2_au" and !ent:GetActive() then
-                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), Auicon, 10, color_white, fov )
+                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2.viewangles[ 2 ], 0 ), Auicon, 10, color_white, fov )
             elseif IsValid( ent ) and ent:GetClass() == "cd2_towerbeacon" and !ent:GetIsDetonated() and ent:CanBeActivated() then
-                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), staricon, 10, beaconblue, fov )
+                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2.viewangles[ 2 ], 0 ), staricon, 10, beaconblue, fov )
             elseif IsValid( ent ) and ent:IsCD2NPC() and ent:GetCD2Team() == "freak" and IsValid( ent:GetEnemy() ) and ( ( ent:GetEnemy():GetNWBool( "cd2_beaconpart", false ) or ent:GetEnemy():GetClass() == "cd2_beacon" ) or ( ent:GetEnemy():GetNWBool( "cd2_towerbeaconpart", false ) ) ) then
-                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2_viewangles[ 2 ], 0 ), FreakIcon, 10, color_white, fov )
+                DrawCoordsOnMiniMap( ent:GetPos(), Angle( 0, CD2.viewangles[ 2 ], 0 ), FreakIcon, 10, color_white, fov )
             end
         end
         --
@@ -650,7 +650,7 @@ hook.Add( "PreDrawEffects", "crackdown2_peacekeepericons/cellicons", function()
     if CD2_InDropMenu or !ply:IsCD2Agent() or CD2_InSpawnPointMenu or !ply:Alive() then return end
     
     if CurTime() > next_update_effects then
-        effects_ents = CD2FindInSphere( ply:GetPos(), 1500 )
+        effects_ents = CD2:FindInSphere( ply:GetPos(), 1500 )
         next_update_effects = CurTime() + 0.5
     end
 

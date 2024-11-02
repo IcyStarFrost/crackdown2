@@ -210,7 +210,7 @@ end
 function ENT:Swipe()
     if CurTime() < self.cd2_nextattack then return end
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
         self:PlayGesture( ACT_GMOD_GESTURE_RANGE_ZOMBIE )
         --self:EmitSound( "npc/zombie/zo_attack" .. random( 1, 2 ) .. ".wav", 70, 100, 1, CHAN_VOICE )
         coroutine.wait( 1 )

@@ -39,7 +39,7 @@ function ENT:Initialize()
 
     if SERVER then
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             for i = 1, #self.PathVectors do
                 if !IsValid( self ) then return end

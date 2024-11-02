@@ -14,8 +14,8 @@ function ENT:Initialize()
     self:DrawShadow( false )
 
     if SERVER then
-        self.cd2_cellcount = 2 + ( 2 * CD2GetTacticalLocationDifficulty() )
-        self:SetMaxKillCount( random( 7, 13 ) + ( 2 * CD2GetTacticalLocationDifficulty() ) )
+        self.cd2_cellcount = 2 + ( 2 * CD2:GetTacticalLocationDifficulty() )
+        self:SetMaxKillCount( random( 7, 13 ) + ( 2 * CD2:GetTacticalLocationDifficulty() ) )
         self:SetKillCount( 0 )
         self.cd2_activecell = {}
 
@@ -137,27 +137,27 @@ function ENT:OnActivate( ply )
 
         for k, v in ipairs( player.GetAll() ) do
             if v:SqrRangeTo( self ) > ( 2000 * 2000 ) then continue end
-            CD2SetTypingText( v, "TACTICAL ASSAULT INITIATED", "" )
+            CD2:SetTypingText( v, "TACTICAL ASSAULT INITIATED", "" )
         end
 
 
-        if !KeysToTheCity() and random( 1, 2 ) == 1 then
+        if !CD2:KeysToTheCity() and random( 1, 2 ) == 1 then
             for k, v in ipairs( player.GetAll() ) do
                 if v:SqrRangeTo( self ) > ( 2000 * 2000 ) then continue end
                 v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/celldefend.mp3" )
             end
         end
 
-        local npclist = difficultynpcs[ CD2GetTacticalLocationDifficulty() ]
+        local npclist = difficultynpcs[ CD2:GetTacticalLocationDifficulty() ]
 
-        CD2DebugMessage( ply:Name() .. " Initiated a Tactical Assault on Location Marker ", self )
+        CD2:DebugMessage( ply:Name() .. " Initiated a Tactical Assault on Location Marker ", self )
 
         self:SetIsActive( true )
         sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
 
         local aborttime = CurTime() + 10
         local limitwarning = false
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
             while IsValid( self ) do 
                 if !IsValid( self ) or !self:GetIsActive() then return end
                 local players = player_GetAll()
@@ -168,12 +168,12 @@ function ENT:OnActivate( ply )
                     if player:IsCD2Agent() and player:SqrRangeTo( self ) < ( 2000 * 2000 ) and player:Alive() then playernear = true break end
                 end
 
-                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2PingLocation( nil, nil, self:GetPos(), 3 ) CD2SendTextBoxMessage( nil, "Return to the Tactical Location!" ) limitwarning = true end end
+                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2:PingLocation( nil, nil, self:GetPos(), 3 ) CD2:SendTextBoxMessage( nil, "Return to the Tactical Location!" ) limitwarning = true end end
 
                 if CurTime() > aborttime then
                     self:SetIsActive( false )
                     self:SetKillCount( 0 )
-                    CD2SetTypingText( nil, "Tactical Assault Aborted", "", true )
+                    CD2:SetTypingText( nil, "Tactical Assault Aborted", "", true )
                     return
                 end
 
@@ -181,14 +181,14 @@ function ENT:OnActivate( ply )
             end
         end )
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             while IsValid( self ) and self:GetKillCount() < self:GetMaxKillCount() do
                 if !IsValid( self ) or !self:GetIsActive() then return end
                 
                 if #self.cd2_activecell < self.cd2_cellcount then
                     local cell = ents.Create( npclist[ random( #npclist ) ] )
-                    cell:SetPos( CD2GetRandomPos( 2000, self:GetPos() )  )
+                    cell:SetPos( CD2:GetRandomPos( 2000, self:GetPos() )  )
                     cell:Spawn()
                     cell:CallOnRemove( "removefromactive", function() table_RemoveByValue( self.cd2_activecell, cell ) end )
                     
@@ -232,17 +232,17 @@ function ENT:OnActivate( ply )
                 if location:GetLocationType() == "agency" then agencycount = agencycount + 1 end
             end
 
-            if !KeysToTheCity() and agencycount == locationcount then
+            if !CD2:KeysToTheCity() and agencycount == locationcount then
                 for k, v in ipairs( player.GetAll() ) do
                     v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/alltactical_achieve.mp3" )
                 end
             end
 
-            CD2DebugMessage( self, " Tactical Location was converted to Agency" )
+            CD2:DebugMessage( self, " Tactical Location was converted to Agency" )
 
             for k, v in ipairs( player.GetAll() ) do
                 if v:SqrRangeTo( self ) > ( 2000 * 2000 ) then continue end
-                CD2SetTypingText( v, "OBJECTIVE COMPLETE!", "Cell Tactical Location\nCaptured " .. agencycount .. " of " .. locationcount .. " Tactical Locations" )
+                CD2:SetTypingText( v, "OBJECTIVE COMPLETE!", "Cell Tactical Location\nCaptured " .. agencycount .. " of " .. locationcount .. " Tactical Locations" )
             end
 
         end )
@@ -250,7 +250,7 @@ function ENT:OnActivate( ply )
         net.Start( "cd2net_opendropmenu" )
         net.WriteBool( true )
         net.Send( ply )
-        CD2DebugMessage( ply:Name() .. " Entered resupply from ", self, " Agency Tactical location" )
+        CD2:DebugMessage( ply:Name() .. " Entered resupply from ", self, " Agency Tactical location" )
     end
 
 end
@@ -275,16 +275,16 @@ function ENT:Think()
     if !CD2_EmptyStreets and !self:GetIsActive() and CurTime() > self.cd2_nextpassivespawn and #self.cd2_passivenpcs < self.cd2_maxpassivenpccount and self:VisCheck() then
         
         if self:GetLocationType() == "cell" then
-            local npclist = difficultynpcs[ CD2GetTacticalLocationDifficulty() ]
+            local npclist = difficultynpcs[ CD2:GetTacticalLocationDifficulty() ]
 
             local cell = ents.Create( npclist[ random( #npclist ) ] )
-            cell:SetPos( CD2GetRandomPos( 2000, self:GetPos() )  )
+            cell:SetPos( CD2:GetRandomPos( 2000, self:GetPos() )  )
             cell:Spawn()
             cell:CallOnRemove( "removefrompassive", function() table_RemoveByValue( self.cd2_passivenpcs, cell ) end )
             self.cd2_passivenpcs[ #self.cd2_passivenpcs + 1 ] = cell
         elseif self:GetLocationType() == "agency" then
             local peacekeeper = ents.Create( "cd2_peacekeeper" )
-            peacekeeper:SetPos( CD2GetRandomPos( 2000, self:GetPos() )  )
+            peacekeeper:SetPos( CD2:GetRandomPos( 2000, self:GetPos() )  )
             peacekeeper:Spawn()
             peacekeeper:CallOnRemove( "removefrompassive", function() table_RemoveByValue( self.cd2_passivenpcs, peacekeeper ) end )
             self.cd2_passivenpcs[ #self.cd2_passivenpcs + 1 ] = peacekeeper
@@ -304,7 +304,7 @@ function ENT:Think()
             ply:SetNW2Entity( "cd2_targettacticlelocation", self )
             timer.Create( "cd2_unselecttacticlelocation" .. ply:EntIndex(), 0.6, 1, function() if !IsValid( ply ) then return end ply.cd2_checkweapons = true ply:SetNW2Entity( "cd2_targettacticlelocation", nil ) end )
             
-            if !KeysToTheCity() and self:GetLocationType() == "agency" and ply.cd2_checkweapons then
+            if !CD2:KeysToTheCity() and self:GetLocationType() == "agency" and ply.cd2_checkweapons then
                 net.Start( "cd2net_checkweapons" )
                 net.Send( ply )
                 ply.cd2_checkweapons = false

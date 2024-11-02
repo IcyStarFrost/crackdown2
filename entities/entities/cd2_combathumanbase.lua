@@ -202,11 +202,11 @@ function ENT:MainThink()
 
             -- Use equipment
             if self.cd2_Equipment != "none" and random( 1, 1000 ) == 1 and ( !self.cd2_grenadecooldown or CurTime() > self.cd2_grenadecooldown ) then
-                CD2CreateThread( function()
+                CD2:CreateThread( function()
                     self:AddGesture( ACT_GMOD_GESTURE_ITEM_THROW, true )
                     coroutine.wait( 1 )
                     if !IsValid( self ) or !IsValid( self:GetEnemy() ) then return end
-                    CD2ThrowEquipment( self.cd2_Equipment, self, self:GetEnemy():GetPos() )
+                    CD2:ThrowEquipment( self.cd2_Equipment, self, self:GetEnemy():GetPos() )
                 end )
                 self.cd2_grenadecooldown = CurTime() + rand( 5, 15 )
             end

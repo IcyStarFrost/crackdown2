@@ -98,12 +98,12 @@ function PLAYER:StartLevelUpEffect()
 
     BroadcastLua( "Entity( " .. self:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_GMOD_GESTURE_BOW, true )" )
     
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
         coroutine.wait( 1 )
         if !IsValid( self ) then return end
         BroadcastLua( "Entity( " .. self:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_GMOD_GESTURE_TAUNT_ZOMBIE, true )" )
 
-        local near = CD2FindInSphere( self:GetPos(), 200, function( ent ) return ent != self end )
+        local near = CD2:FindInSphere( self:GetPos(), 200, function( ent ) return ent != self end )
 
         for i = 1, #near do
             local ent = near[ i ]
@@ -120,7 +120,7 @@ function PLAYER:StartLevelUpEffect()
     end )
 
     
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
 
         self:Freeze( true )
 
@@ -132,7 +132,7 @@ function PLAYER:StartLevelUpEffect()
 
     end )
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
         if !IsValid( self ) then return end
 
         for i = 1, 50 do
@@ -152,67 +152,67 @@ end
 
 function PLAYER:SaveProgress()
 
-    CD2FILESYSTEM:WritePlayerData( self, "cd2_skill_Agility", self:GetAgilitySkill() )
-    CD2FILESYSTEM:WritePlayerData( self, "cd2_skill_Weapon", self:GetWeaponSkill() )
-    CD2FILESYSTEM:WritePlayerData( self, "cd2_skill_Strength", self:GetStrengthSkill() )
-    CD2FILESYSTEM:WritePlayerData( self, "cd2_skill_Explosive", self:GetExplosiveSkill() )
+    CD2:WritePlayerData( self, "cd2_skill_Agility", self:GetAgilitySkill() )
+    CD2:WritePlayerData( self, "cd2_skill_Weapon", self:GetWeaponSkill() )
+    CD2:WritePlayerData( self, "cd2_skill_Strength", self:GetStrengthSkill() )
+    CD2:WritePlayerData( self, "cd2_skill_Explosive", self:GetExplosiveSkill() )
 
-    CD2FILESYSTEM:WritePlayerData( self, "cd2_skillxp_Agility", self:GetAgilityXP() )
-    CD2FILESYSTEM:WritePlayerData( self, "cd2_skillxp_Weapon", self:GetWeaponXP() )
-    CD2FILESYSTEM:WritePlayerData( self, "cd2_skillxp_Strength", self:GetStrengthXP() )
-    CD2FILESYSTEM:WritePlayerData( self, "cd2_skillxp_Explosive", self:GetExplosiveXP() )
+    CD2:WritePlayerData( self, "cd2_skillxp_Agility", self:GetAgilityXP() )
+    CD2:WritePlayerData( self, "cd2_skillxp_Weapon", self:GetWeaponXP() )
+    CD2:WritePlayerData( self, "cd2_skillxp_Strength", self:GetStrengthXP() )
+    CD2:WritePlayerData( self, "cd2_skillxp_Explosive", self:GetExplosiveXP() )
 
 end
 
 function PLAYER:LoadProgress()
     local wait = true
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
 
         -- Skills
-        CD2FILESYSTEM:RequestPlayerData( self, "cd2_skill_Agility", function( value ) if value then self:SetAgilitySkill( value ) end wait = false end )
+        CD2:RequestPlayerData( self, "cd2_skill_Agility", function( value ) if value then self:SetAgilitySkill( value ) end wait = false end )
 
         while wait do coroutine.yield() end
 
         wait = true
 
-        CD2FILESYSTEM:RequestPlayerData( self, "cd2_skill_Weapon", function( value ) if value then self:SetWeaponSkill( value ) end wait = false end )
+        CD2:RequestPlayerData( self, "cd2_skill_Weapon", function( value ) if value then self:SetWeaponSkill( value ) end wait = false end )
 
         while wait do coroutine.yield() end
 
         wait = true
 
-        CD2FILESYSTEM:RequestPlayerData( self, "cd2_skill_Strength", function( value ) if value then self:SetStrengthSkill( value ) end wait = false end )
+        CD2:RequestPlayerData( self, "cd2_skill_Strength", function( value ) if value then self:SetStrengthSkill( value ) end wait = false end )
 
         while wait do coroutine.yield() end
 
         wait = true
 
-        CD2FILESYSTEM:RequestPlayerData( self, "cd2_skill_Explosive", function( value ) if value then self:SetExplosiveSkill( value ) end wait = false end )
+        CD2:RequestPlayerData( self, "cd2_skill_Explosive", function( value ) if value then self:SetExplosiveSkill( value ) end wait = false end )
 
         while wait do coroutine.yield() end
 
         wait = true
 
         -- XP
-        CD2FILESYSTEM:RequestPlayerData( self, "cd2_skillxp_Agility", function( value ) if value then self:SetAgilityXP( value ) end wait = false end )
+        CD2:RequestPlayerData( self, "cd2_skillxp_Agility", function( value ) if value then self:SetAgilityXP( value ) end wait = false end )
 
         while wait do coroutine.yield() end
 
         wait = true
 
-        CD2FILESYSTEM:RequestPlayerData( self, "cd2_skillxp_Weapon", function( value ) if value then self:SetWeaponXP( value ) end wait = false end )
+        CD2:RequestPlayerData( self, "cd2_skillxp_Weapon", function( value ) if value then self:SetWeaponXP( value ) end wait = false end )
 
         while wait do coroutine.yield() end
 
         wait = true
 
-        CD2FILESYSTEM:RequestPlayerData( self, "cd2_skillxp_Strength", function( value ) if value then self:SetStrengthXP( value ) end wait = false end )
+        CD2:RequestPlayerData( self, "cd2_skillxp_Strength", function( value ) if value then self:SetStrengthXP( value ) end wait = false end )
 
         while wait do coroutine.yield() end
 
         wait = true
 
-        CD2FILESYSTEM:RequestPlayerData( self, "cd2_skillxp_Explosive", function( value ) if value then self:SetExplosiveXP( value ) end wait = false end )
+        CD2:RequestPlayerData( self, "cd2_skillxp_Explosive", function( value ) if value then self:SetExplosiveXP( value ) end wait = false end )
 
         while wait do coroutine.yield() end
         self:BuildSkills()

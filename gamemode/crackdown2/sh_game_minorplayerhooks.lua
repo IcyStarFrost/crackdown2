@@ -18,20 +18,20 @@ if SERVER then
 
     -- Director commentary over level ups
     hook.Add( "CD2_OnLevelUp", "crackdown2_levelup", function( ply, skill )
-        if KeysToTheCity() then return end
+        if CD2:KeysToTheCity() then return end
 
         if skill == "Strength" and ply:GetStrengthSkill() == 4 then
-            CD2SendTextBoxMessage( ply, "While in the air, hold USE key and press your attack/fire button to initiate a devastating Ground Pound" )
+            CD2:SendTextBoxMessage( ply, "While in the air, hold USE key and press your attack/fire button to initiate a devastating Ground Pound" )
         end
 
         if skill == "Agility" and !ply.cd2_firstagilityimprove then
-            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstagilityimprove", function( val )
+            CD2:RequestPlayerData( ply, "cd2_firstagilityimprove", function( val )
                 if !val then
                     timer.Simple( 2, function()
                         if !IsValid( ply ) then return end
                         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/agility_improve.mp3" )
                     end )
-                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstagilityimprove", true )
+                    CD2:WritePlayerData( ply, "cd2_firstagilityimprove", true )
                 else
                     ply.cd2_firstagilityimprove = true
                 end
@@ -39,13 +39,13 @@ if SERVER then
         end
 
         if skill == "Weapon" and !ply.cd2_firstfirearmimprove then
-            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstfirearmimprove", function( val )
+            CD2:RequestPlayerData( ply, "cd2_firstfirearmimprove", function( val )
                 if !val then
                     timer.Simple( 2, function()
                         if !IsValid( ply ) then return end
                         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firearm_improve.mp3" )
                     end )
-                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstfirearmimprove", true )
+                    CD2:WritePlayerData( ply, "cd2_firstfirearmimprove", true )
                 else
                     ply.cd2_firstfirearmimprove = true
                 end
@@ -53,13 +53,13 @@ if SERVER then
         end
 
         if skill == "Strength" and !ply.cd2_firststrengthimprove then
-            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firststrengthimprove", function( val )
+            CD2:RequestPlayerData( ply, "cd2_firststrengthimprove", function( val )
                 if !val then
                     timer.Simple( 2, function()
                         if !IsValid( ply ) then return end
                         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/strength_improve.mp3" )
                     end )
-                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firststrengthimprove", true )
+                    CD2:WritePlayerData( ply, "cd2_firststrengthimprove", true )
                 else
                     ply.cd2_firststrengthimprove = true
                 end
@@ -67,13 +67,13 @@ if SERVER then
         end
 
         if skill == "Explosive" and !ply.cd2_firstexplosiveimprove then
-            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstexplosiveimprove", function( val )
+            CD2:RequestPlayerData( ply, "cd2_firstexplosiveimprove", function( val )
                 if !val then
                     timer.Simple( 2, function()
                         if !IsValid( ply ) then return end
                         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/explosive_improve.mp3" )
                     end )
-                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstexplosiveimprove", true )
+                    CD2:WritePlayerData( ply, "cd2_firstexplosiveimprove", true )
                 else
                     ply.cd2_firstexplosiveimprove = true
                 end
@@ -84,11 +84,11 @@ if SERVER then
 
     hook.Add( "OnCD2NPCKilled", "crackdown2_firstcellkill", function( npc, info )
         local attacker = info:GetAttacker()
-        if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadFirstCellKill or KeysToTheCity() or npc:GetCD2Team() != "cell" then return end
-        CD2FILESYSTEM:RequestPlayerData( attacker, "cd2_hadfirstcellkill", function( val )
+        if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadFirstCellKill or CD2:KeysToTheCity() or npc:GetCD2Team() != "cell" then return end
+        CD2:RequestPlayerData( attacker, "cd2_hadfirstcellkill", function( val )
             if !val then
                 attacker:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firstcellkill.mp3" )
-                CD2FILESYSTEM:WritePlayerData( attacker, "cd2_hadfirstcellkill", true )
+                CD2:WritePlayerData( attacker, "cd2_hadfirstcellkill", true )
             else
                 attacker.cd2_hadFirstCellKill = true
             end
@@ -97,7 +97,7 @@ if SERVER then
 
     hook.Add( "OnCD2NPCKilled", "crackdown2_uvweaponachievement", function( npc, info )
         local attacker = info:GetAttacker()
-        if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadUVachievement or KeysToTheCity() or npc:GetCD2Team() != "freak" then return end
+        if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadUVachievement or CD2:KeysToTheCity() or npc:GetCD2Team() != "freak" then return end
         local wep = attacker:GetActiveWeapon()
         if wep:GetClass() != "cd2_uvshotgun" then return end
         attacker.cd2_uvkillcount = attacker.cd2_uvkillcount and attacker.cd2_uvkillcount + 1 or 1
@@ -105,10 +105,10 @@ if SERVER then
 
         if attacker.cd2_uvkillcount < 30 then return end
 
-        CD2FILESYSTEM:RequestPlayerData( attacker, "cd2_hadUVachievement", function( val )
+        CD2:RequestPlayerData( attacker, "cd2_hadUVachievement", function( val )
             if !val then
                 attacker:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/uv_achievement.mp3" )
-                CD2FILESYSTEM:WritePlayerData( attacker, "cd2_hadUVachievement", true )
+                CD2:WritePlayerData( attacker, "cd2_hadUVachievement", true )
             else
                 attacker.cd2_hadUVachievement = true
             end
@@ -235,7 +235,7 @@ if SERVER then
             net.Broadcast()
 
             if vel >= 1000 and !ply.cd2_IsUsingGroundStrike then
-                local near = CD2FindInSphere( ply:GetPos(), 200, function( ent ) return ent != ply end )
+                local near = CD2:FindInSphere( ply:GetPos(), 200, function( ent ) return ent != ply end )
 
                 for i = 1, #near do
                     local ent = near[ i ]

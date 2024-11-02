@@ -64,7 +64,7 @@ function ENT:OnDelayEnd()
         net.WriteFloat( 1 + ( skilllevel == 6 and 4 or skilllevel > 1 and 0.25 * skilllevel or 0 ) )
         net.Broadcast()
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             coroutine.wait( 0.5 )
 

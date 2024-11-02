@@ -111,8 +111,8 @@ function CD2OpenMainMenu()
             confirmbutton:SetText( "CONFIRM" )
             confirmbutton:Dock( BOTTOM )
 
-            local colorvector = CD2FILESYSTEM:ReadPlayerData( "cd2_agentcolorvector" )
-            if !colorvector then colorvector = Vector( 1, 1, 1 ) CD2FILESYSTEM:WritePlayerData( "cd2_agentcolorvector", colorvector ) end
+            local colorvector = CD2:ReadPlayerData( "cd2_agentcolorvector" )
+            if !colorvector then colorvector = Vector( 1, 1, 1 ) CD2:WritePlayerData( "cd2_agentcolorvector", colorvector ) end
 
             local agentpreview = vgui.Create( "DModelPanel", MenuPanelHolder )
             agentpreview:SetSize( ScrW() / 2, ScrH() / 3 )
@@ -129,7 +129,7 @@ function CD2OpenMainMenu()
 
             function color:ValueChanged( col ) 
                 colorvector = Vector( col.r / 255, col.g / 255, col.b / 255 )
-                CD2FILESYSTEM:WritePlayerData( "cd2_agentcolorvector", colorvector )
+                CD2:WritePlayerData( "cd2_agentcolorvector", colorvector )
             end
 
             function confirmbutton:Paint( w, h ) 
@@ -142,15 +142,15 @@ function CD2OpenMainMenu()
                 channel:Kill()
 
                 net.Start( "cd2net_setplayercolor" )
-                net.WriteVector( CD2FILESYSTEM:ReadPlayerData( "cd2_agentcolorvector" ) )
+                net.WriteVector( CD2:ReadPlayerData( "cd2_agentcolorvector" ) )
                 net.SendToServer()
 
-                local isreturningplayer = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_isreturningplayer" ) or KeysToTheCity() and true
-                local completedtutorial = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "c_completedtutorial" ) or KeysToTheCity() and true
+                local isreturningplayer = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "c_isreturningplayer" ) or CD2:KeysToTheCity() and true
+                local completedtutorial = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "c_completedtutorial" ) or CD2:KeysToTheCity() and true
                 
                 -- If the player is new to the gamemode, then play the intro video
                 if !isreturningplayer then
-                    CD2CreateThread( function()
+                    CD2:CreateThread( function()
 
                         if BRANCH == "x86-64" or BRANCH == "chromium" then
                             CD2BeginIntroVideo()
@@ -160,39 +160,39 @@ function CD2OpenMainMenu()
                             end
                         end
 
-                        CD2_DrawAgilitySkill = false
-                        CD2_DrawFirearmSkill = false
-                        CD2_DrawStrengthSkill = false
-                        CD2_DrawExplosiveSkill = false
+                        CD2.DrawAgilitySkill = false
+                        CD2.DrawFirearmSkill = false
+                        CD2.DrawStrengthSkill = false
+                        CD2.DrawExplosiveSkill = false
                         CD2_CanOpenAgencyConsole = false
 
-                        CD2_DrawTargetting = false
-                        CD2_DrawHealthandShields = false
-                        CD2_DrawWeaponInfo = false
-                        CD2_DrawMinimap = false
-                        CD2_DrawBlackbars = false
+                        CD2.DrawTargetting = false
+                        CD2.DrawHealthandShields = false
+                        CD2.DrawWeaponInfo = false
+                        CD2.DrawMinimap = false
+                        CD2.DrawBlackbars = false
 
                         net.Start( "cd2net_starttutorial" )
                         net.SendToServer()
 
                     end )
 
-                    CD2FILESYSTEM:WritePlayerData( "c_isreturningplayer", true )
+                    CD2:WritePlayerData( "c_isreturningplayer", true )
                 else -- If not then let them get in game already. If they haven't completed the tutorial then run it
 
                     if !completedtutorial then
 
-                        CD2_DrawAgilitySkill = false
-                        CD2_DrawFirearmSkill = false
-                        CD2_DrawStrengthSkill = false
-                        CD2_DrawExplosiveSkill = false
+                        CD2.DrawAgilitySkill = false
+                        CD2.DrawFirearmSkill = false
+                        CD2.DrawStrengthSkill = false
+                        CD2.DrawExplosiveSkill = false
                         CD2_CanOpenAgencyConsole = false
 
-                        CD2_DrawTargetting = false
-                        CD2_DrawHealthandShields = false
-                        CD2_DrawWeaponInfo = false
-                        CD2_DrawMinimap = false
-                        CD2_DrawBlackbars = false
+                        CD2.DrawTargetting = false
+                        CD2.DrawHealthandShields = false
+                        CD2.DrawWeaponInfo = false
+                        CD2.DrawMinimap = false
+                        CD2.DrawBlackbars = false
 
                         net.Start( "cd2net_starttutorial" )
                         net.SendToServer()
@@ -200,7 +200,7 @@ function CD2OpenMainMenu()
                     end
 
                     timer.Simple( 1, function()
-                        if !KeysToTheCity() then
+                        if !CD2:KeysToTheCity() then
                             sound.PlayFile( "sound/crackdown2/vo/agencydirector/droppoint.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
                         end
                     end )

@@ -2,29 +2,29 @@
 hook.Add( "CD2_BeaconDetonate", "crackdown2_beaconsequence", function( beacon )
     if !beacon.cd2_map_isgenerated then return end
     
-    if !KeysToTheCity() then
-        local Beacondata = CD2FILESYSTEM:ReadMapData( "cd2_map_beacondata" )
+    if !CD2:KeysToTheCity() then
+        local Beacondata = CD2:ReadMapData( "cd2_map_beacondata" )
 
         local beaconid = beacon.cd2_AUgroup
         local tbl = Beacondata[ beaconid + 1 ]
 
-        CD2DebugMessage( "Beacon of AU Group " .. beaconid .. " has been detonated")
+        CD2:DebugMessage( "Beacon of AU Group " .. beaconid .. " has been detonated")
 
         
         for i = 1, #Beacondata do
             local bdata = Beacondata[ i ]
-            if bdata.id == beacon.cd2_map_id then CD2DebugMessage( "Marking " .. bdata.id .. " as detonated in map data" ) bdata.isdetonated = true CD2FILESYSTEM:WriteMapData( "cd2_map_beacondata", Beacondata ) break end
+            if bdata.id == beacon.cd2_map_id then CD2:DebugMessage( "Marking " .. bdata.id .. " as detonated in map data" ) bdata.isdetonated = true CD2:WriteMapData( "cd2_map_beacondata", Beacondata ) break end
         end
 
-        CD2DebugMessage( "Advancing Beacon Sequence" )
+        CD2:DebugMessage( "Advancing Beacon Sequence" )
         CD2CreateBeaconSet( tbl )
     else
         local beaconid = beacon.cd2_AUgroup
         local tbl = CD2_BeaconData[ beaconid + 1 ]
         
-        CD2DebugMessage( "Beacon of AU Group " .. beaconid .. " has been detonated")
+        CD2:DebugMessage( "Beacon of AU Group " .. beaconid .. " has been detonated")
 
-        CD2DebugMessage( "Advancing Beacon Sequence" )
+        CD2:DebugMessage( "Advancing Beacon Sequence" )
         CD2CreateBeaconSet( tbl )
     end
     
@@ -36,7 +36,7 @@ end )
 function CD2CreateBeaconSet( beacondata ) 
     if !beacondata then return end
 
-    CD2DebugMessage( "Creating Beacon set for " .. beacondata.AUID )
+    CD2:DebugMessage( "Creating Beacon set for " .. beacondata.AUID )
 
     -- Beacon vars --
     local spawnpos = beacondata.beaconspawnpos
@@ -52,7 +52,7 @@ function CD2CreateBeaconSet( beacondata )
 
         beacon:Spawn()
 
-        CD2DebugMessage( "Loaded Detonated Beacon " .. beacondata.AUID )
+        CD2:DebugMessage( "Loaded Detonated Beacon " .. beacondata.AUID )
 
         timer.Simple( 0.1, function() beacon:StartBeaconasActive() end ) 
     end
@@ -76,7 +76,7 @@ function CD2CreateBeaconSet( beacondata )
         au:SetBeamPos( beacondata.beaconspawnpos + Vector( 0, 0, 120 ) )
         au:Spawn()
 
-        CD2DebugMessage( "Loading " .. ( isactive and "Active Absorption Unit" or "Inactive Absorption Unit" ) .. " " .. groupID )
+        CD2:DebugMessage( "Loading " .. ( isactive and "Active Absorption Unit" or "Inactive Absorption Unit" ) .. " " .. groupID )
 
         if isactive then
             activeAUs = activeAUs + 1
@@ -88,19 +88,19 @@ function CD2CreateBeaconSet( beacondata )
     local function handleLocationMarker( group )
         if group != beacondata.AUID then return end
 
-        CD2DebugMessage( "AU Group " .. group .. " power network has been completed!" )
+        CD2:DebugMessage( "AU Group " .. group .. " power network has been completed!" )
 
         local marker = ents.Create( "cd2_locationmarker" )
         marker:SetPos( beacondata.pos ) 
         marker:SetLocationType( "beacon" )
         marker.cd2_AUgroup = beacondata.AUID
 
-        CD2PingLocation( nil, nil, beacondata.pos, 3 )
+        CD2:PingLocation( nil, nil, beacondata.pos, 3 )
     
         function marker:OnActivate( ply ) 
             sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
 
-            CD2DebugMessage( self, "A Beacon for AUGroup " .. beacondata.AUID .. " has been called by " .. ply:Name() )
+            CD2:DebugMessage( self, "A Beacon for AUGroup " .. beacondata.AUID .. " has been called by " .. ply:Name() )
     
             marker.cd2_beacon = ents.Create( "cd2_beacon" )
             marker.cd2_beacon:SetPos( beacondata.beaconspawnpos )
@@ -118,9 +118,9 @@ function CD2CreateBeaconSet( beacondata )
     
         marker:Spawn()
 
-        CD2DebugMessage( marker, "Created Beacon Marker for AU Group " .. group )
+        CD2:DebugMessage( marker, "Created Beacon Marker for AU Group " .. group )
     
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
             while true do 
                 if !IsValid( marker ) then break end
     
@@ -138,16 +138,16 @@ function CD2CreateBeaconSet( beacondata )
                     end
     
                     CD2_CurrentBeacon = group + 1
-                    if !KeysToTheCity() then CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", group + 1 ) end
+                    if !CD2:KeysToTheCity() then CD2:WriteMapData( "cd2_map_currentbeacon", group + 1 ) end
     
                     coroutine.wait( 7 )
 
-                    if !KeysToTheCity() and count == CD2_BeaconCount then
+                    if !CD2:KeysToTheCity() and count == CD2_BeaconCount then
                         for k, v in ipairs( player.GetAll() ) do
                             v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allbeacons_achieve.mp3" )
                         end
 
-                        CD2CreateThread( function()
+                        CD2:CreateThread( function()
                             coroutine.wait( 10 )
                             for k, v in ipairs( player.GetAll() ) do
                                 v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/final1.mp3" )
@@ -174,19 +174,19 @@ function CD2CreateBeaconSet( beacondata )
                             coroutine.wait( 6 )
 
                             for k, v in ipairs( player.GetAll() ) do
-                                CD2PingLocation( v, nil, CD2_BeaconTower:GetPos(), 5 )
+                                CD2:PingLocation( v, nil, CD2_BeaconTower:GetPos(), 5 )
                             end
 
                             coroutine.wait( 2 )
 
                             for k, v in ipairs( player.GetAll() ) do
-                                CD2PingLocation( v, nil, CD2_BeaconTower:GetPos(), 5 )
+                                CD2:PingLocation( v, nil, CD2_BeaconTower:GetPos(), 5 )
                             end
                         
                         end )
                     end
     
-                    CD2SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )
+                    CD2:SetTypingText( nil, "OBJECTIVE COMPLETE!", "Beacon Detonated\n" .. count .. " of " .. CD2_BeaconCount .. " Beacons detonated" )
                     break
                 end
     

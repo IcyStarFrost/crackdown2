@@ -10,55 +10,55 @@ if CLIENT then
 
 
     function CreateKeysTotheCityMenu()
-        if !KeysToTheCity() then return end
+        if !CD2:KeysToTheCity() then return end
 
-        if IsValid( CD2_KeysToTheCityMenu ) then CD2_KeysToTheCityMenu:Remove() end
+        if IsValid( CD2_CD2:KeysToTheCityMenu ) then CD2_CD2:KeysToTheCityMenu:Remove() end
 
         hook.Add( "Think", "crackdown2_showhidekttcmenu", function()
-            if !IsValid( CD2_KeysToTheCityMenu ) then return end
+            if !IsValid( CD2_CD2:KeysToTheCityMenu ) then return end
 
             if CD2_InDropMenu or CD2_InSpawnPointMenu or !LocalPlayer():Alive() then
-                CD2_KeysToTheCityMenu:Hide()
+                CD2_CD2:KeysToTheCityMenu:Hide()
             elseif !CD2_InDropMenu and !CD2_InSpawnPointMenu and LocalPlayer():Alive() then
-                CD2_KeysToTheCityMenu:Show()
+                CD2_CD2:KeysToTheCityMenu:Show()
             end
         
         end )
     
-        CD2_KeysToTheCityMenu = vgui.Create( "DPanel", GetHUDPanel() )
-        CD2_KeysToTheCityMenu:SetPos( ScrW() - 400, ScrH() - 450 )
-        CD2_KeysToTheCityMenu:SetSize( 350, 280 )
+        CD2_CD2:KeysToTheCityMenu = vgui.Create( "DPanel", GetHUDPanel() )
+        CD2_CD2:KeysToTheCityMenu:SetPos( ScrW() - 400, ScrH() - 450 )
+        CD2_CD2:KeysToTheCityMenu:SetSize( 350, 280 )
 
-        CD2_KeysToTheCityMenu.Scroll = vgui.Create( "DScrollPanel", CD2_KeysToTheCityMenu )
-        CD2_KeysToTheCityMenu.Scroll:Dock( FILL )
-        local vbar = CD2_KeysToTheCityMenu.Scroll:GetVBar()
+        CD2_CD2:KeysToTheCityMenu.Scroll = vgui.Create( "DScrollPanel", CD2_CD2:KeysToTheCityMenu )
+        CD2_CD2:KeysToTheCityMenu.Scroll:Dock( FILL )
+        local vbar = CD2_CD2:KeysToTheCityMenu.Scroll:GetVBar()
 
         function vbar:Paint( w, h ) end
 
-        CD2_KeysToTheCityMenu.CurrentIndex = 1
-        CD2_KeysToTheCityMenu.CurrentOptionPanel = nil
-        CD2_KeysToTheCityMenu.CurrentFolder = "global"
-        CD2_KeysToTheCityMenu.OptionFolders = { global = {} }
-        CD2_KeysToTheCityMenu.OptionFolderPanels = {}
+        CD2_CD2:KeysToTheCityMenu.CurrentIndex = 1
+        CD2_CD2:KeysToTheCityMenu.CurrentOptionPanel = nil
+        CD2_CD2:KeysToTheCityMenu.CurrentFolder = "global"
+        CD2_CD2:KeysToTheCityMenu.OptionFolders = { global = {} }
+        CD2_CD2:KeysToTheCityMenu.OptionFolderPanels = {}
 
-        function CD2_KeysToTheCityMenu:SelectIndex( i )
-            local folder = CD2_KeysToTheCityMenu.OptionFolders[ CD2_KeysToTheCityMenu.CurrentFolder ]
+        function CD2_CD2:KeysToTheCityMenu:SelectIndex( i )
+            local folder = CD2_CD2:KeysToTheCityMenu.OptionFolders[ CD2_CD2:KeysToTheCityMenu.CurrentFolder ]
             local pnl = folder[ i ]
-            CD2_KeysToTheCityMenu.CurrentIndex = i
-            CD2_KeysToTheCityMenu.CurrentOptionPanel = pnl
-            CD2_KeysToTheCityMenu.Scroll:ScrollToChild( pnl )
+            CD2_CD2:KeysToTheCityMenu.CurrentIndex = i
+            CD2_CD2:KeysToTheCityMenu.CurrentOptionPanel = pnl
+            CD2_CD2:KeysToTheCityMenu.Scroll:ScrollToChild( pnl )
         end
 
-        function CD2_KeysToTheCityMenu:CallCurrentOption()
-            local func = CD2_KeysToTheCityMenu.CurrentOptionPanel.callback
-            func( CD2_KeysToTheCityMenu.CurrentOptionPanel )
+        function CD2_CD2:KeysToTheCityMenu:CallCurrentOption()
+            local func = CD2_CD2:KeysToTheCityMenu.CurrentOptionPanel.callback
+            func( CD2_CD2:KeysToTheCityMenu.CurrentOptionPanel )
         end
 
-        function CD2_KeysToTheCityMenu:GetCurrentFolderTable()
-            return CD2_KeysToTheCityMenu.OptionFolders[ CD2_KeysToTheCityMenu.CurrentFolder ]
+        function CD2_CD2:KeysToTheCityMenu:GetCurrentFolderTable()
+            return CD2_CD2:KeysToTheCityMenu.OptionFolders[ CD2_CD2:KeysToTheCityMenu.CurrentFolder ]
         end
 
-        function CD2_KeysToTheCityMenu:Paint( w, h ) 
+        function CD2_CD2:KeysToTheCityMenu:Paint( w, h ) 
             surface_SetDrawColor( bg )
             surface_DrawRect( 0, 0, w, h )
 
@@ -68,7 +68,7 @@ if CLIENT then
     
         local function AddOption( name, folder, type, options, callback )
             folder = folder or "global"
-            local optionpnl = vgui.Create( "DPanel", CD2_KeysToTheCityMenu.Scroll )
+            local optionpnl = vgui.Create( "DPanel", CD2_CD2:KeysToTheCityMenu.Scroll )
             optionpnl:SetSize( 100, 30 )
             optionpnl:Dock( TOP )
 
@@ -82,33 +82,33 @@ if CLIENT then
             optionpnl.label:SetFont( "crackdown2_font30" )
 
 
-            CD2_KeysToTheCityMenu.OptionFolders[ folder ] = CD2_KeysToTheCityMenu.OptionFolders[ folder ] or {}
+            CD2_CD2:KeysToTheCityMenu.OptionFolders[ folder ] = CD2_CD2:KeysToTheCityMenu.OptionFolders[ folder ] or {}
 
-            if !CD2_KeysToTheCityMenu.OptionFolderPanels[ folder ] and folder != "global" then
-                CD2_KeysToTheCityMenu.OptionFolderPanels[ folder ] = AddOption( folder, "global", "Folder", {}, function()
-                    local tbl = CD2_KeysToTheCityMenu:GetCurrentFolderTable()
+            if !CD2_CD2:KeysToTheCityMenu.OptionFolderPanels[ folder ] and folder != "global" then
+                CD2_CD2:KeysToTheCityMenu.OptionFolderPanels[ folder ] = AddOption( folder, "global", "Folder", {}, function()
+                    local tbl = CD2_CD2:KeysToTheCityMenu:GetCurrentFolderTable()
                     for i = 1, #tbl do
                         local pnl = tbl[ i ]
                         pnl:SetParent()
                         pnl:Hide()
                     end
 
-                    local tbl2 = CD2_KeysToTheCityMenu.OptionFolders[ folder ]
-                    CD2_KeysToTheCityMenu.CurrentFolder = folder
+                    local tbl2 = CD2_CD2:KeysToTheCityMenu.OptionFolders[ folder ]
+                    CD2_CD2:KeysToTheCityMenu.CurrentFolder = folder
                     
                     for i = 1, #tbl2 do
                         local pnl = tbl2[ i ]
-                        pnl:SetParent( CD2_KeysToTheCityMenu.Scroll )
+                        pnl:SetParent( CD2_CD2:KeysToTheCityMenu.Scroll )
                         pnl:Show()
                     end
 
-                    CD2_KeysToTheCityMenu:SelectIndex( 1 )
+                    CD2_CD2:KeysToTheCityMenu:SelectIndex( 1 )
                 end )
             end
 
-            if CD2_KeysToTheCityMenu.CurrentFolder != folder then optionpnl:SetParent() optionpnl:Hide() end
+            if CD2_CD2:KeysToTheCityMenu.CurrentFolder != folder then optionpnl:SetParent() optionpnl:Hide() end
 
-            local foldertable = CD2_KeysToTheCityMenu.OptionFolders[ folder ]
+            local foldertable = CD2_CD2:KeysToTheCityMenu.OptionFolders[ folder ]
 
             if type == "Check" then
                 optionpnl.OptionPnl = vgui.Create( "DCheckBox", optionpnl )
@@ -162,7 +162,7 @@ if CLIENT then
                 surface_SetDrawColor( bg )
                 surface_DrawRect( 0, 0, w, h )
     
-                surface_SetDrawColor( CD2_KeysToTheCityMenu.CurrentOptionPanel == self and color_white or linecol )
+                surface_SetDrawColor( CD2_CD2:KeysToTheCityMenu.CurrentOptionPanel == self and color_white or linecol )
                 surface_DrawOutlinedRect( 0, 0, w, h, 2 )
             end
 
@@ -179,7 +179,7 @@ if CLIENT then
             AddOption( "Spawn " .. v.PrintName, "Weapons", "Button", { default = false }, function( pnl )
                 net.Start( "cd2net_kttc_spawnnpc" )
                 net.WriteString( v.ClassName )
-                net.WriteAngle( CD2_viewangles )
+                net.WriteAngle( CD2.viewangles )
                 net.SendToServer()
             end )
         end
@@ -192,7 +192,7 @@ if CLIENT then
             AddOption( "Spawn " .. basetable.t.PrintName, "Equipment", "Button", { default = false }, function( pnl )
                 net.Start( "cd2net_kttc_spawnnpc" )
                 net.WriteString( ClassName )
-                net.WriteAngle( CD2_viewangles )
+                net.WriteAngle( CD2.viewangles )
                 net.SendToServer()
             end )
         end
@@ -202,7 +202,7 @@ if CLIENT then
         AddOption( "Spawn Hidden Orb", "Objects", "Button", { default = false }, function( pnl )
             net.Start( "cd2net_kttc_spawnnpc" )
             net.WriteString( "cd2_hiddenorb")
-            net.WriteAngle( CD2_viewangles )
+            net.WriteAngle( CD2.viewangles )
             net.SendToServer()
         end )
         --
@@ -212,21 +212,21 @@ if CLIENT then
         AddOption( "Spawn Explosive Barrel", "Objects", "Button", { default = false }, function( pnl )
             net.Start( "cd2net_kttc_spawnprop" )
             net.WriteString( "models/props_c17/oildrum001_explosive.mdl" )
-            net.WriteAngle( CD2_viewangles )
+            net.WriteAngle( CD2.viewangles )
             net.SendToServer()
         end )
 
         AddOption( "Spawn Radio", "Objects", "Button", { default = false }, function( pnl )
             net.Start( "cd2net_kttc_spawnnpc" )
             net.WriteString( "cd2_radio" )
-            net.WriteAngle( CD2_viewangles )
+            net.WriteAngle( CD2.viewangles )
             net.SendToServer()
         end )
 
         AddOption( "Spawn Speaker", "Objects", "Button", { default = false }, function( pnl )
             net.Start( "cd2net_kttc_spawnnpc" )
             net.WriteString( "cd2_speaker" )
-            net.WriteAngle( CD2_viewangles )
+            net.WriteAngle( CD2.viewangles )
             net.SendToServer()
         end )
         --
@@ -239,7 +239,7 @@ if CLIENT then
             AddOption( "Spawn " .. basetable.t.PrintName, "Agency", "Button", { default = false }, function( pnl )
                 net.Start( "cd2net_kttc_spawnnpc" )
                 net.WriteString( ClassName )
-                net.WriteAngle( CD2_viewangles )
+                net.WriteAngle( CD2.viewangles )
                 net.SendToServer()
             end )
         end
@@ -261,7 +261,7 @@ if CLIENT then
         AddOption( "Spawn Civilian", "Civilian", "Button", { default = false }, function( pnl )
             net.Start( "cd2net_kttc_spawnnpc" )
             net.WriteString( "cd2_civilian" )
-            net.WriteAngle( CD2_viewangles )
+            net.WriteAngle( CD2.viewangles )
             net.SendToServer()
         end )
         --
@@ -272,7 +272,7 @@ if CLIENT then
             AddOption( "Spawn " .. basetable.t.PrintName, "Cell", "Button", { default = false }, function( pnl )
                 net.Start( "cd2net_kttc_spawnnpc" )
                 net.WriteString( ClassName )
-                net.WriteAngle( CD2_viewangles )
+                net.WriteAngle( CD2.viewangles )
                 net.SendToServer()
             end )
         end
@@ -285,7 +285,7 @@ if CLIENT then
             AddOption( "Spawn " .. basetable.t.PrintName, "Freaks", "Button", { default = false }, function( pnl )
                 net.Start( "cd2net_kttc_spawnnpc" )
                 net.WriteString( ClassName )
-                net.WriteAngle( CD2_viewangles )
+                net.WriteAngle( CD2.viewangles )
                 net.SendToServer()
             end )
         end
@@ -427,7 +427,7 @@ if CLIENT then
 
         AddOption( "Free Cam", "global", "Check", { default = false }, function( pnl )
             pnl:SetValue( !pnl:GetValue() )
-            CD2_FreeCamMode = pnl:GetValue()
+            CD2.FreeCamMode = pnl:GetValue()
         end )
 
         AddOption( "Hide HUD", "global", "Check", { default = false }, function( pnl )
@@ -435,9 +435,9 @@ if CLIENT then
             CD2_HideKTTCMenu = !pnl:GetValue()
 
             if pnl:GetValue() then
-                CD2_KeysToTheCityMenu:SetPos( -10000, -100000 )
+                CD2_CD2:KeysToTheCityMenu:SetPos( -10000, -100000 )
             else
-                CD2_KeysToTheCityMenu:SetPos( ScrW() - 400, ScrH() - 450 )
+                CD2_CD2:KeysToTheCityMenu:SetPos( ScrW() - 400, ScrH() - 450 )
             end
 
             RunConsoleCommand( "cd2_drawhud", !pnl:GetValue() and "1" or "0" )
@@ -457,64 +457,64 @@ if CLIENT then
         
         -------------------------
 
-        CD2_KeysToTheCityMenu:SelectIndex( 1 )
+        CD2_CD2:KeysToTheCityMenu:SelectIndex( 1 )
 
         local nextcanpress = 0
-        function CD2_KeysToTheCityMenu:Think()
+        function CD2_CD2:KeysToTheCityMenu:Think()
             if SysTime() < nextcanpress or LocalPlayer():IsTyping() then return end
 
             if input.IsKeyDown( KEY_DOWN ) then
 
-                local nextindex = CD2_KeysToTheCityMenu.CurrentIndex + 1
-                local tbl = CD2_KeysToTheCityMenu:GetCurrentFolderTable()
+                local nextindex = CD2_CD2:KeysToTheCityMenu.CurrentIndex + 1
+                local tbl = CD2_CD2:KeysToTheCityMenu:GetCurrentFolderTable()
                 if nextindex > #tbl then
                     nextindex = 1
                 end
 
                 surface.PlaySound( "crackdown2/ui/hover.mp3" )
-                CD2_KeysToTheCityMenu:SelectIndex( nextindex )
+                CD2_CD2:KeysToTheCityMenu:SelectIndex( nextindex )
                 nextcanpress = SysTime() + 0.2
 
             elseif input.IsKeyDown( KEY_UP ) then
             
-                local nextindex = CD2_KeysToTheCityMenu.CurrentIndex - 1
-                local tbl = CD2_KeysToTheCityMenu:GetCurrentFolderTable()
+                local nextindex = CD2_CD2:KeysToTheCityMenu.CurrentIndex - 1
+                local tbl = CD2_CD2:KeysToTheCityMenu:GetCurrentFolderTable()
                 if nextindex < 1 then
                     nextindex = #tbl
                 end
     
                 surface.PlaySound( "crackdown2/ui/hover.mp3" )
-                CD2_KeysToTheCityMenu:SelectIndex( nextindex )
+                CD2_CD2:KeysToTheCityMenu:SelectIndex( nextindex )
                 nextcanpress = SysTime() + 0.2
 
             elseif input.IsKeyDown( KEY_ENTER ) then
 
-                CD2_KeysToTheCityMenu:CallCurrentOption()
+                CD2_CD2:KeysToTheCityMenu:CallCurrentOption()
                 surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
                 nextcanpress = SysTime() + 0.2
 
-            elseif input.IsKeyDown( KEY_BACKSPACE ) and CD2_KeysToTheCityMenu.CurrentFolder != "global" then
+            elseif input.IsKeyDown( KEY_BACKSPACE ) and CD2_CD2:KeysToTheCityMenu.CurrentFolder != "global" then
 
                 surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
 
-                local tbl = CD2_KeysToTheCityMenu:GetCurrentFolderTable()
+                local tbl = CD2_CD2:KeysToTheCityMenu:GetCurrentFolderTable()
                 for i = 1, #tbl do
                     local pnl = tbl[ i ]
                     pnl:SetParent()
                     pnl:Hide()
                 end
 
-                local tbl2 = CD2_KeysToTheCityMenu.OptionFolders[ "global" ]
-                CD2_KeysToTheCityMenu.CurrentFolder = "global"
+                local tbl2 = CD2_CD2:KeysToTheCityMenu.OptionFolders[ "global" ]
+                CD2_CD2:KeysToTheCityMenu.CurrentFolder = "global"
                 
                 for i = 1, #tbl2 do
                     local pnl = tbl2[ i ]
-                    pnl:SetParent( CD2_KeysToTheCityMenu.Scroll )
+                    pnl:SetParent( CD2_CD2:KeysToTheCityMenu.Scroll )
                     pnl:Show()
                 end
 
                 
-                CD2_KeysToTheCityMenu:SelectIndex( 1 )
+                CD2_CD2:KeysToTheCityMenu:SelectIndex( 1 )
 
             end
         end
@@ -571,17 +571,17 @@ elseif SERVER then
         CD2_EmptyStreets = val
 
         if val then
-            CD2ClearNPCS()
+            CD2:ClearNPCS()
             table.Empty( CD2_SpawnedNSNNpcs )
         end
     end )
 
     net.Receive( "cd2net_kttc_nexttime", function( len, ply )
-        if !KeysToTheCity() then return end
+        if !CD2:KeysToTheCity() then return end
         CD2_NextFreakSpawn = CurTime() + 10
         SetGlobalBool( "cd2_isday", !GetGlobalBool( "cd2_isday", false ) )
 
-        CD2DebugMessage( "Time is now changing to " .. ( GetGlobalBool( "cd2_isday", false ) and "Dawn" or "Dusk" ) )
+        CD2:DebugMessage( "Time is now changing to " .. ( GetGlobalBool( "cd2_isday", false ) and "Dawn" or "Dusk" ) )
 
         net.Start( "cd2net_dawndusk_changetime" )
         net.WriteBool( GetGlobalBool( "cd2_isday", false ) )
@@ -591,18 +591,18 @@ elseif SERVER then
     end )
 
     net.Receive( "cd2net_kttc_freezetime", function( len, ply )
-        if !KeysToTheCity() then return end
+        if !CD2:KeysToTheCity() then return end
         local bool = net.ReadBool()
         CD2_FreezeTime = bool
     end )
 
     net.Receive( "cd2net_kttc_godmode", function( len, ply )
-        if !KeysToTheCity() then return end
+        if !CD2:KeysToTheCity() then return end
         ply.cd2_godmode = net.ReadBool()
     end )
 
     net.Receive( "cd2net_kttc_spawnprop", function( len, ply )
-        if !KeysToTheCity() then return end
+        if !CD2:KeysToTheCity() then return end
         local mdl = net.ReadString()
         local angles = net.ReadAngle()
 
@@ -614,7 +614,7 @@ elseif SERVER then
     end )
     
     net.Receive( "cd2net_kttc_spawnnpc", function( len, ply )
-        if !KeysToTheCity() then return end
+        if !CD2:KeysToTheCity() then return end
         local class = net.ReadString()
         local angles = net.ReadAngle()
 
@@ -625,12 +625,12 @@ elseif SERVER then
     end )
 
     net.Receive( "cd2net_kttc_setinfiniteammo", function( len, ply )
-        if !KeysToTheCity() then return end
+        if !CD2:KeysToTheCity() then return end
         ply.cd2_infiniteammo = net.ReadBool()
     end )
         
     net.Receive( "cd2net_kttc_setskill", function( len, ply )
-        if !KeysToTheCity() then return end
+        if !CD2:KeysToTheCity() then return end
         local lvl = net.ReadUInt( 5 )
         local skillname = net.ReadString()
 

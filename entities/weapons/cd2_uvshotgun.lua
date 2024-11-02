@@ -164,7 +164,7 @@ if CLIENT then
     
         particle:Finish()
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
             local lerppos = pos * 1
 
             for i = 1, 10 do 

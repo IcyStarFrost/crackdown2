@@ -24,7 +24,7 @@ function ENT:Initialize()
     if CLIENT then
         self.cd2_channel = nil -- The current playing BASS Channel
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             while IsValid( self ) do
                 

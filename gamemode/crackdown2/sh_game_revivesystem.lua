@@ -69,7 +69,7 @@ if SERVER then
         local agent = net.ReadEntity()
         if agent:Alive() or !agent:GetCanRevive() then return end
 
-        CD2DebugMessage( agent:Name() .. " Was revived by " .. ply:Name() )
+        CD2:DebugMessage( agent:Name() .. " Was revived by " .. ply:Name() )
 
         BroadcastLua( "Entity(" .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_CUSTOM, ACT_GMOD_GESTURE_ITEM_PLACE, true )" )
 

@@ -47,7 +47,7 @@ function ENT:Draw()
 
     if istoofar then return end
 
-    cam.Start3D2D( self:GetPos(), Angle( 0, CD2_viewangles[ 2 ] + -90, 90 ), 2 )
+    cam.Start3D2D( self:GetPos(), Angle( 0, CD2.viewangles[ 2 ] + -90, 90 ), 2 )
         surface.SetMaterial( beam )
         surface.SetDrawColor( self.cd2_color )
         surface.DrawTexturedRect( -25, -80, 50, 90 )
@@ -92,7 +92,7 @@ local agilityskillcolor = Color( 0, 255, 0 )
 local strengthskillcolor = Color( 255, 251, 0)
 local explosiveskillcolor = Color( 0, 110, 255 )
 function ENT:OnCollected( ply )
-    CD2DebugMessage( ply:Name() .. " collected a Hidden orb " .. self:EntIndex() )
+    CD2:DebugMessage( ply:Name() .. " collected a Hidden orb " .. self:EntIndex() )
     self.cd2_missingplayers[ ply:SteamID() ] = false
     self.cd2_collectedby[ ply:SteamID() ] = true
 
@@ -103,19 +103,19 @@ function ENT:OnCollected( ply )
     if SERVER then
 
         for i = 1, 6 do
-            CD2CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, agilityskillcolor )
-            CD2CreateSkillGainOrb( self:GetPos(), ply, "Weapon", 0.2, weaponskillcolor )
-            CD2CreateSkillGainOrb( self:GetPos(), ply, "Strength", 1, strengthskillcolor )
-            CD2CreateSkillGainOrb( self:GetPos(), ply, "Explosive", 0.4, explosiveskillcolor )
+            CD2:CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, agilityskillcolor )
+            CD2:CreateSkillGainOrb( self:GetPos(), ply, "Weapon", 0.2, weaponskillcolor )
+            CD2:CreateSkillGainOrb( self:GetPos(), ply, "Strength", 1, strengthskillcolor )
+            CD2:CreateSkillGainOrb( self:GetPos(), ply, "Explosive", 0.4, explosiveskillcolor )
         end
 
-        CD2SendTextBoxMessage( ply, "Well done. You found a Hidden Orb!" )
+        CD2:SendTextBoxMessage( ply, "Well done. You found a Hidden Orb!" )
 
-        if !KeysToTheCity() and !ply.cd2_hadfirsthiddenorb then
-            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firsthiddenorb", function( val ) 
+        if !CD2:KeysToTheCity() and !ply.cd2_hadfirsthiddenorb then
+            CD2:RequestPlayerData( ply, "cd2_firsthiddenorb", function( val ) 
                 if !val then
                     ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firsthiddenorb_achieve.mp3" )
-                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firsthiddenorb", true )
+                    CD2:WritePlayerData( ply, "cd2_firsthiddenorb", true )
                 end
                 ply.cd2_hadfirsthiddenorb = true
             end )
@@ -136,7 +136,7 @@ function ENT:CheckPlayers()
     for k, v in pairs( self.cd2_missingplayers ) do
         if v then shouldremove = false end
     end
-    if shouldremove then CD2DebugMessage( "Hidden Orb " .. self:EntIndex() .. " has been collected by all players. Removing." ) self:Remove() end
+    if shouldremove then CD2:DebugMessage( "Hidden Orb " .. self:EntIndex() .. " has been collected by all players. Removing." ) self:Remove() end
 end
 
 function ENT:Think()

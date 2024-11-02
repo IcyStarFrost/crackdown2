@@ -2,8 +2,8 @@
 -- All fonts have been relocated here so everytime I reload the lua files, the fonts are not being recreated over and over and later
 -- begins to bloat memory or just crashes the game. 
 
-CD2_LoadedFonts = CD2_LoadedFonts or false
-if !CD2_LoadedFonts then
+CD2.LoadedFonts = CD2.LoadedFonts or false
+if !CD2.LoadedFonts then
     surface.CreateFont( "crackdown2_weaponstattext", {
         font = "Agency FB",
         extended = false,
@@ -136,5 +136,5 @@ if !CD2_LoadedFonts then
         outline = false,
 
     })
-    CD2_LoadedFonts = true
+    CD2.LoadedFonts = true
 end

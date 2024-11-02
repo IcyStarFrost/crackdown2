@@ -107,7 +107,7 @@ function ENT:TypingText()
         if IsValid( au ) and au:GetActive() then activecount = activecount + 1 end
     end
 
-    if !KeysToTheCity() and ( CD2_BeaconCount * 3 ) == activecount then
+    if !CD2:KeysToTheCity() and ( CD2_BeaconCount * 3 ) == activecount then
         for k, v in ipairs( player.GetAll() ) do
             v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allau_achieve.mp3" )
         end
@@ -118,9 +118,9 @@ function ENT:TypingText()
     for k, ply in ipairs( player.GetAll() ) do
         if ply:SqrRangeTo( self ) > ( 1000 * 1000 ) then continue end
         if othercount == 3 then
-            CD2SetTypingText( ply, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\nA Beacon can now be deployed" )
+            CD2:SetTypingText( ply, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\nA Beacon can now be deployed" )
         elseif othercount > 0 then
-            CD2SetTypingText( ply, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\n" .. othercount .. " of 3 units active" )
+            CD2:SetTypingText( ply, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\n" .. othercount .. " of 3 units active" )
         end
 
     end
@@ -175,7 +175,7 @@ function ENT:Think()
 
     if CLIENT or self:GetActive() then return end
 
-    local nearplayers = CD2FindInSphere( self:GetPos(), 100, function( ent ) return ent:IsCD2Agent() end )
+    local nearplayers = CD2:FindInSphere( self:GetPos(), 100, function( ent ) return ent:IsCD2Agent() end )
     if #nearplayers > 0 and CurTime() > self.cd2_nextchargepoint then
         if !self.cd2_first then
             self:EmitSound( "crackdown2/ambient/au/chargenew" .. math.random( 1, 4 ) .. ".mp3", 80 )
@@ -185,18 +185,18 @@ function ENT:Think()
 
         if self:GetCharge() >= 100 then
             self:EnableBeam() 
-            CD2DebugMessage( self, "AU unit of Group " .. self:GetAUGroupID() .. " has been activated" )
+            CD2:DebugMessage( self, "AU unit of Group " .. self:GetAUGroupID() .. " has been activated" )
             hook.Run( "CD2_AUActivated", self )
             self:TypingText() 
 
-            if !KeysToTheCity() then
+            if !CD2:KeysToTheCity() then
                 for i = 1, #nearplayers do
                     local ply = nearplayers[ i ]
                     if ply.cd2_hadfirstau then continue end
-                    CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstau", function( val ) 
+                    CD2:RequestPlayerData( ply, "cd2_firstau", function( val ) 
                         if !val then
                             ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firstau_achieve.mp3" )
-                            CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstau", true )
+                            CD2:WritePlayerData( ply, "cd2_firstau", true )
                         end
                         ply.cd2_hadfirstau = true
                     end )

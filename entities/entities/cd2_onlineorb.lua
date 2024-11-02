@@ -81,7 +81,7 @@ local strengthskillcolor = Color( 255, 251, 0)
 local explosiveskillcolor = Color( 0, 110, 255 )
 
 function ENT:OnCollected( ply )
-    CD2DebugMessage( ply:Name() .. " collected a agility orb " .. self:EntIndex() )
+    CD2:DebugMessage( ply:Name() .. " collected a agility orb " .. self:EntIndex() )
     self.cd2_missingplayers[ ply:SteamID() ] = false
     self.cd2_collectedby[ ply:SteamID() ] = true
 
@@ -91,13 +91,13 @@ function ENT:OnCollected( ply )
 
     if SERVER then
 
-        CD2SendTextBoxMessage( ply, "Well done. You found a Online Orb!" )
+        CD2:SendTextBoxMessage( ply, "Well done. You found a Online Orb!" )
 
         for i = 1, 6 do
-            CD2CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, agilityskillcolor )
-            CD2CreateSkillGainOrb( self:GetPos(), ply, "Weapon", 0.2, weaponskillcolor )
-            CD2CreateSkillGainOrb( self:GetPos(), ply, "Strength", 1, strengthskillcolor )
-            CD2CreateSkillGainOrb( self:GetPos(), ply, "Explosive", 0.4, explosiveskillcolor )
+            CD2:CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, agilityskillcolor )
+            CD2:CreateSkillGainOrb( self:GetPos(), ply, "Weapon", 0.2, weaponskillcolor )
+            CD2:CreateSkillGainOrb( self:GetPos(), ply, "Strength", 1, strengthskillcolor )
+            CD2:CreateSkillGainOrb( self:GetPos(), ply, "Explosive", 0.4, explosiveskillcolor )
         end
     end
 
@@ -115,17 +115,17 @@ function ENT:CheckPlayers()
     for k, v in pairs( self.cd2_missingplayers ) do
         if v then shouldremove = false end
     end
-    if shouldremove then CD2DebugMessage( "Online Orb " .. self:EntIndex() .. " has been collected by all players. Removing." ) self:Remove() end
+    if shouldremove then CD2:DebugMessage( "Online Orb " .. self:EntIndex() .. " has been collected by all players. Removing." ) self:Remove() end
 end
 
 function ENT:Think()
 
     self:CheckPlayers()
 
-    local players = CD2FindInSphere( self:GetPos(), 70, function( ent ) return ent:IsCD2Agent() end )
+    local players = CD2:FindInSphere( self:GetPos(), 70, function( ent ) return ent:IsCD2Agent() end )
     for i = 1, #players do
         local ply = players[ i ]
-        if !ply.cd2_onlineorb_notified and SERVER then if !KeysToTheCity() then ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/onlineorb.mp3" ) end  CD2SendTextBoxMessage( ply, "Team up with another Agent to collect this Orb!" ) ply.cd2_onlineorb_notified = true end
+        if !ply.cd2_onlineorb_notified and SERVER then if !CD2:KeysToTheCity() then ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/onlineorb.mp3" ) end  CD2:SendTextBoxMessage( ply, "Team up with another Agent to collect this Orb!" ) ply.cd2_onlineorb_notified = true end
         if #players > 1 and self.cd2_missingplayers[ ply:SteamID() ] then
             self:OnCollected( ply )
         elseif #players < 2 then

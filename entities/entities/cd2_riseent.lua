@@ -8,7 +8,7 @@ local random = math.random
 function ENT:Initialize()
     self:SetModel( self:GetPlayer():GetModel() )
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
         local len = self:SetSequence( anims[ random( 2 ) ] )
         self:ResetSequenceInfo()
         self:SetCycle( 0 )

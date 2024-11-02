@@ -26,7 +26,7 @@ CD2_DropSecondary = "cd2_shotgun"
 CD2_DropEquipment = "cd2_grenade"
 
 local function PlayerHasWeapon( class )
-    local hasweapon = CD2FILESYSTEM:ReadPlayerData( "cd2_weaponcollect_" .. class )
+    local hasweapon = CD2:ReadPlayerData( "cd2_weaponcollect_" .. class )
     return hasweapon
 end
 
@@ -38,13 +38,13 @@ function CD2OpenDropMenu( issupplypoint )
 
     surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
 
-    CD2_DropPrimary = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "cd2_dropprimary" ) or CD2_DropPrimary
-    CD2_DropSecondary = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "cd2_dropsecondary" ) or CD2_DropSecondary
-    CD2_DropEquipment = !KeysToTheCity() and CD2FILESYSTEM:ReadPlayerData( "cd2_dropequipment" ) or CD2_DropEquipment
+    CD2_DropPrimary = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "cd2_dropprimary" ) or CD2_DropPrimary
+    CD2_DropSecondary = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "cd2_dropsecondary" ) or CD2_DropSecondary
+    CD2_DropEquipment = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "cd2_dropequipment" ) or CD2_DropEquipment
 
     if IsValid( CD2_DropMenu ) then CD2_DropMenu:Remove() end
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
 
         local fadepanel = vgui.Create( "DPanel" )
         fadepanel:Dock( FILL )
@@ -106,8 +106,8 @@ function CD2OpenDropMenu( issupplypoint )
         coroutine.wait( 0 ) -- Delay so CD2_DropMenu can re-layout so we can get accurate position/sizing value
 
 
-        local plyweaponskill = CD2FILESYSTEM:ReadPlayerData( "cd2_skill_Weapon" ) or 1
-        local plyexplosiveskill = CD2FILESYSTEM:ReadPlayerData( "cd2_skill_Explosive" ) or 1
+        local plyweaponskill = CD2:ReadPlayerData( "cd2_skill_Weapon" ) or 1
+        local plyexplosiveskill = CD2:ReadPlayerData( "cd2_skill_Explosive" ) or 1
 
 
         local function CreateWeaponStatsPanel( isequipment )
@@ -150,7 +150,7 @@ function CD2OpenDropMenu( issupplypoint )
 
             -- Returns if the player can use this weapon
             function panel:PassesWeaponSkillTest()
-                return !KeysToTheCity() and ( requirescollect and PlayerHasWeapon( class ) ) or !KeysToTheCity() and !requirescollect and ( !isequipment and !isexplosive ) and skilllevel and skilllevel <= plyweaponskill or !KeysToTheCity() and !requirescollect and ( isequipment or isexplosive ) and skilllevel and skilllevel <= plyexplosiveskill or KeysToTheCity()
+                return !CD2:KeysToTheCity() and ( requirescollect and PlayerHasWeapon( class ) ) or !CD2:KeysToTheCity() and !requirescollect and ( !isequipment and !isexplosive ) and skilllevel and skilllevel <= plyweaponskill or !CD2:KeysToTheCity() and !requirescollect and ( isequipment or isexplosive ) and skilllevel and skilllevel <= plyexplosiveskill or CD2:KeysToTheCity()
             end
 
             function statsholder:Paint( w, h )
@@ -210,11 +210,11 @@ function CD2OpenDropMenu( issupplypoint )
             function modelpanel:Paint( w, h )
                 oldpaint( self, w, h )
 
-                if !KeysToTheCity() and !requirescollect and ( !isequipment and !isexplosive ) and skilllevel and skilllevel > plyweaponskill then
+                if !CD2:KeysToTheCity() and !requirescollect and ( !isequipment and !isexplosive ) and skilllevel and skilllevel > plyweaponskill then
                     draw_DrawText( "UNLOCKED AT FIREARMS LEVEL " .. skilllevel, "crackdown2_weaponstattext", 10, h - 20, lightgrey, TEXT_ALIGN_LEFT )
-                elseif !KeysToTheCity() and !requirescollect and ( isequipment or isexplosive ) and skilllevel and skilllevel > plyexplosiveskill then
+                elseif !CD2:KeysToTheCity() and !requirescollect and ( isequipment or isexplosive ) and skilllevel and skilllevel > plyexplosiveskill then
                     draw_DrawText( "UNLOCKED AT EXPLOSIVES LEVEL " .. skilllevel, "crackdown2_weaponstattext", 10, h - 20, lightgrey, TEXT_ALIGN_LEFT )
-                elseif !KeysToTheCity() and requirescollect and !PlayerHasWeapon( class ) then
+                elseif !CD2:KeysToTheCity() and requirescollect and !PlayerHasWeapon( class ) then
                     draw_DrawText( "EQUIPMENT YET TO BE STORED", "crackdown2_weaponstattext", 10, h - 20, lightgrey, TEXT_ALIGN_LEFT )
                 end
             end
@@ -350,9 +350,9 @@ function CD2OpenDropMenu( issupplypoint )
                         if IsValid( ent ) then
                             
                             
-                            if !KeysToTheCity() and ( v.DropMenu_RequiresCollect and !PlayerHasWeapon( v.ClassName ) ) or !KeysToTheCity() and ( v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyexplosiveskill ) then
+                            if !CD2:KeysToTheCity() and ( v.DropMenu_RequiresCollect and !PlayerHasWeapon( v.ClassName ) ) or !CD2:KeysToTheCity() and ( v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyexplosiveskill ) then
                                 lockicon:Show()
-                            elseif !KeysToTheCity() and ( v.DropMenu_RequiresCollect and !PlayerHasWeapon( v.ClassName ) )  or !KeysToTheCity() and ( !v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyweaponskill ) then
+                            elseif !CD2:KeysToTheCity() and ( v.DropMenu_RequiresCollect and !PlayerHasWeapon( v.ClassName ) )  or !CD2:KeysToTheCity() and ( !v.IsEquipment and v.DropMenu_SkillLevel and v.DropMenu_SkillLevel > plyweaponskill ) then
                                 lockicon:Show()
                             else
                                 lockicon:Hide()
@@ -391,9 +391,9 @@ function CD2OpenDropMenu( issupplypoint )
 
                         if IsValid( ent ) then
 
-                            if !KeysToTheCity() and ( wepdata.DropMenu_RequiresCollect and !PlayerHasWeapon( wepdata.ClassName ) ) or !KeysToTheCity() and wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyexplosiveskill then
+                            if !CD2:KeysToTheCity() and ( wepdata.DropMenu_RequiresCollect and !PlayerHasWeapon( wepdata.ClassName ) ) or !CD2:KeysToTheCity() and wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyexplosiveskill then
                                 lockicon:Show()
-                            elseif !KeysToTheCity() and ( wepdata.DropMenu_RequiresCollect and !PlayerHasWeapon( wepdata.ClassName ) ) or !KeysToTheCity() and !wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyweaponskill then
+                            elseif !CD2:KeysToTheCity() and ( wepdata.DropMenu_RequiresCollect and !PlayerHasWeapon( wepdata.ClassName ) ) or !CD2:KeysToTheCity() and !wepdata.IsEquipment and wepdata.DropMenu_SkillLevel and wepdata.DropMenu_SkillLevel > plyweaponskill then
                                 lockicon:Show()
                             else
                                 lockicon:Hide()
@@ -493,10 +493,10 @@ function CD2OpenDropMenu( issupplypoint )
             if !skilltest1 or !skilltest2 or !skilltest3 then surface.PlaySound( "buttons/button10.wav" ) return end
             CD2_DropMenu:Remove()
 
-            if !KeysToTheCity() then
-                CD2FILESYSTEM:WritePlayerData( "cd2_dropprimary", CD2_DropPrimary )
-                CD2FILESYSTEM:WritePlayerData( "cd2_dropsecondary", CD2_DropSecondary )
-                CD2FILESYSTEM:WritePlayerData( "cd2_dropequipment", CD2_DropEquipment )
+            if !CD2:KeysToTheCity() then
+                CD2:WritePlayerData( "cd2_dropprimary", CD2_DropPrimary )
+                CD2:WritePlayerData( "cd2_dropsecondary", CD2_DropSecondary )
+                CD2:WritePlayerData( "cd2_dropequipment", CD2_DropEquipment )
             end
 
             if !issupplypoint then
@@ -542,12 +542,12 @@ hook.Add( "Think", "crackdown2_regeneratemenu", function()
         if !CD2_InSpawnPointMenu then
             CD2OpenSpawnPointMenu()
 
-            if !KeysToTheCity() then
-                local directorcommented = CD2FILESYSTEM:ReadPlayerData( "cd2_director_dead" )
+            if !CD2:KeysToTheCity() then
+                local directorcommented = CD2:ReadPlayerData( "cd2_director_dead" )
 
                 if !directorcommented then
                     sound.PlayFile( "sound/crackdown2/vo/agencydirector/regenerate.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
-                    CD2FILESYSTEM:WritePlayerData( "cd2_director_dead", true )
+                    CD2:WritePlayerData( "cd2_director_dead", true )
                 end
             end
         end

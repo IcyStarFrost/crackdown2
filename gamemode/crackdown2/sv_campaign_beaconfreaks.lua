@@ -14,11 +14,11 @@ hook.Add( "Tick", "crackdown2_antibeaconfreaks", function()
         local beacon = beacons[ i ]
         if IsValid( beacon ) and beacon:GetIsCharging() and ( beacon.cd2_freakcount and beacon.cd2_freakcount < 15 or !beacon.cd2_freakcount ) and ( !beacon.cd2_nextfreakspawn or CurTime() > beacon.cd2_nextfreakspawn ) then
             beacon.cd2_freakcount = beacon.cd2_freakcount or 0 
-            local difficulty = CD2GetBeaconDifficulty()
+            local difficulty = CD2:GetBeaconDifficulty()
             local classes = difficultynpcs[ difficulty ]
             
             local freak = ents.Create( classes[ math.random( #classes ) ] )
-            freak:SetPos( CD2GetRandomPos( 700, beacon:GetPos() ) )
+            freak:SetPos( CD2:GetRandomPos( 700, beacon:GetPos() ) )
             local ang = ( beacon:GetPos() - freak:GetPos() ):Angle() ang[ 1 ] = 0 ang[ 3 ] = 0
             freak:SetAngles( ang )
             freak:Spawn()
@@ -35,7 +35,7 @@ hook.Add( "Tick", "crackdown2_antibeaconfreaks", function()
 
             if difficulty > 2 and random( 1, 100 ) < 5 and ( !beacon.cd2_goliathcooldown or CurTime() > beacon.cd2_goliathcooldown ) then
                 local freak = ents.Create( "cd2_goliath" )
-                freak:SetPos( CD2GetRandomPos( 700, beacon:GetPos() ) )
+                freak:SetPos( CD2:GetRandomPos( 700, beacon:GetPos() ) )
                 local ang = ( beacon:GetPos() - freak:GetPos() ):Angle() ang[ 1 ] = 0 ang[ 3 ] = 0
                 freak:SetAngles( ang )
                 freak:Spawn()

@@ -64,7 +64,7 @@ function SWEP:PrimaryAttack()
         rocket:SetSaveValue( "m_flDamage", 120 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
         rocket:Spawn()
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
             local target = self:GetOwner():IsPlayer() and self:GetOwner():GetNW2Entity( "cd2_lockontarget", nil ) or self:GetOwner():IsCD2NPC() and self:GetOwner():GetEnemy()
             
             while true do 

@@ -24,11 +24,11 @@ if SERVER then
             levelsetfunc( ply, levelgetfunc( ply ) + 1 ) 
             xpsetfunc( ply, 0 )
             
-            CD2DebugMessage( ply:Name() .. " Leveled up their " .. skillname .. " skill to lvl " .. levelgetfunc( ply ) )
+            CD2:DebugMessage( ply:Name() .. " Leveled up their " .. skillname .. " skill to lvl " .. levelgetfunc( ply ) )
 
             hook.Run( "CD2_OnLevelUp", ply, skillname )
 
-            CD2CreateThread( function()
+            CD2:CreateThread( function()
 
                 while IsValid( ply ) and !ply:IsOnGround() do
                     coroutine.yield()

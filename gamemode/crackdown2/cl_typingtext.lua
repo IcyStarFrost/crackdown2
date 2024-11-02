@@ -3,7 +3,7 @@
 local id = 0
 local white = Color( 255, 255, 255, 255 )
 local topcolor = Color( 255, 255, 255, 255 )
-function CD2SetTypingText( toptext, bottomtext, red )
+function CD2:SetTypingText( toptext, bottomtext, red )
     if !GetConVar( "cd2_drawhud" ):GetBool() then return end
     local toptexttbl = string.ToTable( toptext )
     local bottomtexttbl = string.ToTable( bottomtext )
@@ -22,7 +22,7 @@ function CD2SetTypingText( toptext, bottomtext, red )
     CD2_TypingText_Top = ""
     CD2_TypingText_Bottom = ""
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
         for i = 1, #toptexttbl do
             if thisid != id then return end
             CD2_TypingText_Top = CD2_TypingText_Top .. toptexttbl[ i ]

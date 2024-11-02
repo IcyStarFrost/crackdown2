@@ -215,7 +215,7 @@ end
 function ENT:Swipe()
     if CurTime() < self.cd2_nextattack then return end
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
         self:PlayGesture( ACT_GMOD_GESTURE_RANGE_ZOMBIE )
         --self:EmitSound( "npc/zombie/zo_attack" .. random( 1, 2 ) .. ".wav", 70, 100, 1, CHAN_VOICE )
         coroutine.wait( 1 )
@@ -230,7 +230,7 @@ function ENT:Swipe()
             net.Start( "cd2net_playergroundpound" )
             net.WriteVector( self:GetPos() )
             net.Broadcast()
-            local near = CD2FindInSphere( self:GetPos(), 200, function( ent ) return ent != self and !ent.cd2_towerbeaconcore and ent:GetClass() != "cd2_towerbeacon" end )
+            local near = CD2:FindInSphere( self:GetPos(), 200, function( ent ) return ent != self and !ent.cd2_towerbeaconcore and ent:GetClass() != "cd2_towerbeacon" end )
 
             for i = 1, #near do
                 local ent = near[ i ]
@@ -266,7 +266,7 @@ end
 function ENT:Sling()
     if CurTime() < self.cd2_nextattack then return end
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
 
         self:PlayGesture( ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE )
 

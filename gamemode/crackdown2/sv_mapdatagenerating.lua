@@ -3,9 +3,9 @@ local Trace = util.TraceLine
 local tracetable = {}
 
 -- Generates Map data by using the Navigation Mesh
-function CD2GenerateMapData( randomize, agencystart )
+function CD2:GenerateMapData( randomize, agencystart )
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
         if !navmesh.IsLoaded() then return end
 
         local navareas = navmesh.GetAllNavAreas()
@@ -21,7 +21,7 @@ function CD2GenerateMapData( randomize, agencystart )
         local onlineorbdata = {}
         local beacondata = {}
 
-        CD2DebugMessage( "Generating Map Data for " .. game.GetMap() )
+        CD2:DebugMessage( "Generating Map Data for " .. game.GetMap() )
 
         -- Get all Nav area Z positions | Get Hiding Spots
         for k, nav in pairsfunc( navareas ) do
@@ -43,7 +43,7 @@ function CD2GenerateMapData( randomize, agencystart )
         end
         averageZ = add / #averagetbl
 
-        CD2DebugMessage( "Average Z position on the Navigation Mesh is " .. averageZ )
+        CD2:DebugMessage( "Average Z position on the Navigation Mesh is " .. averageZ )
 
         -- get areas that are higher than the average
         for i = 1, #navareas do
@@ -56,14 +56,14 @@ function CD2GenerateMapData( randomize, agencystart )
 
         end
 
-        CD2DebugMessage( "Found a total of  " .. #highareas .. " Areas that are being considered for Agility Orbs " )
+        CD2:DebugMessage( "Found a total of  " .. #highareas .. " Areas that are being considered for Agility Orbs " )
 
         -- Create Agility Orbs
         for k, nav in pairsfunc( highareas ) do
             if !IsValid( nav ) or nav:IsUnderwater() then continue end
             local pos = nav:GetRandomPoint()
 
-            local nearorbs = CD2FindInSphere( pos, 1500, function( ent ) return ent:GetClass() == "cd2_agilityorb" end )
+            local nearorbs = CD2:FindInSphere( pos, 1500, function( ent ) return ent:GetClass() == "cd2_agilityorb" end )
 
             if #nearorbs > 0 then continue end
 
@@ -92,14 +92,14 @@ function CD2GenerateMapData( randomize, agencystart )
             coroutine.wait( 0.01 )
         end
 
-        CD2DebugMessage( "Generated " .. #agilityorbdata .. " Agility Orbs")
+        CD2:DebugMessage( "Generated " .. #agilityorbdata .. " Agility Orbs")
 
         -- Create Online Orbs
         for k, nav in pairsfunc( navareas ) do
             if !IsValid( nav ) or nav:IsUnderwater() then continue end
             local pos = nav:GetRandomPoint()
             
-            local nearorbs = CD2FindInSphere( pos, 6500, function( ent ) return ent:GetClass() == "cd2_onlineorb" end )
+            local nearorbs = CD2:FindInSphere( pos, 6500, function( ent ) return ent:GetClass() == "cd2_onlineorb" end )
 
             if #nearorbs > 0 then continue end
 
@@ -115,9 +115,9 @@ function CD2GenerateMapData( randomize, agencystart )
             coroutine.wait( 0.01 )
         end
 
-        CD2DebugMessage( "Generated " .. #onlineorbdata .. " Online Orbs")
+        CD2:DebugMessage( "Generated " .. #onlineorbdata .. " Online Orbs")
 
-        CD2DebugMessage( "Generating Beacon/AU data.." )
+        CD2:DebugMessage( "Generating Beacon/AU data.." )
 
         local incre = 0
         local incre2 = 0
@@ -143,7 +143,7 @@ function CD2GenerateMapData( randomize, agencystart )
         
             local result = Trace( tracetable )
 
-            if result.HitPos:DistToSqr( pos ) < ( 500 * 500 ) then CD2DebugMessage( "Rejecting a potential beacon position due to low ceiling" ) continue end
+            if result.HitPos:DistToSqr( pos ) < ( 500 * 500 ) then CD2:DebugMessage( "Rejecting a potential beacon position due to low ceiling" ) continue end
 
             incre2 = incre2 + 1
 
@@ -157,7 +157,7 @@ function CD2GenerateMapData( randomize, agencystart )
 
             for v = 1, 3 do
                 incre = incre + 1
-                local aupos = CD2GetRandomPos( 10000, pos )
+                local aupos = CD2:GetRandomPos( 10000, pos )
                 tbl.AUs[ #tbl.AUs + 1 ] = { aupos = aupos, isactive = false, id = "AU:" .. incre }
             end
 
@@ -167,21 +167,21 @@ function CD2GenerateMapData( randomize, agencystart )
 
         if #beacondata < 1 then  
             coroutine.wait( 1 )
-            CD2DebugMessage( "WARNING! MAP GENERATOR DEEMED THE CURRENT MAP UNPLAYABLE" )
+            CD2:DebugMessage( "WARNING! MAP GENERATOR DEEMED THE CURRENT MAP UNPLAYABLE" )
             BroadcastLua( "CD2ShowFailMenu( 'The Map Data Generator deemed this map to be unplayable. Please pick a different map' )" )
             SetGlobal2Bool( "cd2_mapgenfailed", true )
             return 
         end 
 
-        CD2DebugMessage( "Generated " .. ( #beacondata * 3 ) .. " AU positions and " .. #beacondata .. " Beacon Positions" )
+        CD2:DebugMessage( "Generated " .. ( #beacondata * 3 ) .. " AU positions and " .. #beacondata .. " Beacon Positions" )
 
         -- Create Hidden Orbs
 
-        CD2DebugMessage( "Finding hiding places for Hidden Orbs.." )
+        CD2:DebugMessage( "Finding hiding places for Hidden Orbs.." )
         for k, pos in pairsfunc( hiddenvectors ) do
             if !pos then continue end
 
-            local nearorbs = CD2FindInSphere( pos, 2500, function( ent ) return ent:GetClass() == "cd2_hiddenorb" end )
+            local nearorbs = CD2:FindInSphere( pos, 2500, function( ent ) return ent:GetClass() == "cd2_hiddenorb" end )
 
             if #nearorbs > 0 then continue end
 
@@ -197,9 +197,9 @@ function CD2GenerateMapData( randomize, agencystart )
             coroutine.wait( 0.01 )
         end
 
-        CD2DebugMessage( "Generated " .. #hiddenorbdata .. " Hidden Orbs")
+        CD2:DebugMessage( "Generated " .. #hiddenorbdata .. " Hidden Orbs")
 
-        CD2DebugMessage( "Looking for suitable areas for Tactical Locations.." )
+        CD2:DebugMessage( "Looking for suitable areas for Tactical Locations.." )
 
         -- Create Tactical Locations
         local assignfirstlocation = true
@@ -208,7 +208,7 @@ function CD2GenerateMapData( randomize, agencystart )
 
             if nav:GetSizeX() > 80 and nav:GetSizeY() > 80 then
                 local pos = nav:GetCenter()
-                local nearlocations = CD2FindInSphere( pos, 5000, function( ent ) return ent:GetClass() == "cd2_locationmarker" and ent:GetLocationType() == "cell" end )
+                local nearlocations = CD2:FindInSphere( pos, 5000, function( ent ) return ent:GetClass() == "cd2_locationmarker" and ent:GetLocationType() == "cell" end )
                 if #nearlocations > 0 then continue end
 
                 local location = ents.Create( "cd2_locationmarker" )
@@ -219,10 +219,10 @@ function CD2GenerateMapData( randomize, agencystart )
                 location:SetIsBeginningLocation( assignfirstlocation )
                 if assignfirstlocation then SetGlobal2Vector( "cd2_beginnerlocation", location:GetPos() ) end
 
-                location:SetLocationType( ( KeysToTheCity() or agencystart ) and assignfirstlocation and "agency" or "cell" )
+                location:SetLocationType( ( CD2:KeysToTheCity() or agencystart ) and assignfirstlocation and "agency" or "cell" )
                 location:Spawn()
 
-                if assignfirstlocation then CD2_BeginnerLocation = location CD2DebugMessage( "Assigned beginning location to " .. location.cd2_map_id ) end
+                if assignfirstlocation then CD2_BeginnerLocation = location CD2:DebugMessage( "Assigned beginning location to " .. location.cd2_map_id ) end
 
                 assignfirstlocation = false
                 tacticallocationdata[ #tacticallocationdata + 1 ] = { pos = location:GetPos(), id = location.cd2_map_id, type = location:GetLocationType(), isbeginninglocation = location:GetIsBeginningLocation() }
@@ -233,12 +233,12 @@ function CD2GenerateMapData( randomize, agencystart )
         if #tacticallocationdata < 2 then  
             coroutine.wait( 1 )
             SetGlobal2Bool( "cd2_mapgenfailed", true )
-            CD2DebugMessage( "WARNING! MAP GENERATOR DEEMED THE CURRENT MAP UNPLAYABLE" )
+            CD2:DebugMessage( "WARNING! MAP GENERATOR DEEMED THE CURRENT MAP UNPLAYABLE" )
             BroadcastLua( "CD2ShowFailMenu( 'The Map Data Generator deemed this map to be unplayable. Please pick a different map' )" )
             return 
         end 
 
-        CD2DebugMessage( "Generated " .. #tacticallocationdata .. " Tactical Locations" )
+        CD2:DebugMessage( "Generated " .. #tacticallocationdata .. " Tactical Locations" )
 
 
         -- Final Beacon --
@@ -254,15 +254,15 @@ function CD2GenerateMapData( randomize, agencystart )
             break
         end
 
-        CD2DebugMessage( "Generated Beacon Tower" )
+        CD2:DebugMessage( "Generated Beacon Tower" )
         
 
         -- First Beacon --
         local pos = GetGlobal2Vector( "cd2_beginnerlocation" )
 
-        if !KeysToTheCity() or !agencystart then
+        if !CD2:KeysToTheCity() or !agencystart then
             CD2_Firstbeacon = ents.Create( "cd2_beacon" )
-            CD2_Firstbeacon:SetPos( CD2GetRandomPos( 1000, pos )  )
+            CD2_Firstbeacon:SetPos( CD2:GetRandomPos( 1000, pos )  )
             CD2_Firstbeacon:Spawn()
         end
 
@@ -282,24 +282,24 @@ function CD2GenerateMapData( randomize, agencystart )
 
         CD2CreateBeaconSet( beacondata[ 1 ] )
 
-        CD2DebugMessage( "Completed Map Data Generation for " .. game.GetMap() )
+        CD2:DebugMessage( "Completed Map Data Generation for " .. game.GetMap() )
         
-        if !KeysToTheCity() then
-            CD2FILESYSTEM:WriteMapData( "cd2_map_finalbeacon", finalbeacondata )
-            CD2FILESYSTEM:WriteMapData( "cd2_map_currentbeacon", 1 )
-            CD2FILESYSTEM:WriteMapData( "cd2_map_beacondata", beacondata )
-            CD2FILESYSTEM:WriteMapData( "cd2_map_agilityorbdata", agilityorbdata )
-            CD2FILESYSTEM:WriteMapData( "cd2_map_hiddenorbdata", hiddenorbdata )
-            CD2FILESYSTEM:WriteMapData( "cd2_map_tacticallocationdata", tacticallocationdata )
-            CD2FILESYSTEM:WriteMapData( "cd2_map_onlineorbdata", onlineorbdata )
+        if !CD2:KeysToTheCity() then
+            CD2:WriteMapData( "cd2_map_finalbeacon", finalbeacondata )
+            CD2:WriteMapData( "cd2_map_currentbeacon", 1 )
+            CD2:WriteMapData( "cd2_map_beacondata", beacondata )
+            CD2:WriteMapData( "cd2_map_agilityorbdata", agilityorbdata )
+            CD2:WriteMapData( "cd2_map_hiddenorbdata", hiddenorbdata )
+            CD2:WriteMapData( "cd2_map_tacticallocationdata", tacticallocationdata )
+            CD2:WriteMapData( "cd2_map_onlineorbdata", onlineorbdata )
         end
     end )
 end
 
 -- Loads a Map Data File
 function CD2LoadMapData()
-    CD2DebugMessage( "Attempting to load map data for " .. game.GetMap() )
-    local mapdata = CD2FILESYSTEM:ReadMapData( "TABLE" )
+    CD2:DebugMessage( "Attempting to load map data for " .. game.GetMap() )
+    local mapdata = CD2:ReadMapData( "TABLE" )
     if !mapdata then return false end
     
     local agilityorbs = mapdata.cd2_map_agilityorbdata
@@ -327,7 +327,7 @@ function CD2LoadMapData()
 
     end
 
-    CD2DebugMessage( "Loaded " .. #agilityorbs .. " Agility Orbs" )
+    CD2:DebugMessage( "Loaded " .. #agilityorbs .. " Agility Orbs" )
 
     for i = 1, #onlineorbs do
         local orbdata = onlineorbs[ i ]
@@ -343,7 +343,7 @@ function CD2LoadMapData()
         onlineorb:Spawn()
     end
 
-    CD2DebugMessage( "Loaded " .. #onlineorbs .. " Online Orbs" )
+    CD2:DebugMessage( "Loaded " .. #onlineorbs .. " Online Orbs" )
 
     -- Load Hidden Orbs
     for i = 1, #hiddenorbs do
@@ -361,19 +361,19 @@ function CD2LoadMapData()
 
     end
 
-    CD2DebugMessage( "Loaded " .. #hiddenorbs .. " Hidden Orbs" )
+    CD2:DebugMessage( "Loaded " .. #hiddenorbs .. " Hidden Orbs" )
 
     CD2_BeaconTower = ents.Create( "cd2_towerbeacon" )
     CD2_BeaconTower:SetPos( finalbeacondata.pos )
     CD2_BeaconTower:Spawn()
 
-    CD2DebugMessage( "Loaded the Tower Beacon" )
+    CD2:DebugMessage( "Loaded the Tower Beacon" )
 
     CD2_AgilityOrbCount = #agilityorbs
     CD2_HiddenOrbCount = #hiddenorbs
     CD2_OnlineOrbCount = #onlineorbs
 
-    local beaconindex = CD2FILESYSTEM:ReadMapData( "cd2_map_currentbeacon" )
+    local beaconindex = CD2:ReadMapData( "cd2_map_currentbeacon" )
     local detonatecount = 0
     local activeaucount = 0
 
@@ -390,8 +390,8 @@ function CD2LoadMapData()
 
     SetGlobal2Int( "cd2_beaconcount", CD2_BeaconCount )
 
-    CD2DebugMessage( "Loaded " .. detonatecount .. " active beacons. Loaded " .. activeaucount .. " active Absorption Units" )
-    CD2DebugMessage( "Loaded " .. #beacondata .. " Beacons and " .. ( #beacondata * 3 ) .. " Absorption Units. Current beacon group is " .. beaconindex )
+    CD2:DebugMessage( "Loaded " .. detonatecount .. " active beacons. Loaded " .. activeaucount .. " active Absorption Units" )
+    CD2:DebugMessage( "Loaded " .. #beacondata .. " Beacons and " .. ( #beacondata * 3 ) .. " Absorption Units. Current beacon group is " .. beaconindex )
 
 
     -- Load tactical locations
@@ -416,7 +416,7 @@ function CD2LoadMapData()
 
     end
 
-    CD2DebugMessage( "Loaded " .. #tacticallocations .. " Tactical Locations" )
+    CD2:DebugMessage( "Loaded " .. #tacticallocations .. " Tactical Locations" )
 
     SetGlobal2Bool( "cd2_MapDataLoaded", true )
 
@@ -427,25 +427,25 @@ end
 
 local table_remove = table.remove
 hook.Add( "CD2_OnAgilityOrbCollected", "crackdown2_removeorbfrommapdata", function( orb, ply )
-    if !orb.cd2_map_isgenerated or KeysToTheCity() then return end
-    local agilityorbdata = CD2FILESYSTEM:ReadMapData( "cd2_map_agilityorbdata" )
+    if !orb.cd2_map_isgenerated or CD2:KeysToTheCity() then return end
+    local agilityorbdata = CD2:ReadMapData( "cd2_map_agilityorbdata" )
 
     for i = 1, #agilityorbdata do
         local data = agilityorbdata[ i ]
 
         if data and data.id == orb.cd2_map_id then
-            CD2DebugMessage( "Removing Map Generated Agility Orb ID " .. orb.cd2_map_id )
+            CD2:DebugMessage( "Removing Map Generated Agility Orb ID " .. orb.cd2_map_id )
             table_remove( agilityorbdata, i )
         end
     end
 
-    CD2FILESYSTEM:WriteMapData( "cd2_map_agilityorbdata", agilityorbdata )
+    CD2:WriteMapData( "cd2_map_agilityorbdata", agilityorbdata )
 end )
 
 
 hook.Add( "CD2_AUActivated", "crackdown2_updateAUs", function( au ) 
-    if !au.cd2_map_isgenerated or KeysToTheCity() then return end
-    local Beacondata = CD2FILESYSTEM:ReadMapData( "cd2_map_beacondata" )
+    if !au.cd2_map_isgenerated or CD2:KeysToTheCity() then return end
+    local Beacondata = CD2:ReadMapData( "cd2_map_beacondata" )
 
     for i = 1, #Beacondata do
         local beacongroupdata = Beacondata[ i ]
@@ -460,62 +460,62 @@ hook.Add( "CD2_AUActivated", "crackdown2_updateAUs", function( au )
         end
     end
 
-    CD2FILESYSTEM:WriteMapData( "cd2_map_beacondata", Beacondata )
+    CD2:WriteMapData( "cd2_map_beacondata", Beacondata )
 end )
 
 
 hook.Add( "CD2_OnOnlineOrbCollected", "crackdown2_removeorbfrommapdata", function( orb, ply )
-    if !orb.cd2_map_isgenerated or KeysToTheCity() then return end
-    local onlineorbdata = CD2FILESYSTEM:ReadMapData( "cd2_map_onlineorbdata" )
+    if !orb.cd2_map_isgenerated or CD2:KeysToTheCity() then return end
+    local onlineorbdata = CD2:ReadMapData( "cd2_map_onlineorbdata" )
 
     for i = 1, #onlineorbdata do
         local data = onlineorbdata[ i ]
 
         if data and data.id == orb.cd2_map_id then
-            CD2DebugMessage( "Removing Map Generated Online Orb ID " .. orb.cd2_map_id )
+            CD2:DebugMessage( "Removing Map Generated Online Orb ID " .. orb.cd2_map_id )
             table_remove( onlineorbdata, i )
         end
     end
 
-    CD2FILESYSTEM:WriteMapData( "cd2_map_onlineorbdata", onlineorbdata )
+    CD2:WriteMapData( "cd2_map_onlineorbdata", onlineorbdata )
 end )
 
 hook.Add( "CD2_OnHiddenOrbCollected", "crackdown2_removeorbfrommapdata", function( orb, ply )
-    if !orb.cd2_map_isgenerated or KeysToTheCity() then return end
-    local hiddenorbdata = CD2FILESYSTEM:ReadMapData( "cd2_map_hiddenorbdata" )
+    if !orb.cd2_map_isgenerated or CD2:KeysToTheCity() then return end
+    local hiddenorbdata = CD2:ReadMapData( "cd2_map_hiddenorbdata" )
 
     for i = 1, #hiddenorbdata do
         local data = hiddenorbdata[ i ]
 
         if data and data.id == orb.cd2_map_id then
-            CD2DebugMessage( "Removing Map Generated Hidden Orb ID " .. orb.cd2_map_id )
+            CD2:DebugMessage( "Removing Map Generated Hidden Orb ID " .. orb.cd2_map_id )
             table_remove( hiddenorbdata, i )
         end
     end
 
-    CD2FILESYSTEM:WriteMapData( "cd2_map_hiddenorbdata", hiddenorbdata )
+    CD2:WriteMapData( "cd2_map_hiddenorbdata", hiddenorbdata )
 end )
 
 
 hook.Add( "CD2_OnTacticalLocationCaptured", "crackdown2_locationcaptured", function( location ) 
     if !location.cd2_map_isgenerated then return end
 
-    if !KeysToTheCity() then
-        local locationdata = CD2FILESYSTEM:ReadMapData( "cd2_map_tacticallocationdata" )
+    if !CD2:KeysToTheCity() then
+        local locationdata = CD2:ReadMapData( "cd2_map_tacticallocationdata" )
 
         for i = 1, #locationdata do
             local data = locationdata[ i ]
 
             if data and data.id == location.cd2_map_id then
-                CD2DebugMessage( "Updating Tactical Location status ID " .. location.cd2_map_id )
+                CD2:DebugMessage( "Updating Tactical Location status ID " .. location.cd2_map_id )
                 data.type = "agency"
             end
         end
 
-        CD2FILESYSTEM:WriteMapData( "cd2_map_tacticallocationdata", locationdata )
+        CD2:WriteMapData( "cd2_map_tacticallocationdata", locationdata )
     end
     
-    if location:GetIsBeginningLocation() and !KeysToTheCity() and IsValid( CD2_Firstbeacon ) then
+    if location:GetIsBeginningLocation() and !CD2:KeysToTheCity() and IsValid( CD2_Firstbeacon ) then
         tracetable.start = location:GetPos()
         tracetable.endpos = location:GetPos() + Vector( 0, 0, 6000 )
         tracetable.mask = MASK_SOLID_BRUSHONLY

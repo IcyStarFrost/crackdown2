@@ -33,7 +33,7 @@ function ENT:OnDelayEnd()
         
         util.BlastDamageInfo( blast, self:GetPos(), 600 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
 
-        for k, v in ipairs( CD2FindInSphere( self:GetPos(), 600 + ( skilllevel > 1 and 50 * skilllevel or 0 ), function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" end ) ) do
+        for k, v in ipairs( CD2:FindInSphere( self:GetPos(), 600 + ( skilllevel > 1 and 50 * skilllevel or 0 ), function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" end ) ) do
             blast = DamageInfo()
             blast:SetAttacker( IsValid( self:GetThrower() ) and self:GetThrower() or self )
             blast:SetInflictor( self )
@@ -56,7 +56,7 @@ function ENT:OnDelayEnd()
         net.Broadcast()
 
         local pos = self:GetPos()
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
             local scale = 2 + ( skilllevel == 6 and 4 or skilllevel > 1 and 0.25 * skilllevel or 0 )
             
             for i = 1, 30 do 

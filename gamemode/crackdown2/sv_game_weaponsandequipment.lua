@@ -36,7 +36,7 @@ end )
 hook.Add( "KeyPress", "crackdown2_equipmentuse", function( ply, key )
     if key == IN_GRENADE1 and ( ply:GetEquipmentCount() > 0 or ply.cd2_infiniteammo ) and ( !ply.cd2_grenadecooldown or CurTime() > ply.cd2_grenadecooldown ) then
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             if !ply.cd2_infiniteammo then ply:SetEquipmentCount( ply:GetEquipmentCount() - 1 ) end
 
@@ -56,7 +56,7 @@ hook.Add( "KeyPress", "crackdown2_equipmentuse", function( ply, key )
 
             if SERVER then
                 local pos = ply:GetEyeTrace().HitPos
-                CD2ThrowEquipment( ply:GetEquipment(), ply, pos )
+                CD2:ThrowEquipment( ply:GetEquipment(), ply, pos )
             end
 
         end )
@@ -77,8 +77,8 @@ hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
     local wep = ply:GetActiveWeapon()
 
     if ply:IsOnGround() and IsValid( wep ) and !wep:GetIsReloading() and key == IN_ATTACK and ply:KeyDown( IN_USE ) and ( !ply.cd2_meleecooldown or CurTime() > ply.cd2_meleecooldown ) then
-        local nearby = CD2FindInSphere( ply:GetPos(), 300, function( ent ) return ent:IsCD2NPC() end )
-        local closest = CD2GetClosestInTable( nearby, ply )
+        local nearby = CD2:FindInSphere( ply:GetPos(), 300, function( ent ) return ent:IsCD2NPC() end )
+        local closest = CD2:GetClosestInTable( nearby, ply )
         if IsValid( closest ) then
             local dir = ( closest:CD2EyePos() - ply:EyePos() ):Angle()
             dir:Normalize()
@@ -93,7 +93,7 @@ hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
             BroadcastLua( "Entity( " .. ply:EntIndex() .. "):AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, " .. meleeanims[ random( #meleeanims ) ] .. ", true )" )
         end
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
             coroutine.wait( 0.1 )
             if !IsValid( ply ) then return end
             ply:SetVelocity( ply:GetForward() * 500 )
@@ -157,7 +157,7 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
         ply.cd2_IsUsingGroundStrike = true
         ply:EmitSound( "crackdown2/ply/groundstrikeinit.mp3", 60 )
         ply:EmitSound( "crackdown2/ply/die.mp3", 60 )
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             local trail1 = util.SpriteTrail( ply, ply:LookupAttachment( "anim_attachment_RH"), red, true, 20, 0, 1.5, 1 / ( 20 + 0 ) * 0.5, "trails/laser" )
             local trail2 = util.SpriteTrail( ply, ply:LookupAttachment( "anim_attachment_LH"), red, true, 20, 0, 1.5, 1 / ( 20 + 0 ) * 0.5, "trails/laser" )
@@ -191,7 +191,7 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
             wep:SetPickupMode( false )
             wep:SetHoldType( wep.HoldType )
 
-            local near = CD2FindInSphere( ply:GetPos(), 200, function( ent ) return ent != ply end )
+            local near = CD2:FindInSphere( ply:GetPos(), 200, function( ent ) return ent != ply end )
 
             for i = 1, #near do
                 local ent = near[ i ]
@@ -214,11 +214,11 @@ hook.Add( "KeyPress", "crackdown2_groundstrike", function( ply, key )
             if IsValid( trail1 ) then trail1:Remove() end
             if IsValid( trail2 ) then trail2:Remove() end
 
-            if !KeysToTheCity() and !ply.cd2_hadfirstgroundpound then
-                CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstgroundpound", function( val ) 
+            if !CD2:KeysToTheCity() and !ply.cd2_hadfirstgroundpound then
+                CD2:RequestPlayerData( ply, "cd2_firstgroundpound", function( val ) 
                     if !val then
                         ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/groundstrike_achieve.mp3" )
-                        CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstgroundpound", true )
+                        CD2:WritePlayerData( ply, "cd2_firstgroundpound", true )
                     end
                     ply.cd2_hadfirstgroundpound = true
                 end )

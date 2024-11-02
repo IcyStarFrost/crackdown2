@@ -5,22 +5,22 @@ function CD2PlayCredits()
 
     local viewtbl = {}
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
 
 
         LocalPlayer():ScreenFade( SCREENFADE.IN, Color( 0, 0, 0 ), 4, 1 )
-        CD2_DrawAgilitySkill = false
-        CD2_DrawFirearmSkill = false
-        CD2_DrawStrengthSkill = false
-        CD2_DrawExplosiveSkill = false
+        CD2.DrawAgilitySkill = false
+        CD2.DrawFirearmSkill = false
+        CD2.DrawStrengthSkill = false
+        CD2.DrawExplosiveSkill = false
 
-        CD2_DrawTargetting = false
-        CD2_DrawHealthandShields = false
-        CD2_DrawWeaponInfo = false
-        CD2_DrawMinimap = false
-        CD2_DrawBlackbars = true
+        CD2.DrawTargetting = false
+        CD2.DrawHealthandShields = false
+        CD2.DrawWeaponInfo = false
+        CD2.DrawMinimap = false
+        CD2.DrawBlackbars = true
 
-        CD2_PreventMovement = true
+        CD2.PreventMovement = true
 
         local endcred = false
 
@@ -64,7 +64,7 @@ function CD2PlayCredits()
 
             return object
         end
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             coroutine.wait( 2 )
             local usebind = input.LookupBinding( "+use" )
@@ -173,7 +173,7 @@ function CD2PlayCredits()
         local pos = LocalPlayer():GetPos() + Vector( math.random( -5000, 5000 ), math.random( -5000, 5000 ), ( math.random( 1, 3 ) == 1 and math.random( 10, 5000 ) or 10 ) )
         local lerppos = LocalPlayer():GetPos() + Vector( math.random( -5000, 5000 ), math.random( -5000, 5000 ), ( math.random( 1, 3 ) == 1 and math.random( 10, 5000 ) or 10 ) )
         local ang = math.random( 1, 3 ) == 1 and ( LocalPlayer():GetPos() - pos ):Angle() or Angle( math.random( -30, 30 ), math.random( -180, 180 ), 0 )
-        CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+        CD2.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
 
             if SysTime() > nextchange then
                 pos = LocalPlayer():GetPos() + Vector( math.random( -5000, 5000 ), math.random( -5000, 5000 ), ( math.random( 1, 3 ) == 1 and math.random( 10, 5000 ) or 10 ) )
@@ -201,24 +201,24 @@ function CD2PlayCredits()
         endcred = true
         if chan and chan:IsValid() then chan:FadeOut() end
 
-        CD2_DrawAgilitySkill = true
-        CD2_DrawFirearmSkill = true
-        CD2_DrawStrengthSkill = true
-        CD2_DrawExplosiveSkill = true
+        CD2.DrawAgilitySkill = true
+        CD2.DrawFirearmSkill = true
+        CD2.DrawStrengthSkill = true
+        CD2.DrawExplosiveSkill = true
 
-        CD2_DrawTargetting = true
-        CD2_DrawHealthandShields = true
-        CD2_DrawWeaponInfo = true
-        CD2_DrawMinimap = true
-        CD2_DrawBlackbars = false
-        CD2_ViewOverride = nil
+        CD2.DrawTargetting = true
+        CD2.DrawHealthandShields = true
+        CD2.DrawWeaponInfo = true
+        CD2.DrawMinimap = true
+        CD2.DrawBlackbars = false
+        CD2.ViewOverride = nil
 
-        CD2_PreventMovement = false
+        CD2.PreventMovement = false
 
-        if !KeysToTheCity() and !CD2FILESYSTEM:ReadPlayerData( "cd2_finishedgame" ) then
+        if !CD2:KeysToTheCity() and !CD2:ReadPlayerData( "cd2_finishedgame" ) then
             CD2StartMusic( "sound/crackdown2/music/victory.mp3", 1000 )
             sound.PlayFile( "sound/crackdown2/vo/agencydirector/ending_achievement.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
-            CD2FILESYSTEM:WritePlayerData( "cd2_finishedgame", true )
+            CD2:WritePlayerData( "cd2_finishedgame", true )
         end
 
     end )

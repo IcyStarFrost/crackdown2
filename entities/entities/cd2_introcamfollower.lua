@@ -10,23 +10,23 @@ function ENT:Initialize()
 
     if CLIENT then
         if LocalPlayer() != self:GetPlayer() then return end
-        local currentviewpos = CD2_vieworigin * 1
-        local currentviewangles = CD2_viewangles * 1
+        local currentviewpos = CD2.vieworigin * 1
+        local currentviewangles = CD2.viewangles * 1
 
-        CD2_DrawAgilitySkill = false
-        CD2_DrawFirearmSkill = false
-        CD2_DrawStrengthSkill = false
-        CD2_DrawExplosiveSkill = false
+        CD2.DrawAgilitySkill = false
+        CD2.DrawFirearmSkill = false
+        CD2.DrawStrengthSkill = false
+        CD2.DrawExplosiveSkill = false
 
-        CD2_DrawTargetting = false
-        CD2_DrawHealthandShields = false
-        CD2_DrawWeaponInfo = false
-        CD2_DrawMinimap = false
-        CD2_DrawBlackbars = true
+        CD2.DrawTargetting = false
+        CD2.DrawHealthandShields = false
+        CD2.DrawWeaponInfo = false
+        CD2.DrawMinimap = false
+        CD2.DrawBlackbars = true
 
         local viewtbl = {}
-        CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
-            if !IsValid( self ) then CD2_ViewOverride = nil return end
+        CD2.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+            if !IsValid( self ) then CD2.ViewOverride = nil return end
 
             if !self.cd2_showbeginningtacticallocation then
                 currentviewpos = LerpVector( 1 * FrameTime(), currentviewpos, self:Trace( self:GetPos() + Vector( 0, 0, 5 ), self:GetPos() + Vector( 0, 0, 1000 ) ).HitPos - Vector( 0, 0, 10 ) )
@@ -84,12 +84,12 @@ function ENT:Initialize()
             return object
         end
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
             coroutine.wait( 90 )
             self.cd2_showbeginningtacticallocation = true
         end )
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             local credit = DrawCredit( "CRACKDOWN 2", "Garry's Mod Gamemode Recreation by StarFrost" )
             while credit:IsValid() do coroutine.yield() end
@@ -159,7 +159,7 @@ function ENT:Initialize()
     end
 
     if SERVER then
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             while IsValid( self ) do
 
@@ -198,16 +198,16 @@ end
 
 function ENT:OnRemove()
     if CLIENT and LocalPlayer() == self:GetPlayer() then
-        CD2_DrawAgilitySkill = true
-        CD2_DrawFirearmSkill = true
-        CD2_DrawStrengthSkill = true
-        CD2_DrawExplosiveSkill = true
+        CD2.DrawAgilitySkill = true
+        CD2.DrawFirearmSkill = true
+        CD2.DrawStrengthSkill = true
+        CD2.DrawExplosiveSkill = true
 
-        CD2_DrawTargetting = true
-        CD2_DrawHealthandShields = true
-        CD2_DrawWeaponInfo = true
-        CD2_DrawMinimap = true
-        CD2_DrawBlackbars = false
+        CD2.DrawTargetting = true
+        CD2.DrawHealthandShields = true
+        CD2.DrawWeaponInfo = true
+        CD2.DrawMinimap = true
+        CD2.DrawBlackbars = false
     end
 end
 

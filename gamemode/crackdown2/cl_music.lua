@@ -101,7 +101,7 @@ function CD2StartMusic( path, priority, looped, killonpriorityfade, overridevolu
         CD2Musicchannel:SetChannel( snd )
         table_insert( CD2_MusicChannels, CD2Musicchannel )
 
-        CD2DebugMessage( "Created Music Channel for file path " .. path .. " with a priority of " .. priority )
+        CD2:DebugMessage( "Created Music Channel for file path " .. path .. " with a priority of " .. priority )
 
         if is3d then
             local min, max = snd:Get3DFadeDistance()
@@ -138,7 +138,7 @@ function CD2StartMusic( path, priority, looped, killonpriorityfade, overridevolu
                 if snd:GetVolume() <= 0.05 then 
                     hook.Remove( "Think", "crackdown2_musicsystem" .. id )
                     snd:Stop()
-                    CD2DebugMessage( "Removed Music Channel " .. path .. " with a priority of " .. priority .. " due to fade out" )
+                    CD2:DebugMessage( "Removed Music Channel " .. path .. " with a priority of " .. priority .. " due to fade out" )
                 end
             elseif !CD2Musicchannel:IsFading() and !CD2Musicchannel:IsHighestPriority() then -- We aren't the highest priority and therefor will be silenced until we are
                 snd:SetVolume( Lerp( 2 * FrameTime(), snd:GetVolume(), 0 ) )

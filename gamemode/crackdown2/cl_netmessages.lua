@@ -15,7 +15,7 @@ net.Receive( "cd2net_playerkilled", function()
 
     if IsValid( CD2_DropMenu ) then CD2_DropMenu:Remove() end
 
-    CD2_DrawBlackbars = true
+    CD2.DrawBlackbars = true
     surface.PlaySound( "crackdown2/ply/die.mp3" )
 
 end )
@@ -48,17 +48,17 @@ net.Receive( "cd2net_playerspawnlight", function()
 end )
 
 net.Receive( "cd2net_setplayerangle", function()
-    CD2_plyangle = net.ReadAngle()
+    CD2.plyangle = net.ReadAngle()
 end )
 
 -- Respawn music
 net.Receive( "cd2net_playerrespawn", function()
-    CD2_DrawBlackbars = false 
+    CD2.DrawBlackbars = false 
     CD2StartMusic( "sound/crackdown2/music/playerspawn.mp3", 2, false, true )
 end )
 
 net.Receive( "cd2net_playerrespawn_revive", function()
-    CD2_DrawBlackbars = false 
+    CD2.DrawBlackbars = false 
     CD2StartMusic( "sound/crackdown2/music/revive.mp3", 2, false, true )
 end )
 
@@ -169,7 +169,7 @@ net.Receive( "cd2net_playerinitialspawn", function()
 end )
 
 net.Receive( "cd2net_removeping", function()
-    CD2RemovePingLocation( net.ReadString() )
+    CD2:RemovePingLocation( net.ReadString() )
 end )
 
 net.Receive( "cd2net_pinglocation", function() 
@@ -179,9 +179,9 @@ net.Receive( "cd2net_pinglocation", function()
     local persist = net.ReadBool()
     local pingconsole = net.ReadBool()
     if pingconsole then
-        CD2PingLocationOnConsole( id != "" and id or nil, pos, times, persist )
+        CD2:PingLocationOnConsole( id != "" and id or nil, pos, times, persist )
     else
-        CD2PingLocationTracker( id != "" and id or nil, pos, times, persist )
+        CD2:PingLocationTracker( id != "" and id or nil, pos, times, persist )
     end
 end )
 
@@ -218,17 +218,17 @@ net.Receive( "cd2net_playergroundpound", function()
 end )
 
 net.Receive( "cd2net_enablehud", function()
-    CD2_DrawAgilitySkill = true
-    CD2_DrawFirearmSkill = true
-    CD2_DrawStrengthSkill = true
-    CD2_DrawExplosiveSkill = true
+    CD2.DrawAgilitySkill = true
+    CD2.DrawFirearmSkill = true
+    CD2.DrawStrengthSkill = true
+    CD2.DrawExplosiveSkill = true
     CD2_CanOpenAgencyConsole = true
 
-    CD2_DrawTargetting = true
-    CD2_DrawHealthandShields = true
-    CD2_DrawWeaponInfo = true
-    CD2_DrawMinimap = true
-    CD2_DrawBlackbars = false
+    CD2.DrawTargetting = true
+    CD2.DrawHealthandShields = true
+    CD2.DrawWeaponInfo = true
+    CD2.DrawMinimap = true
+    CD2.DrawBlackbars = false
 end )
 
 net.Receive( "cd2net_playguitar", function()
@@ -261,7 +261,7 @@ net.Receive( "cd2net_playerlevelupeffect", function()
     local ply = net.ReadEntity()
     if !IsValid( ply ) then return end
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
         while !ply:Alive() do coroutine.yield() end
 
         CD2StartMusic( "sound/crackdown2/music/levelup.mp3", 3, false, true )
@@ -297,7 +297,7 @@ net.Receive( "cd2net_playerlevelupeffect", function()
 
     end )
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
         while !ply:Alive() do coroutine.yield() end
 
         coroutine.wait( 1 )
@@ -497,12 +497,12 @@ net.Receive( "cd2net_sendtypingtext", function()
     local top = net.ReadString()
     local bottom = net.ReadString()
     local isred = net.ReadBool()
-    CD2SetTypingText( top, bottom, isred )
+    CD2:SetTypingText( top, bottom, isred )
 end )
 
 
 local function PlayerHasWeapon( class )
-    local hasweapon = CD2FILESYSTEM:ReadPlayerData( "cd2_weaponcollect_" .. class )
+    local hasweapon = CD2:ReadPlayerData( "cd2_weaponcollect_" .. class )
     return hasweapon
 end
 
@@ -515,7 +515,7 @@ net.Receive( "cd2net_checkweapons", function()
     for k , v in ipairs( weps ) do 
         if IsValid( v ) and v.DropMenu_RequiresCollect and !PlayerHasWeapon( v:GetClass() ) then 
             texttbl[ #texttbl + 1 ] = v:GetPrintName()
-            CD2FILESYSTEM:WritePlayerData( "cd2_weaponcollect_" .. v:GetClass(), true )
+            CD2:WritePlayerData( "cd2_weaponcollect_" .. v:GetClass(), true )
             newweps = true 
         end
     end
@@ -524,12 +524,12 @@ net.Receive( "cd2net_checkweapons", function()
 
     if enttbl.DropMenu_RequiresCollect and !PlayerHasWeapon( equipment ) then
         texttbl[ #texttbl + 1 ] = enttbl.PrintName
-        CD2FILESYSTEM:WritePlayerData( "cd2_weaponcollect_" .. equipment, true )
+        CD2:WritePlayerData( "cd2_weaponcollect_" .. equipment, true )
         newweps = true 
     end
 
     if newweps then
-        CD2SetTypingText( "Equipment Stored", table.concat( texttbl, ", " ) )
+        CD2:SetTypingText( "Equipment Stored", table.concat( texttbl, ", " ) )
     end
 
 end )

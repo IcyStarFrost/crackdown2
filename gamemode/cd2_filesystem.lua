@@ -32,11 +32,10 @@ end
 
 
 -- The gamemode's custom file system. This is what handles the saving, loading, and general data players have
-CD2FILESYSTEM = {}
 
 -- File writing with the ability to easily pack tables into jsons or compressed jsons
-function CD2FILESYSTEM:Write( filename, contents, type )
-    CD2DebugMessage( "Writing to file " .. filename .. " with " .. tostring( contents ) )
+function CD2:Write( filename, contents, type )
+    CD2:DebugMessage( "Writing to file " .. filename .. " with " .. tostring( contents ) )
 	local f = file.Open( filename, type == "compressed" and "wb" or "w", "DATA" )
 	if ( !f ) then return end
 
@@ -53,8 +52,8 @@ function CD2FILESYSTEM:Write( filename, contents, type )
 end
 
 -- File reading with the ability to directly get a table from a json or compressed json
-function CD2FILESYSTEM:Read( filename, type )
-    CD2DebugMessage( "Reading from file " .. filename )
+function CD2:Read( filename, type )
+    CD2:DebugMessage( "Reading from file " .. filename )
 
 	local f = file.Open( filename, type == "compressed" and "rb" or "r", "DATA" )
 	if ( !f ) then return end
@@ -69,7 +68,7 @@ function CD2FILESYSTEM:Read( filename, type )
         contents = JSONToTable( contents )
     end
 
-    CD2DebugMessage( "Read " .. tostring( contents ) .. " from " .. filename )
+    CD2:DebugMessage( "Read " .. tostring( contents ) .. " from " .. filename )
 
 	return contents
 end
@@ -78,28 +77,28 @@ end
 if SERVER then
     -- These functions are only used on the server. Completely useless to use on the client
     -- Writes a value to the current map's data. These two are typically used to save/load Agility Orbs and more
-    function CD2FILESYSTEM:WriteMapData( var, any )
+    function CD2:WriteMapData( var, any )
         if !file.Exists( "crackdown2/mapdata/" .. game.GetMap(), "DATA" ) then file.CreateDir( "crackdown2/mapdata/" .. game.GetMap() ) end
-        if !file.Exists( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "DATA" ) then CD2FILESYSTEM:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", {}, "compressed" ) end
-        local data = CD2FILESYSTEM:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "compressed" )
+        if !file.Exists( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "DATA" ) then CD2:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", {}, "compressed" ) end
+        local data = CD2:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "compressed" )
         data[ var ] = any
-        CD2FILESYSTEM:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", data, "compressed" )
+        CD2:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", data, "compressed" )
     end
 
     -- Removes the data file related to this map
-    function CD2FILESYSTEM:ClearMapData()
+    function CD2:ClearMapData()
         file.Delete( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat" )
     end
 
     -- Reads from the current map's data. These two are typically used to save/load Agility Orbs and more
-    function CD2FILESYSTEM:ReadMapData( var )
-        local data = CD2FILESYSTEM:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "compressed" )
+    function CD2:ReadMapData( var )
+        local data = CD2:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "compressed" )
         return var != "TABLE" and data and data[ var ] or var == "TABLE" and data
     end
 
     -- Requests the specified variable value from the provided player's Agent data
-    function CD2FILESYSTEM:RequestPlayerData( ply, var, callback )
-        CD2DebugMessage( "Requesting " .. var .. " from " .. ply:Name() .. "'s Agent data" )
+    function CD2:RequestPlayerData( ply, var, callback )
+        CD2:DebugMessage( "Requesting " .. var .. " from " .. ply:Name() .. "'s Agent data" )
 
         net.Start( "cd2filesystem_requestplayerdata" )
         net.WriteString( var )
@@ -113,15 +112,15 @@ if SERVER then
             local isdone = net.ReadBool()
             chunks = chunks .. chunk
 
-            CD2DebugMessage( "Received a data chunk from " .. ply:Name() .. " for " .. var  )
+            CD2:DebugMessage( "Received a data chunk from " .. ply:Name() .. " for " .. var  )
 
-            if isdone then local tbl = JSONToTable( chunks ) local val = tbl and tbl[ 1 ] or nil callback( val ) CD2DebugMessage( "Received all data chunks for " .. var ) end
+            if isdone then local tbl = JSONToTable( chunks ) local val = tbl and tbl[ 1 ] or nil callback( val ) CD2:DebugMessage( "Received all data chunks for " .. var ) end
         end )
     end
 
     -- Writes the specified value to the player's Agent data variable
-    function CD2FILESYSTEM:WritePlayerData( ply, var, any )
-        CD2DebugMessage( "Writing to " .. ply:Name() .. "'s Agent data: var = " .. var .. " | value = " .. tostring( any ) )
+    function CD2:WritePlayerData( ply, var, any )
+        CD2:DebugMessage( "Writing to " .. ply:Name() .. "'s Agent data: var = " .. var .. " | value = " .. tostring( any ) )
         local tbl = TableToJSON( { any } )
         local chunks = DataSplit( tbl )
 
@@ -139,23 +138,23 @@ end
 if CLIENT then
 
     -- Writes a value to the Player's agent data
-    function CD2FILESYSTEM:WritePlayerData( var, any )
-        CD2DebugMessage( "Writing to your Agent data: var = " .. var .. " | value = " .. tostring( any ) )
-        local data = CD2FILESYSTEM:Read( "crackdown2/agentdata.dat", "compressed" )
+    function CD2:WritePlayerData( var, any )
+        CD2:DebugMessage( "Writing to your Agent data: var = " .. var .. " | value = " .. tostring( any ) )
+        local data = CD2:Read( "crackdown2/agentdata.dat", "compressed" )
         data[ var ] = any
-        CD2FILESYSTEM:Write( "crackdown2/agentdata.dat", data, "compressed" )
+        CD2:Write( "crackdown2/agentdata.dat", data, "compressed" )
     end
 
     -- Reads a value from the Player's agent data
-    function CD2FILESYSTEM:ReadPlayerData( var )
-        local data = CD2FILESYSTEM:Read( "crackdown2/agentdata.dat", "compressed" )
-        CD2DebugMessage( "Reading from your Agent data: var = " .. var .. " | returned value = " .. tostring( data[ var ] ) )
+    function CD2:ReadPlayerData( var )
+        local data = CD2:Read( "crackdown2/agentdata.dat", "compressed" )
+        CD2:DebugMessage( "Reading from your Agent data: var = " .. var .. " | returned value = " .. tostring( data[ var ] ) )
         return data[ var ]
     end
 
     -- Create Agent data if it doesn't exist
     if !file.Exists( "crackdown2/agentdata.dat", "DATA" ) then
-        CD2FILESYSTEM:Write( "crackdown2/agentdata.dat", {}, "compressed" )
+        CD2:Write( "crackdown2/agentdata.dat", {}, "compressed" )
     end
 
 
@@ -169,12 +168,12 @@ if CLIENT then
 
         chunks = chunks .. chunk
 
-        CD2DebugMessage( "Received a data chunk from the Server for " .. var  )
+        CD2:DebugMessage( "Received a data chunk from the Server for " .. var  )
 
         if isdone then
-            CD2DebugMessage( "Received all data chunks for " .. var )
+            CD2:DebugMessage( "Received all data chunks for " .. var )
             local val = JSONToTable( chunks )[ 1 ]
-            CD2FILESYSTEM:WritePlayerData( var, val )
+            CD2:WritePlayerData( var, val )
             chunks = nil
         end
     end )
@@ -182,9 +181,9 @@ if CLIENT then
     -- Received when the server wants to get a value from the Player's Agent Data
     net.Receive( "cd2filesystem_requestplayerdata", function()
         local var = net.ReadString()
-        CD2DebugMessage( "Server is requesting " .. var .. " from your Agent data. Dispatching..")
+        CD2:DebugMessage( "Server is requesting " .. var .. " from your Agent data. Dispatching..")
 
-        local value = CD2FILESYSTEM:ReadPlayerData( var )
+        local value = CD2:ReadPlayerData( var )
         local tbl = TableToJSON( { value } )
         local chunks = DataSplit( tbl )
 

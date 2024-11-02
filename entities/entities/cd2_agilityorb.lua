@@ -52,7 +52,7 @@ function ENT:Draw()
         render.DrawSphere( ( self:GetPos() + Vector( 0, 0, 20 ) ) + Vector( 0, 0, 20 * i ) , 5, isfar and 5 or 10, isfar and 5 or 10, self.cd2_color )
     end
 
-    cam.Start3D2D( self:GetPos(), Angle( 0, CD2_viewangles[ 2 ] + -90, 90 ), 2 )
+    cam.Start3D2D( self:GetPos(), Angle( 0, CD2.viewangles[ 2 ] + -90, 90 ), 2 )
         surface.SetMaterial( beam )
         surface.SetDrawColor( self.cd2_color )
         surface.DrawTexturedRect( -25, -140, 50, 150 )
@@ -94,7 +94,7 @@ function ENT:OnRemove()
 end
 
 function ENT:OnCollected( ply )
-    CD2DebugMessage( ply:Name() .. " collected a agility orb " .. self:EntIndex() )
+    CD2:DebugMessage( ply:Name() .. " collected a agility orb " .. self:EntIndex() )
     self.cd2_missingplayers[ ply:SteamID() ] = false
     self.cd2_collectedby[ ply:SteamID() ] = true
 
@@ -106,16 +106,16 @@ function ENT:OnCollected( ply )
         local orbcount = 4 * self:GetLevel()
 
         for i = 1, orbcount do
-            CD2CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, Color( 0, 255, 0 ) )
+            CD2:CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, Color( 0, 255, 0 ) )
         end
 
-        CD2SendTextBoxMessage( ply, "Well done. You found a Agility Orb!" )
+        CD2:SendTextBoxMessage( ply, "Well done. You found a Agility Orb!" )
 
-        if !KeysToTheCity() and !ply.cd2_InTutorial and !ply.cd2_hadfirstagilityorb then
-            CD2FILESYSTEM:RequestPlayerData( ply, "cd2_firstagilityorb", function( val ) 
+        if !CD2:KeysToTheCity() and !ply.cd2_InTutorial and !ply.cd2_hadfirstagilityorb then
+            CD2:RequestPlayerData( ply, "cd2_firstagilityorb", function( val ) 
                 if !val then
                     ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firstagilityorb_achieve.mp3" )
-                    CD2FILESYSTEM:WritePlayerData( ply, "cd2_firstagilityorb", true )
+                    CD2:WritePlayerData( ply, "cd2_firstagilityorb", true )
                 end
                 ply.cd2_hadfirstagilityorb = true
             end )
@@ -136,7 +136,7 @@ function ENT:CheckPlayers()
     for k, v in pairs( self.cd2_missingplayers ) do
         if v then shouldremove = false end
     end
-    if shouldremove then CD2DebugMessage( "Agility Orb " .. self:EntIndex() .. " has been collected by all players. Removing." ) self:Remove() end
+    if shouldremove then CD2:DebugMessage( "Agility Orb " .. self:EntIndex() .. " has been collected by all players. Removing." ) self:Remove() end
 end
 
 function ENT:Think()

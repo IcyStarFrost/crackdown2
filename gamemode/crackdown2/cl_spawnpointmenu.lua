@@ -27,13 +27,13 @@ local viewtbl = {}
 
 function CD2OpenSpawnPointMenu()
 
-    CD2_DrawBlackbars = false
+    CD2.DrawBlackbars = false
     surface.PlaySound( "crackdown2/ui/dropmenuopen" .. random( 1, 2 ) .. ".mp3" )
 
     net.Start( "cd2net_playerregenerate" )
     net.SendToServer()
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
 
         CD2_InSpawnPointMenu = true
 
@@ -90,13 +90,13 @@ function CD2OpenSpawnPointMenu()
 
         function CD2_SpawnPointMenu:OnRemove()
             CD2_InSpawnPointMenu = false
-            CD2_ViewOverride = nil
+            CD2.ViewOverride = nil
         end
 
         local viewpos
         local spawnpointpanels = {}
 
-        CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+        CD2.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
             local spawns = CD2_SpawnPoints
             local spawnpoint = spawns[ CD2_SpawnPointIndex ]
 

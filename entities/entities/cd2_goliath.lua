@@ -144,7 +144,7 @@ function ENT:OnKilled( info )
 
     self:RemoveAllHooks()
 
-    CD2AssessSkillGainOrbs( self, self.cd2_loggeddamage )
+    CD2:AssessSkillGainOrbs( self, self.cd2_loggeddamage )
 
     hook.Run( "OnCD2NPCKilled", self, info )
 
@@ -208,7 +208,7 @@ function ENT:Swipe()
     if CurTime() < self.cd2_nextattack then return end
 
     self:EmitSound2( "crackdown2/npc/goliath/goliath_hit.mp3", 400, 5 )
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
         self:PlayGesture( ACT_GMOD_GESTURE_RANGE_ZOMBIE )
 
         coroutine.wait( 1 )

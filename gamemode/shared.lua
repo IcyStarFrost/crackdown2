@@ -5,6 +5,10 @@ local ipairs = ipairs
 
 GM.Name = "CRACKDOWN 2"
 
+CD2 = CD2 or {}
+
+CD2.HUD_SCALE = ScreenScaleH( 0.44 )
+
 
 local function IncludeDirectory( directory )
     directory = directory .. "/"

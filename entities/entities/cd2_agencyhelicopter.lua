@@ -33,7 +33,7 @@ end
 -- Makes the helicopter drop peacekeepers
 function ENT:DropPeaceKeepers( pos )
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
 
         while true do 
             if !IsValid( self ) then return end
@@ -102,7 +102,7 @@ function ENT:DeployPeacekeepers()
 
         if !IsValid( peacekeeper ) then continue end
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             peacekeeper:EmitSound( "crackdown2/npc/peacekeeper/drop" .. random( 1, 2 ) .. ".wav", 70 )
 
@@ -121,7 +121,7 @@ function ENT:DeployPeacekeepers()
 
         if !IsValid( peacekeeper ) then continue end
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
 
             peacekeeper:EmitSound( "crackdown2/npc/peacekeeper/drop" .. random( 1, 2 ) .. ".wav", 70 )
 
@@ -142,7 +142,7 @@ function ENT:ExtractEntity( ent )
         self.cd2_cargoxypos = self:GetCargo():GetPos() self.cd2_cargoxypos[ 3 ] = 0
     end
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
 
         while true do 
             if !IsValid( self ) then return end

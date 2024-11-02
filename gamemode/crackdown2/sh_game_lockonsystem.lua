@@ -3,7 +3,7 @@ local player_GetAll = player.GetAll
 -- Crackdown 2 Lockon system --
 local limitlockonsound = false
 
-if CLIENT then CD2_LockOnPos = "body" CD2_LastLockOnPos = "body" end
+if CLIENT then CD2.LockOnPos = "body" CD2_LastLockOnPos = "body" end
 
 hook.Add( "Think", "crackdown2_lockon", function()
 
@@ -19,7 +19,7 @@ hook.Add( "Think", "crackdown2_lockon", function()
                 if !IsValid( wep ) then return end
                 ply.cd2_LockOnPos = ply.cd2_LockOnPos or "body"
                 
-                local lockables = CD2FindInLockableTragets( ply )
+                local lockables = CD2:FindInLockableTragets( ply )
 
                 local oldtarget = ply:GetNW2Entity( "cd2_lockontarget", nil )
                 local target = IsValid( oldtarget ) and oldtarget:GetPos():DistToSqr( ply:GetPos() ) <= ( wep.LockOnRange * wep.LockOnRange ) and oldtarget or IsValid( lockables[ 1 ] ) and lockables[ 1 ]:GetPos():DistToSqr( ply:GetPos() ) <= ( wep.LockOnRange * wep.LockOnRange ) and lockables[ 1 ]
@@ -54,28 +54,28 @@ hook.Add( "Think", "crackdown2_lockon", function()
                 limitlockonsound = true
             end
 
-            if CD2_LockOnPos != CD2_LastLockOnPos then
+            if CD2.LockOnPos != CD2_LastLockOnPos then
                 net.Start( "cd2net_changelockonpos" )
-                net.WriteString( CD2_LockOnPos )
+                net.WriteString( CD2.LockOnPos )
                 net.SendToServer()
                 surface.PlaySound( "crackdown2/ply/switchlockonpos.mp3" ) 
             end
-            CD2_LastLockOnPos = CD2_LockOnPos
+            CD2_LastLockOnPos = CD2.LockOnPos
 
-            local pos = CD2_LockOnPos == "body" and lockontarget:WorldSpaceCenter() or CD2_LockOnPos == "head" and lockontarget:CD2EyePos()
-            local dir = ( pos - CD2_vieworigin ):Angle() 
+            local pos = CD2.LockOnPos == "body" and lockontarget:WorldSpaceCenter() or CD2.LockOnPos == "head" and lockontarget:CD2EyePos()
+            local dir = ( pos - CD2.vieworigin ):Angle() 
             dir:Normalize() -- Funny story with this, without this function, when you go below the target your view jumps straight down. No clue why but this fixed it
             ply:SetEyeAngles( ( pos - ply:EyePos() ):Angle() )
             
-            CD2_viewangles = dir
-            CD2_viewlockedon = true
+            CD2.viewangles = dir
+            CD2.viewlockedon = true
             
         else
-            CD2_viewlockedon = false
+            CD2.viewlockedon = false
             limitlockonsound = false
         end
 
-        CD2_lockon = #CD2FindInLockableTragets( ply ) > 0
+        CD2_lockon = #CD2:FindInLockableTragets( ply ) > 0
         
     end 
 

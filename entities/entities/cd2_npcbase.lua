@@ -621,7 +621,7 @@ function ENT:OnKilled( info )
     
     self:RemoveAllHooks()
 
-    CD2AssessSkillGainOrbs( self, self.cd2_loggeddamage )
+    CD2:AssessSkillGainOrbs( self, self.cd2_loggeddamage )
 
     hook.Run( "OnCD2NPCKilled", self, info )
     

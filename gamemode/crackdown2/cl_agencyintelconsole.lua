@@ -26,14 +26,14 @@ local ping_locations = {}
 local viewoffset = Vector()
 
 local uniqueid = 0
-function CD2PingLocationOnConsole( id, pos, times, persist )
+function CD2:PingLocationOnConsole( id, pos, times, persist )
     id = id or uniqueid
     ping_locations[ id ] = { pos = pos, ping_scale = 0, times = times, can_ping = true, times_pinged = 0, persist = persist }
     uniqueid = uniqueid + 1
     return id
 end
 
-function CD2RemovePingLocationConsole( id )
+function CD2:RemovePingLocationConsole( id )
     ping_locations[ id ] = nil
 end
 
@@ -118,9 +118,9 @@ function OpenIntelConsole()
         return true 
     end )
 
-    CD2_PreventMovement = true
+    CD2.PreventMovement = true
 
-    function CD2_AgencyConsole:OnRemove() CD2_PreventMovement = nil end
+    function CD2_AgencyConsole:OnRemove() CD2.PreventMovement = nil end
 
     local toptext = vgui.Create( "DLabel", CD2_AgencyConsole )
     toptext:SetFont( "crackdown2_font60" )
@@ -329,7 +329,7 @@ function OpenIntelConsole()
             end
 
             ping.ping_scale = Lerp( 3.5 * FrameTime(), ping.ping_scale, ping.times > ping.times_pinged and 40 or 20 )
-            DrawCoordsOnMap( self, ping.pos - viewoffset, plypos, CD2_viewangles, pingmat, ping.ping_scale, cellwhite, 30 )
+            DrawCoordsOnMap( self, ping.pos - viewoffset, plypos, CD2.viewangles, pingmat, ping.ping_scale, cellwhite, 30 )
 
             if ping.can_ping and ping.times > ping.times_pinged then
                 surface.PlaySound( "crackdown2/ui/ping.mp3" )

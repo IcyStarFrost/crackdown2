@@ -185,7 +185,7 @@ function ENT:DrawEffects()
         local core2 = self:GetCore2()
         local core3 = self:GetCore3()
 
-        local nearby = CD2FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" end )
+        local nearby = CD2:FindInSphere( self:GetPos(), 2000, function( ent ) return ent:IsCD2NPC() and ent:GetCD2Team() == "freak" end )
 
         for i = 1, #nearby do
             local freak = nearby[ i ]
@@ -428,7 +428,7 @@ function ENT:Think()
     if CLIENT then return end
 
     if !self:GetIsCharging() and !self:GetIsDetonated() and self:CanBeActivated() then
-        local near = CD2FindInSphere( self:GetPos() + Vector( 0, 0, 100 ), 300, function( ent ) return ent:IsCD2Agent() end )
+        local near = CD2:FindInSphere( self:GetPos() + Vector( 0, 0, 100 ), 300, function( ent ) return ent:IsCD2Agent() end )
 
         for k, ply in ipairs( near ) do
             if ply:KeyDown( IN_USE ) then
@@ -446,7 +446,7 @@ function ENT:Think()
         local players = player.GetAll()
         for i = 1, #players do 
             local ply = players[ i ]
-            if IsValid( ply ) and ply:SqrRangeTo( self:GetPos() ) < ( 2000 * 2000 ) then CD2SetTypingText( ply, "OBJECTIVE INCOMPLETE", "Beacon Core Destroyed", true ) ply:Kill() end
+            if IsValid( ply ) and ply:SqrRangeTo( self:GetPos() ) < ( 2000 * 2000 ) then CD2:SetTypingText( ply, "OBJECTIVE INCOMPLETE", "Beacon Core Destroyed", true ) ply:Kill() end
         end
 
         self:FlareFreaks()
@@ -464,7 +464,7 @@ function ENT:Think()
     if self:GetIsCharging() and CurTime() > self.cd2_delay and ( self.cd2_freakcount < 8 ) and CurTime() > self.cd2_nextspawn then
         
         local freakagent = ents.Create( "cd2_freakagent" )
-        freakagent:SetPos( CD2GetRandomPos( 800, self:GetPos() ) )
+        freakagent:SetPos( CD2:GetRandomPos( 800, self:GetPos() ) )
         local ang = ( self:GetPos() - freakagent:GetPos() ):Angle() ang[ 1 ] = 0 ang[ 3 ] = 0
         freakagent:SetAngles( ang )
         freakagent:Spawn()
@@ -503,7 +503,7 @@ function ENT:Think()
 end
 
 function ENT:CanBeActivated() 
-    if KeysToTheCity() then return true end
+    if CD2:KeysToTheCity() then return true end
     local beacons = ents.FindByClass( "cd2_beacon" )
     local count = 0 
     for k, v in ipairs( beacons ) do if v:GetIsDetonated() then count = count + 1 end end
@@ -547,7 +547,7 @@ function ENT:StartMusic()
 end
 
 function ENT:DispatchDirectorLine( path ) 
-    if KeysToTheCity() then return end
+    if CD2:KeysToTheCity() then return end
     for k, ply in ipairs( player.GetAll() ) do
         if ply:SqrRangeTo( self ) < ( 2000 * 2000 ) then
             ply:PlayDirectorVoiceLine( path )
@@ -557,7 +557,7 @@ end
 
 function ENT:BeginCharge()
 
-    CD2CreateThread( function() 
+    CD2:CreateThread( function() 
 
         
         self.cd2_delay = CurTime() + 34
@@ -567,7 +567,7 @@ function ENT:BeginCharge()
         
         local aborttime = CurTime() + 10
         local limitwarning = false
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
             while true do 
                 if !IsValid( self ) or !self:GetIsCharging() then break end
                 local players = player.GetAll()
@@ -578,10 +578,10 @@ function ENT:BeginCharge()
                     if player:IsCD2Agent() and player:SqrRangeTo( self ) < ( 2000 * 2000 ) and player:Alive() then playernear = true break end
                 end
     
-                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2PingLocation( nil, nil, self:GetPos(), 3 ) CD2SendTextBoxMessage( nil, "Return to the Tower Beacon!" ) limitwarning = true end end
+                if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2:PingLocation( nil, nil, self:GetPos(), 3 ) CD2:SendTextBoxMessage( nil, "Return to the Tower Beacon!" ) limitwarning = true end end
     
                 if CurTime() > aborttime then
-                    CD2PingLocation( nil, self:GetPos() )
+                    CD2:PingLocation( nil, self:GetPos() )
                     self:SetIsCharging( false )
                     self:SetIsDetonated( false )
                     self:SetCore1Charged( false )
@@ -639,11 +639,11 @@ function ENT:BeginCharge()
         self:SetCore3Charged( true )
         self:SetIsCharging( false )
 
-        if !KeysToTheCity() then
+        if !CD2:KeysToTheCity() then
             timer.Simple( 60, function() if !IsValid( self ) then return end self:SetIsDetonated( false ) end )
 
             CD2_EmptyStreets = true
-            CD2ClearNPCS()
+            CD2:ClearNPCS()
             self:StartEndingCutscene()
         else
             self:SetIsDetonated( true )
@@ -671,12 +671,12 @@ function ENT:StartEndingCutscene()
     self:SetCore2Charged( true )
     self:SetCore3Charged( true )
 
-    CD2CreateThread( function()
+    CD2:CreateThread( function()
     
         coroutine.wait( 8 )
 
         local freak = ents.Create( "cd2_freak" )
-        freak:SetPos( CD2GetRandomPos( 3000, self:GetPos() ) )
+        freak:SetPos( CD2:GetRandomPos( 3000, self:GetPos() ) )
         freak.CanAttack = function( self ) return false end
         local ang = ( self:GetPos() - freak:GetPos() ):Angle() ang[ 1 ] = 0 ang[ 3 ] = 0
         freak:SetAngles( ang )
@@ -691,7 +691,7 @@ function ENT:StartEndingCutscene()
 
         freak:LookTo( self:GetPos(), 3 )
 
-        local freakspos = CD2GetRandomPos( 6000, self:GetPos() )
+        local freakspos = CD2:GetRandomPos( 6000, self:GetPos() )
         local freaks = {}
         SetGlobal2Vector( "cd2_endingcutscenepos1", freakspos )
 
@@ -703,7 +703,7 @@ function ENT:StartEndingCutscene()
 
         for i = 1, 7 do 
             local freak = ents.Create( "cd2_freak" )
-            freak:SetPos( CD2GetRandomPos( 1000, freakspos ) )
+            freak:SetPos( CD2:GetRandomPos( 1000, freakspos ) )
             freak.CanAttack = function( self ) return false end
             local ang = ( freak:GetPos() - self:GetPos() ):Angle() ang[ 1 ] = 0 ang[ 3 ] = 0
             freak:SetAngles( ang )
@@ -742,7 +742,7 @@ if CLIENT then
         
         local viewtbl = {}
 
-        CD2CreateThread( function()
+        CD2:CreateThread( function()
             local endtime = SysTime() + 8
 
             while true do 
@@ -903,27 +903,27 @@ if CLIENT then
         
         end )
 
-        CD2CreateThread( function() 
+        CD2:CreateThread( function() 
             sound.PlayFile( "sound/crackdown2/ending/finalsequence.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
 
             CD2_InCutscene = true
-            CD2_DrawAgilitySkill = false
-            CD2_DrawFirearmSkill = false
-            CD2_DrawStrengthSkill = false
-            CD2_DrawExplosiveSkill = false
+            CD2.DrawAgilitySkill = false
+            CD2.DrawFirearmSkill = false
+            CD2.DrawStrengthSkill = false
+            CD2.DrawExplosiveSkill = false
 
-            CD2_DrawTargetting = false
-            CD2_DrawHealthandShields = false
-            CD2_DrawWeaponInfo = false
-            CD2_DrawMinimap = false
-            CD2_DrawBlackbars = true
+            CD2.DrawTargetting = false
+            CD2.DrawHealthandShields = false
+            CD2.DrawWeaponInfo = false
+            CD2.DrawMinimap = false
+            CD2.DrawBlackbars = true
 
-            CD2_PreventMovement = true
+            CD2.PreventMovement = true
 
             local newpos = pos + Vector( 500, 500, 50 )
             local fov2 = 80
 
-            CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+            CD2.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
 
                 
                 viewtbl.origin = newpos
@@ -944,7 +944,7 @@ if CLIENT then
             newpos = pos + Vector( 500, 500, 800 )
             fov2 = 50
 
-            CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+            CD2.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
 
                 
                 viewtbl.origin = newpos
@@ -967,7 +967,7 @@ if CLIENT then
 
             local lerpangle = ( ( GetGlobal2Vector( "cd2_endingcutscenepos1", Vector() ) + Vector( 0, 0, 55 ) ) - newpos ):Angle()
 
-            CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+            CD2.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
 
                 
                 viewtbl.origin = newpos
@@ -991,7 +991,7 @@ if CLIENT then
             ang:Normalize()
             fov2 = 50
 
-            CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+            CD2.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
 
                 
                 viewtbl.origin = newpos
@@ -1022,7 +1022,7 @@ if CLIENT then
             local lerppos = ( freakpos * 1 ) + ( freakpos - pos ):GetNormalized() * 500
             fov2 = 50
 
-            CD2_ViewOverride = function( ply, origin, angles, fov, znear, zfar )
+            CD2.ViewOverride = function( ply, origin, angles, fov, znear, zfar )
 
                 
                 viewtbl.origin = freakpos
@@ -1046,7 +1046,7 @@ if CLIENT then
             newpos = ( pos * 1 ) + Vector( math.random( -2000, 2000 ), math.random( -2000, 2000 ), 0)
             ang = ( pos - newpos ):Angle()
 
-            CD2_ViewOverride = function( ply, origin, angles, fov, znrea, zfar )
+            CD2.ViewOverride = function( ply, origin, angles, fov, znrea, zfar )
 
                 
                 viewtbl.origin = newpos

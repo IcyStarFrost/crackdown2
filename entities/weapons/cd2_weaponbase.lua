@@ -238,6 +238,23 @@ function SWEP:Equip( newowner )
     end
 end
 
+function SWEP:InteractTest( ply )
+    if IsValid( self.cd2_reservedplayer ) and ply != self.cd2_reservedplayer then return false end
+    if self:WaterLevel() != 0 then return false end
+    local wepowner = self:GetOwner()
+    if IsValid( wepowner ) and wepowner:IsCD2NPC() then
+        return false
+    end
+
+    if ply:HasWeapon( self:GetClass() ) then return false end
+
+    if ply:SqrRangeTo( self ) > 100 ^ 2 then return false end
+
+    if self:GetOwner() == ply then return false end 
+
+    return "Int3"
+end
+
 
 function SWEP:Deploy()
     local owner = self:GetOwner()
@@ -306,7 +323,7 @@ function SWEP:DrawWorldModel()
     self.cd2_effectdelay = self.cd2_effectdelay or SysTime() + 0.5
     if !IsValid( self:GetOwner() ) and self:GetVelocity():IsZero() and LocalPlayer():SqrRangeTo( self ) < ( 2000 * 2000 ) then
         local wep = LocalPlayer():GetWeapon( self:GetClass() )
-        if SysTime() < self.cd2_effectdelay or ( IsValid( wep ) and wep:Ammo1() >= ( wep.Primary.DefaultClip - wep.Primary.ClipSize ) ) then 
+        if SysTime() < self.cd2_effectdelay or ( IsValid( wep ) and wep:Ammo1() >= wep.Primary.DefaultClip ) then 
             self:SetupBones()
             self:SetPos( self:GetNetworkOrigin() )
             self:SetAngles( self:GetNetworkAngles() )

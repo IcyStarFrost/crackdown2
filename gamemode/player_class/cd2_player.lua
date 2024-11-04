@@ -58,6 +58,9 @@ function PLAYER:Init()
         self.Player:SetTeam( 1 )
     end
 
+    self.Player.ButtonData = {}
+    self.Player:SetIntNearestInteractables( util.TableToJSON( { Int1 = NULL, Int2 = NULL, Int3 = NULL } ) )
+
     self.Player:SetCanUseLockon( true )
     self.Player:SetCanUseMelee( true )
     self.Player:SetCD2Team( "agency" )
@@ -198,6 +201,7 @@ function PLAYER:SetupDataTables()
 
     self.Player:NetworkVar( "String", 0, "CD2Team" ) -- The team this player is in. Obviously mainly set to agency
     self.Player:NetworkVar( "String", 1, "Equipment" )
+    self.Player:NetworkVar( "String", 2, "IntNearestInteractables" )
 
     self.Player:NetworkVar( "Entity", 0, "Ragdoll" )
 

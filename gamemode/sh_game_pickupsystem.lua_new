@@ -126,7 +126,7 @@ if CLIENT then
         local targ = ply:GetNW2Entity( "cd2_pickuptarget", nil )
         local isholding = ply:GetNW2Bool( "cd2_isholdingent", false )
 
-        if !IsValid( targ ) or isholding or CurTime() < ply:GetNW2Float( "cd2_weapondrawcur", 0 ) then return end
+        if !IsValid( targ ) or isholding then return end
 
         local usebind = input_LookupBinding( "+use" ) or "e"
         local code = input_GetKeyCode( usebind )

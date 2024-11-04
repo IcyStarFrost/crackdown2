@@ -89,8 +89,8 @@ function CD2:OpenSpawnPointMenu()
         selecttext:Dock( TOP )
 
         function self.SpawnPointMenu:OnRemove()
-            self.InSpawnPointMenu = false
-            self.ViewOverride = nil
+            CD2.InSpawnPointMenu = false
+            CD2.ViewOverride = nil
         end
 
         local viewpos

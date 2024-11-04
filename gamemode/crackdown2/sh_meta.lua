@@ -36,6 +36,48 @@ if SERVER then
         net.WriteFloat( volume or 1 )
         net.Broadcast()
     end
+
+    function ENT:IsButtonDown( button )
+        return self.ButtonData[ button ]
+    end
+end
+
+-- Returns a table of the nearest interactables
+-- TABLE FORMAT
+-- TBL = {
+    -- [Int1] = ENTITY,
+    -- [Int2] = ENTITY
+-- }
+function PLAYER:GetNearestInteractables()
+    if !self:IsCD2Agent() then return "[]" end
+    local encoded = self:GetIntNearestInteractables()
+    local tbl = util.JSONToTable( encoded )
+
+    return tbl
+end
+
+function PLAYER:GetInteractable1()
+    local index = self:GetNearestInteractables().Int1
+
+    if index then 
+        return Entity( index )
+    end
+end
+
+function PLAYER:GetInteractable2()
+    local index = self:GetNearestInteractables().Int2
+
+    if index then 
+        return Entity( index )
+    end
+end
+
+function PLAYER:GetInteractable3()
+    local index = self:GetNearestInteractables().Int3
+
+    if index then 
+        return Entity( index )
+    end
 end
 
 if CLIENT then
@@ -148,6 +190,8 @@ function PLAYER:StartLevelUpEffect()
     
     end )
 end
+
+
 
 
 function PLAYER:SaveProgress()

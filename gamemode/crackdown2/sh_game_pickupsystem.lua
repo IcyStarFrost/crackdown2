@@ -30,10 +30,10 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
 
 
         -- Held key
-        if ply:KeyDown( IN_USE ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) then ply.cd2_PickupDelay = ply.cd2_PickupDelay or CurTime() + 1 else ply.cd2_PickupDelay = nil end
+        if ply:IsButtonDown( ply:GetInfoNum( "cd2_interact1", KEY_Q ) ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) then ply.cd2_PickupDelay = ply.cd2_PickupDelay or CurTime() + 0.2 else ply.cd2_PickupDelay = nil end
 
         -- Pickup a new object
-        if !IsValid( ply.cd2_HeldObject ) and CurTime() > ply:GetNW2Float( "cd2_weapondrawcur", 0 ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) and ( ply.cd2_PickupDelay and CurTime() > ply.cd2_PickupDelay ) then
+        if !IsValid( ply.cd2_HeldObject ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) and ( ply.cd2_PickupDelay and CurTime() > ply.cd2_PickupDelay ) then
             ply:GetActiveWeapon():EnterPickupMode()
             local ent = ply:GetNW2Entity( "cd2_pickuptarget", nil )
 
@@ -120,8 +120,6 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
 end )
 
 if CLIENT then
-    local input_LookupBinding = input.LookupBinding
-    local input_GetKeyCode = input.GetKeyCode
     local input_GetKeyName = input.GetKeyName
 
     hook.Add( "HUDPaint", "crackdown2_pickupprompt", function()
@@ -131,11 +129,9 @@ if CLIENT then
         local targ = ply:GetNW2Entity( "cd2_pickuptarget", nil )
         local isholding = ply:GetNW2Bool( "cd2_isholdingent", false )
 
-        if !IsValid( targ ) or isholding or CurTime() < ply:GetNW2Float( "cd2_weapondrawcur", 0 ) then return end
+        if !IsValid( targ ) or isholding then return end
 
-        local usebind = input_LookupBinding( "+use" ) or "e"
-        local code = input_GetKeyCode( usebind )
-        local buttonname = input_GetKeyName( code )
+        local buttonname = input_GetKeyName( CD2:GetConVar( "cd2_interact1" ):GetInt() )
         
         local screen = ( targ:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
         CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), "Hold to pickup/drop object" )

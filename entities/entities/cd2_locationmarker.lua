@@ -48,8 +48,6 @@ function ENT:Initialize()
         end )
 
         local upper = string.upper
-        local input_LookupBinding = input.LookupBinding
-        local input_GetKeyCode = input.GetKeyCode
         local input_GetKeyName = input.GetKeyName
         local surface_SetDrawColor = surface.SetDrawColor
         local draw_NoTexture = draw.NoTexture
@@ -64,13 +62,11 @@ function ENT:Initialize()
 
         local cell = Material( "crackdown2/ui/cell.png", "smooth" )
 
-        hook.Add( "HudPaint", self, function()
+        hook.Add( "HUDPaint", self, function()
             local ply = LocalPlayer()
-            local currentlocation = ply:GetNW2Entity( "cd2_targettacticlelocation", nil )
+            local currentlocation = ply:GetInteractable2()
             if IsValid( currentlocation ) and currentlocation == self then
-                local usebind = input_LookupBinding( "+use" ) or "e"
-                local code = input_GetKeyCode( usebind )
-                local buttonname = input_GetKeyName( code )
+                local buttonname = input_GetKeyName( CD2:GetConVar( "cd2_interact2" ):GetInt() )
                 local screen = ( currentlocation:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
                 CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), self:GetLocationType() == "beacon" and "Drop Beacon" or self:GetLocationType() == "agency" and "Call Helicopter" or self:GetLocationType() == "cell" and "Begin Assault on this Tactical Location" )
             end
@@ -136,14 +132,14 @@ function ENT:OnActivate( ply )
     if self:GetLocationType() == "cell" and SERVER then
 
         for k, v in ipairs( player.GetAll() ) do
-            if v:SqrRangeTo( self ) > ( 2000 * 2000 ) then continue end
+            if v:SqrRangeTo( self ) > 2000 ^ 2 then continue end
             CD2:SetTypingText( v, "TACTICAL ASSAULT INITIATED", "" )
         end
 
 
         if !CD2:KeysToTheCity() and random( 1, 2 ) == 1 then
             for k, v in ipairs( player.GetAll() ) do
-                if v:SqrRangeTo( self ) > ( 2000 * 2000 ) then continue end
+                if v:SqrRangeTo( self ) > 2000 ^ 2 then continue end
                 v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/celldefend.mp3" )
             end
         end
@@ -269,6 +265,13 @@ function ENT:VisCheck()
     return withinPVS
 end
 
+function ENT:InteractTest( ply )
+    if ply:SqrRangeTo( self ) > 150 ^ 2 then return false end
+    if self:GetIsActive() then return false end
+
+    return "Int2"
+end
+
 function ENT:Think()
     if CLIENT then return end
 
@@ -296,25 +299,21 @@ function ENT:Think()
 
     if !self:GetIsActive() then
 
-        local players = player_GetAll()
-        for i = 1, #players do
-            local ply = players[ i ]
-            if !IsValid( ply ) or !ply:IsCD2Agent() or ply:GetPos():DistToSqr( self:GetPos() ) > ( 150 * 150 ) then continue end
+        for _, ply in player.Iterator() do
 
-            ply:SetNW2Entity( "cd2_targettacticlelocation", self )
-            timer.Create( "cd2_unselecttacticlelocation" .. ply:EntIndex(), 0.6, 1, function() if !IsValid( ply ) then return end ply.cd2_checkweapons = true ply:SetNW2Entity( "cd2_targettacticlelocation", nil ) end )
-            
-            if !CD2:KeysToTheCity() and self:GetLocationType() == "agency" and ply.cd2_checkweapons then
-                net.Start( "cd2net_checkweapons" )
-                net.Send( ply )
-                ply.cd2_checkweapons = false
-            end
+            if ply:GetInteractable2() == self then 
+                if !CD2:KeysToTheCity() and self:GetLocationType() == "agency" and ply.cd2_checkweapons then
+                    net.Start( "cd2net_checkweapons" )
+                    net.Send( ply )
+                    ply.cd2_checkweapons = false
+                end
 
 
-            if ply:KeyPressed( IN_USE ) then
-                self:OnActivate( ply )
-                --self:SetIsActive( true )
-                --sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
+                if ply:IsButtonDown( ply:GetInfoNum( "cd2_interact2", KEY_E ) ) then
+                    self:OnActivate( ply )
+                    --self:SetIsActive( true )
+                    --sound.Play( "crackdown2/ambient/tacticallocationactivate.mp3", self:GetPos(), 100, 100, 1 )
+                end
             end
 
         end

@@ -11,7 +11,7 @@ local channel
 function CD2:ShowFailMenu( text, isnavmesh )
     if IsValid( CD2.FailPanel ) then CD2.FailPanel:Remove() end
     if IsValid( CD2_AgencyConsole ) then CD2_AgencyConsole:Remove() end 
-    if IsValid( CD2_DropMenu ) then CD2_DropMenu:Remove() end
+    if IsValid( CD2.DropMenu ) then CD2.DropMenu:Remove() end
     if IsValid( CD2.SpawnPointMenu ) then CD2.SpawnPointMenu:Remove() end
     if IsValid( CD2.MainMenu ) then CD2.MainMenu:Remove() end
     if IsValid( channel ) then channel:Kill() end

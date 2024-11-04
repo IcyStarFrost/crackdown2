@@ -18,7 +18,7 @@ local pairs = pairs
 local ipairs = ipairs
 
 CD2.InDropMenu = false
-CD2_DropMenu = CD2_DropMenu or nil
+CD2.DropMenu = CD2.DropMenu or nil
 
 
 CD2.DropPrimary = "cd2_assaultrifle"
@@ -42,7 +42,7 @@ function CD2:OpenDropMenu( issupplypoint )
     CD2.DropSecondary = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "CD2.DropSecondary" ) or CD2.DropSecondary
     CD2.DropEquipment = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "CD2.DropEquipment" ) or CD2.DropEquipment
 
-    if IsValid( CD2_DropMenu ) then CD2_DropMenu:Remove() end
+    if IsValid( CD2.DropMenu ) then CD2.DropMenu:Remove() end
 
     CD2:CreateThread( function()
 
@@ -58,42 +58,42 @@ function CD2:OpenDropMenu( issupplypoint )
         end
 
 
-        CD2_DropMenu = vgui.Create( "DPanel", GetHUDPanel() )
-        CD2_DropMenu:Dock( FILL )
+        CD2.DropMenu = vgui.Create( "DPanel", GetHUDPanel() )
+        CD2.DropMenu:Dock( FILL )
 
 
-        CD2_DropMenu:MakePopup()
+        CD2.DropMenu:MakePopup()
         CD2.InDropMenu = true
-        function CD2_DropMenu:OnRemove()
+        function CD2.DropMenu:OnRemove()
             CD2.InDropMenu = false
-            CD2_DropMenu:SetMouseInputEnabled( false )
-            CD2_DropMenu:SetKeyBoardInputEnabled( false )
+            CD2.DropMenu:SetMouseInputEnabled( false )
+            CD2.DropMenu:SetKeyBoardInputEnabled( false )
         end
 
-        function CD2_DropMenu:Paint( w, h )
+        function CD2.DropMenu:Paint( w, h )
             surface_SetDrawColor( grey )
             surface_SetMaterial( background )
             surface_DrawTexturedRect( 0, 0, w, h )
         end
 
-        local toptext = vgui.Create( "DLabel", CD2_DropMenu )
+        local toptext = vgui.Create( "DLabel", CD2.DropMenu )
         toptext:SetFont( "crackdown2_font60" )
         toptext:SetSize( 100, 100 )
         toptext:SetText( !issupplypoint and "             AGENCY REDEPLOYMENT PROGRAM" or "             AGENCY SUPPORT" )
         toptext:Dock( TOP )
 
-        local line = vgui.Create( "DPanel", CD2_DropMenu )
+        local line = vgui.Create( "DPanel", CD2.DropMenu )
         line:SetSize( 100, 3 )
         line:Dock( TOP )
 
-        local selecttext = vgui.Create( "DLabel", CD2_DropMenu )
+        local selecttext = vgui.Create( "DLabel", CD2.DropMenu )
         selecttext:SetFont( "crackdown2_font50" )
         selecttext:SetSize( 100, 60 )
         selecttext:SetColor( Color( 218, 103, 10 ) )
         selecttext:SetText( "             SELECT YOUR EQUIPMENT" )
         selecttext:Dock( TOP )
 
-        local weapondetailpanel = vgui.Create( "DPanel", CD2_DropMenu )
+        local weapondetailpanel = vgui.Create( "DPanel", CD2.DropMenu )
         weapondetailpanel:SetSize( 500, 200 )
         weapondetailpanel:Dock( RIGHT )
         weapondetailpanel:InvalidateParent( true )
@@ -103,7 +103,7 @@ function CD2:OpenDropMenu( issupplypoint )
             surface_DrawOutlinedRect( 0, 0, w, h, 3 )
         end
         
-        coroutine.wait( 0 ) -- Delay so CD2_DropMenu can re-layout so we can get accurate position/sizing value
+        coroutine.wait( 0 ) -- Delay so CD2.DropMenu can re-layout so we can get accurate position/sizing value
 
 
         local plyweaponskill = CD2:ReadPlayerData( "cd2_skill_Weapon" ) or 1
@@ -258,7 +258,7 @@ function CD2:OpenDropMenu( issupplypoint )
         
         -- Helper function
         local function CreateWeaponRow( text, varname, statpanel, isequipment )
-            local variable = _G[ varname ]
+            local variable = CD2[ varname ]
             local weaponlist = {}
             local tblindex = 1
 
@@ -286,14 +286,14 @@ function CD2:OpenDropMenu( issupplypoint )
                 end
             end
 
-            local label = vgui.Create( "DLabel", CD2_DropMenu )
+            local label = vgui.Create( "DLabel", CD2.DropMenu )
             label:SetFont( "crackdown2_font45" )
             label:SetSize( 100, 60 )
             label:SetColor( Color( 218, 103, 10) )
             label:SetText( "             " .. text )
             label:Dock( TOP )
 
-            local row = vgui.Create( "DPanel", CD2_DropMenu )
+            local row = vgui.Create( "DPanel", CD2.DropMenu )
             row:SetSize( 100, 150 )
             row:Dock( TOP )
 
@@ -308,7 +308,7 @@ function CD2:OpenDropMenu( issupplypoint )
             end
 
             local function CreateWeaponHolder( isselectingpanel, indexadd )
-                local variable = _G[ varname ]
+                local variable = CD2[ varname ]
 
 
                 local panel = vgui.Create( "DPanel", row )
@@ -365,7 +365,7 @@ function CD2:OpenDropMenu( issupplypoint )
                             variable = v.ClassName
                             
                             if isselectingpanel then
-                                _G[ varname ] = v.ClassName
+                                CD2[ varname ] = v.ClassName
                                 statpanel:SetWeaponData( v )
                             end
                         end
@@ -406,7 +406,7 @@ function CD2:OpenDropMenu( issupplypoint )
                             variable = wepdata.ClassName
 
                             if isselectingpanel then
-                                _G[ varname ] = wepdata.ClassName
+                                CD2[ varname ] = wepdata.ClassName
                                 statpanel:SetWeaponData( wepdata )
                             end
                         end
@@ -446,7 +446,7 @@ function CD2:OpenDropMenu( issupplypoint )
         end
 
         
-        local bottombuttonspanel = vgui.Create( "DPanel", CD2_DropMenu )
+        local bottombuttonspanel = vgui.Create( "DPanel", CD2.DropMenu )
         bottombuttonspanel:DockMargin( 3, 3, 3, 3 )
         bottombuttonspanel:SetSize( 250, 30 )
         bottombuttonspanel:Dock( BOTTOM )
@@ -466,9 +466,9 @@ function CD2:OpenDropMenu( issupplypoint )
         backbutton:Dock( LEFT ) ]]
         
         
-        PRIMARYROW = CreateWeaponRow( "PRIMARY", "CD2.DropPrimary", detailtoppanel )
-        SECONDARYROW = CreateWeaponRow( "SECONDARY", "CD2.DropSecondary", detailmidpanel )
-        EQUIPMENTROW = CreateWeaponRow( "EXPLOSIVE", "CD2.DropEquipment", detailbottompanel, true )
+        PRIMARYROW = CreateWeaponRow( "PRIMARY", "DropPrimary", detailtoppanel )
+        SECONDARYROW = CreateWeaponRow( "SECONDARY", "DropSecondary", detailmidpanel )
+        EQUIPMENTROW = CreateWeaponRow( "EXPLOSIVE", "DropEquipment", detailbottompanel, true )
         
         function line:Paint( w, h )
             surface_SetDrawColor( color_white )
@@ -480,23 +480,18 @@ function CD2:OpenDropMenu( issupplypoint )
             surface_DrawRect( 0, 0, w, h )
         end
 
-        
-
-
-
-
 
         function confirmbutton:DoClick()
             local skilltest1 = detailtoppanel:PassesWeaponSkillTest()
             local skilltest2 = detailmidpanel:PassesWeaponSkillTest()
             local skilltest3 = detailbottompanel:PassesWeaponSkillTest()
             if !skilltest1 or !skilltest2 or !skilltest3 then surface.PlaySound( "buttons/button10.wav" ) return end
-            CD2_DropMenu:Remove()
+            CD2.DropMenu:Remove()
 
             if !CD2:KeysToTheCity() then
-                CD2:WritePlayerData( "CD2.DropPrimary", CD2.DropPrimary )
-                CD2:WritePlayerData( "CD2.DropSecondary", CD2.DropSecondary )
-                CD2:WritePlayerData( "CD2.DropEquipment", CD2.DropEquipment )
+                CD2:WritePlayerData( "DropPrimary", CD2.DropPrimary )
+                CD2:WritePlayerData( "DropSecondary", CD2.DropSecondary )
+                CD2:WritePlayerData( "DropEquipment", CD2.DropEquipment )
             end
 
             if !issupplypoint then
@@ -508,7 +503,7 @@ function CD2:OpenDropMenu( issupplypoint )
                 net.WriteAngle( CD2.SelectedSpawnAngle )
                 net.SendToServer()
 
-                LocalPlayer().cd2_equipment = CD2_Equipment
+                LocalPlayer().cd2_equipment = CD2.Equipment
                 LocalPlayer().cd2_lastspawnprimary = CD2.DropPrimary
                 LocalPlayer().cd2_lastspawnsecondary = CD2.DropSecondary
             else
@@ -518,7 +513,7 @@ function CD2:OpenDropMenu( issupplypoint )
                 net.WriteString( CD2.DropEquipment )
                 net.SendToServer()
 
-                LocalPlayer().cd2_equipment = CD2_Equipment
+                LocalPlayer().cd2_equipment = CD2.Equipment
                 LocalPlayer().cd2_lastspawnprimary = CD2.DropPrimary
                 LocalPlayer().cd2_lastspawnsecondary = CD2.DropSecondary
             end

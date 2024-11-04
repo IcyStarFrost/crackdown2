@@ -108,6 +108,12 @@ function ENT:ThrowTo( pos )
     end
 end
 
+function ENT:InteractTest( ply )
+    if !ply:IsCD2Agent() or ply:SqrRangeTo( self ) > 100 ^ 2 then return false end
+    if ply:GetEquipment() == self:GetClass() then return false end
+
+    return "Int3"
+end
 
 function ENT:Think()
     if self.Exploded then return end
@@ -137,23 +143,17 @@ function ENT:Think()
     -- Custom Pickup code for equipment
     if SERVER and !IsValid( self:GetThrower() ) and !self:GetHadThrower() and self:WaterLevel() == 0 then
 
-        local players = player_GetAll()
-        for i = 1, #players do
-            local ply = players[ i ]
-            if !ply:IsCD2Agent() or ply:GetPos():DistToSqr( self:GetPos() ) > ( 50 * 50 ) then continue end
+        for _, ply in player.Iterator() do
 
-            if IsValid( ply ) and self:IsAmmoToPlayer( ply ) and ply:GetEquipmentCount() < ply:GetMaxEquipmentCount() then
+            if IsValid( ply ) and self:IsAmmoToPlayer( ply ) and ply:GetEquipmentCount() < ply:GetMaxEquipmentCount() and ply:SqrRangeTo( self ) < 100 ^ 2 then
                 ply:SetEquipmentCount( self.cd2_equipmentcount or clamp( ply:GetEquipmentCount() + ( ply:GetMaxEquipmentCount() / 4 ), 0, ply:GetMaxEquipmentCount() ) )
                 ply:EmitSound( "items/ammo_pickup.wav", 60 )
                 self:Remove()
-            elseif IsValid( ply ) and !self:IsAmmoToPlayer( ply ) and !IsValid( ply:GetNW2Entity( "cd2_targetweapon", nil )) then
+            elseif IsValid( ply ) and !self:IsAmmoToPlayer( ply ) then
 
-                ply:SetNW2Entity( "cd2_targetequipment", self )
-                ply:SetNW2Float( "cd2_equipmentdrawcur", CurTime() + 0.1 )
+                if ply:IsButtonDown( ply:GetInfoNum( "cd2_interact3", KEY_R ) ) then ply.cd2_PickupWeaponDelay = ply.cd2_PickupWeaponDelay or CurTime() + 0.2 else ply.cd2_PickupWeaponDelay = nil end
 
-                if ply:KeyDown( IN_RELOAD ) then ply.cd2_PickupWeaponDelay = ply.cd2_PickupWeaponDelay or CurTime() + 1 else ply.cd2_PickupWeaponDelay = nil end
-
-                if IsValid( ply:GetNW2Entity( "cd2_targetequipment", nil ) ) and ply.cd2_PickupWeaponDelay and CurTime() > ply.cd2_PickupWeaponDelay or ( ply:GetEquipmentCount() == 0 ) then
+                if ply:GetInteractable3() == self and ply.cd2_PickupWeaponDelay and CurTime() > ply.cd2_PickupWeaponDelay or ( ply:GetEquipmentCount() == 0 ) then
                     local oldequipment = ply:GetEquipment()
                     local oldcount = ply:GetEquipmentCount()
 

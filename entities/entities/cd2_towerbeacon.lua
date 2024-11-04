@@ -581,7 +581,7 @@ function ENT:BeginCharge()
                 if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2:PingLocation( nil, nil, self:GetPos(), 3 ) CD2:SendTextBoxMessage( nil, "Return to the Tower Beacon!" ) limitwarning = true end end
     
                 if CurTime() > aborttime then
-                    CD2:PingLocation( nil, self:GetPos() )
+                    CD2:PingLocation( nil, nil, self:GetPos() )
                     self:SetIsCharging( false )
                     self:SetIsDetonated( false )
                     self:SetCore1Charged( false )

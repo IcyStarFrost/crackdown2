@@ -13,7 +13,7 @@ net.Receive( "cd2net_playerkilled", function()
         if LocalPlayer():Alive() and SysTime() > time then channel:FadeOut() end
     end )
 
-    if IsValid( CD2_DropMenu ) then CD2_DropMenu:Remove() end
+    if IsValid( CD2.DropMenu ) then CD2.DropMenu:Remove() end
 
     CD2.DrawBlackbars = true
     surface.PlaySound( "crackdown2/ply/die.mp3" )

@@ -300,16 +300,6 @@ function ENT:Initialize()
     
 end
 
-function ENT:Draw()
-    if CurTime() > self.cd2_nextdrawmodelcheck then
-        self.cd2_candrawmodel = self:GetPos():DistToSqr( LocalPlayer():GetPos() ) <= ( 3000 * 3000 )
-        self.cd2_nextdrawmodelcheck = CurTime() + 1
-    end
-
-    if self.cd2_candrawmodel then
-        self:DrawModel()
-    end
-end
 
 function ENT:SetupDataTables()
     self:NetworkVar( "String", 0, "CD2Team" ) 
@@ -387,9 +377,9 @@ function ENT:Think()
     if SERVER then self.cd2_FallVelocity = !self:IsOnGround() and self.loco:GetVelocity()[ 3 ] or self.cd2_FallVelocity end
     
     if SERVER and ( self.cd2_NextRegenTime and CurTime() > self.cd2_NextRegenTime ) and self:Health() < self:GetMaxHealth() and ( !self.cd2_NextRegen or CurTime() > self.cd2_NextRegen ) then
-            self:SetHealth( self:Health() + 1 )
-            self:SetNW2Float( "cd2_health", self:Health() )
-            self.cd2_NextRegen = CurTime() + 0.03
+        self:SetHealth( self:Health() + 1 )
+        self:SetNW2Float( "cd2_health", self:Health() )
+        self.cd2_NextRegen = CurTime() + 0.03
     end
 
     if SERVER and CurTime() > self.cd2_NextPVScheck then
@@ -470,8 +460,6 @@ function ENT:Think()
 end
 
 function ENT:BodyUpdate()
-    if game.SinglePlayer() and self:GetRangeSquaredTo( Entity( 1 ) ) > ( 2500 * 2500 ) then return end
-
     if !self.loco:GetVelocity():IsZero() and self:IsOnGround() then
         self:BodyMoveXY()
         return

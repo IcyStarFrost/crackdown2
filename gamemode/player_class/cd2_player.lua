@@ -61,7 +61,7 @@ function PLAYER:Init()
     self.Player.ButtonData = {}
     self.Player:SetIntNearestInteractables( util.TableToJSON( { Int1 = NULL, Int2 = NULL, Int3 = NULL } ) )
 
-    self.Player:SetCanUseLockon( true )
+    self.Player:SetLockonEnabled( true )
     self.Player:SetCanUseMelee( true )
     self.Player:SetCD2Team( "agency" )
     self.Player:SetEquipment( "cd2_grenade" )
@@ -204,6 +204,8 @@ function PLAYER:SetupDataTables()
     self.Player:NetworkVar( "String", 2, "IntNearestInteractables" )
 
     self.Player:NetworkVar( "Entity", 0, "Ragdoll" )
+    self.Player:NetworkVar( "Entity", 1, "LockonTarget" )
+    self.Player:NetworkVar( "Entity", 2, "PickupObject" )
 
     -- Skill Stats --
     -- These skills should be capped at 6
@@ -226,8 +228,9 @@ function PLAYER:SetupDataTables()
 
     self.Player:NetworkVar( "Bool", 2, "CanRevive" ) -- If the player can be revived
     self.Player:NetworkVar( "Bool", 3, "IsStunned" ) -- If the player is stunned
-    self.Player:NetworkVar( "Bool", 4, "CanUseLockon" ) -- if this player can lock onto things
+    self.Player:NetworkVar( "Bool", 4, "LockonEnabled" ) -- if this player can lock onto things
     self.Player:NetworkVar( "Bool", 5, "CanUseMelee" ) -- If this player can melee
+    self.Player:NetworkVar( "Bool", 6, "IsHoldingEnt" ) -- If this player is holding an object
 
     self.Player:NetworkVar( "Float", 7, "LockonSpreadDecay" ) -- This will increase spread but will decrease down to the weapon's set lock on spread
 

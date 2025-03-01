@@ -333,7 +333,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         draw_Circle( scrw / 2, scrh / 2, 2, 30 )
 
         if CD2.lockon then
-            local target = ply:GetNW2Entity( "CD2_lockontarget", nil )
+            local target = ply:GetLockonTarget()
             surface.DrawLine( ( scrw / 2 ), ( scrh / 2 ) + 10, ( scrw / 2 ), ( scrh / 2 ) + 20 )
             surface.DrawLine( ( scrw / 2 ), ( scrh / 2 ) - 10, ( scrw / 2 ), ( scrh / 2 ) - 20 )
             surface.DrawLine( ( scrw / 2 ) + 10, ( scrh / 2 ), ( scrw / 2 ) + 20, ( scrh / 2 ) )

@@ -470,8 +470,6 @@ function ENT:Think()
 end
 
 function ENT:BodyUpdate()
-    if game.SinglePlayer() and self:GetRangeSquaredTo( Entity( 1 ) ) > ( 2500 * 2500 ) then return end
-
     if !self.loco:GetVelocity():IsZero() and self:IsOnGround() then
         self:BodyMoveXY()
         return

@@ -168,7 +168,7 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
     local owner = self:GetOwner()
 
     damage = owner:IsPlayer() and damage + ( 5 * owner:GetWeaponSkill() ) or damage
-    spread = owner.cd2_spreadoverride or owner:IsPlayer() and IsValid( owner:GetNW2Entity( "CD2_lockontarget", nil ) ) and Vector( self.Primary.LockOnSpread + owner:GetLockonSpreadDecay(), self.Primary.LockOnSpread + owner:GetLockonSpreadDecay() ) or Vector( spread, spread, 0 )
+    spread = owner.cd2_spreadoverride or owner:IsPlayer() and IsValid( owner:GetLockonTarget() ) and Vector( self.Primary.LockOnSpread + owner:GetLockonSpreadDecay(), self.Primary.LockOnSpread + owner:GetLockonSpreadDecay() ) or Vector( spread, spread, 0 )
 
 	self.bullet = self.bullet or {}
 	self.bullet.Num	= num_bullets
@@ -184,8 +184,8 @@ function SWEP:ShootBullet( damage, num_bullets, spread, ammo_type, force, tracer
 
 	owner:FireBullets( self.bullet )
 
-    if owner:IsPlayer() and owner.CD2_lockonPos == "head" and IsValid( owner:GetNW2Entity( "CD2_lockontarget", nil ) ) then
-        local dist = owner:GetPos():Distance( owner:GetNW2Entity( "CD2_lockontarget", nil ):GetPos() ) / 150
+    if owner:IsPlayer() and owner.CD2_lockonPos == "head" and IsValid( owner:GetLockonTarget() ) then
+        local dist = owner:GetPos():Distance( owner:GetLockonTarget():GetPos() ) / 150
 
         owner:SetLockonSpreadDecay( dist * 0.08 ) 
     end
@@ -250,7 +250,7 @@ function SWEP:InteractTest( ply )
 
     if ply:SqrRangeTo( self ) > 100 ^ 2 then return false end
 
-    if self:GetOwner() == ply then return false end 
+    if IsValid( self:GetOwner() ) and self:GetOwner():IsPlayer() then return false end 
 
     return "Int3"
 end

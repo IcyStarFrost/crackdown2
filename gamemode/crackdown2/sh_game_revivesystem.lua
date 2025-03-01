@@ -23,7 +23,7 @@ if !game.SinglePlayer() and CLIENT then
                 localply.cd2_revivetarget = ragdoll
 
                 if localply:KeyDown( IN_USE ) then
-                    localply.cd2_revivetime = localply.cd2_revivetime or CurTime() + 1
+                    localply.cd2_revivetime = localply.cd2_revivetime or CurTime() + 0.2
 
                     if CurTime() > localply.cd2_revivetime then
 

@@ -15,7 +15,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
                 ply:Spectate( OBS_MODE_NONE )
             end
 
-            ply:SetCanUseLockon( false )
+            ply:SetLockonEnabled( false )
             ply:SetCanUseMelee( false )
             CD2.FreezeTime = game.SinglePlayer()
         
@@ -216,7 +216,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             coroutine.wait( 5 )
 
             CD2:SendTextBoxMessage( ply, "Hold your secondary fire while looking at the freak to lock onto it. While locked on, move your mouse up to target the head and move your mouse back down to return to the body" )
-            ply:SetCanUseLockon( true )
+            ply:SetLockonEnabled( true )
 
             local guide = CD2:CreateGuide( ply:GetPos(), pos )
 
@@ -446,7 +446,7 @@ net.Receive( "cd2net_starttutorial", function( len, ply )
             local playerspawnpos = CD2:GetRandomPos( 2000, locationpos )
             local ang = ( locationpos - playerspawnpos ):Angle() ang[ 1 ] = 0 ang[ 3 ] = 0
 
-            ply:SetCanUseLockon( true )
+            ply:SetLockonEnabled( true )
             ply:SetCanUseMelee( true )
             CD2.FreezeTime = false
         

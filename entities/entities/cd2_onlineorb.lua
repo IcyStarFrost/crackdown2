@@ -33,10 +33,9 @@ function ENT:Initialize()
 
     if CLIENT then
         hook.Add("HUDPaint", self, function() 
-            if LocalPlayer():SqrRangeTo( self ) > ( 70 * 70 ) then return end 
-            local renderinput = self:GetNW2Bool( "cd2_drawinput", false )
+            if LocalPlayer():SqrRangeTo( self ) > 70 ^ 2 then return end 
 
-            if renderinput then
+            if !self.cd2_collectedby[ LocalPlayer():SteamID() ] then
                 local screen = ( self:GetPos() + Vector( 0, 0, 5 ) ):ToScreen()
                 CD2DrawInputbar( screen.x, screen.y, "", !game.SinglePlayer() and "Not enough players in range!" or "Play with other Agents to collect this orb!" )
             end
@@ -128,9 +127,6 @@ function ENT:Think()
         if !ply.cd2_onlineorb_notified and SERVER then if !CD2:KeysToTheCity() then ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/onlineorb.mp3" ) end  CD2:SendTextBoxMessage( ply, "Team up with another Agent to collect this Orb!" ) ply.cd2_onlineorb_notified = true end
         if #players > 1 and self.cd2_missingplayers[ ply:SteamID() ] then
             self:OnCollected( ply )
-        elseif #players < 2 then
-            self:SetNW2Bool( "cd2_drawinput", true )
-            timer.Create( "removeinput" .. self:EntIndex(), 0.5, 1, function() if !IsValid( self ) then return end self:SetNW2Bool( "cd2_drawinput", false ) end )
         end
     end
     

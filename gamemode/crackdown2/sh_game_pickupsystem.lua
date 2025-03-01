@@ -23,19 +23,19 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
         local near = CD2:FindInSphere( ply:GetPos(), 100, function( ent ) return ( isphysics[ ent:GetClass() ] or ent.cd2_allowpickup ) and ent:GetNW2Int( "cd2_mass", math.huge ) < ply:GetMaxPickupWeight() and ply:Visible( ent ) and ent:SqrRangeTo( ply ) < ( 100 * 100 ) and IsValid( ent:GetPhysicsObject() ) and ent:GetPhysicsObject():IsMotionEnabled() end )
         
         if ( !ply.cd2_meleecooldown or CurTime() > ply.cd2_meleecooldown ) then
-            ply:SetNW2Entity( "cd2_pickuptarget", CD2:GetClosestInTable( near, ply ) )
+            ply:SetPickupObject( CD2:GetClosestInTable( near, ply ) )
         else
-            ply:SetNW2Entity( "cd2_pickuptarget", nil )
+            ply:SetPickupObject( nil )
         end
 
 
         -- Held key
-        if ply:IsButtonDown( ply:GetInfoNum( "cd2_interact1", KEY_Q ) ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) then ply.cd2_PickupDelay = ply.cd2_PickupDelay or CurTime() + 0.2 else ply.cd2_PickupDelay = nil end
+        if ply:IsButtonDown( ply:GetInfoNum( "cd2_interact1", KEY_Q ) ) and IsValid( ply:GetPickupObject() ) then ply.cd2_PickupDelay = ply.cd2_PickupDelay or CurTime() + 0.2 else ply.cd2_PickupDelay = nil end
 
         -- Pickup a new object
-        if !IsValid( ply.cd2_HeldObject ) and IsValid( ply:GetNW2Entity( "cd2_pickuptarget", nil ) ) and ( ply.cd2_PickupDelay and CurTime() > ply.cd2_PickupDelay ) then
+        if !IsValid( ply.cd2_HeldObject ) and IsValid( ply:GetPickupObject() ) and ( ply.cd2_PickupDelay and CurTime() > ply.cd2_PickupDelay ) then
             ply:GetActiveWeapon():EnterPickupMode()
-            local ent = ply:GetNW2Entity( "cd2_pickuptarget", nil )
+            local ent = ply:GetPickupObject()
 
             ent:SetPos( ply:HandsPos() )
             ent:SetAngles( ply:HandsAngles() )
@@ -48,7 +48,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
             ent:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
             ent:Use( ply, ply, USE_TOGGLE )
 
-            ply:SetNW2Bool( "cd2_isholdingent", true )
+            ply:SetIsHoldingEnt( true )
             ply.cd2_HeldObject = ent
             ply.cd2_PickupDelay = math.huge -- Prevent the delayed code from running again until the use key is lifted
 
@@ -63,7 +63,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
 
             timer.Simple( 1, function() if !IsValid( ent ) then return end ent:SetOwner( NULL ) end )
 
-            ply:SetNW2Bool( "cd2_isholdingent", false )
+            ply:SetIsHoldingEnt( false )
             if IsValid( ply:GetActiveWeapon() ) then ply:GetActiveWeapon():ExitPickupMode() end
             ply.cd2_HeldObject = nil
             ply.cd2_PickupDelay = math.huge -- Prevent the delayed code from running again until the use key is lifted
@@ -87,7 +87,7 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
                 phys:ApplyForceCenter( ply:GetAimVector() * ( phys:GetMass() * mult ) )
             end
 
-            ply:SetNW2Bool( "cd2_isholdingent", false )
+            ply:SetIsHoldingEnt( false )
             timer.Simple( 1, function()
                 if IsValid( ply ) and IsValid( ply:GetActiveWeapon() ) then
                     ply:GetActiveWeapon():ExitPickupMode() 
@@ -110,8 +110,8 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
         end
 
         -- Incase the held entity gets deleted
-        if !IsValid( ply.cd2_HeldObject ) and ply:GetNW2Bool( "cd2_isholdingent", false ) then
-            ply:SetNW2Bool( "cd2_isholdingent", false )
+        if !IsValid( ply.cd2_HeldObject ) and ply:GetIsHoldingEnt() then
+            ply:SetIsHoldingEnt( false )
             ply:GetActiveWeapon():ExitPickupMode()
         end
 
@@ -126,8 +126,10 @@ if CLIENT then
         if !GetConVar( "cd2_drawhud" ):GetBool() then return end
         local ply = LocalPlayer()
 
-        local targ = ply:GetNW2Entity( "cd2_pickuptarget", nil )
-        local isholding = ply:GetNW2Bool( "cd2_isholdingent", false )
+        if !ply:IsCD2Agent() then return end
+
+        local targ = ply:GetPickupObject()
+        local isholding = ply:GetIsHoldingEnt()
 
         if !IsValid( targ ) or isholding then return end
 

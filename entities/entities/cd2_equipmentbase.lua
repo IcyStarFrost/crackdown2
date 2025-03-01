@@ -144,6 +144,7 @@ function ENT:Think()
     if SERVER and !IsValid( self:GetThrower() ) and !self:GetHadThrower() and self:WaterLevel() == 0 then
 
         for _, ply in player.Iterator() do
+            if !ply:IsCD2Agent() then continue end
 
             if IsValid( ply ) and self:IsAmmoToPlayer( ply ) and ply:GetEquipmentCount() < ply:GetMaxEquipmentCount() and ply:SqrRangeTo( self ) < 100 ^ 2 then
                 ply:SetEquipmentCount( self.cd2_equipmentcount or clamp( ply:GetEquipmentCount() + ( ply:GetMaxEquipmentCount() / 4 ), 0, ply:GetMaxEquipmentCount() ) )

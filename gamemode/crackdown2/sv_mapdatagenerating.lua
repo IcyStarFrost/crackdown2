@@ -425,6 +425,9 @@ function CD2:LoadMapData()
 end
 
 
+-- TODO: Do not delete agility orbs after collection. 
+-- Instead, make them track steamids that collected them and become invisble for those that have collected them.
+-- This will ensure all players are able to collect all agility orbs.
 local table_remove = table.remove
 hook.Add( "CD2_OnAgilityOrbCollected", "crackdown2_removeorbfrommapdata", function( orb, ply )
     if !orb.cd2_map_isgenerated or CD2:KeysToTheCity() then return end

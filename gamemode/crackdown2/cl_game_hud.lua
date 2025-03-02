@@ -705,7 +705,7 @@ local modify = {
 hook.Add( "RenderScreenspaceEffects", "crackdown2_lowhealthcolors", function()
     local ply = LocalPlayer()
 
-    if CD2IsDay() then
+    if CD2:IsDay() then
         modify[ "$pp_colour_brightness" ] = Lerp( 0.1 * FrameTime(), modify[ "$pp_colour_brightness" ], 0 )
     else
         modify[ "$pp_colour_brightness" ] = Lerp( 0.1 * FrameTime(), modify[ "$pp_colour_brightness" ], -0.2 )

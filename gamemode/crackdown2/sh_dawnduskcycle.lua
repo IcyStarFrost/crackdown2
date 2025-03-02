@@ -1,7 +1,7 @@
 local random = math.random
 
 -- Returns if the current game time is day
-function CD2IsDay()
+function CD2:IsDay()
     return GetGlobalBool( "cd2_isday", false )
 end
 

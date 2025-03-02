@@ -126,13 +126,13 @@ if SERVER then
         if ( game.SinglePlayer() or IsValid( Entity( 1 ) ) and Entity( 1 ):IsListenServerHost() ) and ( !IsValid( Entity( 1 ) ) or !Entity( 1 ):IsCD2Agent() or Entity( 1 ).cd2_InTutorial ) then return end
         if limit_time > CurTime() then return end
         limit_time = CurTime() + 0.3
-        CD2.MaxCivilians = CD2IsDay() and 15 or !CD2IsDay() and 6
+        CD2.MaxCivilians = CD2:IsDay() and 15 or !CD2:IsDay() and 6
 
 
         -- Civilians --
         if GetCivilianCount() < CD2.MaxCivilians and CurTime() > CD2.NextCivilianSpawn then
             SpawnNPC( nil, "cd2_civilian", GetRandomPlayer() )
-            CD2.NextCivilianSpawn = CD2IsDay() and CurTime() + 1 or !CD2IsDay() and CurTime() + 4
+            CD2.NextCivilianSpawn = CD2:IsDay() and CurTime() + 1 or !CD2:IsDay() and CurTime() + 4
         end
         --
 
@@ -162,11 +162,11 @@ if SERVER then
         --
 
         -- Freaks --
-        if !CD2IsDay() and #GetFreaks() < CD2.MaxFreaks and CurTime() > CD2.NextFreakSpawn then
+        if !CD2:IsDay() and #GetFreaks() < CD2.MaxFreaks and CurTime() > CD2.NextFreakSpawn then
             SpawnNPC( nil, "cd2_freak", GetRandomPlayer() )
             limitfreakkill = false
             CD2.NextFreakSpawn = CurTime() + rand( 0.1, 2 )
-        elseif CD2IsDay() and !limitfreakkill then
+        elseif CD2:IsDay() and !limitfreakkill then
 
             CD2:CreateThread( function()
                 coroutine.wait( 3 )

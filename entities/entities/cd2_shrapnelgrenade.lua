@@ -29,12 +29,12 @@ local highskillsounds = { "crackdown2/weapons/explosiveskill4.wav", "crackdown2/
 
 function ENT:OnDelayEnd()
 
-    if CLIENT then
+--[[     if CLIENT then
         local effect = EffectData()
         effect:SetOrigin( self:GetPos() )
         util.Effect( "Explosion", effect, true, true )
     end
-
+ ]]
     util.Decal( "Scorch", self:GetPos(), self:GetPos() - Vector( 0, 0, 50 ), self )
 
     if SERVER then
@@ -48,9 +48,9 @@ function ENT:OnDelayEnd()
         blast:SetDamagePosition( self:GetPos() )
 
         if skilllevel < 4 then
-            sound.Play( skillsounds[ skilllevel ], self:GetPos(), 80, 100, 1 )
+            sound.Play( skillsounds[ skilllevel ], self:GetPos(), 90, 100, 1 )
         elseif skilllevel >= 4 then
-            sound.Play( highskillsounds[ random( 3 ) ], self:GetPos(), 90, 100, 1 )
+            sound.Play( highskillsounds[ random( 3 ) ], self:GetPos(), 100, 100, 1 )
         end
 
         if skilllevel > 1 then
@@ -86,9 +86,9 @@ function ENT:OnDelayEnd()
                 blast:SetDamagePosition( result.HitPos )
         
                 if skilllevel < 4 then
-                    sound.Play( skillsounds[ skilllevel ], result.HitPos, 80, 100, 1 )
+                    sound.Play( skillsounds[ skilllevel ], result.HitPos, 90, 100, 1 )
                 elseif skilllevel >= 4 then
-                    sound.Play( highskillsounds[ random( 3 ) ], result.HitPos, 90, 100, 1 )
+                    sound.Play( highskillsounds[ random( 3 ) ], result.HitPos, 100, 100, 1 )
                 end
         
                 if skilllevel > 1 then

@@ -52,11 +52,11 @@ function ENT:CreateCluster()
     end
 
     cluster:AddCallback( "PhysicsCollide", function()
-
+--[[ 
         local effect = EffectData()
         effect:SetOrigin( cluster:GetPos() )
         util.Effect( "Explosion", effect, true, true )
-
+ ]]
         util.Decal( "Scorch", cluster:GetPos(), cluster:GetPos() - Vector( 0, 0, 50 ), cluster )
     
         if SERVER then
@@ -70,9 +70,9 @@ function ENT:CreateCluster()
             blast:SetDamagePosition( cluster:GetPos() )
     
             if skilllevel < 4 then
-                sound.Play( skillsounds[ skilllevel ], cluster:GetPos(), 80, 100, 1 )
+                sound.Play( skillsounds[ skilllevel ], cluster:GetPos(), 90, 100, 1 )
             elseif skilllevel >= 4 then
-                sound.Play( highskillsounds[ random( 3 ) ], cluster:GetPos(), 90, 100, 1 )
+                sound.Play( highskillsounds[ random( 3 ) ], cluster:GetPos(), 100, 100, 1 )
             end
 
             if skilllevel > 1 then
@@ -118,9 +118,9 @@ function ENT:OnDelayEnd()
         blast:SetDamagePosition( self:GetPos() )
 
         if skilllevel < 4 then
-            sound.Play( skillsounds[ skilllevel ], self:GetPos(), 80, 100, 1 )
+            sound.Play( skillsounds[ skilllevel ], self:GetPos(), 90, 100, 1 )
         elseif skilllevel >= 4 then
-            sound.Play( highskillsounds[ random( 3 ) ], self:GetPos(), 90, 100, 1 )
+            sound.Play( highskillsounds[ random( 3 ) ], self:GetPos(), 100, 100, 1 )
         end
 
         if skilllevel > 1 then

@@ -89,9 +89,9 @@ function SWEP:PrimaryAttack()
                 util.BlastDamageInfo( blast, rocket:GetPos(), 300 + ( skilllevel > 1 and 50 * skilllevel or 0 ) )
 
                 if skilllevel < 4 then
-                    sound.Play( skillsounds[ skilllevel ], rocket:GetPos(), 80, 100, 1 )
+                    sound.Play( skillsounds[ skilllevel ], rocket:GetPos(), 90, 100, 1 )
                 elseif skilllevel >= 4 then
-                    sound.Play( highskillsounds[ random( 3 ) ], rocket:GetPos(), 90, 100, 1 )
+                    sound.Play( highskillsounds[ random( 3 ) ], rocket:GetPos(), 100, 100, 1 )
                 end
 
                 sound.Play( "crackdown2/weapons/exp" .. random( 1, 4 ) .. ".wav", rocket:GetPos(), 90 + ( 10 * skilllevel ), 100, 1 )

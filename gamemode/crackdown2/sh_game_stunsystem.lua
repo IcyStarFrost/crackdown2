@@ -97,7 +97,7 @@ hook.Add( "Tick", "crackdown2_stunsystem", function()
         if IsValid( ragdoll ) and ply:Alive() and ply:GetIsStunned() and shouldoverride then
             lastpos = ragdoll:GetPos()
 
-            CD2.ViewOverride = function( ply2, origin, angles, fov, znear, zfar )
+            CD2.ViewOverride = function( _, origin, angles, fov, znear, zfar )
                 if !IsValid( ragdoll ) or CD2.InSpawnPointMenu then return end
 
                 viewtrace.start = ( ragdoll:GetPos() + Vector( 0, 0, 18 ) )

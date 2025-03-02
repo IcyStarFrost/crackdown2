@@ -1,5 +1,7 @@
 -- Reviving system --
 
+
+-- TODO: Determine whether this system needs a rewrite or not.
 if !game.SinglePlayer() and CLIENT then
     local player_GetAll = player.GetAll
     local upper = string.upper

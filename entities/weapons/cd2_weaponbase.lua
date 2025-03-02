@@ -336,7 +336,7 @@ function SWEP:DrawWorldModel()
             effecttrace.filter = self
             effecttrace.collisiongroup = COLLISION_GROUP_WORLD
             local result = Trace( effecttrace )
-            self.cd2_effectpos = result.HitPos
+            self.cd2_effectpos = result.HitPos + Vector( 0, 0, 2 )
         end
 
         self:SetupBones()

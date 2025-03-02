@@ -11,7 +11,7 @@ SWEP.Primary.Automatic = true
 
 SWEP.Primary.RPM = 750
 SWEP.Primary.Damage = 15
-SWEP.Primary.Force = nil
+SWEP.Primary.Force = 3
 SWEP.Primary.Tracer = 1
 SWEP.Primary.TracerName = "AR2Tracer"
 SWEP.Primary.Spread = 0.04

@@ -113,7 +113,7 @@ function SWEP:PrimaryAttack()
         self:GetOwner():AddGesture( anim, true )
     end
 
-    self:ShootBullet( self.Primary.Damage, self.Primary.Bulletcount, self.Primary.Spread, self.Primary.Ammo, self.Primary.Force, self.Primary.Tracer, self.Primary.TracerName )
+    self:ShootBullet( self.Primary.Damage, self.Primary.Bulletcount, ( !self:GetOwner():IsPlayer() or self:GetOwner():IsPlayer() and self.IsShotgun ) and self.Primary.Spread or 0, self.Primary.Ammo, self.Primary.Force, self.Primary.Tracer, self.Primary.TracerName )
 
     self:SetNextPrimaryFire( ( CurTime() + 60 / ( self.Primary.RPM / game.GetTimeScale() ) ) )
 end

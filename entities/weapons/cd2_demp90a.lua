@@ -26,5 +26,6 @@ SWEP.DropMenu_Damage = 6
 SWEP.DropMenu_Range = 2
 SWEP.DropMenu_FireRate = 2
 
+SWEP.IsShotgun = true
 SWEP.HoldType = "shotgun"
 SWEP.Primary.ShootSound = "crackdown2/weapons/dempfire1.mp3"

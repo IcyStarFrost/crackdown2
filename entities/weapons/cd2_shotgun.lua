@@ -11,7 +11,7 @@ SWEP.Primary.Automatic = false
 
 SWEP.Primary.RPM = 110
 SWEP.Primary.Damage = 6
-SWEP.Primary.Force = nil
+SWEP.Primary.Force = 3
 SWEP.Primary.Tracer = 1
 SWEP.Primary.Spread = 0.06
 SWEP.Primary.LockOnSpread = 0.04
@@ -24,5 +24,6 @@ SWEP.DropMenu_Damage = 6
 SWEP.DropMenu_Range = 2
 SWEP.DropMenu_FireRate = 2
 
+SWEP.IsShotgun = true
 SWEP.HoldType = "shotgun"
 SWEP.Primary.ShootSound = { "crackdown2/weapons/agencyshotgunfire1.mp3", "crackdown2/weapons/agencyshotgunfire2.mp3" }

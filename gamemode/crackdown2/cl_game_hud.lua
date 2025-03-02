@@ -99,7 +99,6 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             CD2DrawInputbar( scrw / 1.9, 300, string.upper( forwardname ), "Hold to call for help" )
         end
 
-        RemoveHUDpanels()
         return 
     end
 

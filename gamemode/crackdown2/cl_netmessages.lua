@@ -218,16 +218,16 @@ net.Receive( "cd2net_playergroundpound", function()
 end )
 
 net.Receive( "cd2net_enablehud", function()
-    CD2.DrawAgilitySkill = true
-    CD2.DrawFirearmSkill = true
-    CD2.DrawStrengthSkill = true
-    CD2.DrawExplosiveSkill = true
+    CD2:ToggleHUDComponent( "AgilitySkill", true )
+    CD2:ToggleHUDComponent( "WeaponSkill", true )
+    CD2:ToggleHUDComponent( "StrengthSkill", true )
+    CD2:ToggleHUDComponent( "ExplosiveSkill", true )
     CD2_CanOpenAgencyConsole = true
 
     CD2:ToggleHUDComponent( "Crosshair", true )
-    CD2.DrawHealthandShields = true
-    CD2.DrawWeaponInfo = true
-    CD2.DrawMinimap = true
+    CD2:ToggleHUDComponent( "HealthAndShields", true )
+    CD2:ToggleHUDComponent( "WeaponInfo", true )
+    CD2:ToggleHUDComponent( "Minimap", true )
     CD2.DrawBlackbars = false
 end )
 

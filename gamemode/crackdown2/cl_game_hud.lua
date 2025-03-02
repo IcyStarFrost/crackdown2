@@ -73,20 +73,19 @@ end
 CD2_CheapMinimap = true
 
 CD2:ToggleHUDComponent( "Crosshair", true ) -- Draws crosshair and target healthbars
-CD2.DrawHealthandShields = true -- Draws health and shields bars
-CD2.DrawWeaponInfo = true -- Draws weapon info and equipment
-CD2.DrawMinimap = true -- Draws the tracker
+CD2:ToggleHUDComponent( "HealthAndShields", true ) -- Draws health and shields bars
+CD2:ToggleHUDComponent( "WeaponInfo", true ) -- Draws weapon info and equipment
+CD2:ToggleHUDComponent( "Minimap", true ) -- Draws the tracker
 CD2.DrawBlackbars = false -- Draws the top and bottom black bars
 
-CD2.DrawAgilitySkill = true
-CD2.DrawFirearmSkill = true
-CD2.DrawStrengthSkill = true
-CD2.DrawExplosiveSkill = true
+CD2:ToggleHUDComponent( "AgilitySkill", true )
+CD2:ToggleHUDComponent( "WeaponSkill", true )
+CD2:ToggleHUDComponent( "StrengthSkill", true )
+CD2:ToggleHUDComponent( "ExplosiveSkill", true )
 
 hook.Add( "HUDPaint", "crackdown2_hud", function()
     local scrw, scrh, ply = ScrW(), ScrH(), LocalPlayer()
     if CD2.InDropMenu or IsValid( CD2_AgencyConsole ) then RemoveHUDpanels() return end
-    if !CD2.DrawWeaponInfo then RemoveHUDpanels() end
 
     if !game.SinglePlayer() and GetConVar( "cd2_drawhud" ):GetBool() then
         for k, v in ipairs( player.GetAll() ) do
@@ -103,8 +102,6 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
             end
         end
     end
-
-    if CD2.InSpawnPointMenu or !ply:IsCD2Agent() then RemoveHUDpanels() return end
 
     if CD2.DrawBlackbars then
         hlerp1 = hlerp1 or -150

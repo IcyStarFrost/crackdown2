@@ -907,15 +907,15 @@ if CLIENT then
             sound.PlayFile( "sound/crackdown2/ending/finalsequence.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
 
             CD2.InCutscene = true
-            CD2.DrawAgilitySkill = false
-            CD2.DrawFirearmSkill = false
-            CD2.DrawStrengthSkill = false
-            CD2.DrawExplosiveSkill = false
+            CD2:ToggleHUDComponent( "AgilitySkill", false )
+            CD2:ToggleHUDComponent( "WeaponSkill", false )
+            CD2:ToggleHUDComponent( "StrengthSkill", false )
+            CD2:ToggleHUDComponent( "ExplosiveSkill", false )
 
             CD2:ToggleHUDComponent( "Crosshair", false )
-            CD2.DrawHealthandShields = false
-            CD2.DrawWeaponInfo = false
-            CD2.DrawMinimap = false
+            CD2:ToggleHUDComponent( "HealthAndShields", false )
+            CD2:ToggleHUDComponent( "WeaponInfo", false )
+            CD2:ToggleHUDComponent( "Minimap", false )
             CD2.DrawBlackbars = true
 
             CD2.PreventMovement = true

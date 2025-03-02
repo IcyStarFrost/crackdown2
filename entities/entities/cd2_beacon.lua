@@ -456,15 +456,15 @@ function ENT:BeaconDetonate()
             CD2:StartMusic( "sound/crackdown2/music/beacon_victory.mp3", 605 )
 
             CD2.PreventMovement = true
-            CD2.DrawAgilitySkill = false
-            CD2.DrawFirearmSkill = false
-            CD2.DrawStrengthSkill = false
-            CD2.DrawExplosiveSkill = false
+            CD2:ToggleHUDComponent( "AgilitySkill", false )
+            CD2:ToggleHUDComponent( "WeaponSkill", false )
+            CD2:ToggleHUDComponent( "StrengthSkill", false )
+            CD2:ToggleHUDComponent( "ExplosiveSkill", false )
 
             CD2:ToggleHUDComponent( "Crosshair", false )
-            CD2.DrawHealthandShields = false
-            CD2.DrawWeaponInfo = false
-            CD2.DrawMinimap = false
+            CD2:ToggleHUDComponent( "HealthAndShields", false )
+            CD2:ToggleHUDComponent( "WeaponInfo", false )
+            CD2:ToggleHUDComponent( "Minimap", false )
             CD2.DrawBlackbars = true
 
             
@@ -501,15 +501,15 @@ function ENT:BeaconDetonate()
             CD2.PreventMovement = nil
             CD2.ViewOverride = nil
 
-            CD2.DrawAgilitySkill = true
-            CD2.DrawFirearmSkill = true
-            CD2.DrawStrengthSkill = true
-            CD2.DrawExplosiveSkill = true
+            CD2:ToggleHUDComponent( "AgilitySkill", true )
+            CD2:ToggleHUDComponent( "WeaponSkill", true )
+            CD2:ToggleHUDComponent( "StrengthSkill", true )
+            CD2:ToggleHUDComponent( "ExplosiveSkill", true )
 
             CD2:ToggleHUDComponent( "Crosshair", true )
-            CD2.DrawHealthandShields = true
-            CD2.DrawWeaponInfo = true
-            CD2.DrawMinimap = true
+            CD2:ToggleHUDComponent( "HealthAndShields", true )
+            CD2:ToggleHUDComponent( "WeaponInfo", true )
+            CD2:ToggleHUDComponent( "Minimap", true )
             CD2.DrawBlackbars = false
 
             if !CD2:KeysToTheCity() and !CD2:ReadPlayerData( "cd2_firstbeacon" ) then

@@ -160,16 +160,16 @@ function CD2:OpenMainMenu()
                             end
                         end
 
-                        CD2.DrawAgilitySkill = false
-                        CD2.DrawFirearmSkill = false
-                        CD2.DrawStrengthSkill = false
-                        CD2.DrawExplosiveSkill = false
+                        CD2:ToggleHUDComponent( "AgilitySkill", false )
+                        CD2:ToggleHUDComponent( "WeaponSkill", false )
+                        CD2:ToggleHUDComponent( "StrengthSkill", false )
+                        CD2:ToggleHUDComponent( "ExplosiveSkill", false )
                         CD2_CanOpenAgencyConsole = false
 
                         CD2:ToggleHUDComponent( "Crosshair", false )
-                        CD2.DrawHealthandShields = false
-                        CD2.DrawWeaponInfo = false
-                        CD2.DrawMinimap = false
+                        CD2:ToggleHUDComponent( "HealthAndShields", false )
+                        CD2:ToggleHUDComponent( "WeaponInfo", false )
+                        CD2:ToggleHUDComponent( "Minimap", false )
                         CD2.DrawBlackbars = false
 
                         net.Start( "cd2net_starttutorial" )
@@ -182,16 +182,16 @@ function CD2:OpenMainMenu()
 
                     if !completedtutorial then
 
-                        CD2.DrawAgilitySkill = false
-                        CD2.DrawFirearmSkill = false
-                        CD2.DrawStrengthSkill = false
-                        CD2.DrawExplosiveSkill = false
+                        CD2:ToggleHUDComponent( "AgilitySkill", false )
+                        CD2:ToggleHUDComponent( "WeaponSkill", false )
+                        CD2:ToggleHUDComponent( "StrengthSkill", false )
+                        CD2:ToggleHUDComponent( "ExplosiveSkill", false )
                         CD2_CanOpenAgencyConsole = false
 
                         CD2:ToggleHUDComponent( "Crosshair", false )
-                        CD2.DrawHealthandShields = false
-                        CD2.DrawWeaponInfo = false
-                        CD2.DrawMinimap = false
+                        CD2:ToggleHUDComponent( "HealthAndShields", false )
+                        CD2:ToggleHUDComponent( "WeaponInfo", false )
+                        CD2:ToggleHUDComponent( "Minimap", false )
                         CD2.DrawBlackbars = false
 
                         net.Start( "cd2net_starttutorial" )

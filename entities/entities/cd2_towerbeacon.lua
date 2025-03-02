@@ -912,7 +912,7 @@ if CLIENT then
             CD2.DrawStrengthSkill = false
             CD2.DrawExplosiveSkill = false
 
-            CD2.DrawTargetting = false
+            CD2:ToggleHUDComponent( "Crosshair", false )
             CD2.DrawHealthandShields = false
             CD2.DrawWeaponInfo = false
             CD2.DrawMinimap = false

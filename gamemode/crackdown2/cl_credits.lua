@@ -14,7 +14,7 @@ function CD2:PlayCredits()
         self.DrawStrengthSkill = false
         self.DrawExplosiveSkill = false
 
-        self.DrawTargetting = false
+        self:ToggleHUDComponent( "Crosshair", false )
         self.DrawHealthandShields = false
         self.DrawWeaponInfo = false
         self.DrawMinimap = false
@@ -206,7 +206,7 @@ function CD2:PlayCredits()
         self.DrawStrengthSkill = true
         self.DrawExplosiveSkill = true
 
-        self.DrawTargetting = true
+        selfCD2:ToggleHUDComponent( "Crosshair", true )
         self.DrawHealthandShields = true
         self.DrawWeaponInfo = true
         self.DrawMinimap = true

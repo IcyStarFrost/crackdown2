@@ -18,7 +18,7 @@ function ENT:Initialize()
         CD2.DrawStrengthSkill = false
         CD2.DrawExplosiveSkill = false
 
-        CD2.DrawTargetting = false
+        CD2:ToggleHUDComponent( "Crosshair", false )
         CD2.DrawHealthandShields = false
         CD2.DrawWeaponInfo = false
         CD2.DrawMinimap = false
@@ -203,7 +203,7 @@ function ENT:OnRemove()
         CD2.DrawStrengthSkill = true
         CD2.DrawExplosiveSkill = true
 
-        CD2.DrawTargetting = true
+        CD2:ToggleHUDComponent( "Crosshair", true )
         CD2.DrawHealthandShields = true
         CD2.DrawWeaponInfo = true
         CD2.DrawMinimap = true

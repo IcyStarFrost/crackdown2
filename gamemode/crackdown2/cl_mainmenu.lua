@@ -166,7 +166,7 @@ function CD2:OpenMainMenu()
                         CD2.DrawExplosiveSkill = false
                         CD2_CanOpenAgencyConsole = false
 
-                        CD2.DrawTargetting = false
+                        CD2:ToggleHUDComponent( "Crosshair", false )
                         CD2.DrawHealthandShields = false
                         CD2.DrawWeaponInfo = false
                         CD2.DrawMinimap = false
@@ -188,7 +188,7 @@ function CD2:OpenMainMenu()
                         CD2.DrawExplosiveSkill = false
                         CD2_CanOpenAgencyConsole = false
 
-                        CD2.DrawTargetting = false
+                        CD2:ToggleHUDComponent( "Crosshair", false )
                         CD2.DrawHealthandShields = false
                         CD2.DrawWeaponInfo = false
                         CD2.DrawMinimap = false

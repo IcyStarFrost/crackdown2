@@ -2,9 +2,7 @@ local math = math
 local surface = surface
 local red = Color( 163, 12, 12)
 local blackish = Color( 39, 39, 39)
-local black = Color( 0, 0, 0 )
 local grey = Color( 61, 61, 61)
-local linecol = Color( 61, 61, 61, 100 )
 --local alphawhite = Color( 255, 255, 255, 10 )
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local cell = Material( "crackdown2/ui/cell.png", "smooth" )
@@ -13,10 +11,6 @@ local agentdown = Material( "crackdown2/ui/agentdown.png", "smooth" )
 
 
 CD2Progressbars = CD2Progressbars or {}
-
-
-local hlerp1
-local hlerp2
 
 CD2.lockon = false
 
@@ -64,28 +58,8 @@ end
 
 local fireicon = Material( "crackdown2/ui/explosive.png" )
 
-
-local function RemoveHUDpanels()
-    if IsValid( CD2_weaponpnl ) then CD2_weaponpnl:Remove() end
-    if IsValid( CD2_equipmentpnl ) then CD2_equipmentpnl:Remove() end
-end
-
-CD2_CheapMinimap = true
-
-CD2:ToggleHUDComponent( "Crosshair", true ) -- Draws crosshair and target healthbars
-CD2:ToggleHUDComponent( "HealthAndShields", true ) -- Draws health and shields bars
-CD2:ToggleHUDComponent( "WeaponInfo", true ) -- Draws weapon info and equipment
-CD2:ToggleHUDComponent( "Minimap", true ) -- Draws the tracker
-CD2.DrawBlackbars = false -- Draws the top and bottom black bars
-
-CD2:ToggleHUDComponent( "AgilitySkill", true )
-CD2:ToggleHUDComponent( "WeaponSkill", true )
-CD2:ToggleHUDComponent( "StrengthSkill", true )
-CD2:ToggleHUDComponent( "ExplosiveSkill", true )
-
 hook.Add( "HUDPaint", "crackdown2_hud", function()
-    local scrw, scrh, ply = ScrW(), ScrH(), LocalPlayer()
-    if CD2.InDropMenu or IsValid( CD2_AgencyConsole ) then RemoveHUDpanels() return end
+    local scrw, ply = ScrW(), LocalPlayer()
 
     if !game.SinglePlayer() and GetConVar( "cd2_drawhud" ):GetBool() then
         for k, v in ipairs( player.GetAll() ) do
@@ -103,21 +77,6 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         end
     end
 
-    if CD2.DrawBlackbars then
-        hlerp1 = hlerp1 or -150
-        hlerp2 = hlerp2 or scrh
-
-        hlerp1 = Lerp( 2 * FrameTime(), hlerp1, 0 )
-        hlerp2 = Lerp( 2 * FrameTime(), hlerp2, scrh - 150 )
-
-        surface.SetDrawColor( black )
-
-        surface.DrawRect( 0, hlerp1, scrw, 150 )
-        surface.DrawRect( 0, hlerp2, scrw, 150 )
-    else
-        hlerp1 = -100
-        hlerp2 = scrh
-    end
 
     if !ply:Alive() then 
         local usebind = input.LookupBinding( "+use" ) or "e"

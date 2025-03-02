@@ -116,7 +116,7 @@ hook.Add( "KeyPress", "crackdown2_meleesystem", function( ply, key )
                         local add = IsValid( heldobjectphys ) and heldobjectphys:GetMass() / 2 or 0
 
                         local hitphys = hitent:GetPhysicsObject()
-                        local force = hitent:IsCD2NPC() and 20000 or IsValid( hitphys ) and hitphys:GetMass() * 10 or 20000
+                        local force = hitent:IsCD2NPC() and 20000 or IsValid( hitphys ) and hitphys:GetMass() * ( 1 + ply:GetStrengthSkill() ) or 20000
                         local normal = ( hitent:WorldSpaceCenter() - ply:WorldSpaceCenter() ):GetNormalized()
                         
                         local info = DamageInfo()

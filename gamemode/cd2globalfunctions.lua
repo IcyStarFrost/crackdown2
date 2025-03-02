@@ -412,11 +412,6 @@ function CD2:KeysToTheCity()
     return GetConVar( "cd2_keystothecitymode" ):GetBool()
 end
 
--- Returns if the map is the pacific city map
-function InPacificCity()
-    return game.GetMap() == "cd2_pacificcity_remap"
-end
-
 -- Quick test functions
 
 function CD2:QuickSpawnCellNPC()

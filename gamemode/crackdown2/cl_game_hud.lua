@@ -260,11 +260,6 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     if CD2.InDropMenu or IsValid( CD2_AgencyConsole ) then RemoveHUDpanels() return end
     if !CD2.DrawWeaponInfo then RemoveHUDpanels() end
 
-    if game.GetTimeScale() < 0.90 then
-
-        draw.DrawText( "Damping frame loss.. (" .. ( math.Round( ( 1 - game.GetTimeScale() ) * 100, 0 ) ) .."%)", "crackdown2_font30", 60, scrh / 2, alphawhite, TEXT_ALIGN_LEFT )
-    end
-
     if !game.SinglePlayer() and GetConVar( "cd2_drawhud" ):GetBool() then
         for k, v in ipairs( player.GetAll() ) do
             if v == LocalPlayer() or !v:IsCD2Agent() then continue end

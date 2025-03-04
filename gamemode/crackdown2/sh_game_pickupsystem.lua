@@ -120,7 +120,6 @@ hook.Add( "Tick", "crackdown2_pickupsystem", function()
 end )
 
 if CLIENT then
-    local input_GetKeyName = input.GetKeyName
 
     hook.Add( "HUDPaint", "crackdown2_pickupprompt", function()
         if !GetConVar( "cd2_drawhud" ):GetBool() then return end

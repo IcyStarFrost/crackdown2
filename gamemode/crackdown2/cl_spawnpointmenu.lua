@@ -175,18 +175,16 @@ function CD2:OpenSpawnPointMenu()
 
             local usebind = input_LookupBinding( "+use" ) or "e"
             local code = input_GetKeyCode( usebind )
-            local buttonname = input_GetKeyName( code )
     
             local reloadbind = input_LookupBinding( "+reload" ) or "r"
             local rcode = input_GetKeyCode( reloadbind )
-            local reloadname = input_GetKeyName( rcode )
 
             local jumpbind = input_LookupBinding( "+jump" ) or "SPACE"
             local jumpcode = input_GetKeyCode( jumpbind )
             local jumpname = input_GetKeyName( jumpcode )
 
-            CD2:DrawInputBar( 100, 200, upper( buttonname ), " Select previous Drop Point" )
-            CD2:DrawInputBar( 150, 250, upper( reloadname ), " Select next Drop Point" )
+            CD2:DrawInputBar( 100, 200, code, " Select previous Drop Point" )
+            CD2:DrawInputBar( 150, 250, rcode, " Select next Drop Point" )
 
             draw.DrawText( "Press " .. jumpname .. " to confirm your Drop Point", "crackdown2_font60", w / 2, h - 55, orange, TEXT_ALIGN_CENTER )
 

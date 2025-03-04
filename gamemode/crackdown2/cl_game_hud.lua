@@ -90,8 +90,8 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         local reloadname = input.GetKeyName( rcode )
         
 
-        CD2:DrawInputBar( scrw / 2.1, 200, CD2:GetInteractKey3(), "Regenerate" )
-        CD2:DrawInputBar( scrw / 2, 250, CD2:GetInteractKey2(), "Regenerate at nearest spawn" )
+        CD2:DrawInputBar( scrw / 2.1, 200, CD2:GetInteractKey2(), "Regenerate" )
+        CD2:DrawInputBar( scrw / 2, 250, CD2:GetInteractKey3(), "Regenerate at nearest spawn" )
 
         if #player.GetAll() > 1 then
             local fbind = input.LookupBinding( "+forward" ) or "w"

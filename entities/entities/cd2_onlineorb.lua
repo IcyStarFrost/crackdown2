@@ -37,7 +37,7 @@ function ENT:Initialize()
 
             if !self.cd2_collectedby[ LocalPlayer():SteamID() ] then
                 local screen = ( self:GetPos() + Vector( 0, 0, 5 ) ):ToScreen()
-                CD2DrawInputbar( screen.x, screen.y, "", !game.SinglePlayer() and "Not enough players in range!" or "Play with other Agents to collect this orb!" )
+                CD2:DrawInputBar( screen.x, screen.y, "", !game.SinglePlayer() and "Not enough players in range!" or "Play with other Agents to collect this orb!" )
             end
         end )
     end

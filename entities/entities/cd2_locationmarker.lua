@@ -66,9 +66,8 @@ function ENT:Initialize()
             local ply = LocalPlayer()
             local currentlocation = ply:GetInteractable2()
             if IsValid( currentlocation ) and currentlocation == self then
-                local buttonname = input_GetKeyName( CD2:GetConVar( "cd2_interact2" ):GetInt() )
                 local screen = ( currentlocation:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
-                CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), self:GetLocationType() == "beacon" and "Drop Beacon" or self:GetLocationType() == "agency" and "Call Helicopter" or self:GetLocationType() == "cell" and "Begin Assault on this Tactical Location" )
+                CD2:DrawInputBar( screen.x, screen.y, CD2:GetInteractKey2(), self:GetLocationType() == "beacon" and "Drop Beacon" or self:GetLocationType() == "agency" and "Call Helicopter" or self:GetLocationType() == "cell" and "Begin Assault on this Tactical Location" )
             end
         end )
 

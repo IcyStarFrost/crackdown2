@@ -38,7 +38,7 @@ function CD2RegisterProgressBar( ent, distance, priority, drawfunc )
 end
 
 
-function CD2DrawInputbar( x, y, keyname, text )
+function CD2:DrawInputBar( x, y, key, text )
 
     surface.SetFont( "crackdown2_font30" )
     local sizex = surface.GetTextSize( text )
@@ -50,7 +50,9 @@ function CD2DrawInputbar( x, y, keyname, text )
     surface.SetDrawColor( grey )
     CD2:DrawCircle( x, y, 20, 6 )
 
-    draw.DrawText( keyname, "crackdown2_font30", x, y - 15, color_white, TEXT_ALIGN_CENTER )
+    local keyname = key != "" and input.GetKeyName( key ) or ""
+
+    draw.DrawText( string.upper( keyname ), "crackdown2_font30", x, y - 15, color_white, TEXT_ALIGN_CENTER )
 
     draw.DrawText( text, "crackdown2_font30", x + 20, y - 17, color_white, TEXT_ALIGN_LEFT )
     
@@ -88,15 +90,15 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         local reloadname = input.GetKeyName( rcode )
         
 
-        CD2DrawInputbar( scrw / 2.1, 200, string.upper( buttonname ), "Regenerate" )
-        CD2DrawInputbar( scrw / 2, 250, string.upper( reloadname ), "Regenerate at nearest spawn" )
+        CD2:DrawInputBar( scrw / 2.1, 200, CD2:GetInteractKey3(), "Regenerate" )
+        CD2:DrawInputBar( scrw / 2, 250, CD2:GetInteractKey2(), "Regenerate at nearest spawn" )
 
         if #player.GetAll() > 1 then
             local fbind = input.LookupBinding( "+forward" ) or "w"
             local fcode = input.GetKeyCode( fbind )
             local forwardname = input.GetKeyName( fcode )
 
-            CD2DrawInputbar( scrw / 1.9, 300, string.upper( forwardname ), "Hold to call for help" )
+            CD2:DrawInputBar( scrw / 1.9, 300, KEY_W, "Hold to call for help" )
         end
 
         return 

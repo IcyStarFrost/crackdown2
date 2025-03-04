@@ -51,13 +51,9 @@ if !game.SinglePlayer() and CLIENT then
         if !GetConVar( "cd2_drawhud" ):GetBool() then return end
         local targ = LocalPlayer().cd2_revivetarget
         if !IsValid( targ ) or !targ:GetRagdollOwner():GetCanRevive() then return end
-
-        local usebind = input_LookupBinding( "+use" ) or "e"
-        local code = input_GetKeyCode( usebind )
-        local buttonname = input_GetKeyName( code )
         
         local screen = ( targ:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
-        CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), "Revive " .. targ:GetRagdollOwner():Name() )
+        CD2:DrawInputBar( screen.x, screen.y, CD2:GetInteractKey2(), "Revive " .. targ:GetRagdollOwner():Name() )
     end )
 
 end

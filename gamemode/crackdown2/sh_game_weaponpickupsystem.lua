@@ -78,10 +78,8 @@ hook.Add( "HUDPaint", "crackdown2_pickupweaponpaint", function()
     local curwep = ply:GetActiveWeapon()
     if !IsValid( wep ) or !wep:IsWeapon() or !IsValid( curwep ) then return end
 
-    local buttonname = input_GetKeyName( CD2:GetConVar( "cd2_interact3" ):GetInt() )
-    
     local screen = ( wep:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
-    CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), "Hold to Equip " .. wep:GetPrintName() .. " / Drop " .. curwep:GetPrintName() )
+    CD2:DrawInputBar( screen.x, screen.y, CD2:GetInteractKey3(), "Hold to Equip " .. wep:GetPrintName() .. " / Drop " .. curwep:GetPrintName() )
 end )
 
 
@@ -96,8 +94,6 @@ hook.Add( "HUDPaint", "crackdown2_pickupequipmentpaint", function()
 
     if !IsValid( equipment ) then return end
 
-    local buttonname = input_GetKeyName( CD2:GetConVar( "cd2_interact3" ):GetInt() )
-    
     local screen = ( equipment:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
-    CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), "Hold to Equip " .. equipment:GetPrintName() .. " / Drop " .. scripted_ents.Get( ply:GetEquipment() ).PrintName )
+    CD2:DrawInputBar( screen.x, screen.y, CD2:GetInteractKey3(), "Hold to Equip " .. equipment:GetPrintName() .. " / Drop " .. scripted_ents.Get( ply:GetEquipment() ).PrintName )
 end )

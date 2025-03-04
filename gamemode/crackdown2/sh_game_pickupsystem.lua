@@ -132,11 +132,9 @@ if CLIENT then
         local isholding = ply:GetIsHoldingEnt()
 
         if !IsValid( targ ) or isholding then return end
-
-        local buttonname = input_GetKeyName( CD2:GetConVar( "cd2_interact1" ):GetInt() )
         
         local screen = ( targ:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()
-        CD2DrawInputbar( screen.x, screen.y, upper( buttonname ), "Hold to pickup/drop object" )
+        CD2:DrawInputBar( screen.x, screen.y, CD2:GetInteractKey1(), "Hold to pickup/drop object" )
     end )
 
 end

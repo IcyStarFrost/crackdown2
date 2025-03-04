@@ -104,11 +104,8 @@ local coreicons = { Material( "crackdown2/ui/core1.png", "smooth" ), Material( "
 function ENT:HUDDraw()
 
     if !self:GetIsCharging() and !self:GetIsDetonated() and LocalPlayer():SqrRangeTo( self ) < ( 300 * 300 ) and self:CanBeActivated() then
-        local usebind = input.LookupBinding( "+use" ) or "e"
-        local code = input.GetKeyCode( usebind )
-        local buttonname = input.GetKeyName( code )
         local screen = ( self:GetPos() + Vector( 0, 0, 100 ) ):ToScreen()
-        CD2DrawInputbar( screen.x, screen.y, string.upper( buttonname ), "Start Beacon Charge" )
+        CD2:DrawInputBar( screen.x, screen.y, CD2:GetInteractKey2(), "Start Beacon Charge" )
     end
 
     if !self:GetIsCharging() then return end
@@ -581,7 +578,7 @@ function ENT:BeginCharge()
                 if playernear then aborttime = CurTime() + 10 limitwarning = false else if !limitwarning then CD2:PingLocation( nil, nil, self:GetPos(), 3 ) CD2:SendTextBoxMessage( nil, "Return to the Tower Beacon!" ) limitwarning = true end end
     
                 if CurTime() > aborttime then
-                    CD2:PingLocation( nil, nil, self:GetPos() )
+                    CD2:PingLocation( nil, nil, self:GetPos(), 3 )
                     self:SetIsCharging( false )
                     self:SetIsDetonated( false )
                     self:SetCore1Charged( false )

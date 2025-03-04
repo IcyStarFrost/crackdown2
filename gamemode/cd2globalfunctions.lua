@@ -377,6 +377,25 @@ function CD2:GetRandomPos( dist, pos )
     return Vector()
 end
 
+if CLIENT then
+    local interact1 = GetConVar( "cd2_interact1" )
+    local interact2 = GetConVar( "cd2_interact2" )
+    local interact3 = GetConVar( "cd2_interact3" )
+
+    function CD2:GetInteractKey1()
+        return interact1:GetInt() 
+    end
+
+    function CD2:GetInteractKey2()
+        return interact2:GetInt() 
+    end
+
+    function CD2:GetInteractKey3()
+        return interact3:GetInt() 
+    end
+
+end
+
 if SERVER then
     -- Sets the text to type in the middle of the player's screen
     function CD2:SetTypingText( ply, top, bottom, isred )

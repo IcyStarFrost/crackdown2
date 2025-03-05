@@ -33,40 +33,30 @@ end
 
 -- The gamemode's custom file system. This is what handles the saving, loading, and general data players have
 
--- File writing with the ability to easily pack tables into jsons or compressed jsons
-function CD2:Write( filename, contents, type )
+function CD2:Write( filename, contents )
     CD2:DebugMessage( "Writing to file " .. filename .. " with " .. tostring( contents ) )
-	local f = file.Open( filename, type == "compressed" and "wb" or "w", "DATA" )
+	local f = file.Open( filename, "wb", "DATA" )
 	if ( !f ) then return end
 
-    if type == "json" then
-        contents = TableToJSON( contents )
-    elseif type == "compressed" then
-        contents = TableToJSON( contents )
-        contents = compress( contents )
-    end
+    contents = TableToJSON( contents )
+    contents = compress( contents )
 
 	f:Write( contents )
 	f:Close()
 
 end
 
--- File reading with the ability to directly get a table from a json or compressed json
-function CD2:Read( filename, type )
+function CD2:Read( filename )
     CD2:DebugMessage( "Reading from file " .. filename )
 
-	local f = file.Open( filename, type == "compressed" and "rb" or "r", "DATA" )
+	local f = file.Open( filename, "rb", "DATA" )
 	if ( !f ) then return end
 
 	local contents = f:Read( f:Size() )
 	f:Close()
 
-    if type == "json" then
-        contents = JSONToTable( contents )
-    elseif type == "compressed" then
-        contents = decompress( contents )
-        contents = JSONToTable( contents )
-    end
+    contents = decompress( contents )
+    contents = JSONToTable( contents )
 
     CD2:DebugMessage( "Read " .. tostring( contents ) .. " from " .. filename )
 
@@ -79,10 +69,10 @@ if SERVER then
     -- Writes a value to the current map's data. These two are typically used to save/load Agility Orbs and more
     function CD2:WriteMapData( var, any )
         if !file.Exists( "crackdown2/mapdata/" .. game.GetMap(), "DATA" ) then file.CreateDir( "crackdown2/mapdata/" .. game.GetMap() ) end
-        if !file.Exists( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "DATA" ) then CD2:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", {}, "compressed" ) end
-        local data = CD2:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "compressed" )
+        if !file.Exists( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "DATA" ) then CD2:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", {} ) end
+        local data = CD2:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat" )
         data[ var ] = any
-        CD2:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", data, "compressed" )
+        CD2:Write( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", data )
     end
 
     -- Removes the data file related to this map
@@ -92,7 +82,7 @@ if SERVER then
 
     -- Reads from the current map's data. These two are typically used to save/load Agility Orbs and more
     function CD2:ReadMapData( var )
-        local data = CD2:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat", "compressed" )
+        local data = CD2:Read( "crackdown2/mapdata/" .. game.GetMap() .. "/data.dat"  )
         return var != "TABLE" and data and data[ var ] or var == "TABLE" and data
     end
 
@@ -140,21 +130,21 @@ if CLIENT then
     -- Writes a value to the Player's agent data
     function CD2:WritePlayerData( var, any )
         CD2:DebugMessage( "Writing to your Agent data: var = " .. var .. " | value = " .. tostring( any ) )
-        local data = CD2:Read( "crackdown2/agentdata.dat", "compressed" )
+        local data = CD2:Read( "crackdown2/agentdata.dat" )
         data[ var ] = any
-        CD2:Write( "crackdown2/agentdata.dat", data, "compressed" )
+        CD2:Write( "crackdown2/agentdata.dat", data )
     end
 
     -- Reads a value from the Player's agent data
     function CD2:ReadPlayerData( var )
-        local data = CD2:Read( "crackdown2/agentdata.dat", "compressed" )
+        local data = CD2:Read( "crackdown2/agentdata.dat" )
         CD2:DebugMessage( "Reading from your Agent data: var = " .. var .. " | returned value = " .. tostring( data[ var ] ) )
         return data[ var ]
     end
 
     -- Create Agent data if it doesn't exist
     if !file.Exists( "crackdown2/agentdata.dat", "DATA" ) then
-        CD2:Write( "crackdown2/agentdata.dat", {}, "compressed" )
+        CD2:Write( "crackdown2/agentdata.dat", {} )
     end
 
 

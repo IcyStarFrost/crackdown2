@@ -67,6 +67,24 @@ function GM:PlayerStartVoice()
 
 end
 
+local HUDBlock = {
+    [ "CHudAmmo" ] = true,
+    [ "CHudBattery" ] = true,
+    [ "CHudHealth" ] = true,
+    [ "CHudSecondaryAmmo" ] = true,
+    [ "CHudWeapon" ] = true,
+    [ "CHudZoom" ] = true,
+    [ "CHudSuitPower" ] = true,
+    [ "CHUDQuickInfo" ] = true,
+    [ "CHudCrosshair" ] = true,
+    [ "CHudDamageIndicator" ] = true,
+    [ "CHudWeaponSelection" ] = true
+}
+
+hook.Add( "HUDShouldDraw", "crackdown2_hidehuds", function( name )
+    if HUDBlock[ name ] then return false end
+end )
+
 local explosivemodels = {
     [ "models/props_c17/oildrum001_explosive.mdl" ] = 1,
     [ "models/props_junk/gascan001a.mdl" ] = 0.6

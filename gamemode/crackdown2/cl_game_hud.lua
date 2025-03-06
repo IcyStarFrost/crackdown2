@@ -1,35 +1,14 @@
 local math = math
 local surface = surface
 local red = Color( 163, 12, 12)
-local blackish = Color( 39, 39, 39)
-local grey = Color( 61, 61, 61)
 --local alphawhite = Color( 255, 255, 255, 10 )
 local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local cell = Material( "crackdown2/ui/cell.png", "smooth" )
-
-local agentdown = Material( "crackdown2/ui/agentdown.png", "smooth" )
 
 
 CD2Progressbars = CD2Progressbars or {}
 
 CD2.lockon = false
-
-function CD2:DrawCircle( x, y, radius, seg, rotate )
-    rotate = rotate or 0
-	local cir = {}
-
-	table.insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
-	for i = 0, seg do
-		local a = math.rad( ( i / seg ) * -360 + rotate )
-		table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
-	end
-
-	local a = math.rad( rotate ) -- This is needed for non math.absolute segment counts
-	table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
-
-	surface.DrawPoly( cir )
-end
-
 
 
 function CD2RegisterProgressBar( ent, distance, priority, drawfunc )
@@ -38,72 +17,9 @@ function CD2RegisterProgressBar( ent, distance, priority, drawfunc )
 end
 
 
-function CD2:DrawInputBar( x, y, key, text )
-
-    surface.SetFont( "crackdown2_font30" )
-    local sizex = surface.GetTextSize( text )
-
-    draw.NoTexture()
-    surface.SetDrawColor( blackish )
-    surface.DrawRect( x, y - 15, sizex + 30, 30 )
-    
-    surface.SetDrawColor( grey )
-    CD2:DrawCircle( x, y, 20, 6 )
-
-    local keyname = key != "" and input.GetKeyName( key ) or ""
-
-    draw.DrawText( string.upper( keyname ), "crackdown2_font30", x, y - 15, color_white, TEXT_ALIGN_CENTER )
-
-    draw.DrawText( text, "crackdown2_font30", x + 20, y - 17, color_white, TEXT_ALIGN_LEFT )
-    
-end
-
 local fireicon = Material( "crackdown2/ui/explosive.png" )
 
 hook.Add( "HUDPaint", "crackdown2_hud", function()
-    local scrw, ply = ScrW(), LocalPlayer()
-
-    if !game.SinglePlayer() and GetConVar( "cd2_drawhud" ):GetBool() then
-        for k, v in ipairs( player.GetAll() ) do
-            if v == LocalPlayer() or !v:IsCD2Agent() then continue end
-            local ent = IsValid( v:GetRagdollEntity() ) and v:GetRagdollEntity() or v
-            local screen = ( ent:GetPos() + Vector( 0, 0, 100 ) ):ToScreen()
-            draw.DrawText( v:Name(), "crackdown2_agentnames", screen.x, screen.y, v:GetPlayerColor():ToColor(), TEXT_ALIGN_CENTER )
-
-            if !v:Alive() then 
-                local screen = ( ent:GetPos() + Vector( 0, 0, 10 ) ):ToScreen()
-                surface.SetMaterial( agentdown )
-                surface.SetDrawColor( color_white )
-                surface.DrawTexturedRect( screen.x - 65, screen.y - 25, 130, 70 )
-            end
-        end
-    end
-
-
-    if !ply:Alive() and !CD2.InSpawnPointMenu then 
-        local usebind = input.LookupBinding( "+use" ) or "e"
-        local code = input.GetKeyCode( usebind )
-        local buttonname = input.GetKeyName( code )
-
-        local reloadbind = input.LookupBinding( "+reload" ) or "r"
-        local rcode = input.GetKeyCode( reloadbind )
-        local reloadname = input.GetKeyName( rcode )
-        
-
-        CD2:DrawInputBar( scrw / 2.1, 200, CD2:GetInteractKey2(), "Regenerate" )
-        CD2:DrawInputBar( scrw / 2, 250, CD2:GetInteractKey3(), "Regenerate at nearest spawn" )
-
-        if #player.GetAll() > 1 then
-            local fbind = input.LookupBinding( "+forward" ) or "w"
-            local fcode = input.GetKeyCode( fbind )
-            local forwardname = input.GetKeyName( fcode )
-
-            CD2:DrawInputBar( scrw / 1.9, 300, KEY_W, "Hold to call for help" )
-        end
-
-        return 
-    end
-
     if !GetConVar( "cd2_drawhud" ):GetBool() then RemoveHUDpanels() return end 
 
     for k, tbl in ipairs( CD2Progressbars ) do
@@ -111,7 +27,6 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
         local active = tbl.drawfunc( tbl.ent )
         if active then break end
     end
-    
 end )
 
 local explosivemodels = {
@@ -155,24 +70,6 @@ end )
 
 
 
-local HUDBlock = {
-    [ "CHudAmmo" ] = true,
-    [ "CHudBattery" ] = true,
-    [ "CHudHealth" ] = true,
-    [ "CHudSecondaryAmmo" ] = true,
-    [ "CHudWeapon" ] = true,
-    [ "CHudZoom" ] = true,
-    [ "CHudSuitPower" ] = true,
-    [ "CHUDQuickInfo" ] = true,
-    [ "CHudCrosshair" ] = true,
-    [ "CHudDamageIndicator" ] = true,
-    [ "CHudWeaponSelection" ] = true
-}
-
-hook.Add( "HUDShouldDraw", "crackdown2_hidehuds", function( name )
-    if HUDBlock[ name ] then return false end
-end )
-
 local modify = {
 	[ "$pp_colour_addr" ] = 0,
 	[ "$pp_colour_addg" ] = 0,
@@ -213,15 +110,3 @@ hook.Add( "NeedsDepthPass", "crackdown2_bokehdepthpass", function()
     return !LocalPlayer():Alive()
 end )
 
--- Connect messages --
-hook.Add( "PlayerConnect", "crackdown2_connectmessage", function( name )
-    if game.SinglePlayer() then return end
-    CD2SetTextBoxText( name .. " joined the game" )
-end )
-
-gameevent.Listen( "player_disconnect" )
-
-hook.Add( "player_disconnect", "crackdown2_disconnectmessage", function( data )
-    if game.SinglePlayer() then return end
-    CD2SetTextBoxText( data.name .. " left the game (" .. data.reason .. ")"  )
-end )

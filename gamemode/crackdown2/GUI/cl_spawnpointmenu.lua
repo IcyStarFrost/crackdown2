@@ -173,20 +173,10 @@ function CD2:OpenSpawnPointMenu()
             surface_SetDrawColor( blackish )
             surface_DrawRect( 0, h - 50, w, 100 )
 
-            local usebind = input_LookupBinding( "+use" ) or "e"
-            local code = input_GetKeyCode( usebind )
-    
-            local reloadbind = input_LookupBinding( "+reload" ) or "r"
-            local rcode = input_GetKeyCode( reloadbind )
+            CD2:DrawInputBar( 100, 200, KEY_E, " Select previous Drop Point" )
+            CD2:DrawInputBar( 150, 250, KEY_R, " Select next Drop Point" )
 
-            local jumpbind = input_LookupBinding( "+jump" ) or "SPACE"
-            local jumpcode = input_GetKeyCode( jumpbind )
-            local jumpname = input_GetKeyName( jumpcode )
-
-            CD2:DrawInputBar( 100, 200, code, " Select previous Drop Point" )
-            CD2:DrawInputBar( 150, 250, rcode, " Select next Drop Point" )
-
-            draw.DrawText( "Press " .. jumpname .. " to confirm your Drop Point", "crackdown2_font60", w / 2, h - 55, orange, TEXT_ALIGN_CENTER )
+            draw.DrawText( "Press " .. input.GetKeyName( KEY_SPACE ) .. " to confirm your Drop Point", "crackdown2_font60", w / 2, h - 55, orange, TEXT_ALIGN_CENTER )
 
         end
 
@@ -195,21 +185,21 @@ function CD2:OpenSpawnPointMenu()
 
 end
 
-hook.Add( "Think", "crackdown2_spawnpointmenu", function()
+hook.Add( "CD2_ButtonPressed", "crackdown2_spawnpointmenu", function( ply, button )
     local ply = LocalPlayer()
 
     if !CD2.InSpawnPointMenu then return end
 
 
-    if ply:KeyPressed( IN_USE ) then
+    if button == KEY_E then
         surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
         CD2.SpawnPointIndex = CD2.SpawnPointIndex - 1
         if CD2.SpawnPointIndex <= 0 then CD2.SpawnPointIndex = #CD2.SpawnPoints end
-    elseif ply:KeyPressed( IN_RELOAD ) then
+    elseif button == KEY_R then
         surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
         CD2.SpawnPointIndex = CD2.SpawnPointIndex + 1
         if CD2.SpawnPointIndex > #CD2.SpawnPoints then CD2.SpawnPointIndex = 1 end
-    elseif ply:KeyPressed( IN_JUMP ) then 
+    elseif button == KEY_SPACE then 
         surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
         CD2.SpawnPointMenu:Remove()
         if !CD2.InDropMenu then

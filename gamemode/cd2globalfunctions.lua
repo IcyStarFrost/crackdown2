@@ -378,6 +378,9 @@ function CD2:GetRandomPos( dist, pos )
 end
 
 if CLIENT then
+    local blackish = Color( 39, 39, 39)
+    local grey = Color( 61, 61, 61)
+
     function CD2:GetInteractKey1()
         return GetConVar( "cd2_interact1" ):GetInt() 
     end
@@ -388,6 +391,44 @@ if CLIENT then
 
     function CD2:GetInteractKey3()
         return GetConVar( "cd2_interact3" ):GetInt() 
+    end
+
+
+    function CD2:DrawCircle( x, y, radius, seg, rotate )
+        rotate = rotate or 0
+        local cir = {}
+    
+        table.insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
+        for i = 0, seg do
+            local a = math.rad( ( i / seg ) * -360 + rotate )
+            table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+        end
+    
+        local a = math.rad( rotate ) -- This is needed for non math.absolute segment counts
+        table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+    
+        surface.DrawPoly( cir )
+    end
+
+
+    function CD2:DrawInputBar( x, y, key, text )
+
+        surface.SetFont( "crackdown2_font30" )
+        local sizex = surface.GetTextSize( text )
+    
+        draw.NoTexture()
+        surface.SetDrawColor( blackish )
+        surface.DrawRect( x, y - 15, sizex + 30, 30 )
+        
+        surface.SetDrawColor( grey )
+        CD2:DrawCircle( x, y, 20, 6 )
+    
+        local keyname = key != "" and input.GetKeyName( key ) or ""
+    
+        draw.DrawText( string.upper( keyname ), "crackdown2_font30", x, y - 15, color_white, TEXT_ALIGN_CENTER )
+    
+        draw.DrawText( text, "crackdown2_font30", x + 20, y - 17, color_white, TEXT_ALIGN_LEFT )
+        
     end
 
 end

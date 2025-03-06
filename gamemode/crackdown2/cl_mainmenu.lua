@@ -145,72 +145,39 @@ function CD2:OpenMainMenu()
                 net.WriteVector( CD2:ReadPlayerData( "cd2_agentcolorvector" ) )
                 net.SendToServer()
 
-                local isreturningplayer = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "c_isreturningplayer" ) or CD2:KeysToTheCity() and true
                 local completedtutorial = !CD2:KeysToTheCity() and CD2:ReadPlayerData( "c_completedtutorial" ) or CD2:KeysToTheCity() and true
                 
-                -- If the player is new to the gamemode, then play the intro video
-                if !isreturningplayer then
-                    CD2:CreateThread( function()
+                if !completedtutorial then
 
-                        if BRANCH == "x86-64" or BRANCH == "chromium" then
-                            CD2:BeginIntroVideo()
+                    CD2:ToggleHUDComponent( "AgilitySkill", false )
+                    CD2:ToggleHUDComponent( "WeaponSkill", false )
+                    CD2:ToggleHUDComponent( "StrengthSkill", false )
+                    CD2:ToggleHUDComponent( "ExplosiveSkill", false )
+                    CD2_CanOpenAgencyConsole = false
 
-                            while IsValid( CD2_videopanel ) do
-                                coroutine.yield()
-                            end
-                        end
+                    CD2:ToggleHUDComponent( "Crosshair", false )
+                    CD2:ToggleHUDComponent( "HealthAndShields", false )
+                    CD2:ToggleHUDComponent( "WeaponInfo", false )
+                    CD2:ToggleHUDComponent( "Minimap", false )
+                    CD2.DrawBlackbars = false
 
-                        CD2:ToggleHUDComponent( "AgilitySkill", false )
-                        CD2:ToggleHUDComponent( "WeaponSkill", false )
-                        CD2:ToggleHUDComponent( "StrengthSkill", false )
-                        CD2:ToggleHUDComponent( "ExplosiveSkill", false )
-                        CD2_CanOpenAgencyConsole = false
-
-                        CD2:ToggleHUDComponent( "Crosshair", false )
-                        CD2:ToggleHUDComponent( "HealthAndShields", false )
-                        CD2:ToggleHUDComponent( "WeaponInfo", false )
-                        CD2:ToggleHUDComponent( "Minimap", false )
-                        CD2.DrawBlackbars = false
-
-                        net.Start( "cd2net_starttutorial" )
-                        net.SendToServer()
-
-                    end )
-
-                    CD2:WritePlayerData( "c_isreturningplayer", true )
-                else -- If not then let them get in game already. If they haven't completed the tutorial then run it
-
-                    if !completedtutorial then
-
-                        CD2:ToggleHUDComponent( "AgilitySkill", false )
-                        CD2:ToggleHUDComponent( "WeaponSkill", false )
-                        CD2:ToggleHUDComponent( "StrengthSkill", false )
-                        CD2:ToggleHUDComponent( "ExplosiveSkill", false )
-                        CD2_CanOpenAgencyConsole = false
-
-                        CD2:ToggleHUDComponent( "Crosshair", false )
-                        CD2:ToggleHUDComponent( "HealthAndShields", false )
-                        CD2:ToggleHUDComponent( "WeaponInfo", false )
-                        CD2:ToggleHUDComponent( "Minimap", false )
-                        CD2.DrawBlackbars = false
-
-                        net.Start( "cd2net_starttutorial" )
-                        net.SendToServer()
-                        return
-                    end
-
-                    timer.Simple( 1, function()
-                        if !CD2:KeysToTheCity() then
-                            sound.PlayFile( "sound/crackdown2/vo/agencydirector/droppoint.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
-                        end
-                    end )
-            
-                    CD2:OpenSpawnPointMenu()
-                    CD2:StartMusic( "sound/crackdown2/music/droppointmusic.mp3", 800, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
-                        if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
-                    end )
-
+                    net.Start( "cd2net_starttutorial" )
+                    net.SendToServer()
+                    return
                 end
+
+                timer.Simple( 1, function()
+                    if !CD2:KeysToTheCity() then
+                        sound.PlayFile( "sound/crackdown2/vo/agencydirector/droppoint.mp3", "noplay", function( snd, id, name ) snd:SetVolume( 10 ) snd:Play() end )
+                    end
+                end )
+        
+                CD2:OpenSpawnPointMenu()
+                CD2:StartMusic( "sound/crackdown2/music/droppointmusic.mp3", 800, true, false, nil, nil, nil, nil, nil, function( CD2Musicchannel ) 
+                    if player_manager.GetPlayerClass( LocalPlayer() ) == "cd2_player" then CD2Musicchannel:FadeOut() end
+                end )
+
+                
 
             end
 

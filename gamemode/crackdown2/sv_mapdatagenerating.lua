@@ -535,3 +535,46 @@ hook.Add( "CD2_OnTacticalLocationCaptured", "crackdown2_locationcaptured", funct
     
     
 end )
+
+hook.Add( "PostCleanupMap", "crackdown2_regenmap", function()
+
+    local hooktbl = hook.GetTable()
+    local powernetworkhooks = hooktbl.CD2_PowerNetworkComplete
+
+    if powernetworkhooks then
+        for k, v in pairs( powernetworkhooks ) do
+            hook.Remove( "CD2_PowerNetworkComplete", k )
+        end
+    end
+
+    CD2:GenerateMapData( true )
+
+    for k, ply in ipairs( player.GetAll() ) do
+        timer.Simple( 0.01, function()
+            if !IsValid( ply.cd2_holsteredweapon ) then 
+    
+                local mdl
+    
+                for k, v in ipairs( ply:GetWeapons() ) do
+                    if v != ply:GetActiveWeapon() then mdl = v:GetModel() break end
+                end
+    
+                ply.cd2_holsteredweapon = ents.Create( "base_anim" )
+                ply.cd2_holsteredweapon:SetNoDraw( true )
+                ply.cd2_holsteredweapon:SetModel( mdl or "" )
+                ply.cd2_holsteredweapon:SetPos( ply:GetPos() )
+                ply.cd2_holsteredweapon:SetAngles( ply:GetAngles() )
+                ply.cd2_holsteredweapon:Spawn()
+    
+                local mins = ply.cd2_holsteredweapon:GetModelBounds()
+                ply.cd2_holsteredweapon:FollowBone( ply, ply:LookupBone( "ValveBiped.Bip01_Spine2" ) )
+                ply.cd2_holsteredweapon:SetLocalPos( Vector( -10, -9, 0 ) - mins / 2 ) 
+                ply.cd2_holsteredweapon:SetLocalAngles( Angle( 40, 0, 0 ) )
+    
+                ply.cd2_holsteredweapon.Think = function( entself ) if entself:GetModel() != "models/error.mdl" then entself:SetNoDraw( !ply:Alive() and true or ply:GetNoDraw() ) end end
+    
+                if mdl then ply.cd2_holsteredweapon:SetNoDraw( false ) end
+            end
+        end )
+    end 
+end )

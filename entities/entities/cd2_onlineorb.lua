@@ -33,7 +33,7 @@ function ENT:Initialize()
 
     if CLIENT then
         hook.Add("HUDPaint", self, function() 
-            if LocalPlayer():SqrRangeTo( self ) > 70 ^ 2 then return end 
+            if LocalPlayer():SqrRangeTo( self ) > 70 ^ 2 or !ply:Alive() then return end 
 
             if !self.cd2_collectedby[ LocalPlayer():SteamID() ] then
                 local screen = ( self:GetPos() + Vector( 0, 0, 5 ) ):ToScreen()

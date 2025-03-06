@@ -125,7 +125,7 @@ if CLIENT then
         if !GetConVar( "cd2_drawhud" ):GetBool() then return end
         local ply = LocalPlayer()
 
-        if !ply:IsCD2Agent() then return end
+        if !ply:IsCD2Agent() or !ply:Alive() then return end
 
         local targ = ply:GetPickupObject()
         local isholding = ply:GetIsHoldingEnt()

@@ -64,6 +64,8 @@ function ENT:Initialize()
 
         hook.Add( "HUDPaint", self, function()
             local ply = LocalPlayer()
+            if !ply:Alive() then return end
+
             local currentlocation = ply:GetInteractable2()
             if IsValid( currentlocation ) and currentlocation == self then
                 local screen = ( currentlocation:GetPos() + Vector( 0, 0, 30 ) ):ToScreen()

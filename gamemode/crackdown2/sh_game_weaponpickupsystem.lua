@@ -72,7 +72,7 @@ hook.Add( "HUDPaint", "crackdown2_pickupweaponpaint", function()
     if !GetConVar( "cd2_drawhud" ):GetBool() then return end
     local ply = LocalPlayer()
 
-    if !ply:IsCD2Agent() then return end
+    if !ply:IsCD2Agent() or !ply:Alive() then return end
 
     local wep = ply:GetInteractable3()
     local curwep = ply:GetActiveWeapon()
@@ -88,7 +88,7 @@ end )
 hook.Add( "HUDPaint", "crackdown2_pickupequipmentpaint", function()
     if !GetConVar( "cd2_drawhud" ):GetBool() then return end
     local ply = LocalPlayer()
-    if !ply:IsCD2Agent() then return end
+    if !ply:IsCD2Agent() or !ply:Alive() then return end
 
     local equipment = ply:GetInteractable3()
 

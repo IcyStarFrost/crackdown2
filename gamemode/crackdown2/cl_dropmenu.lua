@@ -528,12 +528,10 @@ end
 
 
 
-hook.Add( "Think", "crackdown2_regeneratemenu", function()
-    local ply = LocalPlayer()
-
+hook.Add( "CD2_ButtonPressed", "crackdown2_regeneratemenu", function( ply, button )
     if CD2.InDropMenu or CD2.InSpawnPointMenu or ply:Alive() then return end
 
-    if ply:KeyPressed( IN_USE ) then
+    if button == KEY_E then
         if !CD2.InSpawnPointMenu then
             CD2:OpenSpawnPointMenu()
 
@@ -546,7 +544,7 @@ hook.Add( "Think", "crackdown2_regeneratemenu", function()
                 end
             end
         end
-    elseif ply:KeyPressed( IN_RELOAD ) then
+    elseif button == KEY_R then
         net.Start( "cd2net_spawnatnearestspawn" )
         net.WriteString( CD2.DropPrimary )
         net.WriteString( CD2.DropSecondary )
@@ -555,18 +553,12 @@ hook.Add( "Think", "crackdown2_regeneratemenu", function()
     end
 
     -- Call for help --
-    if ply:KeyDown( IN_FORWARD ) and !game.SinglePlayer() then
-        ply.cd2_callforhelpdelay = ply.cd2_callforhelpdelay or CurTime() + 1
-        ply.cd2_callforhelpcooldown = ply.cd2_callforhelpcooldown or 0
+    if button == KEY_W and !game.SinglePlayer() and ( !ply.cd2_callforhelpcooldown or CurTime() > ply.cd2_callforhelpcooldown ) then
+        net.Start( "cd2net_playercallforhelp" )
+        net.SendToServer()
+        CD2SetTextBoxText( "Call for help has been sent to other Agents" )
 
-        if CurTime() > ply.cd2_callforhelpdelay and CurTime() > ply.cd2_callforhelpcooldown then
-            net.Start( "cd2net_playercallforhelp" )
-            net.SendToServer()
-            CD2SetTextBoxText( "Call for help has been sent to other Agents" )
-            ply.cd2_callforhelpcooldown = CurTime() + 10
-        end
-    else
-        ply.cd2_callforhelpdelay = nil
+        ply.cd2_callforhelpcooldown = CurTime() + 10
     end
 
 end )

@@ -80,7 +80,7 @@ hook.Add( "HUDPaint", "crackdown2_hud", function()
     end
 
 
-    if !ply:Alive() then 
+    if !ply:Alive() and !CD2.InSpawnPointMenu then 
         local usebind = input.LookupBinding( "+use" ) or "e"
         local code = input.GetKeyCode( usebind )
         local buttonname = input.GetKeyName( code )

@@ -82,7 +82,7 @@ if SERVER then
 
     end )
 
-    hook.Add( "OnCD2NPCKilled", "crackdown2_firstcellkill", function( npc, info )
+    hook.Add( "CD2_OnNPCKilled", "crackdown2_firstcellkill", function( npc, info )
         local attacker = info:GetAttacker()
         if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadFirstCellKill or CD2:KeysToTheCity() or npc:GetCD2Team() != "cell" then return end
         CD2:RequestPlayerData( attacker, "cd2_hadfirstcellkill", function( val )
@@ -95,7 +95,7 @@ if SERVER then
         end )
     end )
 
-    hook.Add( "OnCD2NPCKilled", "crackdown2_uvweaponachievement", function( npc, info )
+    hook.Add( "CD2_OnNPCKilled", "crackdown2_uvweaponachievement", function( npc, info )
         local attacker = info:GetAttacker()
         if !IsValid( attacker ) or !attacker:IsPlayer() or attacker.cd2_hadUVachievement or CD2:KeysToTheCity() or npc:GetCD2Team() != "freak" then return end
         local wep = attacker:GetActiveWeapon()

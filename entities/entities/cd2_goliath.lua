@@ -146,7 +146,7 @@ function ENT:OnKilled( info )
 
     CD2:AssessSkillGainOrbs( self, self.cd2_loggeddamage )
 
-    hook.Run( "OnCD2NPCKilled", self, info )
+    hook.Run( "CD2_OnNPCKilled", self, info )
 
     self:SetState( "DieSequence" )
 

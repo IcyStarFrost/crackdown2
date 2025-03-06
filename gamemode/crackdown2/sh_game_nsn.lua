@@ -105,7 +105,7 @@ if SERVER then
         return npc
     end
 
-    hook.Add( "OnCD2NPCKilled", "crackdown2_removefromnsntable", function( ent, info )
+    hook.Add( "CD2_OnNPCKilled", "crackdown2_removefromnsntable", function( ent, info )
         for i = 1, #CD2.SpawnedNSNNpcs do
             local npc = CD2.SpawnedNSNNpcs[ i ]
             if npc == ent then table_remove( CD2.SpawnedNSNNpcs, i ) break end

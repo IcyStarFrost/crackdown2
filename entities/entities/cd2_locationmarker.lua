@@ -23,8 +23,8 @@ function ENT:Initialize()
         self.cd2_passivenpcs = {}
         self.cd2_nextpassivespawn = CurTime() + 2
 
-        hook.Add( "OnCD2NPCKilled", self, function( self, ent, info )
-            if !IsValid( self ) then hook.Remove( "OnCD2NPCKilled", self) return end
+        hook.Add( "CD2_OnNPCKilled", self, function( self, ent, info )
+            if !IsValid( self ) then hook.Remove( "CD2_OnNPCKilled", self) return end
             if table_HasValue( self.cd2_activecell, ent ) then self:SetKillCount( self:GetKillCount() + 1 ) end
         end )
     end

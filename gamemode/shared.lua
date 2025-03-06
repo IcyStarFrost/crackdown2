@@ -50,7 +50,6 @@ if SERVER then
     AddCSLuaFile( "cd2convars.lua" )
     AddCSLuaFile( "cd2_filesystem.lua" )
     AddCSLuaFile( "cd2_fonts.lua" )
-    AddCSLuaFile( "medialib.lua" )
 end
 include( "cd2globalfunctions.lua" )
 include( "cd2_filesystem.lua" )

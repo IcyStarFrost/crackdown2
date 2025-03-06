@@ -3,14 +3,21 @@
 
 if SERVER then
     hook.Add("PlayerButtonDown", "crackdown2_buttondown", function( ply, button )
-        net.Start( "cd2net_inputpressed" )
-        net.WriteUInt( button, 32 )
-        net.Send( ply )
+        
+        if !game.SinglePlayer() then
+            net.Start( "cd2net_inputpressed" )
+            net.WriteUInt( button, 32 )
+            net.Send( ply )
+        end
 
         hook.Run( "CD2_ButtonPressed", ply, button )
     end )
 
 elseif CLIENT then
+
+    hook.Add("PlayerButtonDown", "crackdown2_buttondown", function( ply, button )
+        hook.Run( "CD2_ButtonPressed", ply, button )
+    end )
 
     net.Receive( "cd2net_inputpressed", function()
         local button = net.ReadUInt( 32 )

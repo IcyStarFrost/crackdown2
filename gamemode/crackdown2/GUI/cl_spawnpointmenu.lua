@@ -51,7 +51,7 @@ function CD2:OpenSpawnPointMenu()
         self.SpawnPointMenu = vgui.Create( "DPanel", GetHUDPanel() )
         self.SpawnPointMenu:Dock( FILL )
         self.SpawnPointMenu:MakePopup()
-        self.SpawnPointMenu:SetKeyBoardInputEnabled( false )
+
 
         hook.Add( "SetupWorldFog", self.SpawnPointMenu, function()
             render.FogStart( 0 )
@@ -181,30 +181,25 @@ function CD2:OpenSpawnPointMenu()
         end
 
 
+        function self.SpawnPointMenu:OnKeyCodePressed( button )
+            
+            if button == KEY_E then
+                surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
+                CD2.SpawnPointIndex = CD2.SpawnPointIndex - 1
+                if CD2.SpawnPointIndex <= 0 then CD2.SpawnPointIndex = #CD2.SpawnPoints end
+            elseif button == KEY_R then
+                surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
+                CD2.SpawnPointIndex = CD2.SpawnPointIndex + 1
+                if CD2.SpawnPointIndex > #CD2.SpawnPoints then CD2.SpawnPointIndex = 1 end
+            elseif button == KEY_SPACE then 
+                surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
+                CD2.SpawnPointMenu:Remove()
+                if !CD2.InDropMenu then
+                    CD2:OpenDropMenu()
+                end
+            end
+        end
+
     end )
 
 end
-
-hook.Add( "CD2_ButtonPressed", "crackdown2_spawnpointmenu", function( ply, button )
-    local ply = LocalPlayer()
-
-    if !CD2.InSpawnPointMenu then return end
-
-
-    if button == KEY_E then
-        surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
-        CD2.SpawnPointIndex = CD2.SpawnPointIndex - 1
-        if CD2.SpawnPointIndex <= 0 then CD2.SpawnPointIndex = #CD2.SpawnPoints end
-    elseif button == KEY_R then
-        surface.PlaySound( "crackdown2/ui/ui_spawnselect.mp3" )
-        CD2.SpawnPointIndex = CD2.SpawnPointIndex + 1
-        if CD2.SpawnPointIndex > #CD2.SpawnPoints then CD2.SpawnPointIndex = 1 end
-    elseif button == KEY_SPACE then 
-        surface.PlaySound( "crackdown2/ui/ui_select.mp3" )
-        CD2.SpawnPointMenu:Remove()
-        if !CD2.InDropMenu then
-            CD2:OpenDropMenu()
-        end
-    end
-
-end )

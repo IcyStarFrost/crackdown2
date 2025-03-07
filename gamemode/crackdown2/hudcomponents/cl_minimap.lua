@@ -18,6 +18,8 @@ local cell = Material( "crackdown2/ui/cell.png", "smooth" )
 
 local ping_locations = {}
 
+
+-- TODO: Also update location pinging.
 local uniqueid = 0
 function CD2:PingLocationTracker( id, pos, times, persist )
     id = id or uniqueid
@@ -73,6 +75,8 @@ local function DrawCoordsOnMiniMap( pos, ang, icon, iconsize, color)
     surface.DrawTexturedRectRotated( 200 + vec[ 1 ], ( ScrH() - 200 ) - vec[ 2 ], ScreenScale( iconsize ), ScreenScale( iconsize ), ( angs[ 2 ] ) )
 end
 
+
+-- TODO: Cleanup how icons are displayed on the minimap (perhaps set variables on particular entities that are read by the minimap?)
 function CD2.HUDCOMPONENENTS.components.Minimap( ply, scrw, scrh, hudscale )
     if !ply:Alive() then return end
 

@@ -21,12 +21,12 @@ end
 -- Connect messages --
 hook.Add( "PlayerConnect", "crackdown2_connectmessage", function( name )
     if game.SinglePlayer() then return end
-    CD2SetTextBoxText( name .. " joined the game" )
+    CD2:DispatchTextBox( name .. " joined the game" )
 end )
 
 gameevent.Listen( "player_disconnect" )
 
 hook.Add( "player_disconnect", "crackdown2_disconnectmessage", function( data )
     if game.SinglePlayer() then return end
-    CD2SetTextBoxText( data.name .. " left the game (" .. data.reason .. ")"  )
+    CD2:DispatchTextBox( data.name .. " left the game (" .. data.reason .. ")"  )
 end )

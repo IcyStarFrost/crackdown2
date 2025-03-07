@@ -1,9 +1,6 @@
 
 CD2Progressbars = CD2Progressbars or {}
 
-CD2.lockon = false
-
-
 function CD2RegisterProgressBar( ent, distance, priority, drawfunc )
     CD2Progressbars[ #CD2Progressbars + 1 ] = { ent = ent, priority = priority, distance = distance, drawfunc = drawfunc }
     table.sort( CD2Progressbars, function( a, b ) return a.priority > b.priority end )

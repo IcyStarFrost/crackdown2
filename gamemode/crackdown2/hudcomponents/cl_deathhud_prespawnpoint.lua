@@ -40,7 +40,7 @@ hook.Add( "CD2_ButtonPressed", "crackdown2_regeneratemenu", function( ply, butto
     if button == KEY_W and !game.SinglePlayer() and ( !ply.cd2_callforhelpcooldown or CurTime() > ply.cd2_callforhelpcooldown ) then
         net.Start( "cd2net_playercallforhelp" )
         net.SendToServer()
-        CD2SetTextBoxText( "Call for help has been sent to other Agents" )
+        CD2:DispatchTextBox( "Call for help has been sent to other Agents" )
 
         ply.cd2_callforhelpcooldown = CurTime() + 10
     end

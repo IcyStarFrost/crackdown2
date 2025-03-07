@@ -253,7 +253,7 @@ net.Receive( "cd2net_sendtext", function()
 end )
 
 net.Receive( "cd2net_sendtextboxmessage", function()
-    CD2SetTextBoxText( net.ReadString() )
+    CD2:DispatchTextBox( net.ReadString() )
 end )
 
 local energy = Material( "crackdown2/effects/energy.png" )

@@ -73,20 +73,23 @@ function ENT:Initialize()
             end
         end )
 
-        CD2RegisterProgressBar( self, 2000, 2, function()
+
+        CD2:SetupProgressBar( self, 2000, function( ply, index )
             if !GetConVar( "cd2_drawhud" ):GetBool() then return end
 
-            if self:GetLocationType() == "cell" and self:GetIsActive() and LocalPlayer():SqrRangeTo( self ) <= ( 2000 * 2000 ) then
+            local y = 100 * index
+
+            if self:GetLocationType() == "cell" and self:GetIsActive() then
                 surface_SetDrawColor( blackish )
                 draw_NoTexture()
-                surface_DrawRect( ScrW() - 350,  50, 300, 20 )
+                surface_DrawRect( ScrW() - 350,  50 + y, 300, 20 )
             
                 surface_SetDrawColor( linecol )
-                surface_DrawOutlinedRect( ScrW() - 350,  50, 300, 20, 1 )
+                surface_DrawOutlinedRect( ScrW() - 350,  50 + y, 300, 20, 1 )
             
                 surface_SetDrawColor( celltargetred )
                 surface_SetMaterial( cell )
-                surface_DrawTexturedRect( ScrW() - 420,  28, 64, 64 )
+                surface_DrawTexturedRect( ScrW() - 420,  28 + y, 64, 64 )
             
                 local max = self:GetMaxKillCount()
                 local count = self:GetKillCount()
@@ -96,11 +99,12 @@ function ENT:Initialize()
                     local x = ( ScrW() - 345 ) + ( wscale * ( i - 1 ) )
                     if x >= ScrW() - 395 and x + wscale / 2 <= ScrW() - 50 then
                         surface_SetDrawColor( celltargetred )
-                        surface_DrawRect( x, 55, ceil( wscale / 2 ), 10 )
+                        surface_DrawRect( x, 55 + y, ceil( wscale / 2 ), 10 )
                     end
                 end
                 return true
             end
+            
         end )
     end
 end

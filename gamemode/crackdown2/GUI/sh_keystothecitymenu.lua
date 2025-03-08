@@ -266,6 +266,13 @@ if CLIENT then
         end )
         --
 
+        AddOption( "Spawn AU", "Objects", "Button", { default = false }, function( pnl )
+            net.Start( "cd2net_kttc_spawnnpc" )
+            net.WriteString( "cd2_au" )
+            net.WriteAngle( CD2.viewangles )
+            net.SendToServer()
+        end )
+
         -- Cell --
         for ClassName, basetable in pairs( scripted_ents.GetList() ) do
             if basetable.Base != "cd2_combathumanbase" or basetable.t.cd2_Team != "cell" then continue end

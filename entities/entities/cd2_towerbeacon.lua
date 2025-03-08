@@ -76,7 +76,8 @@ function ENT:Initialize()
         self.cd2_lasthealth = 100
         self.cd2_nextfloatingenergyparticle = 0
 
-        CD2RegisterProgressBar( self, 2000, 100, self.HUDDraw )
+
+        CD2:SetupProgressBar( self, 2000, self.HUDDraw )
 
         hook.Add( "PreDrawEffects", self, function() self:DrawEffects() end )
     end
@@ -101,33 +102,35 @@ local glow = Material( "crackdown2/ui/sprite2.png" )
 local beam = Material( "crackdown2/effects/beam.png", "smooth" )
 local coreicons = { Material( "crackdown2/ui/core1.png", "smooth" ), Material( "crackdown2/ui/core2.png", "smooth" ), Material( "crackdown2/ui/core3.png", "smooth" ) }
 
-function ENT:HUDDraw()
-    if !LocalPlayer():Alive() then return end
+function ENT:HUDDraw( ply, index )
+    if !ply:Alive() then return end
     
-    if !self:GetIsCharging() and !self:GetIsDetonated() and LocalPlayer():SqrRangeTo( self ) < ( 300 * 300 ) and self:CanBeActivated() then
+    if !self:GetIsCharging() and !self:GetIsDetonated() and ply:SqrRangeTo( self ) < ( 300 * 300 ) and self:CanBeActivated() then
         local screen = ( self:GetPos() + Vector( 0, 0, 100 ) ):ToScreen()
         CD2:DrawInputBar( screen.x, screen.y, CD2:GetInteractKey2(), "Start Beacon Charge" )
     end
 
     if !self:GetIsCharging() then return end
 
+    local y = 100 * index
+
     -- Base
     surface.SetDrawColor( blackish )
     draw.NoTexture()
-    surface.DrawRect( ScrW() - 350,  40, 300, 64 )
+    surface.DrawRect( ScrW() - 350,  40 + y, 300, 64 )
     
     surface.SetDrawColor( linecol )
-    surface.DrawOutlinedRect( ScrW() - 350,  40, 300, 64, 1 )
+    surface.DrawOutlinedRect( ScrW() - 350,  40 + y, 300, 64, 1 )
     --
 
     -- Icon
     surface.SetDrawColor( self.cd2_corecolor )
     surface.SetMaterial( glow )
-    surface.DrawTexturedRect( ScrW() - 473,  5, 128, 128 )
+    surface.DrawTexturedRect( ScrW() - 473,  5 + y, 128, 128 )
 
     surface.SetDrawColor( color_white )
     surface.SetMaterial( coreicons[ self:GetCurrentCore() ] )
-    surface.DrawTexturedRect( ScrW() - 460,  25, 100, 100 )
+    surface.DrawTexturedRect( ScrW() - 460,  25 + y, 100, 100 )
 
     self.cd2_corecolor.r = Lerp( 1 * FrameTime(), self.cd2_corecolor.r, 0 )
     self.cd2_corecolor.g = Lerp( 1 * FrameTime(), self.cd2_corecolor.g, 110 )
@@ -140,19 +143,19 @@ function ENT:HUDDraw()
     
     -- Progress bar
     surface.SetDrawColor( chargecol )
-    surface.DrawRect( ScrW() - 340, 55, progressW, 10 )
+    surface.DrawRect( ScrW() - 340, 55 + y, progressW, 10 )
     
     surface.SetDrawColor( linecol )
-    surface.DrawOutlinedRect( ScrW() - 345,  50, 290, 20, 1 )
+    surface.DrawOutlinedRect( ScrW() - 345,  50 + y, 290, 20, 1 )
 
     local healthW = ( self:GetCurrentCoreHealth() / 100 ) * 280
     
     -- Health Bar
     surface.SetDrawColor( orangeish )
-    surface.DrawRect( ScrW() - 340, 80, healthW, 10 )
+    surface.DrawRect( ScrW() - 340, 80 + y, healthW, 10 )
     
     surface.SetDrawColor( linecol )
-    surface.DrawOutlinedRect( ScrW() - 345,  75, 290, 20, 1 )
+    surface.DrawOutlinedRect( ScrW() - 345,  75 + y, 290, 20, 1 )
     
     if self:GetCurrentCoreHealth() != lasthealth then
         self.cd2_corecolor.r = 255 

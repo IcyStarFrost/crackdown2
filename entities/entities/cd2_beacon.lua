@@ -134,26 +134,27 @@ function ENT:Initialize()
         local curtimed
         local lasthealth = 100
 
-        CD2RegisterProgressBar( self, 2000, 3, function() 
+        CD2:SetupProgressBar( self, 2000, function( ply, index )
             if !GetConVar( "cd2_drawhud" ):GetBool() then return end
             if self:GetIsDetonated() then hook.Remove( "HUDPaint", self ) return end
             if !LocalPlayer():IsCD2Agent() or !self.truedur or !self:GetIsCharging() then return end
             curtimed = curtimed or CurTime()
+            local y = 100 * index
 
 
             -- Base
             surface.SetDrawColor( blackish )
             draw.NoTexture()
-            surface.DrawRect( ScrW() - 350,  40, 300, 64 )
+            surface.DrawRect( ScrW() - 350,  40 + y, 300, 64 )
         
             surface.SetDrawColor( linecol )
-            surface.DrawOutlinedRect( ScrW() - 350,  40, 300, 64, 1 )
+            surface.DrawOutlinedRect( ScrW() - 350,  40 + y, 300, 64, 1 )
             --
 
             -- Icon
             surface.SetDrawColor( color_white )
             surface.SetMaterial( beaconicon )
-            surface.DrawTexturedRect( ScrW() - 420,  40, 64, 64 )
+            surface.DrawTexturedRect( ScrW() - 420,  40 + y, 64, 64 )
 
             beaconiconcol.r = Lerp( 1 * FrameTime(), beaconiconcol.r, 0 )
             beaconiconcol.g = Lerp( 1 * FrameTime(), beaconiconcol.g, 110 )
@@ -161,26 +162,26 @@ function ENT:Initialize()
 
             surface.SetDrawColor( beaconiconcol )
             surface.SetMaterial( glow )
-            surface.DrawTexturedRect( ScrW() - 452,  5, 128, 128 )
+            surface.DrawTexturedRect( ScrW() - 452,  5 + y, 128, 128 )
             --
         
             local progressW = ( ( CurTime() - curtimed ) / self.truedur ) * 280
         
             -- Beacon Progress bar
             surface.SetDrawColor( chargecol )
-            surface.DrawRect( ScrW() - 340, 55, progressW, 10 )
+            surface.DrawRect( ScrW() - 340, 55 + y, progressW, 10 )
         
             surface.SetDrawColor( linecol )
-            surface.DrawOutlinedRect( ScrW() - 345,  50, 290, 20, 1 )
+            surface.DrawOutlinedRect( ScrW() - 345,  50 + y, 290, 20, 1 )
 
             local healthW = ( self:GetBeaconHealth() / 100 ) * 280
         
             -- Beacon Health Bar
             surface.SetDrawColor( orangeish )
-            surface.DrawRect( ScrW() - 340, 80, healthW, 10 )
+            surface.DrawRect( ScrW() - 340, 80 + y, healthW, 10 )
         
             surface.SetDrawColor( linecol )
-            surface.DrawOutlinedRect( ScrW() - 345,  75, 290, 20, 1 )
+            surface.DrawOutlinedRect( ScrW() - 345,  75 + y, 290, 20, 1 )
             
             if self:GetBeaconHealth() != lasthealth then
                 beaconiconcol.r = 255 

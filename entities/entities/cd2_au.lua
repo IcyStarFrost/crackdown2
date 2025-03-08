@@ -19,7 +19,39 @@ function ENT:Initialize()
     if CLIENT then
         self.cd2_hasfiredbeam = false
 
-        CD2RegisterProgressBar( self, 300, 1, function()
+
+        CD2:SetupProgressBar( self, 300, function( ply, index )
+            if !GetConVar( "cd2_drawhud" ):GetBool() then return end
+            if self:GetActive() then return end
+
+            local y = 100 * index
+        
+            -- Base
+            surface.SetDrawColor( blackish )
+            draw.NoTexture()
+            surface.DrawRect( ScrW() - 350,  45 + y, 300, 30 )
+        
+            surface.SetDrawColor( linecol )
+            surface.DrawOutlinedRect( ScrW() - 350,  45 + y, 300, 30, 1 )
+            --
+
+            -- Icon
+            surface.SetDrawColor( color_white )
+            surface.SetMaterial( peacekeeper )
+            surface.DrawTexturedRect( ScrW() - 440,  30 + y, 80, 64 )
+            --
+
+            -- AU Progress bar
+            surface.SetDrawColor( beaconiconcol )
+            surface.DrawRect( ScrW() - 340, 55 + y, ( self:GetCharge() / 100 ) * 280, 10 )
+        
+            surface.SetDrawColor( linecol )
+            surface.DrawOutlinedRect( ScrW() - 345,  50 + y, 290, 20, 1 )
+
+            return true
+        end )
+
+       --[[  CD2RegisterProgressBar( self, 300, 1, function()
             if !GetConVar( "cd2_drawhud" ):GetBool() then return end
             if self:GetActive() then return end
         
@@ -45,7 +77,7 @@ function ENT:Initialize()
             surface.SetDrawColor( linecol )
             surface.DrawOutlinedRect( ScrW() - 345,  50, 290, 20, 1 )
             return true
-        end  )
+        end  ) ]]
 
         hook.Add( "PreDrawEffects", self, function()
             if self:GetActive() then

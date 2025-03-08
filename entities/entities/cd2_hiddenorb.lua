@@ -61,11 +61,8 @@ function ENT:OnCollected( ply )
 
         local totalcollected, total = self:GetAmountCollected( ply )
         
-        CD2:CreateThread( function()
-            CD2:SendTextBoxMessage( ply, "Collected " .. totalcollected .. " of " .. total .. " Hidden Orbs" )
-            coroutine.wait( 4 )
-            CD2:SendTextBoxMessage( ply, "Well done. You found an Hidden Orb! " .. totalcollected .. " Orbs of " .. total .. " collected." )
-        end )
+        CD2:SendTextBoxMessage( ply, "Collected " .. totalcollected .. " of " .. total .. " Hidden Orbs" )
+        CD2:SendTextBoxMessage( ply, "Well done. You found an Hidden Orb! " .. totalcollected .. " Orbs of " .. total .. " collected." )
 
         if !CD2:KeysToTheCity() and !ply.cd2_hadfirsthiddenorb then
             CD2:RequestPlayerData( ply, "cd2_firsthiddenorb", function( val ) 

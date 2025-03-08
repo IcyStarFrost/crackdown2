@@ -58,11 +58,8 @@ function ENT:OnCollected( ply )
 
         local totalcollected, total = self:GetAmountCollected( ply )
 
-        CD2:CreateThread( function()
-            CD2:SendTextBoxMessage( ply, "Collected " .. totalcollected .. " of " .. total .. " Online Orbs" )
-            coroutine.wait( 4 )
-            CD2:SendTextBoxMessage( ply, "Well done. You found an Online Orb! " .. totalcollected .. " Orbs of " .. total .. " collected." )
-        end )
+        CD2:SendTextBoxMessage( ply, "Collected " .. totalcollected .. " of " .. total .. " Online Orbs" )
+        CD2:SendTextBoxMessage( ply, "Well done. You found an Online Orb! " .. totalcollected .. " Orbs of " .. total .. " collected." )
 
         for i = 1, 6 do
             CD2:CreateSkillGainOrb( self:GetPos(), ply, "Agility", 2, agilityskillcolor )

@@ -60,11 +60,8 @@ function ENT:OnCollected( ply )
 
         local totalcollected, total = self:GetAmountCollected( ply )
 
-        CD2:CreateThread( function()
-            CD2:SendTextBoxMessage( ply, "Collected " .. totalcollected .. " of " .. total .. " Agility Orbs" )
-            coroutine.wait( 4 )
-            CD2:SendTextBoxMessage( ply, "Well done. You found an Agility Orb! " .. totalcollected .. " Orbs of " .. total .. " collected." )
-        end )
+        CD2:SendTextBoxMessage( ply, "Collected " .. totalcollected .. " of " .. total .. " Agility Orbs" )
+        CD2:SendTextBoxMessage( ply, "Well done. You found an Agility Orb! " .. totalcollected .. " Orbs of " .. total .. " collected." )
 
         if !CD2:KeysToTheCity() and !ply.cd2_InTutorial and !ply.cd2_hadfirstagilityorb then
             CD2:RequestPlayerData( ply, "cd2_firstagilityorb", function( val ) 

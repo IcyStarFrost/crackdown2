@@ -343,14 +343,17 @@ end
 function ENT:Think()
 
     if SERVER and game.SinglePlayer() and self.cd2_ShouldcheckPVS and CurTime() > self.cd2_PVSchecklimit then
-        if !Entity( 1 ):TestPVS( self ) and Entity( 1 ):SqrRangeTo( self ) > ( 1500 * 1500 )  or CD2_DisableAllAI then
-            self:SetIsDisabled( true )
-            if !Entity( 1 ):TestPVS( self ) and CurTime() > self.cd2_pvsremovetime then self:Remove() end
-        elseif Entity( 1 ):TestPVS( self ) and !CD2_DisableAllAI then 
-            self:SetIsDisabled( false )
+        if !Entity( 1 ):TestPVS( self ) and Entity( 1 ):SqrRangeTo( self ) > 1500 ^ 2 and CurTime() > self.cd2_pvsremovetime then
+            self:Remove()
         end
-        if Entity( 1 ):TestPVS( self ) or Entity( 1 ):SqrRangeTo( self ) < ( 1500 * 1500 ) then self.cd2_pvsremovetime = CurTime() + 10 end
-        self.cd2_PVSchecklimit = CurTime() + 1
+        if Entity( 1 ):TestPVS( self ) or Entity( 1 ):SqrRangeTo( self ) < 1500 ^ 2 then self.cd2_pvsremovetime = CurTime() + 10 end
+        self.cd2_PVSchecklimit = CurTime() + 2
+    end
+
+    if SERVER and CD2_DisableAllAI and !self:GetIsDisabled() then
+        self:SetIsDisabled( true )
+    elseif SERVER and !CD2_DisableAllAI and self:GetIsDisabled() then
+        self:SetIsDisabled( false )
     end
 
     if SERVER and self:Health() > 0 then

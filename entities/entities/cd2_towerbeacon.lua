@@ -102,7 +102,7 @@ local beam = Material( "crackdown2/effects/beam.png", "smooth" )
 local coreicons = { Material( "crackdown2/ui/core1.png", "smooth" ), Material( "crackdown2/ui/core2.png", "smooth" ), Material( "crackdown2/ui/core3.png", "smooth" ) }
 
 function ENT:HUDDraw()
-    if !ply:Alive() then return end
+    if !LocalPlayer():Alive() then return end
     
     if !self:GetIsCharging() and !self:GetIsDetonated() and LocalPlayer():SqrRangeTo( self ) < ( 300 * 300 ) and self:CanBeActivated() then
         local screen = ( self:GetPos() + Vector( 0, 0, 100 ) ):ToScreen()

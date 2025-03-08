@@ -4,7 +4,7 @@ function CD2.HUDCOMPONENENTS.components.DeathHud( ply, scrw, scrh, hudscale )
         CD2:DrawInputBar( scrw / 2.1, 200, KEY_E, "Regenerate" )
         CD2:DrawInputBar( scrw / 2, 250, KEY_R, "Regenerate at nearest spawn" )
 
-        if #player.GetAll() > 1 then
+        if player.GetCount() > 1 then
             CD2:DrawInputBar( scrw / 1.9, 300, KEY_W, "Hold to call for help" )
         end
 
@@ -37,7 +37,7 @@ hook.Add( "CD2_ButtonPressed", "crackdown2_regeneratemenu", function( ply, butto
     end
 
     -- Call for help --
-    if button == KEY_W and !game.SinglePlayer() and ( !ply.cd2_callforhelpcooldown or CurTime() > ply.cd2_callforhelpcooldown ) then
+    if button == KEY_W and player.GetCount() > 1 and !game.SinglePlayer() and ( !ply.cd2_callforhelpcooldown or CurTime() > ply.cd2_callforhelpcooldown ) then
         net.Start( "cd2net_playercallforhelp" )
         net.SendToServer()
         CD2:DispatchTextBox( "Call for help has been sent to other Agents" )

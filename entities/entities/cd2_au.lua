@@ -51,34 +51,6 @@ function ENT:Initialize()
             return true
         end )
 
-       --[[  CD2RegisterProgressBar( self, 300, 1, function()
-            if !GetConVar( "cd2_drawhud" ):GetBool() then return end
-            if self:GetActive() then return end
-        
-            -- Base
-            surface.SetDrawColor( blackish )
-            draw.NoTexture()
-            surface.DrawRect( ScrW() - 350,  45, 300, 30 )
-        
-            surface.SetDrawColor( linecol )
-            surface.DrawOutlinedRect( ScrW() - 350,  45, 300, 30, 1 )
-            --
-
-            -- Icon
-            surface.SetDrawColor( color_white )
-            surface.SetMaterial( peacekeeper )
-            surface.DrawTexturedRect( ScrW() - 440,  30, 80, 64 )
-            --
-
-            -- AU Progress bar
-            surface.SetDrawColor( beaconiconcol )
-            surface.DrawRect( ScrW() - 340, 55, ( self:GetCharge() / 100 ) * 280, 10 )
-        
-            surface.SetDrawColor( linecol )
-            surface.DrawOutlinedRect( ScrW() - 345,  50, 290, 20, 1 )
-            return true
-        end  ) ]]
-
         hook.Add( "PreDrawEffects", self, function()
             if self:GetActive() then
        

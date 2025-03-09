@@ -32,7 +32,7 @@ function CD2.HUDCOMPONENENTS.components.WeaponInfo( ply, scrw, scrh, hudscale )
             end
         end
 
-        if !IsValid( CD2_weaponpnl ) then
+        if !IsValid( CD2_weaponpnl ) and GetConVar( "cd2_drawhud" ):GetBool() then
             CD2_weaponpnl = vgui.Create( "DModelPanel", GetHUDPanel() )
             CD2_weaponpnl:SetModel( mdl )
             CD2_weaponpnl:SetPos( scrw - 400 , scrh - 100 )
@@ -57,7 +57,7 @@ function CD2.HUDCOMPONENENTS.components.WeaponInfo( ply, scrw, scrh, hudscale )
             function CD2_weaponpnl:LayoutEntity() end
             function thinkpanel:Paint( w, h ) end
             function thinkpanel:Think()
-                if CD2.InDropMenu or !ply:IsCD2Agent() or CD2.InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
+                if !GetConVar( "cd2_drawhud" ):GetBool() or CD2.InDropMenu or !ply:IsCD2Agent() or CD2.InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
                 local wep = ply:GetActiveWeapon()
                 if IsValid( CD2_weaponpnl ) and IsValid( wep ) then local ent = CD2_weaponpnl:GetEntity() ent:SetModel( wep:GetWeaponWorldModel() ) CD2_weaponpnl:SetLookAt( ent:OBBCenter() ) end
                 
@@ -78,7 +78,7 @@ function CD2.HUDCOMPONENENTS.components.WeaponInfo( ply, scrw, scrh, hudscale )
         surface.DrawOutlinedRect( scrw - 400, scrh - 130, 300, 30, 2 )
         surface.DrawOutlinedRect( scrw - 400, scrh - 100, 280, 60, 2 )
 
-        if !IsValid( CD2_equipmentpnl ) then
+        if !IsValid( CD2_equipmentpnl ) and GetConVar( "cd2_drawhud" ):GetBool() then
             local mdl = scripted_ents.Get( ply:GetEquipment() ).WorldModel
 
             CD2_equipmentpnl = vgui.Create( "DModelPanel", GetHUDPanel() )
@@ -105,7 +105,7 @@ function CD2.HUDCOMPONENENTS.components.WeaponInfo( ply, scrw, scrh, hudscale )
             function CD2_equipmentpnl:LayoutEntity() end
             function thinkpanel:Paint( w, h ) end
             function thinkpanel:Think()
-                if CD2.InDropMenu or !ply:IsCD2Agent() or CD2.InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
+                if !GetConVar( "cd2_drawhud" ):GetBool() or CD2.InDropMenu or !ply:IsCD2Agent() or CD2.InSpawnPointMenu or !ply:Alive() then self:GetParent():Remove() return end
 
                 if IsValid( CD2_equipmentpnl ) then
                     local mdl = scripted_ents.Get( ply:GetEquipment() ).WorldModel

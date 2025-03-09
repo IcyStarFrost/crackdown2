@@ -6,6 +6,9 @@ local hudcomponents = CD2.HUDCOMPONENENTS
 -- This was created so each hud component (I.e Crosshair) that was previously seen in the cl_game_hud.lua file can be seperated
 -- for organization purposes.
 hook.Add( "HUDPaint", "crackdown2_hudhandler", function()
+    if !GetConVar( "cd2_drawhud" ):GetBool() then return end
+
+    
     local scrw, scrh = ScrW(), ScrH()
     for name, func in pairs( hudcomponents.components ) do
         if hudcomponents[ "Draw" .. name ] == nil then

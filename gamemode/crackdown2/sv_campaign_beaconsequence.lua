@@ -80,7 +80,7 @@ function CD2:CreateBeaconSet( beacondata )
 
         if isactive then
             activeAUs = activeAUs + 1
-            timer.Simple( 0.1, function() au:EnableBeam() end )
+            timer.Simple( 0.1, function() au:SetActive( true ) end )
         end
     end
     --

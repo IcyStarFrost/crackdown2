@@ -1,5 +1,4 @@
 AddCSLuaFile()
-
 ENT.Base = "base_anim"
 
 local beaconblue = Color( 0, 217, 255 )
@@ -11,45 +10,16 @@ local peacekeeper = Material( "crackdown2/ui/peacekeeper.png", "smooth" )
 local beaconiconcol = Color( 0, 110, 255 )
 
 function ENT:Initialize()
-    self:SetModel( "models/props_combine/combinethumper002.mdl" )
-    self:SetModelScale( 0.5 )
+    if SERVER then
+        self:SetModel( "models/props_combine/combinethumper002.mdl" )
+        self:SetModelScale( 0.5 )
 
-    self.cd2_nextchargepoint = 0
+        self.au_nextcharge = 0
+    end
 
     if CLIENT then
-        self.cd2_hasfiredbeam = false
+        self.cd2_nextparticle = 0 
 
-
-        CD2:SetupProgressBar( self, 300, function( ply, index )
-            if !GetConVar( "cd2_drawhud" ):GetBool() then return end
-            if self:GetActive() then return end
-
-            local y = 100 * index
-        
-            -- Base
-            surface.SetDrawColor( blackish )
-            draw.NoTexture()
-            surface.DrawRect( ScrW() - 350,  45 + y, 300, 30 )
-        
-            surface.SetDrawColor( linecol )
-            surface.DrawOutlinedRect( ScrW() - 350,  45 + y, 300, 30, 1 )
-            --
-
-            -- Icon
-            surface.SetDrawColor( color_white )
-            surface.SetMaterial( peacekeeper )
-            surface.DrawTexturedRect( ScrW() - 440,  30 + y, 80, 64 )
-            --
-
-            -- AU Progress bar
-            surface.SetDrawColor( beaconiconcol )
-            surface.DrawRect( ScrW() - 340, 55 + y, ( self:GetCharge() / 100 ) * 280, 10 )
-        
-            surface.SetDrawColor( linecol )
-            surface.DrawOutlinedRect( ScrW() - 345,  50 + y, 290, 20, 1 )
-
-            return true
-        end )
 
         hook.Add( "PreDrawEffects", self, function()
             if self:GetActive() then
@@ -83,74 +53,58 @@ function ENT:Initialize()
                 end
             end
         end )
-    end
 
-    if CLIENT then self.cd2_nextparticle = 0 end
+
+        CD2:SetupProgressBar( self, 500, function( ply, index )
+            if !GetConVar( "cd2_drawhud" ):GetBool() then return end
+            if self:GetActive() then return end
+
+            local y = 100 * index
+        
+            -- Base
+            surface.SetDrawColor( blackish )
+            draw.NoTexture()
+            surface.DrawRect( ScrW() - 350,  45 + y, 300, 30 )
+        
+            surface.SetDrawColor( linecol )
+            surface.DrawOutlinedRect( ScrW() - 350,  45 + y, 300, 30, 1 )
+            --
+
+            -- Icon
+            surface.SetDrawColor( color_white )
+            surface.SetMaterial( peacekeeper )
+            surface.DrawTexturedRect( ScrW() - 440,  30 + y, 80, 64 )
+            --
+
+            -- AU Progress bar
+            surface.SetDrawColor( beaconiconcol )
+            surface.DrawRect( ScrW() - 340, 55 + y, ( self:GetCharge() / 100 ) * 280, 10 )
+        
+            surface.SetDrawColor( linecol )
+            surface.DrawOutlinedRect( ScrW() - 345,  50 + y, 290, 20, 1 )
+
+            return true
+        end )
+    end
 end
 
 function ENT:SetupDataTables()
     self:NetworkVar( "Float", 0, "Charge" )
     self:NetworkVar( "Int", 0, "AUGroupID" )
-    self:NetworkVar( "Bool", 0, "Active" )
     self:NetworkVar( "Vector", 0, "BeamPos" )
-end
-
-function ENT:TypingText() 
-    local AUs = ents.FindByClass( "cd2_au" )
-    local othercount = 0
-    for i = 1, #AUs do
-        local au = AUs[ i ]
-        if IsValid( au ) and au:GetActive() and au:GetAUGroupID() == self:GetAUGroupID() then
-            othercount = othercount + 1
-        end
-    end
-
-    local activecount = 0 
-    for i = 1, #AUs do 
-        local au = AUs[ i ]
-        if IsValid( au ) and au:GetActive() then activecount = activecount + 1 end
-    end
-
-    if !CD2:KeysToTheCity() and ( CD2.BeaconCount * 3 ) == activecount then
-        for k, v in ipairs( player.GetAll() ) do
-            v:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allau_achieve.mp3" )
-        end
-    end
-
-    if othercount == 3 then hook.Run( "CD2_PowerNetworkComplete", self:GetAUGroupID() ) end
-
-    for k, ply in ipairs( player.GetAll() ) do
-        if ply:SqrRangeTo( self ) > ( 1000 * 1000 ) then continue end
-        if othercount == 3 then
-            CD2:SetTypingText( ply, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\nA Beacon can now be deployed" )
-        elseif othercount > 0 then
-            CD2:SetTypingText( ply, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\n" .. othercount .. " of 3 units active" )
-        end
-
-    end
-end
-
-function ENT:EnableBeam() 
-    self:SetActive( true )
-end
-
-function ENT:OnRemove()
-    if CLIENT and IsValid( self.cd2_ambientsnd ) then
-        self.cd2_ambientsnd:Stop()
-    end
+    self:NetworkVar( "Bool", 0, "Active" )
 end
 
 function ENT:UpdateTransmitState()
     return TRANSMIT_ALWAYS
 end
 
-function ENT:Think()
 
-    if CLIENT and IsValid( self.cd2_ambientsnd ) then
-        self.cd2_ambientsnd:SetVolume( self:SqrRangeTo( LocalPlayer() ) > ( 1000 * 1000 ) and 0 or 1 )
-    end
+-- Takes care of all the ambient sounds and firing effects
+function ENT:HandleSounds()
+    if self:GetActive() and !IsValid( self.au_ambient ) and !self.au_attemptingambient then
+        self.au_attemptingambient = true
 
-    if CLIENT and !self.cd2_hasfiredbeam and self:GetActive() then
         sound.PlayFile( "sound/crackdown2/ambient/au/charged.mp3", " 3d mono noplay", function( snd, id, name )
             if id then return end
             snd:SetVolume( 2 )
@@ -165,62 +119,149 @@ function ENT:Think()
             snd:Play()
         end )
 
-        sound.PlayFile( "sound/crackdown2/ambient/au/auambient.mp3", " 3d mono noplay", function( snd, id, name )
-            if id then return end
-            self.cd2_ambientsnd = snd
+
+        sound.PlayFile( "sound/crackdown2/ambient/au/auambient.mp3", "3d mono noplay", function( snd )
+            self.au_ambient = snd
+            self.au_attemptingambient = false
             snd:EnableLooping( true )
             snd:SetVolume( 8 )
-            snd:Set3DFadeDistance( 300, 1000000000 )
+            snd:Set3DFadeDistance( 500, 1000000000 )
             snd:SetPos( self:GetPos() )
             snd:Play()
         end )
-        self.cd2_hasfiredbeam= true
     end
-
-    if CLIENT or self:GetActive() then return end
-
-    local nearplayers = CD2:FindInSphere( self:GetPos(), 100, function( ent ) return ent:IsCD2Agent() end )
-    if #nearplayers > 0 and CurTime() > self.cd2_nextchargepoint then
-        if !self.cd2_first then
-            self:EmitSound( "crackdown2/ambient/au/chargenew" .. math.random( 1, 4 ) .. ".mp3", 80 )
-            self.cd2_first = true
-        end
-        self:SetCharge( self:GetCharge() + ( 2 * #nearplayers ) )
-
-        if self:GetCharge() >= 100 then
-            self:EnableBeam() 
-            CD2:DebugMessage( self, "AU unit of Group " .. self:GetAUGroupID() .. " has been activated" )
-            hook.Run( "CD2_AUActivated", self )
-            self:TypingText() 
-
-            if !CD2:KeysToTheCity() then
-                for i = 1, #nearplayers do
-                    local ply = nearplayers[ i ]
-                    if ply.cd2_hadfirstau then continue end
-                    CD2:RequestPlayerData( ply, "cd2_firstau", function( val ) 
-                        if !val then
-                            ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firstau_achieve.mp3" )
-                            CD2:WritePlayerData( ply, "cd2_firstau", true )
-                        end
-                        ply.cd2_hadfirstau = true
-                    end )
-                end
-            end
-        end
-
-        if !self.cd2_nextsound or CurTime() > self.cd2_nextsound then
-            self:EmitSound( "plats/elevbell1.wav", 60, 200, 0.5 )
-            self.cd2_nextsound = CurTime() + 1
-        end
-
-        self.cd2_nextchargepoint = CurTime() + ( 0.1 / #nearplayers )
-    elseif #nearplayers == 0 then
-        self:SetCharge( Lerp( 1 * FrameTime(), self:GetCharge(), 0 ) )
-        self.cd2_first = false
-    end
-    
 end
 
-function ENT:Draw() 
-    self:DrawModel()
+-- Gets the total amount of players charging this AU
+function ENT:GetNearbyPlayerCount()
+    local total = 0
+    for _, ply in player.Iterator() do
+        if ply:IsCD2Agent() and ply:Alive() and ply:SqrRangeTo( self ) < 100 ^ 2 then
+            total = total + 1
+        end
+    end
+    return total
+end
+
+function ENT:CompletedText()
+
+    -- Get active AUs
+    local AUs = ents.FindByClass( "cd2_au" )
+    local totalactive = 0
+    local totalgroupactive = 0
+    for _, au in ipairs( AUs ) do
+        if au:GetActive() then
+            totalactive = totalactive + 1
+        end
+
+        if au:GetActive() and au:GetAUGroupID() == self:GetAUGroupID() then
+            totalgroupactive = totalgroupactive + 1
+        end
+    end
+
+    -- Achievement thing
+    if !CD2:KeysToTheCity() and ( CD2.BeaconCount * 3 ) == activecount then
+        for _, ply in player.Iterator() do
+            ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/allau_achieve.mp3" )
+        end
+    end
+
+    if totalgroupactive == 3 then
+        hook.Run( "CD2_PowerNetworkComplete", self:GetAUGroupID() )
+    end
+
+    for k, ply in player.Iterator() do
+        if ply:SqrRangeTo( self ) > 1000 ^ 2 then continue end
+
+        if totalgroupactive == 3 then
+            CD2:SetTypingText( ply, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\nA Beacon can now be deployed" )
+        elseif totalgroupactive > 0 then
+            CD2:SetTypingText( ply, "OBJECTIVE COMPLETE!", "Absorption Unit Activated\n" .. totalgroupactive .. " of 3 units active" )
+        end
+    end
+end
+
+-- Checks if this was a player's first AU activation
+function ENT:FirstPlyAUCheck()
+    if !CD2:KeysToTheCity() then
+        for _, ply in player.Iterator() do
+            if ply.cd2_hadfirstau or ply:SqrRangeTo( self ) > 100 ^ 2 then continue end
+
+            CD2:RequestPlayerData( ply, "cd2_firstau", function( val ) 
+                if !val then
+                    ply:PlayDirectorVoiceLine( "sound/crackdown2/vo/agencydirector/firstau_achieve.mp3" )
+                    CD2:WritePlayerData( ply, "cd2_firstau", true )
+                end
+                ply.cd2_hadfirstau = true
+            end )
+        end
+    end
+end
+
+function ENT:CompleteCharge()
+    self:SetActive( true )
+    CD2:DebugMessage( self, "AU unit of Group " .. self:GetAUGroupID() .. " has been activated" )
+    hook.Run( "CD2_AUActivated", self )
+
+    self:CompletedText()
+    self:FirstPlyAUCheck()
+end
+
+function ENT:Ping()
+    if !self.cd2_nextsound or CurTime() > self.cd2_nextsound then
+        self:EmitSound( "plats/elevbell1.wav", 60, 200, 0.5 )
+        self.cd2_nextsound = CurTime() + 1
+    end
+end
+
+function ENT:SpatialCharging()
+    local playersnear = false
+
+    for _, ply in player.Iterator() do
+        if ply:IsCD2Agent() and ply:Alive() and ply:SqrRangeTo( self ) < 100 ^ 2 then
+            playersnear = true
+
+            if CurTime() > self.au_nextcharge then
+                local nearestplayers = self:GetNearbyPlayerCount()
+
+                self:SetCharge( self:GetCharge() + ( 2 * nearestplayers ) )
+
+                self.au_nextcharge = CurTime() + ( 0.1 / nearestplayers )
+            end
+
+        end
+    end
+
+    
+
+    if playersnear then
+        self:Ping()
+
+        if !self.au_startedcharge then
+            self:EmitSound( "crackdown2/ambient/au/chargenew" .. math.random( 1, 4 ) .. ".mp3", 80 )
+            self.au_startedcharge = true
+        end
+    else
+        self.au_startedcharge = false
+
+        if self.au_nextcharge < CurTime() and self:GetCharge() > 0 then
+            self:SetCharge( self:GetCharge() - 1 )
+            self.au_nextcharge = CurTime() + 0.1
+        end
+    end
+end
+
+function ENT:Think()
+    if CLIENT then
+        self:HandleSounds()
+    end
+
+    if SERVER and !self:GetActive() then
+        self:SpatialCharging()
+    end
+
+    
+    if SERVER and self:GetCharge() >= 100 and !self:GetActive() then
+        self:CompleteCharge()
+    end
 end
